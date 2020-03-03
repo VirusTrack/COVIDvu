@@ -15,7 +15,7 @@ services:
             PIP_TRUSTED_HOST       : '${PIP_TRUSTED_HOST}'
         image: 'pr3d4t0r/covidvu:latest'
         ports:
-            - 127.0.0.1:8805:8888
+            - 127.0.0.1:8808:8888
             # For LAN availability:
             # - 8805:8888
         privileged: true
