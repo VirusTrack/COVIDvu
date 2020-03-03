@@ -75,6 +75,7 @@ def plotMultipleTimeSeriesDropdown(df,
     ----------
     df: A dataframe where the index are distinct time series to plot, and names are displayed as buttons.
         Columns are dates or times.
+    yLabel: Axis label of the y-axis
     titleLeft: The string to the left of the name of the time series in the title
     titleRight: The string to the right of the name of the time series in the title
     color: Color of the time series
@@ -85,7 +86,6 @@ def plotMultipleTimeSeriesDropdown(df,
     """
     names = list(df.index)
 
-    # Initialize figure
     fig = go.Figure(layout={"yaxis_title": yLabel,
                             "legend": {"itemsizing": "constant"},
                             "hovermode": "x"
