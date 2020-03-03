@@ -64,6 +64,7 @@ def plotTimeSeries(x: Union[list, tuple, Series, ndarray],
 
 
 def plotMultipleTimeSeriesDropdown(df,
+                                   yLabel='',
                                    titleLeft='',
                                    titleRight='',
                                    color='#690415',
@@ -85,7 +86,10 @@ def plotMultipleTimeSeriesDropdown(df,
     names = list(df.index)
 
     # Initialize figure
-    fig = go.Figure()
+    fig = go.Figure(layout={"yaxis_title": yLabel,
+                            "legend": {"itemsizing": "constant"},
+                            "hovermode": "x"
+                            })
 
     buttonsList = []
     for i, name in enumerate(names):
