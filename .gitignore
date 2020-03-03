@@ -136,6 +136,7 @@ dmypy.json
 **.jupyter
 **.local
 **.ssh/
+**/.cufflinks*
 **/.vim/*
 **/work/COVID-19
 *swp
