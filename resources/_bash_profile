@@ -1,0 +1,48 @@
+# .bash_profile
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+PATH=.:./bin:$PATH:$HOME/bin:/sbin:/usr/sbin:/usr/local/sbin:/usr/local/bin
+PS1="[\[\033[01;37m\]\$? \$(if [[ \$? == 0 ]]; then echo \"\[\033[01;32m\]:)\"; else echo \"\[\033[01;31m\]:(\"; fi) $(if [[ ${EUID} == 0 ]]; then echo '\[\033[01;31m\]\h'; else echo '\[\033[01;36m\]\u@\h'; fi)\[\033[01;33m\] \W \$\[\033[00m\]] "
+
+export PATH
+export PS1
+
+
+alias env='env | sort'
+alias grep='grep --color'
+alias ls='ls --color'
+alias sha2='shasum -a 256 -b'
+
+export EDITOR=vim
+export GIT_EDITOR="$EDITOR"
+export HISTSIZE=2000
+
+
+#
+# *** Docker ***
+#
+
+export MD_HOME="$HOME/development/muledocker"
+
+alias cls='docker ps -a'
+alias crm='docker rm'
+alias ctail='docker logs -f'
+alias ils='docker images'
+alias irm='docker rmi'
+
+alias activate='. bin/activate'
+
+
+set -o vi
+
+
+umask 002
+

@@ -127,3 +127,17 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# COVIDvu
+
+**.bash_*
+**.gitconfig
+**.jupyter
+**.local
+**.ssh/
+**/.vim/*
+**/work/COVID-19
+*swp
+.viminfo
+

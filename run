@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
+# *** functions ***
+
+function die {
+    echo "$1"
+    exit "$2"
+} # die
+
+
+function assertPackageIndexAvailability {
+    [[ -n "$DEVPI_HOST" ]] || die "DEVPI_HOST environment variable not set" 3
+    [[ -n "$PIP_TRUSTED_HOST" ]] || die "PIP_TRUSTED_HOST environment variable not set" 4
+
+    curl "$DEVPI_HOST" &> /dev/null || die "Package index server at $DEVPI_HOST is unavailable; start devpi-server" 6
+} # assertPackageIndexAvailability
+
+
+function checkDockerIsAvailable {
+    which docker-compose > /dev/null || die "docker-compose unavailable or not in path" 1
+} # checkDockerIsAvailable
+
+
+function checkDockerComposeFileExists {
+    [[ -e "./docker-compose.yaml" ]] || die "docker-compose.yaml is not present in pwd == $(pwd)" 2
+} # checkDockerComposeFileExists
+
+
+function setOwnership {
+    # Set ownership to the correct user:group to avoid conflicts
+    # between the internal Docker container user names and the 
+    # host's.
+    #
+    # This script resolves to the userID:groupID of the account
+    # from whence it was invoked.
+    #
+    # Documented method because Docker permissions and ownership
+    # kinda suck.
+    export JUPYTER_LAB_USER=$(id -u)
+    export JUPYTER_LAB_GROUP=$(id -g)
+} # setOwnership
+
+
+function configureHOME {
+    # Only for when this runs under $HOME/tmp in nena.cime.net!
+    # Ignore otherwise.  $HOME is unaltered in other boxen.
+    if [[ "Darwin" == $(uname) ]]
+    then
+        if [[ "nena.local" == $(hostname) ]]
+        then
+            export HOME=$(pwd | awk '{ gsub("/covidvu", ""); print; }')
+        fi
+    fi
+} # configureHOME
+
+
+function runJupyterScienceLab {
+    local covidvuContainer=$(docker ps | awk '$0 ~ "covidvu_cime_dev" { print($NF); }')
+
+    if [[ -n "$covidvuContainer" ]]
+    then
+        docker rm -f "$covidvuContainer"
+    fi
+
+   env | awk '/JUPYTER/ || /HOME/' | sort
+   docker-compose up --remove-orphans --no-recreate -d || docker-compose rm -f 
+} # runJupyterScienceLab
+
+
+# *** main ***
+
+assertPackageIndexAvailability
+checkDockerIsAvailable
+checkDockerComposeFileExists
+./perms
+setOwnership
+configureHOME
+runJupyterScienceLab
+
