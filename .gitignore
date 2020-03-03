@@ -129,7 +129,13 @@ dmypy.json
 .pyre/
 
 
-# pr3d
+# COVIDvu
 
+**.bash_*
+**.jupyter
+**.local
+**/.vim/*
 *swp
+.viminfo
+**/work/COVID-19
 
