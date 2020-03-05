@@ -9,18 +9,17 @@ services:
     covidvu_cime_dev:
         container_name: 'covidvu_cime_dev'
         environment:
+            DEVPI_HOST             : '${DEVPI_HOST}'
             GRANT_SUDO             : 'yes'
             JUPYTER_LAB_ENABLE     : 'yes'
+            PIP_TRUSTED_HOST       : '${PIP_TRUSTED_HOST}'
         image: 'pr3d4t0r/covidvu:latest'
         ports:
-            - 192.168.0.240:8808:8888
+            - 127.0.0.1:8808:8888
             # For LAN availability:
             # - 8805:8888
         privileged: true
-        # TODO: pr3d4t0r - fix the environment variables
-        # user: 'root:${JUPYTER_LAB_GROUP}'
-        user: 'root:users'
+        user: 'root:${JUPYTER_LAB_GROUP}'
         volumes:
-            # - '${HOME}/covidvu-project:/home/jovyan'
-            - '.:/home/jovyan'
+            - '${HOME}/covidvu:/home/jovyan'
 
