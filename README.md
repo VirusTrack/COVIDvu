@@ -11,5 +11,14 @@ Fork this project can GitHub at (pr3d4t0r/COVIDvu)[https://github.com/pr3d4t0r/C
 
 
 ---
+## Contributors
+
+|  GitHub  | Name              |
++----------+-------------------+
+| jaryaman | Dr. Juvid Aryaman |
+| pr3d4t0r | Eugene Ciurana    |
+
+
+---
 &#169; 2020 pr3d4t0r.  All rights reserved.
 
