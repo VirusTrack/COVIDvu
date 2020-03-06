@@ -16,6 +16,9 @@ this zero install container.
 
 ### Run from a Docker container, zero install
 
+Prerrequisites:  `docker-compose` must be available in the target system.  These
+instrutions are UNIX-specific.
+
 - Clone this repository
 
   `git clone https://github.com/pr3d4t0r/COVIDvu.git covidvu`
@@ -25,20 +28,58 @@ this zero install container.
   `cd covidvu`
 
 - Set the COVIDvu Jupyter working directory to the current directory by creating
-  a runtime configuration via the `run.env` file:
+  a runtime configuration via the `run.env` file
 
   ```
   cp run.env.SAMPLE run.env
   ```
 
-  Change it to reflect your development environment and preferences:
+  Change it to reflect your development environment and preferences
 
   ```
   export COVIDVU_JUPYTER_MOUNT_POINT="/Users/joeuser/development/covidvu"
-  export COVIDVU_NIC_BIND="127.0.0.1" # all interfaces
-  export COVIDVU_PORT_BIND="8808"	  # Jupyter default
+  export COVIDVU_NIC_BIND="127.0.0.1"
+  export COVIDVU_PORT_BIND="8808"
 
   ```
+
+- Start the container using the `./run` script
+
+  ```
+  ./run
+  ```
+
+  Wait until Docker pulls the latest image becaues the COVIDvu lab is based on
+  the 4.5 GB (JupyterLab Data Science Notebook Docker image](https://hub.docker.com/r/jupyter/datascience-notebook/)
+
+  A confirmation message appears in the console after the image pull completes
+  and the lab starts
+
+  ```
+  Status: Downloaded newer image for pr3d4t0r/covidvu:latest
+  Creating covidvu_cime_dev ... done
+  ```
+
+- Get the JupyterLab authentication token to confirm that the container is
+  running
+
+  ```
+  docker logs covidvu_cime_dev
+
+  # Output:
+
+      To access the notebook, open this file in a browser:
+        file:///home/jovyan/.local/share/jupyter/runtime/nbserver-17-open.html
+    Or copy and paste one of these URLs:
+        http://d57f7b87cf42:8888/?token=025c268f52a758f66112c115e5e407842c71de68be440475
+     or http://127.0.0.1:8888/?token=025c268f52a758f66112c115e5e407842c71de68be440475
+
+  ```
+
+- Open the JupyterLab by going to http://localhost:8808/lab, then enter the
+  authentication token in the appropriate box; choose a password to avoid this
+  step in the future
+  
 
 
 ---
