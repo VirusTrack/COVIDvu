@@ -1,3 +1,7 @@
+from ipywidgets import widgets
+from ipywidgets import interact
+from ipywidgets import fixed
+from ipywidgets import interact_manual
 from pandas.core.series import Series
 from pandas.core.indexes.base import Index
 from numpy import ndarray
@@ -5,6 +9,9 @@ from typing import Union
 from plotly.offline import init_notebook_mode
 import plotly.graph_objs as go
 import cufflinks as cf
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 cf.go_offline(connected=False)
 init_notebook_mode(connected=False)
@@ -64,10 +71,9 @@ def plotTimeSeries(x: Union[list, tuple, Series, ndarray],
 
 
 def plotMultipleTimeSeriesDropdown(df,
-                                   yLabel='',
-                                   titleLeft='',
-                                   titleRight='',
-                                   color='#690415',
+                                   dropDownValues,
+                                   log=False,
+                                   **kwargs
                                    ):
     """
 
@@ -84,51 +90,55 @@ def plotMultipleTimeSeriesDropdown(df,
     -------
     A plotly plot where buttons are rows of df, and each row corresponds to a time series.
     """
-    names = list(df.index)
+
+    yLabel = kwargs.get("yLabel")
+    assert yLabel
+    title = kwargs.get("title")
+    cmapName = kwargs.get("cmapName")
+
+    # filter out name we want
+    try:
+        df = df[list(dropDownValues)]
+        nvalues = len(list(dropDownValues))
+    except KeyError:
+        print(f"No countries {dropDownValues}. Did you know mitochondria have their own DNA?")
+        return
+
+    if cmapName is None:
+        cm = plt.get_cmap("jet")
+    else:
+        cm = plt.get_cmap(cmapName)
+
+    cols = cm((0.5 + np.arange(0, nvalues)) / float(nvalues))
+
+    if log:
+        yLabel = "Log10 " + yLabel
 
     fig = go.Figure(layout={"yaxis_title": yLabel,
                             "legend": {"itemsizing": "constant"},
-                            "hovermode": "x"
+                            "hovermode": "x",
+                            # "template": "plotly_dark"
                             })
 
-    buttonsList = []
-    for i, name in enumerate(names):
-        singleTS = df.loc[name]
-        if i == 0:
-            fig.add_trace(
-                go.Scatter(x=singleTS.index,
-                           y=singleTS,
-                           name=name,
-                           line=dict(color=color))
-            )
+    for ii, country_name in enumerate(dropDownValues):
+        df_this_country = df[country_name]
 
-        else:
-            fig.add_trace(
-                go.Scatter(x=singleTS.index,
-                           y=singleTS,
-                           name=name,
-                           visible=False,
-                           line=dict(color=color))
-            )
+        xvals = df_this_country.index
+        yvals = df_this_country.values
 
-        appearance = [False] * len(names)
-        appearance[i] = True
-        buttonsList.append(dict(label=name,
-                                method="update",
-                                args=[{"visible": appearance},
-                                      {"title": titleLeft+name+titleRight,
-                                       }]
-                                )
-                           )
+        if log:
+            yvals = np.log10(yvals + 1)
 
-    fig.update_layout(
-        updatemenus=[
-            dict(
-                active=0,
-                buttons=buttonsList,
-            )
-        ])
+        fig.add_trace(
+            go.Scatter(x=xvals,
+                       y=yvals,
+                       name=country_name,
+                       line=dict(color=f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{cols[ii][3]})'),
+                       showlegend=True,
+                       mode="lines+markers",
+                       marker={"size": 5})
+        )
 
-    fig.update_layout(title_text=titleLeft+names[0]+titleRight)
+    fig.update_layout(title_text=title)
 
     return fig
