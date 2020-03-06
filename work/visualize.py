@@ -70,25 +70,26 @@ def plotTimeSeries(x: Union[list, tuple, Series, ndarray],
         raise Exception('Invalid arguments')
 
 
-def plotMultipleTimeSeriesDropdown(df,
-                                   dropDownValues,
-                                   log=False,
-                                   **kwargs
-                                   ):
+def plotTimeSeriesInteractive(df,
+                              selectedColumns,
+                              log=False,
+                              **kwargs
+                              ):
     """
 
     Parameters
     ----------
-    df: A dataframe where the index are distinct time series to plot, and names are displayed as buttons.
-        Columns are dates or times.
-    yLabel: Axis label of the y-axis
-    titleLeft: The string to the left of the name of the time series in the title
-    titleRight: The string to the right of the name of the time series in the title
-    color: Color of the time series
+    df: A dataframe where the index is time and columns are distinct time series to plot
+    selectedColumns: The columns of the dataframe to plot
+    **kwargs: Non-widget arguments
+        - yLabel: The y-axis label
+        - title: The title of the plot (optional)
+        - cmapName: The name of the matplotlib colormap (optional)
+
 
     Returns
     -------
-    A plotly plot where buttons are rows of df, and each row corresponds to a time series.
+    A plotly plot of the selected time series
     """
 
     yLabel = kwargs.get("yLabel")
@@ -96,10 +97,19 @@ def plotMultipleTimeSeriesDropdown(df,
     title = kwargs.get("title")
     cmapName = kwargs.get("cmapName")
 
-    # filter out name we want
 
-    df = df[list(dropDownValues)]
-    nvalues = len(list(dropDownValues))
+    if isinstance(selectedColumns, str):
+        selectedColumns = [selectedColumns]
+        nvalues = 1
+    elif isinstance(selectedColumns, tuple):
+        selectedColumns = list(selectedColumns)
+        nvalues = len(list(selectedColumns))
+    elif isinstance(selectedColumns, list):
+        nvalues = len(selectedColumns)
+    else:
+        print('No columns selected')
+        return 
+    df = df[selectedColumns]
 
     if cmapName is None:
         cm = plt.get_cmap("nipy_spectral")
@@ -119,8 +129,8 @@ def plotMultipleTimeSeriesDropdown(df,
                             # "template": "plotly_dark"
                             })
 
-    for ii, country_name in enumerate(dropDownValues):
-        df_this_country = df[country_name]
+    for ii, columnName in enumerate(selectedColumns):
+        df_this_country = df[columnName]
 
         xvals = df_this_country.index
         yvals = df_this_country.values
@@ -135,7 +145,7 @@ def plotMultipleTimeSeriesDropdown(df,
         fig.add_trace(
             go.Scatter(x=xvals,
                        y=yvals,
-                       name=country_name,
+                       name=columnName,
                        line=dict(color=color),
                        showlegend=True,
                        mode="lines+markers",
