@@ -97,20 +97,19 @@ def plotMultipleTimeSeriesDropdown(df,
     cmapName = kwargs.get("cmapName")
 
     # filter out name we want
-    try:
-        df = df[list(dropDownValues)]
-        nvalues = len(list(dropDownValues))
-    except KeyError:
-        print(f"No countries {dropDownValues}. Did you know mitochondria have their own DNA?")
-        return
+
+    df = df[list(dropDownValues)]
+    nvalues = len(list(dropDownValues))
 
     if cmapName is None:
-        cm = plt.get_cmap("jet")
+        cm = plt.get_cmap("nipy_spectral")
     else:
         cm = plt.get_cmap(cmapName)
 
-    cols = cm((0.5 + np.arange(0, nvalues)) / float(nvalues))
-
+    if nvalues > 1:
+        cols = cm(np.arange(0, nvalues+1, nvalues/(nvalues-1))/nvalues)
+    else:
+        cols = cm(0.5)
     if log:
         yLabel = "Log10 " + yLabel
 
@@ -129,11 +128,15 @@ def plotMultipleTimeSeriesDropdown(df,
         if log:
             yvals = np.log10(yvals + 1)
 
+        if nvalues > 1:
+            color = f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{cols[ii][3]})'
+        else:
+            color = f'rgba({cols[0]},{cols[1]},{cols[2]},{cols[3]})'
         fig.add_trace(
             go.Scatter(x=xvals,
                        y=yvals,
                        name=country_name,
-                       line=dict(color=f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{cols[ii][3]})'),
+                       line=dict(color=color),
                        showlegend=True,
                        mode="lines+markers",
                        marker={"size": 5})
