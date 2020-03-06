@@ -136,6 +136,15 @@ That's it!
 
 
 ---
+## Live documentation
+
+Look at http://localhost:8808/notebooks/work/README.ipynb for helpful tools.
+The section _Improve the command prompt and environment_, for example, sets a
+`.bash_profile` with a better prompt, path, aliases, etc. that improve the 
+experience when working at the terminal prompt.
+
+
+---
 ## Project
 
 Fork this project GitHub at (pr3d4t0r/COVIDvu)[https://github.com/pr3d4t0r/COVIDvu]
