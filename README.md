@@ -164,5 +164,5 @@ Fork this project GitHub at (pr3d4t0r/COVIDvu)[https://github.com/pr3d4t0r/COVID
 
 
 ---
-&#169; 2020 pr3d4t0r.  All rights reserved.
+&#169; 2020 the COVIDvu Contributors team.  All rights reserved.
 
