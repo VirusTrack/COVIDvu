@@ -2,6 +2,15 @@
 # vim: set fileencoding=utf-8:
 
 
+# Environment:
+#
+# COVIDVU_JUPYTER_MOUNT_POINT   container mount point for /home/jovyanV
+# COVIDVU_NIC_BIND              container host IP address/NIC; can be 127.0.0.1
+#                               or 0.0.0.0
+# COVIDVU_PORT_BIND             container host port
+#
+# Set your custom environment values in ./run.env - Git ignores this file.
+
 version: '3'
 
 services:
@@ -13,14 +22,12 @@ services:
             JUPYTER_LAB_ENABLE     : 'yes'
         image: 'pr3d4t0r/covidvu:latest'
         ports:
-            - 192.168.0.240:8808:8888
+            - '${COVIDVU_NIC_BIND}:${COVIDVU_PORT_BIND}:8888'
             # For LAN availability:
             # - 8805:8888
         privileged: true
-        # TODO: pr3d4t0r - fix the environment variables
-        # user: 'root:${JUPYTER_LAB_GROUP}'
-        user: 'root:users'
+        user: 'root:${JUPYTER_LAB_GROUP}'
+        # user: 'root:users'
         volumes:
-            # - '${HOME}/covidvu-project:/home/jovyan'
-            - '.:/home/jovyan'
+            - ${COVIDVU_JUPYTER_MOUNT_POINT}:/home/jovyan
 
