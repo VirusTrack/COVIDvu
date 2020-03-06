@@ -149,8 +149,8 @@ experience when working at the terminal prompt.
 
 Fork this project GitHub at (pr3d4t0r/COVIDvu)[https://github.com/pr3d4t0r/COVIDvu]
 
-- (COVID-19 complete genome)[https://www.ncbi.nlm.nih.gov/nuccore/MN908947.3] (8 KB)
-- (Johns Hopkins University COVID-19 data sets)[https://github.com/CSSEGISandData/COVID-19] - GitHub
+- [COVID-19 complete genome](https://www.ncbi.nlm.nih.gov/nuccore/MN908947.3) (8 KB)
+- [Johns Hopkins University COVID-19 data sets](https://github.com/CSSEGISandData/COVID-19) - GitHub
 
 
 ---
