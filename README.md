@@ -79,7 +79,60 @@ instrutions are UNIX-specific.
 - Open the JupyterLab by going to http://localhost:8808/lab, then enter the
   authentication token in the appropriate box; choose a password to avoid this
   step in the future
-  
+
+
+- Open a terminal to verify that files and other work are managed by Git
+
+  ```
+  # Enter these commands in a JupyterLab terminal!
+  git branch -a
+
+  # Output: 
+
+  * master
+    remotes/origin/0006-Automatic-data-refresh
+    remotes/origin/0011-plot-untracked-outcomes
+    remotes/origin/0016-Front-end-scaffolding
+    remotes/origin/0021-Local-launch-instructions
+    remotes/origin/HEAD -> origin/master
+    remotes/origin/JA-refactor-interact
+    remotes/origin/master
+  ```
+
+Git, Python, Vim, and various tools are all available from the command line and
+in some of the existing notebooks.  Look at the `Makefile` to see what tools are
+installed to complement the JupyterLab setup.
+
+- Install the `plotly` and `cufflinks` packages and make them available to the
+  lab and notebooks, to confirm that everything is working as expected
+
+  ```
+  pip install plotly cufflinks
+  ```
+
+After careful consideration, the core team decided that embracing standard
+Python tools like `pip` is a better policy than managing packages and workflows
+using Anaconda.
+
+
+---
+## Run the COVIDvu notebook
+
+The system uses the Johns Hopkins University CSSE dataset to do its work.
+Pull the datasets they made available on GitHub via the README notebook at
+http://localhost:8808/notebooks/work/README.ipynb
+
+- Run the cells in the section _Get the latest data from Johns Hopkins CSSE_
+
+Due to limitations in how JupyterLab deals with Plotly and other third-party
+tools, the notebooks that display plots must be executed in the JupyterNotebook
+environment.  The plots will appear blank if the notebooks are executed inside
+the JupyterLab environment.
+
+Ready to generate the visualizations?  Go to http://localhost:8808/notebooks/work/COVIDvu.ipynb
+and execute all the cells in order.
+
+That's it!
 
 
 ---
