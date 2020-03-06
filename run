@@ -11,8 +11,8 @@ CONTAINER_SIG_FILE="/proc/1/cgroup"
 # Environment configuration:
 
 export COVIDVU_JUPYTER_MOUNT_POINT="."
-export COVIDVU_NIC_BIND="0.0.0.0" # all interfaces
-export COVIDVU_PORT_BIND="8888"	  # Jupyter default
+export COVIDVU_NIC_BIND="127.0.0.1" # localhost
+export COVIDVU_PORT_BIND="8888"	    # Jupyter default
 [[ -e 'run.env' ]] && source 'run.env'
 
 

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+# *** functions ***
+
+function die {
+    echo "$1"
+    exit "$2"
+} # die
+
+
+function assertCOVID19DirExists {
+    [[ -d "./COVID-19" ]] || die "" 0 # nothing to do; silent fail
+} # assertCOVID19DirExists
+
+
+# *** main ***
+
+assertCOVID19DirExists
+
