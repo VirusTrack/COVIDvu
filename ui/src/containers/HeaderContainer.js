@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { useHistory } from "react-router-dom"
 
@@ -18,12 +18,9 @@ export const HeaderContainer = ({activeItem}) => {
             <Navbar.Menu>
                 <Navbar.Segment align="end">
                     <Navbar.Item>
-                        <Button.Group>
-                        <Button color="primary" onClick={() => { history.push('/signup') }}>
-                            <strong>Sign up</strong>
+                        <Button color="primary">
+                            <strong>Reload</strong>
                         </Button>
-                        <Button color="light" onClick={() => { history.push('/login') }}>Log in</Button>
-                        </Button.Group>
                     </Navbar.Item>
                 </Navbar.Segment>
             </Navbar.Menu>
