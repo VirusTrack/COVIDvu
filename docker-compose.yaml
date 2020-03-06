@@ -23,11 +23,8 @@ services:
         image: 'pr3d4t0r/covidvu:latest'
         ports:
             - '${COVIDVU_NIC_BIND}:${COVIDVU_PORT_BIND}:8888'
-            # For LAN availability:
-            # - 8805:8888
         privileged: true
         user: 'root:${JUPYTER_LAB_GROUP}'
-        # user: 'root:users'
         volumes:
             - ${COVIDVU_JUPYTER_MOUNT_POINT}:/home/jovyan
 
