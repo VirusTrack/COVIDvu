@@ -11,6 +11,7 @@ import plotly.graph_objs as go
 import cufflinks as cf
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 cf.go_offline(connected=False)
 init_notebook_mode(connected=False)
@@ -68,8 +69,7 @@ def plotTimeSeries(x: Union[list, tuple, Series, ndarray],
     else:
         raise Exception('Invalid arguments')
 
-# TODO
-colours = ['red', 'blue', 'green', 'orange']
+
 def plotMultipleTimeSeriesDropdown(df,
                                    dropDownValues,
                                    log=False,
@@ -91,23 +91,33 @@ def plotMultipleTimeSeriesDropdown(df,
     A plotly plot where buttons are rows of df, and each row corresponds to a time series.
     """
 
-    #     if name_2:
-    #         name = name_2
-
-    ylabel = kwargs.get("y_label", "Total daily count")
-    color = kwargs.get("colour", "red")
+    yLabel = kwargs.get("yLabel")
+    assert yLabel
+    title = kwargs.get("title")
+    cmapName = kwargs.get("cmapName")
 
     # filter out name we want
     try:
         df = df[list(dropDownValues)]
+        nvalues = len(list(dropDownValues))
     except KeyError:
         print(f"No countries {dropDownValues}. Did you know mitochondria have their own DNA?")
         return
 
-    fig = go.Figure(layout={"yaxis_title": ylabel,
+    if cmapName is None:
+        cm = plt.get_cmap("jet")
+    else:
+        cm = plt.get_cmap(cmapName)
+
+    cols = cm((0.5 + np.arange(0, nvalues)) / float(nvalues))
+
+    if log:
+        yLabel = "Log10 " + yLabel
+
+    fig = go.Figure(layout={"yaxis_title": yLabel,
                             "legend": {"itemsizing": "constant"},
                             "hovermode": "x",
-                            #"template": "plotly_dark"
+                            # "template": "plotly_dark"
                             })
 
     for ii, country_name in enumerate(dropDownValues):
@@ -118,89 +128,17 @@ def plotMultipleTimeSeriesDropdown(df,
 
         if log:
             yvals = np.log10(yvals + 1)
-            ylabel = "log 10 " + ylabel
 
         fig.add_trace(
             go.Scatter(x=xvals,
                        y=yvals,
                        name=country_name,
-                       line=dict(color=colours[ii]),
+                       line=dict(color=f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{cols[ii][3]})'),
                        showlegend=True,
                        mode="lines+markers",
                        marker={"size": 5})
         )
 
-    fig.update_layout(title_text=ylabel)
+    fig.update_layout(title_text=title)
 
     return fig
-
-
-# def plotMultipleTimeSeriesDropdown(df,
-#                                    yLabel='',
-#                                    titleLeft='',
-#                                    titleRight='',
-#                                    color='#690415',
-#                                    ):
-#     """
-#
-#     Parameters
-#     ----------
-#     df: A dataframe where the index are distinct time series to plot, and names are displayed as buttons.
-#         Columns are dates or times.
-#     yLabel: Axis label of the y-axis
-#     titleLeft: The string to the left of the name of the time series in the title
-#     titleRight: The string to the right of the name of the time series in the title
-#     color: Color of the time series
-#
-#     Returns
-#     -------
-#     A plotly plot where buttons are rows of df, and each row corresponds to a time series.
-#     """
-#     names = list(df.index)
-#
-#     fig = go.Figure(layout={"yaxis_title": yLabel,
-#                             "legend": {"itemsizing": "constant"},
-#                             "hovermode": "x"
-#                             })
-#
-#     buttonsList = []
-#     for i, name in enumerate(names):
-#         singleTS = df.loc[name]
-#         if i == 0:
-#             fig.add_trace(
-#                 go.Scatter(x=singleTS.index,
-#                            y=singleTS,
-#                            name=name,
-#                            line=dict(color=color))
-#             )
-#
-#         else:
-#             fig.add_trace(
-#                 go.Scatter(x=singleTS.index,
-#                            y=singleTS,
-#                            name=name,
-#                            visible=False,
-#                            line=dict(color=color))
-#             )
-#
-#         appearance = [False] * len(names)
-#         appearance[i] = True
-#         buttonsList.append(dict(label=name,
-#                                 method="update",
-#                                 args=[{"visible": appearance},
-#                                       {"title": titleLeft+name+titleRight,
-#                                        }]
-#                                 )
-#                            )
-#
-#     fig.update_layout(
-#         updatemenus=[
-#             dict(
-#                 active=0,
-#                 buttons=buttonsList,
-#             )
-#         ])
-#
-#     fig.update_layout(title_text=titleLeft+names[0]+titleRight)
-#
-#     return fig
