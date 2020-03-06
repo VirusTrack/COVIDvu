@@ -3,6 +3,13 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
+# crontab compliant :)
+
+
+COVID_19_DIR="COVID-19"
+TMP_OUTPUT="/tmp/refreshdata.log"
+
+
 # *** functions ***
 
 function die {
@@ -12,11 +19,20 @@ function die {
 
 
 function assertCOVID19DirExists {
-    [[ -d "./COVID-19" ]] || die "" 0 # nothing to do; silent fail
+    [[ -d "./COVID-19" ]] || die "" 1 # nothing to do; silent fail
 } # assertCOVID19DirExists
 
 
 # *** main ***
 
 assertCOVID19DirExists
+
+echo "COVID-19 JS CSSE dataset refresh" > "$TMP_OUTPUT"
+pushd "$COVID_19_DIR" >> "$TMP_OUTPUT"
+git checkout master >> "$TMP_OUTPUT" 2> /dev/null
+git fetch >> "$TMP_OUTPUT"
+git pull >> "$TMP_OUTPUT"
+popd >> "$TMP_OUTPUT"
+cat "$TMP_OUTPUT"
+rm -f "$TMP_OUTPUT"
 
