@@ -139,10 +139,11 @@ dmypy.json
 **/.cufflinks*
 **/.vim/*
 **/work/COVID-19
+**run.env
 *swp
 .viminfo
 
-# virtualenv
+# Windows virtualenv
 work/env
 
 # pycharm

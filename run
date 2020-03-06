@@ -3,6 +3,18 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
+# Constants
+
+CONTAINER_SIG_FILE="/proc/1/cgroup"
+
+
+# Environment configuration:
+
+export COVIDVU_JUPYTER_MOUNT_POINT="."
+export COVIDVU_NIC_BIND="127.0.0.1" # localhost
+export COVIDVU_PORT_BIND="8888"	    # Jupyter default
+[[ -e 'run.env' ]] && source 'run.env'
+
 
 # *** functions ***
 
@@ -10,6 +22,15 @@ function die {
     echo "$1"
     exit "$2"
 } # die
+
+
+function assertNotInContainer {
+    if [[ "Linux" == $(uname) ]]
+    then
+        awk '/docker/ || /lxc/ { exit(99); }' "$CONTAINER_SIG_FILE"
+        [[ "$?" == 0 ]] || die "run failed - cannot execute inside a container" 5
+    fi
+} # assertNotInContainer
 
 
 function assertPackageIndexAvailability {
@@ -45,19 +66,6 @@ function setOwnership {
 } # setOwnership
 
 
-function configureHOME {
-    # Only for when this runs under $HOME/tmp in nena.cime.net!
-    # Ignore otherwise.  $HOME is unaltered in other boxen.
-    if [[ "Darwin" == $(uname) ]]
-    then
-        if [[ "nena.local" == $(hostname) ]]
-        then
-            export HOME=$(pwd | awk '{ gsub("/covidvu", ""); print; }')
-        fi
-    fi
-} # configureHOME
-
-
 function runJupyterScienceLab {
     local covidvuContainer=$(docker ps | awk '$0 ~ "covidvu_cime_dev" { print($NF); }')
 
@@ -66,18 +74,18 @@ function runJupyterScienceLab {
         docker rm -f "$covidvuContainer"
     fi
 
-   env | awk '/JUPYTER/ || /HOME/' | sort
+   env | awk '/COVIDVU/ || /JUPYTER/ || /HOME/' | sort
    docker-compose up --remove-orphans --no-recreate -d || docker-compose rm -f 
 } # runJupyterScienceLab
 
 
 # *** main ***
 
-assertPackageIndexAvailability
+assertNotInContainer
+# TODO:  https://github.com/pr3d4t0r/COVIDvu/issues/17
+# assertPackageIndexAvailability
 checkDockerIsAvailable
 checkDockerComposeFileExists
-./perms
 setOwnership
-configureHOME
-runJupyterScienceLab
+runJupyterScienceLab "$1"
 
