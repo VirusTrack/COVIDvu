@@ -131,7 +131,9 @@ dmypy.json
 
 # COVIDvu
 
+**.NERD*
 **.bash_*
+**.config
 **.gitconfig
 **.jupyter
 **.local
