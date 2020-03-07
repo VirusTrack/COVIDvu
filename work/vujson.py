@@ -9,6 +9,8 @@ import sys
 
 import pandas as pd
 
+import utils
+
 
 # *** initializations ***
 
@@ -26,9 +28,32 @@ JH_CSSE_FILE_RECOVERED = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Recove
 
 # *** functions ***
 
-def allCases(fileName = JH_CSSE_FILE_CONFIRMED):
-    return pd.read_csv(fileName).groupby(['Country/Region']).sum().T
+def allCases(fileName = JH_CSSE_FILE_CONFIRMED, includeGeoLocation = False):
+    cases = pd.read_csv(fileName).groupby(['Country/Region']).sum().T
 
+    if not includeGeoLocation:
+        cases       = cases.iloc[2:]
+        cases.index = pd.to_datetime(cases.index)
+        cases       = utils.computeGlobal(cases)
+        cases       = utils.computeCasesOutside( cases,
+                                                 [ 'Mainland China', '!Global' ],
+                                                 '!Outside Mainland China' )
+
+    return cases
+
+
+def allUSCases(fileName = JH_CSSE_FILE_CONFIRMED):
+    cases = pd.read_csv(JH_CSSE_FILE_CONFIRMED)
+    
+    casesUS = cases[cases['Country/Region']=='US'].drop('Country/Region', axis=1).set_index('Province/State').T
+    casesUS = casesUS.iloc[2:]
+    casesUS.index = pd.to_datetime(casesUS.index)
+    casesUS['!Total US'] = casesUS.sum(axis = 1)
+    casesUS.columns = [c.lstrip() for c in casesUS.columns]
+    casesUS = casesUS.reindex(sorted(casesUS.columns), axis = 1)
+
+    return casesUS
+    
 
 def dumpDataSourceAsJSONFor(cases, target = None, indent = 2):
     """
@@ -63,7 +88,7 @@ def _main(target):
 
     outputFileName = target+'.json'
 
-    dumpDataSourceAsJSONFor(allCases(sourceFileName), outputFileName)
+    dumpDataSourceAsJSONFor(allCases(sourceFileName, includeGeoLocation = True), outputFileName)
 
 
 # *** main ***

@@ -107,7 +107,8 @@ installed to complement the JupyterLab setup.
   lab and notebooks, to confirm that everything is working as expected
 
   ```
-  pip install plotly cufflinks
+  # In the ./work directory:
+  pip install -r requirements.txt
   ```
 
 After careful consideration, the core team decided that embracing standard
@@ -151,16 +152,6 @@ Fork this project GitHub at (pr3d4t0r/COVIDvu)[https://github.com/pr3d4t0r/COVID
 
 - [COVID-19 complete genome](https://www.ncbi.nlm.nih.gov/nuccore/MN908947.3) (8 KB)
 - [Johns Hopkins University COVID-19 data sets](https://github.com/CSSEGISandData/COVID-19) - GitHub
-
-
----
-## Contributors
-
-|  GitHub  | Name              |
-|----------|-------------------|
-| jaryaman | Dr. Juvid Aryaman |
-| pr3d4t0r | Eugene Ciurana    |
-| kinabalu | Andrew Lombardi   |
 
 
 ---
