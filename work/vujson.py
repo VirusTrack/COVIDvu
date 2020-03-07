@@ -8,6 +8,7 @@ import os
 import sys
 
 import pandas as pd
+import re
 
 import utils
 
@@ -42,12 +43,29 @@ def allCases(fileName = JH_CSSE_FILE_CONFIRMED, includeGeoLocation = False):
     return cases
 
 
+def _resampleByStateUS(casesUS):
+    states = []
+    stateCodes = pd.read_csv('stateCodesUS.csv')
+    for region in casesUS.columns:
+        try:
+            postalCode = re.search(r', ([A-Z][A-Z])', region).groups()[0]
+            code = stateCodes[stateCodes['postalCode'] == postalCode]
+            assert code.shape[0] == 1
+            states.append(code['state'].iloc[0])
+        except AttributeError:
+            states.append('Unassigned')
+    casesUS.columns = states
+    casesUS = casesUS.groupby(casesUS.columns, axis=1).sum()
+    return casesUS
+
+
 def allUSCases(fileName = JH_CSSE_FILE_CONFIRMED):
     cases = pd.read_csv(JH_CSSE_FILE_CONFIRMED)
     
     casesUS = cases[cases['Country/Region']=='US'].drop('Country/Region', axis=1).set_index('Province/State').T
     casesUS = casesUS.iloc[2:]
     casesUS.index = pd.to_datetime(casesUS.index)
+    casesUS = _resampleByStateUS(casesUS)
     casesUS['!Total US'] = casesUS.sum(axis = 1)
     casesUS.columns = [c.lstrip() for c in casesUS.columns]
     casesUS = casesUS.reindex(sorted(casesUS.columns), axis = 1)
