@@ -1,4 +1,11 @@
+#!/bin/bash
+
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
 from IPython import get_ipython
+
 
 def computeGlobal(df, globalName='!Global'):
     globalCases = df.sum(axis=1)
@@ -14,6 +21,7 @@ def computeCasesOutside(df, censoredCountries, censoredCountriesName):
     df[censoredCountriesName] = censored
     df = df.reindex(sorted(df.columns), axis=1)
     return df
+
 
 def autoReloadCode():
     """

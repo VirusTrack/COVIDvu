@@ -1,17 +1,25 @@
-from ipywidgets import widgets
-from ipywidgets import interact
+#!/bin/bash
+
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
 from ipywidgets import fixed
+from ipywidgets import interact
 from ipywidgets import interact_manual
-from pandas.core.series import Series
-from pandas.core.indexes.base import Index
+from ipywidgets import widgets
 from numpy import ndarray
-from typing import Union
+from pandas.core.indexes.base import Index
+from pandas.core.series import Series
 from plotly.offline import init_notebook_mode
-import plotly.graph_objs as go
+from typing import Union
+
 import cufflinks as cf
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.graph_objs as go
+
 
 cf.go_offline(connected=False)
 init_notebook_mode(connected=False)
