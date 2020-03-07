@@ -1,5 +1,5 @@
 {
-  "name": "covidvu-ui",
+  "name": "ui",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -17,11 +17,16 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0"
   },
+  "devDependencies": {
+    "npm-check": "^5.9.2"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "deploy": "npm run build && mv build/index.html build/200.html && surge build unruly-angle.surge.sh",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "upgrade-interactive": "npm-check --update"
   },
   "eslintConfig": {
     "extends": "react-app"
