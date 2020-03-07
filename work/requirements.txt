@@ -1,3 +1,7 @@
 cufflinks
+jupyter
 plotly
 pudb
+pandas
+matplotlib
+numpy 
