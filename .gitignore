@@ -140,7 +140,9 @@ dmypy.json
 **.ssh/
 **/.cufflinks*
 **/.vim/*
+**/work/*.tar.gz
 **/work/COVID-19
+**/work/last-update.txt
 **run.env
 *swp
 .viminfo
