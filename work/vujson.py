@@ -97,7 +97,7 @@ def _resampleByRegionUS(casesUS):
 
 
 def allUSCases(fileName = JH_CSSE_FILE_CONFIRMED):
-    cases = pd.read_csv(JH_CSSE_FILE_CONFIRMED)
+    cases = pd.read_csv(fileName)
     
     casesUS = cases[cases['Country/Region']=='US'].drop('Country/Region', axis=1).set_index('Province/State').T
     casesUS = casesUS.iloc[2:]
