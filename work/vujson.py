@@ -26,6 +26,13 @@ JH_CSSE_FILE_CONFIRMED = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Confir
 JH_CSSE_FILE_DEATHS    = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
 JH_CSSE_FILE_RECOVERED = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
 
+US_REGIONS = {
+    'Northeast': sorted([ 'CT', 'ME', 'MA', 'NH', 'RI', 'VT', 'NJ', 'NY', 'PA', ]),
+    'Midwest': sorted([ 'IL', 'IN', 'MI', 'OH', 'WI', 'IA', 'KS', 'MN', 'MO', 'NE', 'ND', 'SD', ]),
+    'South': sorted([ 'DE', 'GA', 'FL', 'MD', 'NC', 'SC', 'VA', 'DC', 'WV', 'AL', 'KY', 'MS', 'TN', 'AR', 'LA', 'OK', 'TX', ]),
+    'West': sorted([ 'AZ', 'CO', 'ID', 'MT', 'NV', 'NM', 'UT', 'WY', 'AK', 'CA', 'HI', 'OR', 'WA', ] ),
+}
+
 
 # *** functions ***
 
@@ -46,19 +53,46 @@ def allCases(fileName = JH_CSSE_FILE_CONFIRMED, includeGeoLocation = False):
 def _resampleByStateUS(casesUS):
     states = []
     stateCodes = pd.read_csv('stateCodesUS.csv')
-    for region in casesUS.columns:
-
-        postalCode = re.search(r', ([A-Z][A-Z])', region)
-        if postalCode:
-            code = stateCodes[stateCodes['postalCode'] == postalCode.groups()[0]]
+    for province in casesUS.columns:
+        match = re.search(r', ([A-Z][A-Z])', province)
+        if match:
+            postalCode = match.groups()[0]
+            code = stateCodes[stateCodes['postalCode'] == postalCode]
             assert code.shape[0] == 1
             states.append(code['state'].iloc[0])
-        elif 'Diamond Princess' in region:
+        elif 'Diamond Princess' in province:
             states.append('Diamond Princess')
         else:
             states.append('Unassigned')
     casesUS.columns = states
     casesUS = casesUS.groupby(casesUS.columns, axis=1).sum()
+    casesUS['!Total US'] = casesUS.sum(axis=1)
+    casesUS = casesUS.reindex(sorted(casesUS.columns), axis=1)
+    return casesUS
+
+
+def _resampleByRegionUS(casesUS):
+    regions = []
+    for province in casesUS.columns:
+        match = re.search(r', ([A-Z][A-Z])', province)
+        if match:
+            postalCode = match.groups()[0]
+            regionFound = False
+            for region in US_REGIONS:
+                if postalCode in US_REGIONS[region]:
+                    regions.append(region)
+                    regionFound = True
+                    break
+            if not regionFound:
+                raise ValueError(f'{postalCode} not found in US_REGIONS')
+        elif 'Diamond Princess' in province:
+            regions.append('Diamond Princess')
+        else:
+            regions.append('Unassigned')
+    casesUS.columns = regions
+    casesUS = casesUS.groupby(casesUS.columns, axis=1).sum()
+    casesUS['!Total US'] = casesUS.sum(axis=1)
+    casesUS = casesUS.reindex(sorted(casesUS.columns), axis=1)
     return casesUS
 
 
@@ -68,12 +102,10 @@ def allUSCases(fileName = JH_CSSE_FILE_CONFIRMED):
     casesUS = cases[cases['Country/Region']=='US'].drop('Country/Region', axis=1).set_index('Province/State').T
     casesUS = casesUS.iloc[2:]
     casesUS.index = pd.to_datetime(casesUS.index)
-    casesUS = _resampleByStateUS(casesUS)
-    casesUS['!Total US'] = casesUS.sum(axis = 1)
-    casesUS.columns = [c.lstrip() for c in casesUS.columns]
-    casesUS = casesUS.reindex(sorted(casesUS.columns), axis = 1)
+    casesByStateUS = _resampleByStateUS(casesUS.copy())
+    casesByRegionUS = _resampleByRegionUS(casesUS.copy())
 
-    return casesUS
+    return casesByStateUS, casesByRegionUS
     
 
 def dumpDataSourceAsJSONFor(cases, target = None, indent = 2):
