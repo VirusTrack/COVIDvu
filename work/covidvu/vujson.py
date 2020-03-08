@@ -10,7 +10,7 @@ import sys
 import pandas as pd
 import re
 
-import utils
+from covidvu import utils
 
 
 # *** initializations ***

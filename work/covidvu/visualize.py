@@ -3,11 +3,6 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
-
-from ipywidgets import fixed
-from ipywidgets import interact
-from ipywidgets import interact_manual
-from ipywidgets import widgets
 from numpy import ndarray
 from pandas.core.indexes.base import Index
 from pandas.core.series import Series
@@ -17,7 +12,6 @@ from typing import Union
 import cufflinks as cf
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import plotly.graph_objs as go
 
 
