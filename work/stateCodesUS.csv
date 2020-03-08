@@ -1,14 +1,14 @@
 state,abbreviation,postalCode
 Alabama,Ala.,AL
 Alaska,Alaska,AK
-AmericanSamoa,,AS
+American Samoa,,AS
 Arizona,Ariz.,AZ
 Arkansas,Ark.,AR
 California,Calif.,CA
 Colorado,Colo.,CO
 Connecticut,Conn.,CT
 Delaware,Del.,DE
-Dist.ofColumbia,D.C.,DC
+Washington D.C.,D.C.,DC
 Florida,Fla.,FL
 Georgia,Ga.,GA
 Guam,Guam,GU
@@ -22,7 +22,7 @@ Kentucky,Ky.,KY
 Louisiana,La.,LA
 Maine,Maine,ME
 Maryland,Md.,MD
-MarshallIslands,,MH
+Marshall Islands,,MH
 Massachusetts,Mass.,MA
 Michigan,Mich.,MI
 Micronesia,,FM
@@ -32,29 +32,29 @@ Missouri,Mo.,MO
 Montana,Mont.,MT
 Nebraska,Nebr.,NE
 Nevada,Nev.,NV
-NewHampshire,N.H.,NH
-NewJersey,N.J.,NJ
-NewMexico,N.M.,NM
-NewYork,N.Y.,NY
-NorthCarolina,N.C.,NC
-NorthDakota,N.D.,ND
-NorthernMarianas,,MP
+New Hampshire,N.H.,NH
+New Jersey,N.J.,NJ
+New Mexico,N.M.,NM
+New York,N.Y.,NY
+North Carolina,N.C.,NC
+North Dakota,N.D.,ND
+Northern Marianas,,MP
 Ohio,Ohio,OH
 Oklahoma,Okla.,OK
 Oregon,Ore.,OR
 Palau,,PW
 Pennsylvania,Pa.,PA
-PuertoRico,P.R.,PR
-RhodeIsland,R.I.,RI
-SouthCarolina,S.C.,SC
-SouthDakota,S.D.,SD
+Puerto Rico,P.R.,PR
+Rhode Island,R.I.,RI
+South Carolina,S.C.,SC
+South Dakota,S.D.,SD
 Tennessee,Tenn.,TN
 Texas,Tex.,TX
 Utah,Utah,UT
 Vermont,Vt.,VT
 Virginia,Va.,VA
-VirginIslands,V.I.,VI
+Virgin Islands,V.I.,VI
 Washington,Wash.,WA
-WestVirginia,W.Va.,WV
+West Virginia,W.Va.,WV
 Wisconsin,Wis.,WI
 Wyoming,Wyo.,WY
