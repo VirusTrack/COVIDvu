@@ -102,6 +102,7 @@ def allUSCases(fileName = JH_CSSE_FILE_CONFIRMED):
     casesUS = cases[cases['Country/Region']=='US'].drop('Country/Region', axis=1).set_index('Province/State').T
     casesUS = casesUS.iloc[2:]
     casesUS.index = pd.to_datetime(casesUS.index)
+    casesUS.index = casesUS.index.map(lambda s: s.date())
     casesByStateUS = _resampleByStateUS(casesUS.copy())
     casesByRegionUS = _resampleByRegionUS(casesUS.copy())
 
