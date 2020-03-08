@@ -6,6 +6,13 @@ from covidvu.utils import computeGlobal
 from covidvu.utils import computeCasesOutside
 from covidvu.utils import autoReloadCode
 
+# *** constants ***
+
+
+# *** functions ***
+
+
+# *** tests ***
 def test_computeGlobal():
     # TODO
     pass
