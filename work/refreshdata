@@ -33,6 +33,9 @@ git checkout master >> "$TMP_OUTPUT" 2> /dev/null
 git fetch >> "$TMP_OUTPUT"
 git pull >> "$TMP_OUTPUT"
 popd >> "$TMP_OUTPUT"
-cat "$TMP_OUTPUT"
+cat "$TMP_OUTPUT" > last-update.txt
 rm -f "$TMP_OUTPUT"
+
+timeStamp=$(date +"%Y%m%d.%H%M%S")
+printf "\nCompleted on %s\n" "$timeStamp" >> last-update.txt
 
