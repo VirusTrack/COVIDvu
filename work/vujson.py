@@ -106,9 +106,14 @@ def allUSCases(fileName = JH_CSSE_FILE_CONFIRMED):
     casesByRegionUS = _resampleByRegionUS(casesUS.copy())
 
     return casesByStateUS, casesByRegionUS
-    
 
-def dumpDataSourceAsJSONFor(cases, target = None, indent = 2):
+
+def _dumpJSON(cases, target):
+    with open(target, 'w') as outputJSON:
+        json.dump(cases, outputJSON)
+
+
+def dumpGlobalCasesAsJSONFor(cases, target = None, indent = 2):
     """
         cases:  dataframe output from the allCases() function; confirmed,
                 deaths, recovered
@@ -123,8 +128,19 @@ def dumpDataSourceAsJSONFor(cases, target = None, indent = 2):
     result = json.loads(result)['data']
 
     if target:
-        with open(target, 'w') as outputJSON:
-            json.dump(result, outputJSON)
+        _dumpJSON(result, target)
+
+    return result
+
+
+def dumpUSCasesAsJSONFor(cases, target = None, scope = 'US', indent = 2):
+    keys        = cases.keys()
+    cases.index = cases.index.map(lambda s: s.strftime('%m/%d/%Y'))
+    result    = cases[keys].to_dict()
+    target    = target.replace('.json', '-%s.json' % scope)
+
+    if target:
+        _dumpJSON(result, target)
 
     return result
 
@@ -139,9 +155,13 @@ def _main(target):
     else:
         raise NotImplementedError
 
+    casesUS, \
+    casesUSRegions = allUSCases(sourceFileName)
     outputFileName = target+'.json'
 
-    dumpDataSourceAsJSONFor(allCases(sourceFileName, includeGeoLocation = True), outputFileName)
+    dumpGlobalCasesAsJSONFor(allCases(sourceFileName, includeGeoLocation = True), outputFileName)
+    dumpUSCasesAsJSONFor(casesUS, outputFileName)
+    dumpUSCasesAsJSONFor(casesUSRegions, outputFileName, 'US-Regions')
 
 
 # *** main ***
