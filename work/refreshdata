@@ -13,7 +13,7 @@ TMP_OUTPUT="/tmp/refreshdata.log"
 # *** functions ***
 
 function die {
-    echo "$1"
+    echo "[Error $2] - $1" | tee ERROR.txt
     exit "$2"
 } # die
 
