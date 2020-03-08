@@ -56,21 +56,21 @@ def plotTimeSeries(x: Union[list, tuple, Series, ndarray],
     if isinstance(x, (list, tuple)) and isinstance(y, (list, tuple)) and isinstance(name, (list, tuple)):
         for i, values in enumerate(zip(x, y)):
             xi, yi = values
-            fig.add_trace(go.Scatter(x=xi,
-                                     y=yi,
-                                     mode="lines",
-                                     name=name[i],
-                                     line=dict(color=color[i]),
+            fig.add_trace(go.Scatter(x    = xi,
+                                     y    = yi,
+                                     mode = "lines",
+                                     name = name[i],
+                                     line = dict(color=color[i]),
                                      )
                           )
         return fig
     # single time series
     elif isinstance(x, (Series, ndarray, Index)) and isinstance(y, (Series, ndarray)) and isinstance(name, str):
-        fig.add_trace(go.Scatter(x=x,
-                                 y=y,
-                                 mode="lines",
-                                 name=name,
-                                 line=dict(color=color)
+        fig.add_trace(go.Scatter(x    = x,
+                                 y    = y,
+                                 mode = "lines",
+                                 name = name,
+                                 line = dict(color=color)
                                  )
                       )
         return fig
@@ -80,7 +80,7 @@ def plotTimeSeries(x: Union[list, tuple, Series, ndarray],
 
 def plotTimeSeriesInteractive(df,
                               selectedColumns,
-                              log=False,
+                              log = False,
                               **kwargs
                               ):
     """
@@ -151,13 +151,14 @@ def plotTimeSeriesInteractive(df,
         else:
             color = f'rgba({cols[0]},{cols[1]},{cols[2]},{cols[3]})'
         fig.add_trace(
-            go.Scatter(x=xvals,
-                       y=yvals,
-                       name=columnName,
-                       line=dict(color=color),
-                       showlegend=True,
-                       mode="lines+markers",
-                       marker={"size": 5})
+            go.Scatter(x          = xvals,
+                       y          = yvals,
+                       name       = columnName,
+                       line       = dict(color=color),
+                       showlegend = True,
+                       mode       = "lines+markers",
+                       marker={"size": 5},
+                       )
         )
 
     fig.update_layout(title_text=title)

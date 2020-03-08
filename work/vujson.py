@@ -51,23 +51,23 @@ def allCases(fileName = JH_CSSE_FILE_CONFIRMED, includeGeoLocation = False):
 
 
 def _resampleByStateUS(casesUS):
-    states = []
+    states     = []
     stateCodes = pd.read_csv('stateCodesUS.csv')
     for province in casesUS.columns:
         match = re.search(r', ([A-Z][A-Z])', province)
         if match:
             postalCode = match.groups()[0]
-            code = stateCodes[stateCodes['postalCode'] == postalCode]
+            code       = stateCodes[stateCodes['postalCode'] == postalCode]
             assert code.shape[0] == 1
             states.append(code['state'].iloc[0])
         elif 'Diamond Princess' in province:
             states.append('Diamond Princess')
         else:
             states.append('Unassigned')
-    casesUS.columns = states
-    casesUS = casesUS.groupby(casesUS.columns, axis=1).sum()
+    casesUS.columns      = states
+    casesUS              = casesUS.groupby(casesUS.columns, axis=1).sum()
     casesUS['!Total US'] = casesUS.sum(axis=1)
-    casesUS = casesUS.reindex(sorted(casesUS.columns), axis=1)
+    casesUS              = casesUS.reindex(sorted(casesUS.columns), axis=1)
     return casesUS
 
 
@@ -76,7 +76,7 @@ def _resampleByRegionUS(casesUS):
     for province in casesUS.columns:
         match = re.search(r', ([A-Z][A-Z])', province)
         if match:
-            postalCode = match.groups()[0]
+            postalCode  = match.groups()[0]
             regionFound = False
             for region in US_REGIONS:
                 if postalCode in US_REGIONS[region]:
@@ -89,21 +89,21 @@ def _resampleByRegionUS(casesUS):
             regions.append('Diamond Princess')
         else:
             regions.append('Unassigned')
-    casesUS.columns = regions
-    casesUS = casesUS.groupby(casesUS.columns, axis=1).sum()
+    casesUS.columns      = regions
+    casesUS              = casesUS.groupby(casesUS.columns, axis=1).sum()
     casesUS['!Total US'] = casesUS.sum(axis=1)
-    casesUS = casesUS.reindex(sorted(casesUS.columns), axis=1)
+    casesUS              = casesUS.reindex(sorted(casesUS.columns), axis=1)
     return casesUS
 
 
 def allUSCases(fileName = JH_CSSE_FILE_CONFIRMED):
     cases = pd.read_csv(fileName)
     
-    casesUS = cases[cases['Country/Region']=='US'].drop('Country/Region', axis=1).set_index('Province/State').T
-    casesUS = casesUS.iloc[2:]
-    casesUS.index = pd.to_datetime(casesUS.index)
-    casesUS.index = casesUS.index.map(lambda s: s.date())
-    casesByStateUS = _resampleByStateUS(casesUS.copy())
+    casesUS         = cases[cases['Country/Region']=='US'].drop('Country/Region', axis=1).set_index('Province/State').T
+    casesUS         = casesUS.iloc[2:]
+    casesUS.index   = pd.to_datetime(casesUS.index)
+    casesUS.index   = casesUS.index.map(lambda s: s.date())
+    casesByStateUS  = _resampleByStateUS(casesUS.copy())
     casesByRegionUS = _resampleByRegionUS(casesUS.copy())
 
     return casesByStateUS, casesByRegionUS
