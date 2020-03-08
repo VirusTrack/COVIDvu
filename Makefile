@@ -3,7 +3,7 @@
 
 
 DOCKER_IMAGE=pr3d4t0r/covidvu
-DOCKER_VERSION=1.0.2
+DOCKER_VERSION=1.0.3
 
 include ./build.mk
 

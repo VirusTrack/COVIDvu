@@ -140,12 +140,13 @@ dmypy.json
 **.ssh/
 **/.cufflinks*
 **/.vim/*
+**/work/*.tar.gz
 **/work/COVID-19
 **/work/last-update.txt
-work/*.json
 **run.env
 *swp
 .viminfo
+work/*.json
 
 # Windows virtualenv
 work/env
