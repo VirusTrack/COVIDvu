@@ -47,12 +47,15 @@ def _resampleByStateUS(casesUS):
     states = []
     stateCodes = pd.read_csv('stateCodesUS.csv')
     for region in casesUS.columns:
-        try:
-            postalCode = re.search(r', ([A-Z][A-Z])', region).groups()[0]
-            code = stateCodes[stateCodes['postalCode'] == postalCode]
+
+        postalCode = re.search(r', ([A-Z][A-Z])', region)
+        if postalCode:
+            code = stateCodes[stateCodes['postalCode'] == postalCode.groups()[0]]
             assert code.shape[0] == 1
             states.append(code['state'].iloc[0])
-        except AttributeError:
+        elif 'Diamond Princess' in region:
+            states.append('Diamond Princess')
+        else:
             states.append('Unassigned')
     casesUS.columns = states
     casesUS = casesUS.groupby(casesUS.columns, axis=1).sum()
