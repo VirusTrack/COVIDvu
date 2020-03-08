@@ -25,6 +25,7 @@ JH_CSSE_PATH           = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOM
 JH_CSSE_FILE_CONFIRMED = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
 JH_CSSE_FILE_DEATHS    = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
 JH_CSSE_FILE_RECOVERED = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
+STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 
 US_REGIONS = {
     'Northeast': sorted([ 'CT', 'ME', 'MA', 'NH', 'RI', 'VT', 'NJ', 'NY', 'PA', ]),
@@ -52,7 +53,7 @@ def allCases(fileName = JH_CSSE_FILE_CONFIRMED, includeGeoLocation = False):
 
 def _resampleByStateUS(casesUS):
     states     = []
-    stateCodes = pd.read_csv('stateCodesUS.csv')
+    stateCodes = pd.read_csv(STATE_CODES_PATH)
     for province in casesUS.columns:
         match = re.search(r', ([A-Z][A-Z])', province)
         if match:
@@ -64,8 +65,14 @@ def _resampleByStateUS(casesUS):
             states.append('Diamond Princess')
         else:
             states.append('Unassigned')
+
     casesUS.columns      = states
     casesUS              = casesUS.groupby(casesUS.columns, axis=1).sum()
+
+    statesWithoutCases   = stateCodes[~stateCodes['state'].isin(casesUS.columns)]['state']
+    for stateName in statesWithoutCases:
+        casesUS[stateName] = 0
+
     casesUS['!Total US'] = casesUS.sum(axis=1)
     casesUS              = casesUS.reindex(sorted(casesUS.columns), axis=1)
     return casesUS
