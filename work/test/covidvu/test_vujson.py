@@ -2,6 +2,8 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE
 # vim: set fileencoding=utf-8:
 
+from covidvu.vujson import STATE_CODES_PATH
+from covidvu.vujson import US_REGIONS
 from covidvu.vujson import allCases
 from covidvu.vujson import _resampleByStateUS
 from covidvu.vujson import _resampleByRegionUS
@@ -13,6 +15,7 @@ from covidvu.vujson import dumpUSCasesAsJSONFor
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.datetimes import DatetimeIndex
 import os
+import pandas as pd
 
 
 # *** constants ***
@@ -27,6 +30,14 @@ TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 
 
 # *** tests ***
+def test_STATE_CODES_PATH():
+    assert os.path.exists(STATE_CODES_PATH)
+
+
+def test_US_REGIONS():
+    assert isinstance(US_REGIONS, dict)
+    assert isinstance(US_REGIONS['Northeast'], list)
+
 def test_allCases():
     confirmedCases = allCases(fileName = TEST_JH_CSSE_FILE_CONFIRMED)
     assert isinstance(confirmedCases, DataFrame)
@@ -35,16 +46,36 @@ def test_allCases():
     assert "!Outside Mainland China" in confirmedCases.columns
 
 def test__resampleByStateUS():
-    # TODO
-    pass
+    cases          = pd.read_csv(TEST_JH_CSSE_FILE_CONFIRMED)
+    casesUS        = cases[cases['Country/Region'] == 'US'].drop('Country/Region', axis=1).set_index('Province/State').T
+    casesUS        = casesUS.iloc[2:]
+    casesUS.index  = pd.to_datetime(casesUS.index)
+    casesUS.index  = casesUS.index.map(lambda s: s.date())
+    casesByStateUS =  _resampleByStateUS(casesUS.copy())
+    states = pd.read_csv(STATE_CODES_PATH)['state']
+    assert isinstance(casesByStateUS, DataFrame)
+    assert isinstance(casesByStateUS.index, DatetimeIndex)
+    assert states.isin(casesByStateUS.columns).all()
+    return casesUS
+
 
 def test__resampleByRegionUS():
-    #TODO
-    pass
+    casesUS         = test__resampleByStateUS()
+    casesByRegionUS = _resampleByRegionUS(casesUS)
+    assert isinstance(casesByRegionUS, DataFrame)
+    assert isinstance(casesByRegionUS.index, DatetimeIndex)
+    assert pd.DataFrame(US_REGIONS.keys()).isin(casesByRegionUS.columns).values.all()
 
 def test_allUSCases():
-    # TODO
-    pass
+    casesByStateUS, casesByRegionUS = allUSCases(TEST_JH_CSSE_FILE_CONFIRMED)
+    states = pd.read_csv(STATE_CODES_PATH)['state']
+
+    assert isinstance(casesByStateUS, DataFrame)
+    assert isinstance(casesByStateUS.index, DatetimeIndex)
+    assert states.isin(casesByStateUS.columns).all()
+    assert isinstance(casesByRegionUS, DataFrame)
+    assert isinstance(casesByRegionUS.index, DatetimeIndex)
+    assert pd.DataFrame(US_REGIONS.keys()).isin(casesByRegionUS.columns).values.all()
 
 def test__dumpJSON():
     #TODO
