@@ -6,16 +6,28 @@
 # crontab compliant :)
 
 
+CONFIG_rclone="rclone.conf"
 COVID_19_DIR="COVID-19"
+JSON_DATA_BUNDLE="COVID19-cases.tar.gz"
+SITE_BUCKET="virustrack.live"
+SITE_DATA_DIR="site-data"
 TMP_OUTPUT="/tmp/refreshdata.log"
+UPDATE_NOTICE_FILE="last-update.txt"
+UPDATE_NOTICE="$SITE_DATA_DIR/$UPDATE_NOTICE_FILE"
+UPDATE_ERROR="$SITE_DATA_DIR/ERROR.txt"
 
 
 # *** functions ***
 
 function die {
-    echo "$1"
+    echo "[Error $2] - $1" | tee "$UPDATE_ERROR"
     exit "$2"
 } # die
+
+
+function resetErrorNotification {
+    [[ -e "$UPDATE_ERROR" ]] && rm -f "$UPDATE_ERROR"
+} # resetErrorNotification
 
 
 function assertCOVID19DirExists {
@@ -23,16 +35,70 @@ function assertCOVID19DirExists {
 } # assertCOVID19DirExists
 
 
+function assert_rcloneConfig {
+    [[ -e "$CONFIG_rclone" ]] || die "rclone not found" 2
+} # assert_rcloneConfig
+
+
+function assertSiteDataExists {
+    if [[ ! -d "$SITE_DATA_DIR" ]]
+    then
+        echo "creating $SITE_DATA_DIR"
+        mkdir -p "$SITE_DATA_DIR" || die "failed to create $SITE_DATA_DIR" 3
+    fi
+} # assertSiteDataExists
+
+
+function resetSiteData {
+    # Weird S3 bug that makes rclone "hang" forever if the 
+    # files are already there and haven't finished propagating.
+    echo "resetting $SITE_DATA_DIR"
+    rm -f "$SITE_DATA_DIR"/*
+    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
+} # resetSiteData
+
+
+function updateCOVID19DataSources {
+    echo "refreshing COVID-19 JS CSSE dataset" | tee "$TMP_OUTPUT"
+
+    pushd "$COVID_19_DIR" >> "$TMP_OUTPUT"
+    git checkout master >> "$TMP_OUTPUT" 2> /dev/null
+    git fetch >> "$TMP_OUTPUT"
+    git pull >> "$TMP_OUTPUT"
+    popd >> "$TMP_OUTPUT"
+
+    cat "$TMP_OUTPUT" | tee -a "$UPDATE_NOTICE"
+    rm -f "$TMP_OUTPUT"
+
+    timeStamp=$(date +"%Y%m%d.%H%M%S")
+    printf "\nCompleted on %s\n" "$timeStamp" >> "$UPDATE_NOTICE"
+} # updateCOVID19DataSources
+
+
+function generateVirusUpdateJSONFiles {
+    echo "generating virus update JSON files"
+    ./vujson.py confirmed deaths recovered
+
+    pushd "$SITE_DATA_DIR" > /dev/null
+    tar czf "$JSON_DATA_BUNDLE" *.json
+    popd > /dev/null
+} # generateVirusUpdateJSONFiles
+
+
+function deployVirusUpdateJSON {
+    echo "cloning $SITE_DATA_DIR to the virustrack.live website"
+    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
+} # deployVirusUpdateJSON
+
+
 # *** main ***
 
+resetErrorNotification
 assertCOVID19DirExists
-
-echo "COVID-19 JS CSSE dataset refresh" > "$TMP_OUTPUT"
-pushd "$COVID_19_DIR" >> "$TMP_OUTPUT"
-git checkout master >> "$TMP_OUTPUT" 2> /dev/null
-git fetch >> "$TMP_OUTPUT"
-git pull >> "$TMP_OUTPUT"
-popd >> "$TMP_OUTPUT"
-cat "$TMP_OUTPUT"
-rm -f "$TMP_OUTPUT"
+assert_rcloneConfig
+assertSiteDataExists
+resetSiteData
+updateCOVID19DataSources
+generateVirusUpdateJSONFiles
+deployVirusUpdateJSON
 

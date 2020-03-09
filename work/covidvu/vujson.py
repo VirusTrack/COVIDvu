@@ -25,6 +25,7 @@ JH_CSSE_PATH           = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOM
 JH_CSSE_FILE_CONFIRMED = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
 JH_CSSE_FILE_DEATHS    = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
 JH_CSSE_FILE_RECOVERED = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
+SITE_DATA              = './site-data'
 STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 
 US_REGIONS = {
@@ -120,7 +121,7 @@ def allUSCases(fileName = JH_CSSE_FILE_CONFIRMED):
 
 def _dumpJSON(cases, target):
     with open(target, 'w') as outputJSON:
-        json.dump(cases, outputJSON)
+        json.dump(cases, outputJSON, ensure_ascii = False)
 
 
 def dumpGlobalCasesAsJSONFor(cases, target = None, indent = 2):
@@ -129,13 +130,9 @@ def dumpGlobalCasesAsJSONFor(cases, target = None, indent = 2):
                 deaths, recovered
         target: string or file stream; if None, return a JSON string
     """
-    dataSource = cases.transpose()
-    keys       = dataSource.keys()
-    result     = dataSource[keys].iloc[:].to_json(orient = 'table',
-                                                  indent = indent)
-
-    # TODO: https://github.com/pr3d4t0r/COVIDvu/issues/33
-    result = json.loads(result)['data']
+    keys        = cases.keys()
+    cases.index = cases.index.map(lambda s: s.strftime('%m/%d/%Y'))
+    result      = cases[keys].to_dict()
 
     if target:
         _dumpJSON(result, target)
@@ -146,8 +143,8 @@ def dumpGlobalCasesAsJSONFor(cases, target = None, indent = 2):
 def dumpUSCasesAsJSONFor(cases, target = None, scope = 'US', indent = 2):
     keys        = cases.keys()
     cases.index = cases.index.map(lambda s: s.strftime('%m/%d/%Y'))
-    result    = cases[keys].to_dict()
-    target    = target.replace('.json', '-%s.json' % scope)
+    result      = cases[keys].to_dict()
+    target      = target.replace('.json', '-%s.json' % scope)
 
     if target:
         _dumpJSON(result, target)
@@ -167,9 +164,9 @@ def _main(target):
 
     casesUS, \
     casesUSRegions = allUSCases(sourceFileName)
-    outputFileName = target+'.json'
+    outputFileName = os.path.join(SITE_DATA, target+'.json')
 
-    dumpGlobalCasesAsJSONFor(allCases(sourceFileName, includeGeoLocation = True), outputFileName)
+    dumpGlobalCasesAsJSONFor(allCases(sourceFileName), outputFileName)
     dumpUSCasesAsJSONFor(casesUS, outputFileName)
     dumpUSCasesAsJSONFor(casesUSRegions, outputFileName, 'US-Regions')
 
