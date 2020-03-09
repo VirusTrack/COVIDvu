@@ -43,7 +43,7 @@ function assert_rcloneConfig {
 function resetSiteData {
     # Weird S3 bug that makes rclone "hang" forever if the 
     # files are already there and haven't finished propagating.
-    echo "reseting $SITE_DATA_DIR"
+    echo "reserting $SITE_DATA_DIR"
     rm -f "$SITE_DATA_DIR"/*
     rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
 } # resetSiteData
