@@ -38,12 +38,14 @@ def test_US_REGIONS():
     assert isinstance(US_REGIONS, dict)
     assert isinstance(US_REGIONS['Northeast'], list)
 
+
 def test_allCases():
     confirmedCases = allCases(fileName = TEST_JH_CSSE_FILE_CONFIRMED)
     assert isinstance(confirmedCases, DataFrame)
     assert isinstance(confirmedCases.index, DatetimeIndex)
     assert "!Global" in confirmedCases.columns
     assert "!Outside Mainland China" in confirmedCases.columns
+
 
 def test__resampleByStateUS():
     cases          = pd.read_csv(TEST_JH_CSSE_FILE_CONFIRMED)
@@ -66,6 +68,7 @@ def test__resampleByRegionUS():
     assert isinstance(casesByRegionUS.index, DatetimeIndex)
     assert pd.DataFrame(US_REGIONS.keys()).isin(casesByRegionUS.columns).values.all()
 
+
 def test_allUSCases():
     casesByStateUS, casesByRegionUS = allUSCases(TEST_JH_CSSE_FILE_CONFIRMED)
     states = pd.read_csv(STATE_CODES_PATH)['state']
@@ -77,13 +80,16 @@ def test_allUSCases():
     assert isinstance(casesByRegionUS.index, DatetimeIndex)
     assert pd.DataFrame(US_REGIONS.keys()).isin(casesByRegionUS.columns).values.all()
 
+
 def test__dumpJSON():
     #TODO
     pass
 
+
 def test_dumpGlobalCasesAsJSONFor():
     # TODO
     pass
+
 
 def test_dumpUSCasesAsJSONFor():
     # TODO

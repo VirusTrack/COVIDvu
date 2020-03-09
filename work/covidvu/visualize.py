@@ -83,6 +83,7 @@ def plotTimeSeriesInteractive(df,
     ----------
     df: A dataframe where the index is time and columns are distinct time series to plot
     selectedColumns: The columns of the dataframe to plot
+    log: If True, displays Log10(df + 1)
     **kwargs: Non-widget arguments
         - yLabel: The y-axis label
         - title: The title of the plot (optional)

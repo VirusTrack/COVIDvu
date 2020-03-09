@@ -24,15 +24,17 @@ TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 # *** tests ***
 def test_computeGlobal():
     cases = pd.read_csv(TEST_JH_CSSE_FILE_CONFIRMED).groupby(['Country/Region']).sum().T
+    cases = cases.iloc[2:]
     cases = computeGlobal(cases)
     assert "!Global" in cases.columns
     assert (cases.loc[:,cases.columns != "!Global"].sum(axis=1) == cases['!Global']).all()
 
 def test_computeCasesOutside():
     cases = pd.read_csv(TEST_JH_CSSE_FILE_CONFIRMED).groupby(['Country/Region']).sum().T
+    cases = cases.iloc[2:]
     cases = computeCasesOutside(cases, ['Mainland China'], '!Outside Mainland China')
     assert "!Outside Mainland China" in cases.columns
-    assert (cases.loc[:, cases.columns != "Mainland China"].sum(axis=1) == cases['!Outside Mainland China']).all()
+    assert (cases.loc[:, ~cases.columns.isin(('Mainland China', '!Outside Mainland China'))].sum(axis=1) == cases['!Outside Mainland China']).all()
 
 def test_autoReloadCode():
     pass
