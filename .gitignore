@@ -150,6 +150,15 @@ dmypy.json
 .viminfo
 work/*.json
 
+# Python virtual environment
+
+**/bin
+**/etc
+**/include
+**/lib
+**/share
+
+
 # Windows virtualenv
 work/env
 
