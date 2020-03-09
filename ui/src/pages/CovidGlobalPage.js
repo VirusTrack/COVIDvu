@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 // import { useLocation, useHistory } from 'react-router'
 
-import { Content, Select, Column, Tag } from "rbx"
+import { Content, Select, Column, Tag, Tab } from "rbx"
 
 import { HeaderContainer } from '../containers/HeaderContainer'
 import { FooterContainer } from '../containers/FooterContainer'
@@ -25,13 +25,17 @@ export const CovidGlobalPage = () => {
     // const history = useHistory()
 
     // const query = queryString.parse(location.search.indexOf('?') !== -1 ? location.search : location.search.substring(1))
-    const [selectedCountries, setSelectedCountries] = useState(['!Global'])
+    const [selectedCountries, setSelectedCountries] = useState(['!Global', '!Outside Mainland China'])
+
+    const [secondaryGraph, setSecondaryGraph] = useState('Deaths')
 
     const availableCountries = COUNTRIES
 
     const [confirmed, setConfirmed] = useState(null)
     const [recovered, setRecovered] = useState(null)
     const [deaths, setDeaths] = useState(null)
+    const [mortality, setMortality] = useState(null)
+    const [recovery, setRecovery] = useState(null)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
 
@@ -74,6 +78,36 @@ export const CovidGlobalPage = () => {
         })
     }, [])
 
+
+    useEffect(() => {
+        // mortality = deaths / confirmed
+        if(deaths !== null && confirmed !== null && recovered !== null) {
+        
+            let mortality = {}
+            let recovery = {}
+
+            Object.keys(deaths).map(country => {
+                Object.keys(deaths[country]).map(date => {
+                    let deathAtDate = deaths[country][date]
+                    let confirmedAtDate = confirmed[country][date]
+                    let recoveredAtDate = recovered[country][date]
+
+                    if(!mortality.hasOwnProperty(country)) {
+                        mortality[country] = {}
+                    }
+                    if(!recovery.hasOwnProperty(country)) {
+                        recovery[country] = {}
+                    }
+                    mortality[country][date] = deathAtDate / confirmedAtDate
+                    recovery[country][date] = recoveredAtDate / confirmedAtDate
+                })
+            })
+
+            setMortality(mortality)
+            setRecovery(recovery)
+        }
+    }, [deaths, confirmed, recovered])
+
     useEffect(() => {
         axios.get(`${DATA_URL}/deaths.json`).then(response => {
             setDeaths(response.data)
@@ -112,42 +146,102 @@ export const CovidGlobalPage = () => {
                             { confirmed ? (
                             <Graph title='Cases'
                                 data={confirmed}
-                                selected={selectedCountries} />
-                            ) : (
-                                <div>
-                                    Loading...
-                                </div>
-                            )}
-                            
-                        </Column>
-                        <Column>
-                        
-                            { deaths ? (
-                            <Graph title='Deaths'
-                                data={deaths}
-                                selected={selectedCountries} />
-                            ) : (
-                                <div>
-                                    Loading...
-                                </div>
-                            )}
-                            
-                        </Column>
-                        <Column>
-                        
-                            { recovered ? (
-                            <Graph title='Recovered'
-                                data={recovered}
-                                selected={selectedCountries} />
-                            ) : (
-                                <div>
-                                    Loading...
-                                </div>
-                            )}
-                            
-                        </Column>
+                                selected={selectedCountries} 
+                                config={
+                                    {
+                                        displayModeBar: false,
+                                        showlegend: true,
 
-                </Column.Group>
+                                    }}
+                                />
+                            ) : (
+                                <div>
+                                    Loading...
+                                </div>
+                            )}
+                            
+                        </Column>
+                        <Column>
+
+                            <Tab.Group>
+                                <Tab active={secondaryGraph === 'Deaths'} onClick={() => { setSecondaryGraph('Deaths')}}>Deaths</Tab>
+                                <Tab active={secondaryGraph === 'Recovered'} onClick={() => { setSecondaryGraph('Recovered')}}>Recovered</Tab>
+                                <Tab active={secondaryGraph === 'Mortality'} onClick={() => { setSecondaryGraph('Mortality')}}>Mortality</Tab>
+                                <Tab active={secondaryGraph === 'Recovery'} onClick={() => { setSecondaryGraph('Recovery')}}>Recovery</Tab>
+                            </Tab.Group>
+
+                            { secondaryGraph === 'Deaths' &&
+                            <React.Fragment>
+                                { deaths ? (
+                                <Graph title={null}
+                                    data={deaths}
+                                    selected={selectedCountries} 
+                                    config={
+                                        {
+                                            displayModeBar: false,
+                                            showlegend: true
+                                        }}
+                                    />
+                                ) : (
+                                    <div>
+                                        Loading...
+                                    </div>
+                                )}
+                            </React.Fragment>
+                            }                            
+                            { secondaryGraph === 'Recovered' &&
+                            <React.Fragment>
+                                { recovered ? (
+                                <Graph title={null}
+                                    data={recovered}
+                                    selected={selectedCountries} 
+                                    config={{displayModeBar: false}}
+                                    />
+                                ) : (
+                                    <div>
+                                        Loading...
+                                    </div>
+                                )}
+                            </React.Fragment>  
+                            }
+                            { secondaryGraph === 'Mortality' &&
+                            <React.Fragment>
+                                { mortality ? (
+                                <Graph title={null}
+                                    data={mortality}
+                                    selected={selectedCountries}
+                                    y_type='percent'
+                                    y_title='Percent'
+                                    config={{displayModeBar: false}}
+                                    />
+                                ) : (
+                                    <div>
+                                        Loading...
+                                    </div>
+                                )}
+                            </React.Fragment>  
+                            }
+                            { secondaryGraph === 'Recovery' &&
+                            <React.Fragment>
+                                { recovery ? (
+                                <Graph title={null}
+                                    data={recovery}
+                                    selected={selectedCountries}
+                                    y_type='percent'
+                                    y_title='Percent'
+                                    config={{displayModeBar: false}}
+                                    />
+                                ) : (
+                                    <div>
+                                        Loading...
+                                    </div>
+                                )}
+                            </React.Fragment>  
+                            }
+
+                        </Column>
+                    </Column.Group>
+
             </Content>
             
             <FooterContainer />

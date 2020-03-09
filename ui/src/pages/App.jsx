@@ -3,6 +3,7 @@ import React from 'react'
 import { CovidGlobalPage } from './CovidGlobalPage'
 import { CovidUSPage } from './CovidUSPage'
 import { CovidUSRegionsPage } from './CovidUSRegionsPage'
+import { AboutPage } from './AboutPage'
 
 import {
     Switch,
@@ -23,6 +24,9 @@ const App = () => (
         </Route>
         <Route path="/covid">
             <CovidGlobalPage />
+        </Route>
+        <Route path="/about">
+            <AboutPage />
         </Route>
         <Route>
             <NotFoundPage />

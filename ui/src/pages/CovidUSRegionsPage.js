@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 // import { useLocation, useHistory } from 'react-router'
 
-import { Content, Select, Column, Tag, Message } from "rbx"
+import { Content, Select, Column, Tag, Message, Tab } from "rbx"
 
 
 import { HeaderContainer } from '../containers/HeaderContainer'
@@ -21,11 +21,15 @@ export const CovidUSRegionsPage = () => {
     // const location = useLocation()
     const [selectedRegions, setSelectedRegions] = useState(['!Total US'])
 
+    const [secondaryGraph, setSecondaryGraph] = useState('Deaths')
+
     const availableRegions = US_REGIONS
 
     const [confirmedUSRegions, setConfirmedUSRegions] = useState(null)
     const [recoveredUSRegions, setRecoveredUSRegions] = useState(null)
     const [deathsUSRegions, setDeathsUSRegions] = useState(null)
+    const [mortalityUSRegions, setMortalityUSRegions] = useState(null)
+    const [recoveryUSRegions, setRecoveryUSRegions] = useState(null)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
 
@@ -52,6 +56,35 @@ export const CovidUSRegionsPage = () => {
 
         })
     }, [])
+
+    useEffect(() => {
+        // mortality = deaths / confirmed
+        if(deathsUSRegions !== null && confirmedUSRegions !== null && recoveredUSRegions !== null) {
+        
+            let mortalityUSRegions = {}
+            let recoveryUSRegions = {}
+
+            Object.keys(deathsUSRegions).map(country => {
+                Object.keys(deathsUSRegions[country]).map(date => {
+                    let deathAtDate = deathsUSRegions[country][date]
+                    let confirmedAtDate = confirmedUSRegions[country][date]
+                    let recoveredAtDate = recoveredUSRegions[country][date]
+
+                    if(!mortalityUSRegions.hasOwnProperty(country)) {
+                        mortalityUSRegions[country] = {}
+                    }
+                    if(!recoveryUSRegions.hasOwnProperty(country)) {
+                        recoveryUSRegions[country] = {}
+                    }
+                    mortalityUSRegions[country][date] = deathAtDate / confirmedAtDate
+                    recoveryUSRegions[country][date] = recoveredAtDate / confirmedAtDate
+                })
+            })
+
+            setMortalityUSRegions(mortalityUSRegions)
+            setRecoveryUSRegions(recoveryUSRegions)
+        }
+    }, [deathsUSRegions, confirmedUSRegions, recoveredUSRegions])
 
     useEffect(() => {
         axios.get(`${DATA_URL}/deaths-US-Regions.json`).then(response => {
@@ -92,6 +125,11 @@ export const CovidUSRegionsPage = () => {
                             <Graph title='Cases US Regions'
                                 data={confirmedUSRegions} 
                                 selected={selectedRegions}
+                                config={
+                                    {
+                                        displayModeBar: false
+                                    }}
+
                                 />
                             ) : (
                                 <div>
@@ -101,29 +139,83 @@ export const CovidUSRegionsPage = () => {
                         </Column>
 
                         <Column>
-                            { deathsUSRegions ? (
-                            <Graph title='Deaths US Regions'
-                                data={deathsUSRegions} 
-                                selected={selectedRegions}                                
-                                />
-                            ) : (
-                                <div>
-                                    Loading...
-                                </div>
-                            )}                                
-                        </Column>
 
-                        <Column>
-                            { recoveredUSRegions ? (
-                            <Graph title='Recovered US Regions'
-                                data={recoveredUSRegions}                                 
-                                selected={selectedRegions}
-                                />
-                            ) : (
-                                <div>
-                                    Loading...
-                                </div>
-                            )}                                
+                        <Tab.Group>
+                                <Tab active={secondaryGraph === 'Deaths'} onClick={() => { setSecondaryGraph('Deaths')}}>Deaths</Tab>
+                                <Tab active={secondaryGraph === 'Recovered'} onClick={() => { setSecondaryGraph('Recovered')}}>Recovered</Tab>
+                                <Tab active={secondaryGraph === 'Mortality'} onClick={() => { setSecondaryGraph('Mortality')}}>Mortality</Tab>
+                                <Tab active={secondaryGraph === 'Recovery'} onClick={() => { setSecondaryGraph('Recovery')}}>Recovery</Tab>
+                            </Tab.Group>
+
+                            { secondaryGraph === 'Deaths' &&
+                            <React.Fragment>
+                                { deathsUSRegions ? (
+                                <Graph title={null}
+                                    data={deathsUSRegions}
+                                    selected={selectedRegions} 
+                                    config={
+                                        {
+                                            displayModeBar: false,
+                                            showlegend: true
+                                        }}
+                                    />
+                                ) : (
+                                    <div>
+                                        Loading...
+                                    </div>
+                                )}
+                            </React.Fragment>
+                            }                            
+                            { secondaryGraph === 'Recovered' &&
+                            <React.Fragment>
+                                { recoveredUSRegions ? (
+                                <Graph title={null}
+                                    data={recoveredUSRegions}
+                                    selected={selectedRegions} 
+                                    config={{displayModeBar: false}}
+                                    />
+                                ) : (
+                                    <div>
+                                        Loading...
+                                    </div>
+                                )}
+                            </React.Fragment>  
+                            }                            
+                            { secondaryGraph === 'Mortality' &&
+                            <React.Fragment>
+                                { mortalityUSRegions ? (
+                                <Graph title={null}
+                                    data={mortalityUSRegions}
+                                    selected={selectedRegions} 
+                                    y_type='percent'
+                                    y_title='Percent'
+                                    config={{displayModeBar: false}}
+                                    />
+                                ) : (
+                                    <div>
+                                        Loading...
+                                    </div>
+                                )}
+                            </React.Fragment>  
+                            }
+                            { secondaryGraph === 'Recovery' &&
+                            <React.Fragment>
+                                { recoveryUSRegions ? (
+                                <Graph title={null}
+                                    data={recoveryUSRegions}
+                                    selected={selectedRegions} 
+                                    y_type='percent'
+                                    y_title='Percent'
+                                    config={{displayModeBar: false}}
+                                    />
+                                ) : (
+                                    <div>
+                                        Loading...
+                                    </div>
+                                )}
+                            </React.Fragment>  
+                            }
+                  
                         </Column>
                 </Column.Group>
                 <Column.Group centered breakpoint="mobile">

@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react'
 
 import Plot from 'react-plotly.js'
 
-export const Graph = ({title, data, selected}) => {
+import numeral from 'numeral'
+import moment from 'moment'
+
+export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
 
@@ -15,35 +18,57 @@ export const Graph = ({title, data, selected}) => {
             plots[region] = {
                 x: [],
                 y: [],
-                mode: 'lines',
-                name: region
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: region,
+                marker: {
+                    size: 5
+                }
             }            
         }
 
         for(const region of selectedData) {
-
-            plots[region] = {
-                x: [],
-                y: [],
-                mode: 'lines',
-                name: region
-            }
-
+            
             const regionData = data[region]
-
+            
             for(const key of Object.keys(regionData)) {
-                plots[region].x.push(key)
-                plots[region].y.push(regionData[key])
+                const formattedDate = moment(key).format('YYYY-MM-DD')
+                plots[region].x.push(formattedDate)
+
+                let value = regionData[key]
+
+                if(y_type === 'percent') {
+                    value = numeral(value).format('0%')
+                }
+
+                plots[region].y.push(value)
             }
         }
     
+        console.dir(plots)
         setPlotsAsValues(Object.values(plots))
     }, [selected, data])
+
+    const layout = {
+        title: title
+    }
+    
+    if(y_title) {
+        layout['yaxis'] = {
+            title: y_title
+        }
+    }
+    if(x_title) {
+        layout['xaxis'] = {
+            title: x_title
+        }
+    }
 
     return (
         <Plot
             data={plotsAsValues}
-            layout={ {width: 400, height: 500, title: title} }
+            layout={layout}
+            config={config}
         />
 
     )
