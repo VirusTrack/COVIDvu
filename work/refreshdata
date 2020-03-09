@@ -40,6 +40,15 @@ function assert_rcloneConfig {
 } # assert_rcloneConfig
 
 
+function assertSiteDataExists {
+    if [[ ! -d "$SITE_DATA_DIR" ]]
+    then
+        echo "creating $SITE_DATA_DIR"
+        mkdir -p "$SITE_DATA_DIR" || die "failed to create $SITE_DATA_DIR" 3
+    fi
+} # assertSiteDataExists
+
+
 function resetSiteData {
     # Weird S3 bug that makes rclone "hang" forever if the 
     # files are already there and haven't finished propagating.
@@ -87,6 +96,7 @@ function deployVirusUpdateJSON {
 resetErrorNotification
 assertCOVID19DirExists
 assert_rcloneConfig
+assertSiteDataExists
 resetSiteData
 updateCOVID19DataSources
 generateVirusUpdateJSONFiles
