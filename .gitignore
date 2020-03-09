@@ -143,7 +143,9 @@ dmypy.json
 **/work/*.tar.gz
 **/work/COVID-19
 **/work/last-update.txt
+**rclone.conf
 **run.env
+**site-data*
 *swp
 .viminfo
 work/*.json

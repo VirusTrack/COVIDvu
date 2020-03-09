@@ -1,0 +1,15 @@
+[virustrack-website]
+type = s3
+provider = AWS
+env_auth = false
+access_key_id = AWSYOURACCESSKEYHERE
+secret_access_key = ADFBQREQ,ERNBQ,ENRBQ,NBRQ
+region = eu-west-1
+location_constraint = eu-west-1
+acl = public-read
+storage_class = STANDARD
+chunk_size = 8M
+upload_concurrency = 2
+server_side_encryption = AES256
+bucket_acl = public-read
+

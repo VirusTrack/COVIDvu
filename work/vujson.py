@@ -25,6 +25,7 @@ JH_CSSE_PATH           = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOM
 JH_CSSE_FILE_CONFIRMED = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
 JH_CSSE_FILE_DEATHS    = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
 JH_CSSE_FILE_RECOVERED = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
+SITE_DATA              = './site-data'
 STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 
 US_REGIONS = {
@@ -165,7 +166,7 @@ def _main(target):
 
     casesUS, \
     casesUSRegions = allUSCases(sourceFileName)
-    outputFileName = target+'.json'
+    outputFileName = os.path.join(SITE_DATA, target+'.json')
 
     dumpGlobalCasesAsJSONFor(allCases(sourceFileName, includeGeoLocation = True), outputFileName)
     dumpUSCasesAsJSONFor(casesUS, outputFileName)
