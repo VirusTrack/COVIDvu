@@ -2,46 +2,48 @@ import React, { useEffect, useState } from 'react'
 
 import Plot from 'react-plotly.js'
 
-export const Graph = ({title, data, selectedCountries}) => {
+export const Graph = ({title, data, selected}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
 
     useEffect(() => {
         let plots = {}
 
-        const selectedData = data.filter(entry => selectedCountries.indexOf(entry['Country/Region']) !== -1)
+        const selectedData = Object.keys(data).filter(entry => selected.indexOf(entry) !== -1)
 
-        for(const elem of selectedData) {
+        for(const region of selectedData) {
+            plots[region] = {
+                x: [],
+                y: [],
+                mode: 'lines',
+                name: region
+            }            
+        }
 
-            const country = elem['Country/Region']
+        for(const region of selectedData) {
 
-            if(!plots.hasOwnProperty(country)) {
-                plots[country] = {
-                    x: [],
-                    y: [],
-                    mode: 'lines',
-                    name: country
-                }
+            plots[region] = {
+                x: [],
+                y: [],
+                mode: 'lines',
+                name: region
             }
 
-            for(const key of Object.keys(elem)) {
+            const regionData = data[region]
 
-                if(key === 'Country/Region' || key === 'Lat' || key === 'Long') {
-                    continue
-                }
-
-                plots[country].x.push(key)
-                plots[country].y.push(elem[key])
+            for(const key of Object.keys(regionData)) {
+                plots[region].x.push(key)
+                plots[region].y.push(regionData[key])
             }
         }
     
         setPlotsAsValues(Object.values(plots))
-    }, [selectedCountries])
+    }, [selected, data])
 
     return (
         <Plot
             data={plotsAsValues}
-            layout={ {width: 450, height: 500, title: title} }
+            layout={ {width: 400, height: 500, title: title} }
         />
 
     )
