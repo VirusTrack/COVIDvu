@@ -17,8 +17,7 @@ UPDATE_NOTICE_FILE="last-update.txt"
 UPDATE_NOTICE="$SITE_DATA_DIR/$UPDATE_NOTICE_FILE"
 UPDATE_ERROR="$SITE_DATA_DIR/ERROR.txt"
 
-# TODO: Figure out why this doesn't work well
-# [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
 
 
 # *** functions ***
@@ -116,6 +115,11 @@ assert_rcloneConfig
 assertSiteDataExists
 resetSiteData
 updateCOVID19DataSources
-generateVirusUpdateJSONFiles
-deployVirusUpdateJSON
+
+case "$1" in
+    "publish")
+        generateVirusUpdateJSONFiles
+        deployVirusUpdateJSON
+        ;;
+esac
 
