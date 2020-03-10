@@ -17,9 +17,6 @@ UPDATE_NOTICE_FILE="last-update.txt"
 UPDATE_NOTICE="$SITE_DATA_DIR/$UPDATE_NOTICE_FILE"
 UPDATE_ERROR="$SITE_DATA_DIR/ERROR.txt"
 
-# TODO: Figure out why this doesn't work well
-# [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
-
 
 # *** functions ***
 
@@ -27,6 +24,15 @@ function die {
     echo "[Error $2] - $1" | tee "$UPDATE_ERROR"
     exit "$2"
 } # die
+
+
+function assertSiteDataExists {
+    if [[ ! -d "$SITE_DATA_DIR" ]]
+    then
+        echo "creating $SITE_DATA_DIR"
+        mkdir -p "$SITE_DATA_DIR" || die "failed to create $SITE_DATA_DIR" 3
+    fi
+} # assertSiteDataExists
 
 
 function resetErrorNotification {
@@ -50,15 +56,6 @@ function assertCloudFrontConfig {
 function assert_rcloneConfig {
     [[ -e "$CONFIG_rclone" ]] || die "rclone config not found" 2
 } # assert_rcloneConfig
-
-
-function assertSiteDataExists {
-    if [[ ! -d "$SITE_DATA_DIR" ]]
-    then
-        echo "creating $SITE_DATA_DIR"
-        mkdir -p "$SITE_DATA_DIR" || die "failed to create $SITE_DATA_DIR" 3
-    fi
-} # assertSiteDataExists
 
 
 function resetSiteData {
@@ -109,13 +106,19 @@ function deployVirusUpdateJSON {
 
 # *** main ***
 
+assertSiteDataExists
 resetErrorNotification
 assertCOVID19DirExists
-assertCloudFrontConfig
-assert_rcloneConfig
-assertSiteDataExists
 resetSiteData
 updateCOVID19DataSources
-generateVirusUpdateJSONFiles
-deployVirusUpdateJSON
+
+case "$1" in
+    "publish")
+        [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+        assertCloudFrontConfig
+        assert_rcloneConfig
+        generateVirusUpdateJSONFiles
+        deployVirusUpdateJSON
+        ;;
+esac
 
