@@ -10,7 +10,7 @@ import sys
 import pandas as pd
 import re
 
-import utils
+from covidvu import utils
 
 
 # *** initializations ***
@@ -76,6 +76,7 @@ def _resampleByStateUS(casesUS):
 
     casesUS['!Total US'] = casesUS.sum(axis=1)
     casesUS              = casesUS.reindex(sorted(casesUS.columns), axis=1)
+    casesUS.index        = pd.to_datetime(casesUS.index)
     return casesUS
 
 
@@ -101,6 +102,7 @@ def _resampleByRegionUS(casesUS):
     casesUS              = casesUS.groupby(casesUS.columns, axis=1).sum()
     casesUS['!Total US'] = casesUS.sum(axis=1)
     casesUS              = casesUS.reindex(sorted(casesUS.columns), axis=1)
+    casesUS.index        = pd.to_datetime(casesUS.index)
     return casesUS
 
 
