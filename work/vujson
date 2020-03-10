@@ -3,6 +3,26 @@
 # vim: set fileencoding=utf-8:
 
 
+CONTAINER_SIG_FILE="/proc/1/cgroup"
+
+# REFRESHDATA_CONFIG="./refreshdata.config"
+# 
+# [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+
+
+# *** functions ***
+
+
 # *** main ***
 
+if [[ "Linux" == $(uname) ]]
+then
+    awk '/docker/ || /lxc/ { exit(99); }' "$CONTAINER_SIG_FILE"
+    if [[ "$?" == 0 ]]
+    then
+        source ./bin/activate
+    fi
+fi
+
+python3 -m covidvu.vujson confirmed deaths recovered
 

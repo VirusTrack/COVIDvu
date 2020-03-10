@@ -30,8 +30,6 @@ export HISTSIZE=2000
 # *** Docker ***
 #
 
-export MD_HOME="$HOME/development/muledocker"
-
 alias cls='docker ps -a'
 alias crm='docker rm'
 alias ctail='docker logs -f'
@@ -39,6 +37,14 @@ alias ils='docker images'
 alias irm='docker rmi'
 
 alias activate='. bin/activate'
+
+
+#
+# *** AWS
+#
+export AWS_ACCESS_KEY_ID="yourpublicaccesskey"
+export AWS_SECRET_ACCESS_KEY_ID="yoursecretaccesskey"
+export VIRUSTRACK_CLOUDFRONT_ID="acloudfrontid"
 
 
 set -o vi
