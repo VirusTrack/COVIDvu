@@ -109,7 +109,6 @@ function deployVirusUpdateJSON {
 assertSiteDataExists
 resetErrorNotification
 assertCOVID19DirExists
-assert_rcloneConfig
 resetSiteData
 updateCOVID19DataSources
 
@@ -117,6 +116,7 @@ case "$1" in
     "publish")
         [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
         assertCloudFrontConfig
+        assert_rcloneConfig
         generateVirusUpdateJSONFiles
         deployVirusUpdateJSON
         ;;
