@@ -10,9 +10,7 @@ import GraphWithLoader from '../components/GraphWithLoader'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
-import { US_STATES, DATA_URL } from '../constants'
-
-import axios from 'axios'
+import { US_STATES } from '../constants'
 
 import numeral from 'numeral'
 
@@ -33,14 +31,31 @@ export const USGraphContainer = () => {
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
 
-    useEffect(() => {
-        axios.get(`${DATA_URL}/confirmed-US.json`).then(response => {
-            const confirmed = response.data
-            setConfirmedUS(confirmed)
-
+    async function fetchConfirmed() {
+        const confirmed = await dataService.getConfirmed('-US')
+        if(confirmed) {
             const totalUS = Object.values(confirmed['!Total US'])
+
+            setConfirmedUS(confirmed)
             setConfirmedTotal(totalUS[totalUS.length - 1])
-        })
+        }
+    }
+
+    async function fetchDeaths() {
+        const deaths = await dataService.getDeaths('-US')
+        setDeathsUS(deaths)
+    }
+    
+    async function fetchRecovered() {
+        const deaths = await dataService.getRecovered('-US')
+        setRecoveredUS(deaths)
+    }
+
+
+    useEffect(() => {
+        fetchConfirmed()
+        fetchDeaths()
+        fetchRecovered()
     }, [])
 
     useMemo(() => {
@@ -51,18 +66,6 @@ export const USGraphContainer = () => {
 
     }, [deathsUS, confirmedUS, recoveredUS])
     
-    useEffect(() => {
-        axios.get(`${DATA_URL}/deaths-US.json`).then(response => {
-            setDeathsUS(response.data)
-        })
-    }, [])
-
-    useEffect(() => {
-        axios.get(`${DATA_URL}/recovered-US.json`).then(response => {
-            setRecoveredUS(response.data)
-        })
-    }, [])
-
     return (
         <ThreeGraphLayout>
             <>                        

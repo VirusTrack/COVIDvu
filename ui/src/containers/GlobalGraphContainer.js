@@ -83,18 +83,18 @@ export const GlobalGraphContainer = () => {
             </>
 
             <GraphWithLoader 
-                    graphName="Cases"
-                    secondaryGraph="Cases"
-                    graph={confirmed}
-                    selected={selectedCountries}
-                    y_title="Total confirmed cases"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
+                graphName="Cases"
+                secondaryGraph="Cases"
+                graph={confirmed}
+                selected={selectedCountries}
+                y_title="Total confirmed cases"
+                config={
+                    {
+                        displayModeBar: false,
+                        showlegend: true
                     }
-                />
+                }
+            />
 
             <>
                 <Tab.Group>

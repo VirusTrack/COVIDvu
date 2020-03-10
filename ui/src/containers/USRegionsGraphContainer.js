@@ -5,9 +5,7 @@ import { Column, Tag, Message, Tab } from "rbx"
 import ThreeGraphLayout from '../layouts/ThreeGraphLayout'
 import DataService from '../services'
 
-import { US_REGIONS, DATA_URL } from '../constants'
-
-import axios from 'axios'
+import { US_REGIONS } from '../constants'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 import SelectRegionComponent from '../components/SelectRegionComponent'
@@ -29,16 +27,31 @@ export const USRegionsGraphContainer = () => {
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
 
-    useEffect(() => {
-        axios.get(`${DATA_URL}/confirmed-US-Regions.json`).then(response => {
-            const confirmed = response.data
+    async function fetchConfirmed() {
+        const confirmed = await dataService.getConfirmed('-US-Regions')
+        if(confirmed) {
+            const totalUS = Object.values(confirmed['!Total US'])
 
             setConfirmedUSRegions(confirmed)
-
-            const totalUS = Object.values(confirmed['!Total US'])
             setConfirmedTotal(totalUS[totalUS.length - 1])
+        }
+    }
 
-        })
+    async function fetchDeaths() {
+        const deaths = await dataService.getDeaths('-US-Regions')
+        setDeathsUSRegions(deaths)
+    }
+    
+    async function fetchRecovered() {
+        const deaths = await dataService.getRecovered('-US-Regions')
+        setRecoveredUSRegions(deaths)
+    }
+
+
+    useEffect(() => {
+        fetchConfirmed()
+        fetchDeaths()
+        fetchRecovered()
     }, [])
 
     useMemo(() => {
@@ -48,19 +61,6 @@ export const USRegionsGraphContainer = () => {
         setRecoveryUSRegions(recovery)
 
     }, [deathsUSRegions, confirmedUSRegions, recoveredUSRegions])
-
-    useEffect(() => {
-        axios.get(`${DATA_URL}/deaths-US-Regions.json`).then(response => {
-            setDeathsUSRegions(response.data)
-        })
-    }, [])
-
-    useEffect(() => {
-        axios.get(`${DATA_URL}/recovered-US-Regions.json`).then(response => {
-            setRecoveredUSRegions(response.data)
-        })
-    }, [])
-
 
     return (
         <ThreeGraphLayout>

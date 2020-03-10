@@ -4,9 +4,9 @@ import { DATA_URL } from './constants'
 
 class DataService {
 
-    async getConfirmed() {
+    async getConfirmed(distinct = '') {
         try {
-            const response = await axios.get(`${DATA_URL}/confirmed.json`)
+            const response = await axios.get(`${DATA_URL}/confirmed${distinct}.json`)
 
             return response.data
         } catch(error) {
@@ -15,14 +15,14 @@ class DataService {
         }
     }
 
-    async getDeaths() {
-        const response = await axios.get(`${DATA_URL}/deaths.json`)
+    async getDeaths(distinct = '') {
+        const response = await axios.get(`${DATA_URL}/deaths${distinct}.json`)
 
         return response.data
     }
 
-    async getRecovered() {
-        const response = await axios.get(`${DATA_URL}/recovered.json`)
+    async getRecovered(distinct = '') {
+        const response = await axios.get(`${DATA_URL}/recovered${distinct}.json`)
 
         return response.data
     }
