@@ -9,6 +9,7 @@
 CONFIG_rclone="rclone.conf"
 COVID_19_DIR="COVID-19"
 JSON_DATA_BUNDLE="COVID19-cases.tar.gz"
+REFRESHDATA_CONFIG="./refreshdata.config"
 SITE_BUCKET="virustrack.live"
 SITE_DATA_DIR="site-data"
 TMP_OUTPUT="/tmp/refreshdata.log"
@@ -25,6 +26,15 @@ function die {
 } # die
 
 
+function assertSiteDataExists {
+    if [[ ! -d "$SITE_DATA_DIR" ]]
+    then
+        echo "creating $SITE_DATA_DIR"
+        mkdir -p "$SITE_DATA_DIR" || die "failed to create $SITE_DATA_DIR" 3
+    fi
+} # assertSiteDataExists
+
+
 function resetErrorNotification {
     [[ -e "$UPDATE_ERROR" ]] && rm -f "$UPDATE_ERROR"
 } # resetErrorNotification
@@ -35,18 +45,17 @@ function assertCOVID19DirExists {
 } # assertCOVID19DirExists
 
 
+function assertCloudFrontConfig {
+    [[ -n "$AWS_ACCESS_KEY_ID" ]] || die "AWS_ACCESS_KEY_ID is not set" 4
+    [[ -n "$AWS_SECRET_ACCESS_KEY_ID" ]] || die "AWS_SECRET_ACCESS_KEY_ID is not set" 5
+    [[ -n "$VIRUSTRACK_CLOUDFRONT_ID" ]] || die "VIRUSTRACK_CLOUDFRONT_ID not defined" 7
+    [[ -n $(which aws) ]] || die "aws command not installed - run apt-get install awscli" 6
+} # assertCloudFrontConfig
+
+
 function assert_rcloneConfig {
-    [[ -e "$CONFIG_rclone" ]] || die "rclone not found" 2
+    [[ -e "$CONFIG_rclone" ]] || die "rclone config not found" 2
 } # assert_rcloneConfig
-
-
-function assertSiteDataExists {
-    if [[ ! -d "$SITE_DATA_DIR" ]]
-    then
-        echo "creating $SITE_DATA_DIR"
-        mkdir -p "$SITE_DATA_DIR" || die "failed to create $SITE_DATA_DIR" 3
-    fi
-} # assertSiteDataExists
 
 
 function resetSiteData {
@@ -70,14 +79,14 @@ function updateCOVID19DataSources {
     cat "$TMP_OUTPUT" | tee -a "$UPDATE_NOTICE"
     rm -f "$TMP_OUTPUT"
 
-    timeStamp=$(date +"%Y%m%d.%H%M%S")
+    timeStamp=$(date +"%Y-%m-%d %H:%M:%S")
     printf "\nCompleted on %s\n" "$timeStamp" >> "$UPDATE_NOTICE"
 } # updateCOVID19DataSources
 
 
 function generateVirusUpdateJSONFiles {
     echo "generating virus update JSON files"
-    ./vujson.py confirmed deaths recovered
+    ./vujson
 
     pushd "$SITE_DATA_DIR" > /dev/null
     tar czf "$JSON_DATA_BUNDLE" *.json
@@ -87,18 +96,29 @@ function generateVirusUpdateJSONFiles {
 
 function deployVirusUpdateJSON {
     echo "cloning $SITE_DATA_DIR to the virustrack.live website"
-    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
+    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
+
+    # TODO: Figure out why this doesn't work well
+    # echo "invalidating CloudFront cache"
+    # aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths '/site-data/*' || die "CloudFront invalidation failed" 8
 } # deployVirusUpdateJSON
 
 
 # *** main ***
 
+assertSiteDataExists
 resetErrorNotification
 assertCOVID19DirExists
-assert_rcloneConfig
-assertSiteDataExists
 resetSiteData
 updateCOVID19DataSources
-generateVirusUpdateJSONFiles
-deployVirusUpdateJSON
+
+case "$1" in
+    "publish")
+        [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+        assertCloudFrontConfig
+        assert_rcloneConfig
+        generateVirusUpdateJSONFiles
+        deployVirusUpdateJSON
+        ;;
+esac
 
