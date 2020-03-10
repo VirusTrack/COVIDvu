@@ -48,7 +48,7 @@ function assertCloudFrontConfig {
 
 
 function assert_rcloneConfig {
-    [[ -e "$CONFIG_rclone" ]] || die "rclone not found" 2
+    [[ -e "$CONFIG_rclone" ]] || die "rclone config not found" 2
 } # assert_rcloneConfig
 
 
