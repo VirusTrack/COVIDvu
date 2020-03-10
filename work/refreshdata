@@ -26,6 +26,15 @@ function die {
 } # die
 
 
+function assertSiteDataExists {
+    if [[ ! -d "$SITE_DATA_DIR" ]]
+    then
+        echo "creating $SITE_DATA_DIR"
+        mkdir -p "$SITE_DATA_DIR" || die "failed to create $SITE_DATA_DIR" 3
+    fi
+} # assertSiteDataExists
+
+
 function resetErrorNotification {
     [[ -e "$UPDATE_ERROR" ]] && rm -f "$UPDATE_ERROR"
 } # resetErrorNotification
@@ -47,15 +56,6 @@ function assertCloudFrontConfig {
 function assert_rcloneConfig {
     [[ -e "$CONFIG_rclone" ]] || die "rclone config not found" 2
 } # assert_rcloneConfig
-
-
-function assertSiteDataExists {
-    if [[ ! -d "$SITE_DATA_DIR" ]]
-    then
-        echo "creating $SITE_DATA_DIR"
-        mkdir -p "$SITE_DATA_DIR" || die "failed to create $SITE_DATA_DIR" 3
-    fi
-} # assertSiteDataExists
 
 
 function resetSiteData {
@@ -106,17 +106,17 @@ function deployVirusUpdateJSON {
 
 # *** main ***
 
+assertSiteDataExists
 resetErrorNotification
 assertCOVID19DirExists
-assertCloudFrontConfig
 assert_rcloneConfig
-assertSiteDataExists
 resetSiteData
 updateCOVID19DataSources
 
 case "$1" in
     "publish")
         [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+        assertCloudFrontConfig
         generateVirusUpdateJSONFiles
         deployVirusUpdateJSON
         ;;
