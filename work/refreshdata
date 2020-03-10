@@ -17,8 +17,6 @@ UPDATE_NOTICE_FILE="last-update.txt"
 UPDATE_NOTICE="$SITE_DATA_DIR/$UPDATE_NOTICE_FILE"
 UPDATE_ERROR="$SITE_DATA_DIR/ERROR.txt"
 
-[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
-
 
 # *** functions ***
 
@@ -118,6 +116,7 @@ updateCOVID19DataSources
 
 case "$1" in
     "publish")
+        [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
         generateVirusUpdateJSONFiles
         deployVirusUpdateJSON
         ;;
