@@ -2,6 +2,7 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE
 # vim: set fileencoding=utf-8:
 
+
 import sys
 
 from setuptools import find_packages
@@ -21,7 +22,7 @@ if '__main__' == __name__:
 
     setup(
         author               = 'the COVIDvu contributors',
-        author_email         = ' covidvu.support@cime.net',
+        author_email         = 'covidvu.support@virustrack.live',
         description          = 'COVIDvu common tools',
         install_requires     = requirements,
         license              = open('../LICENSE.txt').read(),
