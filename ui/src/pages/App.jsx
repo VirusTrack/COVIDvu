@@ -1,6 +1,9 @@
 import React from 'react'
 
-import { HomePage } from './HomePage'
+import { CovidGlobalPage } from './CovidGlobalPage'
+import { CovidUSPage } from './CovidUSPage'
+import { CovidUSRegionsPage } from './CovidUSRegionsPage'
+import { AboutPage } from './AboutPage'
 
 import {
     Switch,
@@ -9,31 +12,21 @@ import {
 } from 'react-router-dom'
 import { NotFoundPage } from './NotFoundPage'
 
-// const PrivateRoute = ({ children, ...rest }) => {
-//     return (
-//         <Route
-//             {...rest}
-//             render={({ location }) => localStorage.getItem('AUTHORIZATION_KEY') ? (
-//                 children
-//             ) : (
-//                 <Redirect
-//                     to={{
-//                         pathname: "/login",
-//                         state: { from: location }
-//                     }}
-//                 />
-//             )
-//         }
-//         />
-//     )
-// }
-
 const App = () => (
     <Switch>
-        <Redirect exact from="/" to="/home" />
+        <Redirect exact from="/" to="/covid" />
 
-        <Route path="/home">
-            <HomePage />
+        <Route path="/covid/us/regions">
+            <CovidUSRegionsPage />
+        </Route>
+        <Route path="/covid/us">
+            <CovidUSPage />
+        </Route>
+        <Route path="/covid">
+            <CovidGlobalPage />
+        </Route>
+        <Route path="/about">
+            <AboutPage />
         </Route>
         <Route>
             <NotFoundPage />

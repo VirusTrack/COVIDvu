@@ -1,4 +1,8 @@
+const DATA_URL = `https://virustrack.live/site-data`
+
 const COUNTRIES = [
+    "!Global",
+    "!Outside Mainland China",
     "Afghanistan",
     "Algeria",
     "Andorra",
@@ -100,4 +104,76 @@ const COUNTRIES = [
     "Vietnam"
   ]
 
-  export default COUNTRIES
+  const US_REGIONS = [
+    "!Total US",
+    "Diamond Princess",
+    "Midwest",
+    "Northeast",
+    "South",
+    "Unassigned",
+    "West"
+  ]
+
+  const US_STATES = [
+  "!Total US",  
+  "Alabama",
+  "Alaska",
+  "American Samoa",
+  "Arizona",
+  "Arkansas",
+  "California",
+  "Colorado",
+  "Connecticut",
+  "Delaware",
+  "Washington D.C.",
+  "Florida",
+  "Georgia",
+  "Guam",
+  "Hawaii",
+  "Idaho",
+  "Illinois",
+  "Indiana",
+  "Iowa",
+  "Kansas",
+  "Kentucky",
+  "Louisiana",
+  "Maine",
+  "Maryland",
+  "Marshall Islands",
+  "Massachusetts",
+  "Michigan",
+  "Micronesia",
+  "Minnesota",
+  "Mississippi",
+  "Missouri",
+  "Montana",
+  "Nebraska",
+  "Nevada",
+  "New Hampshire",
+  "New Jersey",
+  "New Mexico",
+  "New York",
+  "North Carolina",
+  "North Dakota",
+  "Northern Marianas",
+  "Ohio",
+  "Oklahoma",
+  "Oregon",
+  "Palau",
+  "Pennsylvania",
+  "Puerto Rico",
+  "Rhode Island",
+  "South Carolina",
+  "South Dakota",
+  "Tennessee",
+  "Texas",
+  "Utah",
+  "Vermont",
+  "Virginia",
+  "Virgin Islands",
+  "Washington",
+  "West Virginia",
+  "Wisconsin",
+  "Wyoming"]
+
+  export { COUNTRIES, US_REGIONS, US_STATES, DATA_URL }

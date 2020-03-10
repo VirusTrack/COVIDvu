@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "COVIDvu",
+  "name": "Coronavirus COVID-19 Cases",
   "icons": [
     {
       "src": "favicon.ico",

@@ -2,46 +2,73 @@ import React, { useEffect, useState } from 'react'
 
 import Plot from 'react-plotly.js'
 
-export const Graph = ({title, data, selectedCountries}) => {
+import numeral from 'numeral'
+import moment from 'moment'
+
+export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
 
     useEffect(() => {
         let plots = {}
 
-        const selectedData = data.filter(entry => selectedCountries.indexOf(entry['Country/Region']) !== -1)
+        const selectedData = Object.keys(data).filter(entry => selected.indexOf(entry) !== -1)
 
-        for(const elem of selectedData) {
-
-            const country = elem['Country/Region']
-
-            if(!plots.hasOwnProperty(country)) {
-                plots[country] = {
-                    x: [],
-                    y: [],
-                    mode: 'lines',
-                    name: country
+        for(const region of selectedData) {
+            plots[region] = {
+                x: [],
+                y: [],
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: region,
+                marker: {
+                    size: 5
                 }
-            }
+            }            
+        }
 
-            for(const key of Object.keys(elem)) {
+        for(const region of selectedData) {
+            
+            const regionData = data[region]
+            
+            for(const key of Object.keys(regionData)) {
+                const formattedDate = moment(key).format('YYYY-MM-DD')
+                plots[region].x.push(formattedDate)
 
-                if(key === 'Country/Region' || key === 'Lat' || key === 'Long') {
-                    continue
+                let value = regionData[key]
+
+                if(y_type === 'percent') {
+                    value = numeral(value).format('0%')
                 }
 
-                plots[country].x.push(key)
-                plots[country].y.push(elem[key])
+                plots[region].y.push(value)
             }
         }
     
+        console.dir(plots)
         setPlotsAsValues(Object.values(plots))
-    }, [selectedCountries])
+    }, [selected, data])
+
+    const layout = {
+        title: title
+    }
+    
+    if(y_title) {
+        layout['yaxis'] = {
+            title: y_title
+        }
+    }
+    if(x_title) {
+        layout['xaxis'] = {
+            title: x_title
+        }
+    }
 
     return (
         <Plot
             data={plotsAsValues}
-            layout={ {width: 450, height: 500, title: title} }
+            layout={layout}
+            config={config}
         />
 
     )
