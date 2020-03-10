@@ -32,7 +32,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             const regionData = data[region]
             
             for(const key of Object.keys(regionData)) {
-                const formattedDate = moment(key).format('YYYY-MM-DD')
+                const formattedDate = moment(key, 'MM/DD/YYYY').format('YYYY-MM-DD')
                 plots[region].x.push(formattedDate)
 
                 let value = regionData[key]
@@ -45,9 +45,8 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             }
         }
     
-        console.dir(plots)
         setPlotsAsValues(Object.values(plots))
-    }, [selected, data])
+    }, [selected, data, y_type])
 
     const layout = {
         title: title
