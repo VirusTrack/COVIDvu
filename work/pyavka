@@ -44,9 +44,9 @@ function convertUS2TSV {
 
 # *** main ***
 
-# curl -s "$RAW_DATA_SOURCE" | \
-#     awk '/<table/ { gsub("<table", "\n<table"); gsub("\/table>", "/table>\n"); print; }' | \
-#     awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
+curl -s "$RAW_DATA_SOURCE" | \
+    awk '/<table/ { gsub("<table", "\n<table"); gsub("\/table>", "/table>\n"); print; }' | \
+    awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
 
 convertWorld2TSV "$SITE_DATA_DIR/table-00.html"
 convertUS2TSV "$SITE_DATA_DIR/table-01.html"
