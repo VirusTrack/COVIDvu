@@ -1,8 +1,9 @@
+beautifulsoup4
 cufflinks
 jupyter
-plotly
-pudb
-pandas
 matplotlib
 numpy
+pandas
+plotly
+pudb
 pytest

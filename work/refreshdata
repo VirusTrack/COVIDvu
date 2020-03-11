@@ -104,6 +104,11 @@ function deployVirusUpdateJSON {
 } # deployVirusUpdateJSON
 
 
+function patchCSSEData {
+    python -m covidvu.vudpatch confirmed deaths recovered
+} # patchCSSEData
+
+
 # *** main ***
 
 assertSiteDataExists
@@ -118,6 +123,8 @@ case "$1" in
         assertCloudFrontConfig
         assert_rcloneConfig
         generateVirusUpdateJSONFiles
+        ./pyavka
+        patchCSSEData
         deployVirusUpdateJSON
         ;;
 esac
