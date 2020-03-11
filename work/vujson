@@ -3,11 +3,8 @@
 # vim: set fileencoding=utf-8:
 
 
-CONTAINER_SIG_FILE="/proc/1/cgroup"
-
-# REFRESHDATA_CONFIG="./refreshdata.config"
-# 
-# [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
 
 
 # *** functions ***

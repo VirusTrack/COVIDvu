@@ -20,7 +20,8 @@ set fo-=r
 set shell=/bin/bash
 " color desert
 " color elflord
-color darkblue
+" color darkblue
+color shine
 
 set nu
 autocmd VimEnter * NERDTree

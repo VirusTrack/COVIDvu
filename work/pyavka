@@ -2,48 +2,31 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
-# ------------------------------------------------------------------------------
-#                           E X P E R I M E N T A L
-# ------------------------------------------------------------------------------
 
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
 
 SITE_DATA_DIR="site-data"
 
 HTML_FILE_NAME="$SITE_DATA_DIR/table-%02d.html"
 RAW_DATA_SOURCE="https://docs.google.com/spreadsheets/d/e/2PACX-1vR30F8lYP3jG7YOq8es0PBpJIE5yvRVZffOyaqC0GgMBN6yt0Q-NI8pxS7hd1F9dYXnowSC6zpZmW9D/pubhtml?gid=0&amp;single=false&amp;widget=true&amp;headers=true"
-SCRAPED_US_TSV="$SITE_DATA_DIR/scraped-US.tsv"
-SCRAPED_WORLD_TSV="$SITE_DATA_DIR/scraped-world.tsv"
-
-
-function convertWorld2TSV {
-    local inputFile="$1"
-
-    awk '{ gsub("<tr", "\n<tr"); print; }' "$inputFile" | \
-    awk -F "[><]" 'NR < 8 { next; }' | \
-    awk '{ gsub(",", ""); print; }' | tee "$SCRAPED_WORLD_TSV"
-} # convertWorld2TSV
-
-
-function convertUS2TSV {
-    local inputFile="$1"
-
-    awk '{ gsub("<tr", "\n<tr"); print; }' "$inputFile" | \
-    awk -F "[><]" 'NR < 7 { next; } 
-                    /Wuhan/ || /Mariana/ || /Virgin/ || /TBD/ || /Samoa/ || /Guam/ || /Rico/ { next; }
-                    !/TOTAL/ && NF == 45 {                printf("[%d]\t%s\t%s\t%s\t%s\t%s\t%s\n", NF, $13, $17, $21, $25, $29, $33, $36); }
-                    !/TOTAL/ && NF == 49 && length($13) { printf("[%d]\t%s\t%s\t%s\t%s\t%s\t%s\n", NF, $13, $17, $21, $25, $29, $33, $35); }
-                    !/TOTAL/ && NF == 53 {                printf("[%d]\t%s\t%s\t%s\t%s\t%s\t%s\n", NF, $15, $17, $21, $25, $29, $33); }' | \
-    awk '{ gsub(",", ""); print; }' | tee "$SCRAPED_US_TSV"
-    # awk -F "\t" '{ for (f = 1;f <= NF;f++) printf("%d - %s\n", f, $f); }'| tee "$SCRAPED_US_TSV"
-} # convertUS2TSV
 
 
 # *** main ***
+
+if [[ "Linux" == $(uname) ]]
+then
+    awk '/docker/ || /lxc/ { exit(99); }' "$CONTAINER_SIG_FILE"
+    if [[ "$?" == 0 ]]
+    then
+        echo "start virtual environment in " $(pwd)
+        source ./bin/activate
+    fi
+fi
 
 curl -s "$RAW_DATA_SOURCE" | \
     awk '/<table/ { gsub("<table", "\n<table"); gsub("\/table>", "/table>\n"); print; }' | \
     awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
 
-convertWorld2TSV "$SITE_DATA_DIR/table-00.html"
-# convertUS3TSV "$SITE_DATA_DIR/table-01.html"
+python3 -m covidvu.pyavka
 

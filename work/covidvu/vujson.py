@@ -84,8 +84,10 @@ US_REGIONS_LONG = {
     'Texas': 'TX',
     'Utah': 'West',
     'Vermont': 'Northeast',
-    'Washington': 'West',
+    'Virginia': 'South',
     'Washington D.C.': 'South',
+    'Washington': 'West',
+    'West Virginia': 'South',
     'Wisconsin': 'Midwest',
     'Wyoming': 'West',
 }
