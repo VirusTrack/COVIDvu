@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
+
+import { useDispatch, useSelector } from 'react-redux'
+import { actions } from '../ducks/services'
 
 import { Tag, Tab } from "rbx"
-
-import DataService from '../services'
 
 import ThreeGraphLayout from '../layouts/ThreeGraphLayout'
 
@@ -15,7 +16,8 @@ import { US_STATES } from '../constants'
 import numeral from 'numeral'
 
 export const USGraphContainer = () => {
-    const dataService = new DataService()
+
+    const dispatch = useDispatch()
 
     const [selectedStates, setSelectedStates] = useState(['!Total US'])
 
@@ -23,48 +25,24 @@ export const USGraphContainer = () => {
 
     const availableStates = US_STATES
 
-    const [confirmedUS, setConfirmedUS] = useState(null)
-    const [recoveredUS, setRecoveredUS] = useState(null)
-    const [deathsUS, setDeathsUS] = useState(null)
-    const [mortalityUS, setMortalityUS] = useState(null)
-    const [recoveryUS, setRecoveryUS] = useState(null)
+    const confirmed = useSelector(state => state.services.usStates.confirmed)
+    const recovered = useSelector(state => state.services.usStates.recovered)
+    const deaths = useSelector(state => state.services.usStates.deaths)
+    const mortality = useSelector(state => state.services.usStates.mortality)
+    const recovery = useSelector(state => state.services.usStates.recovery)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
 
-    async function fetchConfirmed() {
-        const confirmed = await dataService.getConfirmed('-US')
-        if(confirmed) {
-            const totalUS = Object.values(confirmed['!Total US'])
-
-            setConfirmedUS(confirmed)
-            setConfirmedTotal(totalUS[totalUS.length - 1])
-        }
-    }
-
-    async function fetchDeaths() {
-        const deaths = await dataService.getDeaths('-US')
-        setDeathsUS(deaths)
-    }
-    
-    async function fetchRecovered() {
-        const deaths = await dataService.getRecovered('-US')
-        setRecoveredUS(deaths)
-    }
-
-
     useEffect(() => {
-        fetchConfirmed()
-        fetchDeaths()
-        fetchRecovered()
+        dispatch(actions.fetchUSStates())
     }, [])
 
-    useMemo(() => {
-        const { mortality, recovery } = dataService.calculateMortalityAndRecovery(deathsUS, confirmedUS, recoveredUS)
-
-        setMortalityUS(mortality)
-        setRecoveryUS(recovery)
-
-    }, [deathsUS, confirmedUS, recoveredUS])
+    useEffect(() => {
+        if(confirmed) {
+            const totalStates = Object.values(confirmed['!Total US'])
+            setConfirmedTotal(totalStates[totalStates.length - 1])
+        }
+    }, [confirmed])
     
     return (
         <ThreeGraphLayout>
@@ -83,7 +61,7 @@ export const USGraphContainer = () => {
             <GraphWithLoader 
                 graphName="Cases by State"
                 secondaryGraph="Cases by State"
-                graph={confirmedUS}
+                graph={confirmed}
                 selected={selectedStates}
                 y_title="Total confirmed cases"
                 config={
@@ -105,7 +83,7 @@ export const USGraphContainer = () => {
                 <GraphWithLoader 
                     graphName="Deaths"
                     secondaryGraph={secondaryGraph}
-                    graph={deathsUS}
+                    graph={deaths}
                     selected={selectedStates}
                     y_title="Number of deaths"
                     config={
@@ -119,7 +97,7 @@ export const USGraphContainer = () => {
                 <GraphWithLoader 
                     graphName="Recovered"
                     secondaryGraph={secondaryGraph}
-                    graph={recoveredUS}
+                    graph={recovered}
                     selected={selectedStates}
                     y_title="Number of recovered"
                     config={
@@ -133,7 +111,7 @@ export const USGraphContainer = () => {
                 <GraphWithLoader 
                     graphName="Mortality"
                     secondaryGraph={secondaryGraph}
-                    graph={mortalityUS}
+                    graph={mortality}
                     selected={selectedStates}
                     y_type='percent'
                     y_title="Mortality Rate Percentage"
@@ -148,7 +126,7 @@ export const USGraphContainer = () => {
                 <GraphWithLoader 
                     graphName="Recovery"
                     secondaryGraph={secondaryGraph}
-                    graph={recoveryUS}
+                    graph={recovery}
                     selected={selectedStates}
                     y_type='percent'
                     y_title="Recovery Rate Percentage"

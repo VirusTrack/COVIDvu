@@ -3,6 +3,7 @@ import React from 'react'
 import { CovidGlobalPage } from './CovidGlobalPage'
 import { CovidUSPage } from './CovidUSPage'
 import { CovidUSRegionsPage } from './CovidUSRegionsPage'
+import { StatsPage } from './StatsPage'
 import { AboutPage } from './AboutPage'
 
 import {
@@ -24,6 +25,9 @@ const App = () => (
         </Route>
         <Route path="/covid">
             <CovidGlobalPage />
+        </Route>
+        <Route path="/stats">
+            <StatsPage />
         </Route>
         <Route path="/about">
             <AboutPage />

@@ -1,18 +1,18 @@
 import React from 'react'
 
 import ErrorBoundary from '../components/ErrorBoundary'
-import GlobalGraphContainer from '../containers/GlobalGraphContainer'
+import StatsContainer from '../containers/StatsContainer'
 import MainLayout from '../layouts/MainLayout'
 
-export const CovidGlobalPage = () => {
+export const StatsPage = () => {
 
     return (
         <MainLayout>
             <ErrorBoundary>
-                <GlobalGraphContainer />
+                <StatsContainer />
             </ErrorBoundary>
         </MainLayout>
     )
 }
 
-export default CovidGlobalPage
+export default StatsPage
