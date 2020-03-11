@@ -4,6 +4,7 @@
 
 
 from covidvu.vujson import SITE_DATA
+from covidvu.vujson import US_REGIONS_LONG
 
 import csv
 import json
@@ -24,21 +25,49 @@ SCRAPED_WORLD_DATA = os.path.join(SITE_DATA, 'scraped-world.tsv')
 SCRAPED_US_DATA    = os.path.join(SITE_DATA, 'scraped-US.tsv')
 SCRAPED_TODAY      = datetime.date.today().strftime('%m-%d-%Y')
 
+STATE_NAMES = {
+                    'District of Columbia': 'Washington D.C.',
+              }
+
 
 # *** functions ***
 
-def _fetchWorldUpdates(columnRef):
-    updateWorld = dict()
+def _fetchCurrentUpdates(columnRef, index = 'OTHER PLACES'):
+    updatesDataset = dict()
     with open(SCRAPED_WORLD_DATA, 'r') as inputFile:
         rawData = csv.DictReader(inputFile, delimiter = '\t')
         for row in rawData:
-            if 'Diamond' not in row['OTHER PLACES']:
-                updateWorld[row['OTHER PLACES']] = { SCRAPED_TODAY: float(row[columnRef]) }
+            ref = row[index]
+            if 'Queue' == ref:
+                continue
+            if 'Diamond' not in row[index]:
+                try:
+                    bodyCount = float(row[columnRef]) if row[columnRef] != '' else 0.0
+                except:
+                    bodyCount = 0.0
+                updatesDataset[ref] = { SCRAPED_TODAY: float(bodyCount) }
 
-    if 'Queue' in updateWorld:
-        del(updateWorld['Queue'])
+    if 'Queue' in updatesDataset:
+        del(updatesDataset['Queue'])
 
-    return updateWorld
+    return updatesDataset
+
+
+def _fetchCurrentUpdatesUS(columnRef, index = 'UNITED STATES'):
+    updatesDataset = dict()
+    with open(SCRAPED_US_DATA, 'r') as inputFile:
+        rawData = csv.DictReader(inputFile, delimiter = '\t')
+        for row in rawData:
+            try:
+                bodyCount = float(row[columnRef]) if row[columnRef] != '' else 0.0
+            except:
+                bodyCount = 0.0
+            updatesDataset[row[index]] = { SCRAPED_TODAY: bodyCount, }
+
+    if 'Queue' in updatesDataset:
+        del(updatesDataset['Queue'])
+
+    return updatesDataset
 
 
 def _fetchJSONData(target, region = ""):
@@ -74,16 +103,16 @@ def _homologizeUpdateData(dataset, table):
     return dataset
 
 
-def _applyNewRecordsFrom(dataWorld, updates):
+def _applyNewRecordsFrom(dataset, updates):
     for key in updates:
-        if key not in dataWorld:
-            dataWorld[key] = { SCRAPED_TODAY: 0.0 }
+        if key not in dataset:
+            dataset[key] = { SCRAPED_TODAY: 0.0, }
 
-    return dataWorld
+    return dataset
 
 
 def _patchWorldData(target, columnRef):
-    updateWorld = _fetchWorldUpdates(columnRef)
+    updateWorld = _fetchCurrentUpdates(columnRef)
     updateWorld = _homologizeUpdateData(updateWorld, COUNTRY_NAMES)
     dataWorld   = _fetchJSONData(target)
     dataWorld   = _applyNewRecordsFrom(dataWorld, updateWorld)
@@ -92,6 +121,41 @@ def _patchWorldData(target, columnRef):
         dataWorld[country][SCRAPED_TODAY] = updateWorld[country][SCRAPED_TODAY]
 
     _dumpJSON(dataWorld, target)
+
+
+def _patchUSData(target, columnRef):
+    updateUS = _fetchCurrentUpdatesUS(columnRef, 'UNITED STATES')
+    updateUS = _homologizeUpdateData(updateUS, STATE_NAMES)
+    dataUS   = _fetchJSONData(target, "-US")
+    dataUS   = _applyNewRecordsFrom(dataUS, updateUS)
+
+    for state in updateUS.keys():
+        dataUS[state][SCRAPED_TODAY] = updateUS[state][SCRAPED_TODAY]
+
+    _dumpJSON(dataUS, target, "-US")
+
+
+def _patchUSRegionsData(target, columnRef):
+    updateUSRegions = dict()
+
+    updateUS      = _fetchCurrentUpdatesUS(columnRef, 'UNITED STATES')
+    updateUS      = _homologizeUpdateData(updateUS, STATE_NAMES)
+    dataUSRegions = _fetchJSONData(target, '-US-Regions')
+
+    for state in updateUS:
+        region = US_REGIONS_LONG[state]
+        if region not in updateUSRegions:
+            updateUSRegions[region] = { SCRAPED_TODAY: 0.0, }
+
+        updateUSRegions[region][SCRAPED_TODAY] += float(updateUS[state][SCRAPED_TODAY])
+
+    for key in updateUSRegions.keys():
+        try:
+            dataUSRegions[key][SCRAPED_TODAY] = updateUSRegions[key][SCRAPED_TODAY]
+        except:
+            continue
+
+    a = dataUSRegions['West']
 
 
 def _main(target):
@@ -103,6 +167,8 @@ def _main(target):
         columnRef = 'Recovered'
 
     _patchWorldData(target, columnRef)
+    _patchUSData(target, columnRef)
+    _patchUSRegionsData(target, columnRef)
 
 
 # +++ main +++
