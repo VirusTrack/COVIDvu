@@ -117,7 +117,7 @@ export function* fetchGlobal() {
         const deaths = yield call(dataService.getDeaths)
         const recovered = yield call(dataService.getRecovered)
 
-        const { mortality, recovery } = dataService.calculateMortalityAndRecovery(deaths, confirmed, recovered)
+        const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
 
         // let statsTotals = {}
         
@@ -148,7 +148,7 @@ export function* fetchUSStates() {
         const deaths = yield call(dataService.getDeaths, '-US')
         const recovered = yield call(dataService.getRecovered, '-US')
 
-        const { mortality, recovery } = dataService.calculateMortalityAndRecovery(deaths, confirmed, recovered)
+        const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
 
         yield put(
             { 
@@ -173,7 +173,7 @@ export function* fetchUSRegions() {
         const deaths = yield call(dataService.getDeaths, '-US-Regions')
         const recovered = yield call(dataService.getRecovered, '-US-Regions')
 
-        const { mortality, recovery } = dataService.calculateMortalityAndRecovery(deaths, confirmed, recovered)
+        const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
 
         yield put(
             { 
