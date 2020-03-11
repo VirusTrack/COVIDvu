@@ -13,7 +13,8 @@ import os
 import sys
 
 
-# --- consstants ---
+# --- constants ---
+
 COUNTRY_NAMES = {
                     'Bosnia'         : 'Bosnia and Herzegovina',
                     'Denmark*'       : 'Denmark',

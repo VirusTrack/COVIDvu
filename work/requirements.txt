@@ -1,3 +1,4 @@
+beautifulsoup4
 cufflinks
 jupyter
 matplotlib
@@ -6,4 +7,3 @@ pandas
 plotly
 pudb
 pytest
-scrapy

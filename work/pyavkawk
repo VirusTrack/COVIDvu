@@ -19,8 +19,12 @@ function convertWorld2TSV {
     local inputFile="$1"
 
     awk '{ gsub("<tr", "\n<tr"); print; }' "$inputFile" | \
-    awk -F "[><]" 'NR < 8 { next; }' | \
+    awk -F "[><]" 'NR < 8 { next; } 
+                    !/TOTAL/ && NF == 45 { printf("[%d]\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", NF, $13, $17, $21, $25, $29, $33, $36); }
+                    !/TOTAL/ && NF == 49 && length($13) { printf("[%d]\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", NF, $13, $17, $21, $25, $29, $33, $35); }
+                    !/TOTAL/ && NF == 53 { printf("[%d]\t%s\t%s\t%s\t%s\t%s\t%s\n", NF, $15, $17, $21, $25, $29, $33); }' | \
     awk '{ gsub(",", ""); print; }' | tee "$SCRAPED_WORLD_TSV"
+    # awk -F "\t" '{ for (f = 1;f <= NF;f++) printf("%d - %s\n", f, $f); }'| tee "$SCRAPED_WORLD_TSV"
 } # convertWorld2TSV
 
 
@@ -45,5 +49,5 @@ curl -s "$RAW_DATA_SOURCE" | \
     awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
 
 convertWorld2TSV "$SITE_DATA_DIR/table-00.html"
-# convertUS3TSV "$SITE_DATA_DIR/table-01.html"
+convertUS2TSV "$SITE_DATA_DIR/table-01.html"
 
