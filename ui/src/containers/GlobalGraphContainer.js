@@ -1,4 +1,7 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
+
+import { useDispatch, useSelector } from 'react-redux'
+import { actions } from '../ducks/services'
 
 import { Tag, Tab } from "rbx"
 
@@ -10,63 +13,52 @@ import { COUNTRIES } from '../constants'
 
 import numeral from 'numeral'
 
-import DataService from '../services'
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
 export const GlobalGraphContainer = () => {
 
-    const dataService = new DataService()
-
+    const dispatch = useDispatch()
+      
     const [selectedCountries, setSelectedCountries] = useState(['!Global', '!Outside Mainland China'])
-
     const [secondaryGraph, setSecondaryGraph] = useState('Deaths')
 
     const availableCountries = COUNTRIES
 
-    const [confirmed, setConfirmed] = useState(null)
-    const [recovered, setRecovered] = useState(null)
-    const [deaths, setDeaths] = useState(null)
-    const [mortality, setMortality] = useState(null)
-    const [recovery, setRecovery] = useState(null)
+    const confirmed = useSelector(state => state.services.global.confirmed)
+    const recovered = useSelector(state => state.services.global.recovered)
+    const deaths = useSelector(state => state.services.global.deaths)
+    const mortality = useSelector(state => state.services.global.mortality)
+    const recovery = useSelector(state => state.services.global.recovery)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
+    const [totalCountries, setTotalCountries] = useState(0)
 
-    async function fetchConfirmed() {
-        const confirmed = await dataService.getConfirmed()
-        if(confirmed) {
-            const totalGlobal = Object.values(confirmed['!Global'])
-
-            setConfirmed(confirmed)
-            setConfirmedTotal(totalGlobal[totalGlobal.length - 1])
-        }
-    }
-
-    async function fetchDeaths() {
-        const deaths = await dataService.getDeaths()
-        setDeaths(deaths)
-    }
-    
-    async function fetchRecovered() {
-        const deaths = await dataService.getRecovered()
-        setRecovered(deaths)
-    }
+    const COUNTRY_COUNT = Object.keys(COUNTRIES).length - 2
 
     /**
      * Fetch all the data
      */
     useEffect(() => {
-        fetchConfirmed()
-        fetchDeaths()
-        fetchRecovered()
+        dispatch(actions.fetchGlobal())
+
     }, [])
 
-    useMemo(() => {
-        const { mortality, recovery } = dataService.calculateMortalityAndRecovery(deaths, confirmed, recovered)
+    useEffect(() => {
+        if(confirmed) {
+            const totalGlobal = Object.values(confirmed['!Global'])
+            setConfirmedTotal(totalGlobal[totalGlobal.length - 1])
 
-        setMortality(mortality)
-        setRecovery(recovery)
-
-    }, [deaths, confirmed, recovered])    
+            let confirmedCountries = 0
+            for(const country of Object.keys(confirmed)) {
+                const total = Object.values(confirmed[country]).reduce((total, value) => total + value)
+                
+                if(total > 0 && country !== '!Global' && country !== '!Outside Mainland China') {
+                    ++confirmedCountries
+                }
+            }
+            setTotalCountries(confirmedCountries)
+        }
+    }, [confirmed])
 
     return (
         <ThreeGraphLayout>
@@ -80,8 +72,13 @@ export const GlobalGraphContainer = () => {
                     handleSelected={(dataList) => {
                         setSelectedCountries(dataList)
                     }} />
+
+                <br />
+                <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br />
+                
             </>
 
+            <>
             <GraphWithLoader 
                 graphName="Cases"
                 secondaryGraph="Cases"
@@ -91,11 +88,11 @@ export const GlobalGraphContainer = () => {
                 config={
                     {
                         displayModeBar: false,
-                        showlegend: true
+                        showlegend: true,
                     }
                 }
             />
-
+            </>
             <>
                 <Tab.Group>
                     <Tab active={secondaryGraph === 'Deaths'} onClick={() => { setSecondaryGraph('Deaths')}}>Deaths</Tab>

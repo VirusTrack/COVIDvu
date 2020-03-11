@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+
+import { useDispatch, useSelector } from 'react-redux'
+import { actions } from '../ducks/services'
 
 import { Column, Tag, Message, Tab } from "rbx"
 
 import ThreeGraphLayout from '../layouts/ThreeGraphLayout'
-import DataService from '../services'
 
 import { US_REGIONS } from '../constants'
 
@@ -11,7 +13,7 @@ import GraphWithLoader from '../components/GraphWithLoader'
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
 export const USRegionsGraphContainer = () => {
-    const dataService = new DataService()
+    const dispatch = useDispatch()
 
     const [selectedRegions, setSelectedRegions] = useState(['!Total US'])
 
@@ -19,48 +21,24 @@ export const USRegionsGraphContainer = () => {
 
     const availableRegions = US_REGIONS
 
-    const [confirmedUSRegions, setConfirmedUSRegions] = useState(null)
-    const [recoveredUSRegions, setRecoveredUSRegions] = useState(null)
-    const [deathsUSRegions, setDeathsUSRegions] = useState(null)
-    const [mortalityUSRegions, setMortalityUSRegions] = useState(null)
-    const [recoveryUSRegions, setRecoveryUSRegions] = useState(null)
+    const confirmed = useSelector(state => state.services.usStates.confirmed)
+    const recovered = useSelector(state => state.services.usStates.recovered)
+    const deaths = useSelector(state => state.services.usStates.deaths)
+    const mortality = useSelector(state => state.services.usStates.mortality)
+    const recovery = useSelector(state => state.services.usStates.recovery)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
 
-    async function fetchConfirmed() {
-        const confirmed = await dataService.getConfirmed('-US-Regions')
-        if(confirmed) {
-            const totalUS = Object.values(confirmed['!Total US'])
-
-            setConfirmedUSRegions(confirmed)
-            setConfirmedTotal(totalUS[totalUS.length - 1])
-        }
-    }
-
-    async function fetchDeaths() {
-        const deaths = await dataService.getDeaths('-US-Regions')
-        setDeathsUSRegions(deaths)
-    }
-    
-    async function fetchRecovered() {
-        const deaths = await dataService.getRecovered('-US-Regions')
-        setRecoveredUSRegions(deaths)
-    }
-
-
     useEffect(() => {
-        fetchConfirmed()
-        fetchDeaths()
-        fetchRecovered()
+        dispatch(actions.fetchUSRegions())
     }, [])
 
-    useMemo(() => {
-        const { mortality, recovery } = dataService.calculateMortalityAndRecovery(deathsUSRegions, confirmedUSRegions, recoveredUSRegions)
-
-        setMortalityUSRegions(mortality)
-        setRecoveryUSRegions(recovery)
-
-    }, [deathsUSRegions, confirmedUSRegions, recoveredUSRegions])
+    useEffect(() => {
+        if(confirmed) {
+            const totalRegions = Object.values(confirmed['!Total US'])
+            setConfirmedTotal(totalRegions[totalRegions.length - 1])
+        }
+    }, [confirmed])    
 
     return (
         <ThreeGraphLayout>
@@ -81,7 +59,7 @@ export const USRegionsGraphContainer = () => {
                 graphName="Confirmed"
                 secondaryGraph="Confirmed"
                 title="Cases US Regions"
-                graph={confirmedUSRegions}
+                graph={confirmed}
                 selected={selectedRegions}
                 y_title="Total confirmed cases"
                 config={
@@ -102,7 +80,7 @@ export const USRegionsGraphContainer = () => {
                 <GraphWithLoader 
                     graphName="Deaths"
                     secondaryGraph={secondaryGraph}
-                    graph={deathsUSRegions}
+                    graph={deaths}
                     selected={selectedRegions}
                     y_title="Number of deaths"
                     config={
@@ -116,7 +94,7 @@ export const USRegionsGraphContainer = () => {
                 <GraphWithLoader 
                     graphName="Recovered"
                     secondaryGraph={secondaryGraph}
-                    graph={recoveredUSRegions}
+                    graph={recovered}
                     selected={selectedRegions}
                     y_title='Number of recovered'
                     config={
@@ -130,7 +108,7 @@ export const USRegionsGraphContainer = () => {
                 <GraphWithLoader 
                     graphName="Mortality"
                     secondaryGraph={secondaryGraph}
-                    graph={mortalityUSRegions}
+                    graph={mortality}
                     selected={selectedRegions}
                     y_type='percent'
                     y_title='Mortality Rate Percentage'
@@ -146,7 +124,7 @@ export const USRegionsGraphContainer = () => {
                 <GraphWithLoader 
                     graphName="Recovery"
                     secondaryGraph={secondaryGraph}
-                    graph={recoveryUSRegions}
+                    graph={recovery}
                     selected={selectedRegions}
                     y_type='percent'
                     y_title='Recovery Rate Percentage'

@@ -5,7 +5,7 @@ import Plot from 'react-plotly.js'
 import numeral from 'numeral'
 import moment from 'moment'
 
-export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config}) => {
+export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, width, height}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
 
@@ -49,18 +49,25 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
     }, [selected, data, y_type])
 
     const layout = {
-        title: title
+        title: title,
+        height: height
     }
-    
+        
     if(y_title) {
         layout['yaxis'] = {
             title: y_title
-        }
+        }        
     }
     if(x_title) {
         layout['xaxis'] = {
             title: x_title
         }
+    }
+
+    layout['legend'] = {
+        x: 1,
+        xanchor: 'right',
+        y: 1
     }
 
     return (

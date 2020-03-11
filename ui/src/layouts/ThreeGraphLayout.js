@@ -7,7 +7,7 @@ export const ThreeGraphLayout = ({ children }) => {
 
     return (
         <>
-            <Column.Group gapless breakpoint="mobile">
+            <Column.Group gapless>
                 <Column>
                     {nodes[0]}
                 </Column>
