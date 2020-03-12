@@ -24,7 +24,7 @@ COUNTRY_NAMES = {
                 }
 SCRAPED_WORLD_DATA = os.path.join(SITE_DATA, 'scraped-world.tsv')
 SCRAPED_US_DATA    = os.path.join(SITE_DATA, 'scraped-US.tsv')
-SCRAPED_TODAY      = datetime.date.today().strftime('%m-%d-%Y')
+SCRAPED_TODAY      = datetime.date.today().strftime('%Y-%m-%d')
 
 STATE_NAMES = {
                     'District of Columbia': 'Washington D.C.',
