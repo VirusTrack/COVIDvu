@@ -123,8 +123,11 @@ case "$1" in
         assertCloudFrontConfig
         assert_rcloneConfig
         generateVirusUpdateJSONFiles
-        ./pyavka
-        patchCSSEData
+        if [[ "patch" = "$2" ]]
+        then
+            ./pyavka
+            patchCSSEData
+        fi
         deployVirusUpdateJSON
         ;;
 esac
