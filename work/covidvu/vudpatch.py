@@ -18,6 +18,8 @@ import sys
 COUNTRY_NAMES = {
                     'Bosnia'         : 'Bosnia and Herzegovina',
                     'Denmark*'       : 'Denmark',
+                    'TOTAL'          : '!Global',
+                    'U.S. TOTAL'     : '!Total US',
                     'UAE'            : 'United Arab Emirates',
                     'United Kingdom' : 'UK',
                     'United States'  : 'US',
@@ -28,6 +30,7 @@ SCRAPED_TODAY      = datetime.date.today().strftime('%Y-%m-%d')
 
 STATE_NAMES = {
                     'District of Columbia': 'Washington D.C.',
+                    'U.S. TOTAL'          : '!Total US',
               }
 
 
@@ -120,6 +123,8 @@ def _patchWorldData(target, columnRef):
 
     for country in updateWorld.keys():
         dataWorld[country][SCRAPED_TODAY] = updateWorld[country][SCRAPED_TODAY]
+    
+    dataWorld['!Outside Mainland China'][SCRAPED_TODAY] = dataWorld['!Global'][SCRAPED_TODAY]-dataWorld['Mainland China'][SCRAPED_TODAY]
 
     _dumpJSON(dataWorld, target)
 
@@ -142,6 +147,7 @@ def _patchUSRegionsData(target, columnRef):
     updateUS      = _fetchCurrentUpdatesUS(columnRef, 'UNITED STATES')
     updateUS      = _homologizeUpdateData(updateUS, STATE_NAMES)
     dataUSRegions = _fetchJSONData(target, '-US-Regions')
+    totalUS       = 0.0
 
     for state in updateUS:
         region = US_REGIONS_LONG[state]
@@ -152,11 +158,14 @@ def _patchUSRegionsData(target, columnRef):
 
     for key in updateUSRegions.keys():
         try:
-            dataUSRegions[key][SCRAPED_TODAY] = updateUSRegions[key][SCRAPED_TODAY]
+            datum = updateUSRegions[key][SCRAPED_TODAY]
+            dataUSRegions[key][SCRAPED_TODAY] = datum
+            totalUS += datum
         except:
             continue
 
-    a = dataUSRegions['West']
+    dataUSRegions['!Total US'][SCRAPED_TODAY] = totalUS
+    _dumpJSON(dataUSRegions, target, "-US-Regions")
 
 
 def _main(target):

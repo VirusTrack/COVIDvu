@@ -109,6 +109,11 @@ function patchCSSEData {
 } # patchCSSEData
 
 
+function invalidateCloudFrontCache {
+    aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths "/*"
+} # invalidateCloudFrontCache
+
+
 # *** main ***
 
 assertSiteDataExists
