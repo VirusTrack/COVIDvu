@@ -24,8 +24,6 @@ NIXED_ROWS_INDEX = (
     'Puerto Rico',
     'Queue',
     'TBD',
-    'TOTAL',
-    'U.S. TOTAL',
     'U.S. Virgin Islands',
     'Wuhan',
 )

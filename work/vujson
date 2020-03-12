@@ -22,4 +22,5 @@ then
 fi
 
 python3 -m covidvu.vujson confirmed deaths recovered
+python3 -m covidvu.vucounty confirmed deaths recovered
 

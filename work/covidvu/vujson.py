@@ -37,6 +37,8 @@ US_REGIONS = {
 
 
 US_REGIONS_LONG = {
+    '!Total US': '!Total US',
+    'U.S. TOTAL': '!Total US',
     'Alabama': 'South',
     'Alaska': 'West',
     'Arizona': 'West',
