@@ -31,7 +31,7 @@ export const USRegionsGraphContainer = () => {
 
     useEffect(() => {
         dispatch(actions.fetchUSRegions())
-    }, [])
+    }, [dispatch])
 
     useEffect(() => {
         if(confirmed) {

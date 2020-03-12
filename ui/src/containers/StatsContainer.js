@@ -12,22 +12,6 @@ import numeral from 'numeral'
 export const StatsContainer = () => {
 
     const dispatch = useDispatch()
-      
-    const [selectedCountries, setSelectedCountries] = useState(['!Global', '!Outside Mainland China'])
-    const [secondaryGraph, setSecondaryGraph] = useState('Deaths')
-
-    const availableCountries = COUNTRIES
-
-    const confirmed = useSelector(state => state.services.global.confirmed)
-    const recovered = useSelector(state => state.services.global.recovered)
-    const deaths = useSelector(state => state.services.global.deaths)
-    const mortality = useSelector(state => state.services.global.mortality)
-    const recovery = useSelector(state => state.services.global.recovery)
-
-    const [confirmedTotal, setConfirmedTotal] = useState(0)
-    const [totalCountries, setTotalCountries] = useState(0)
-
-    const COUNTRY_COUNT = Object.keys(COUNTRIES).length - 2
 
     /**
      * Fetch all the data
@@ -35,7 +19,7 @@ export const StatsContainer = () => {
     useEffect(() => {
         dispatch(actions.fetchGlobal())
 
-    }, [])
+    }, [dispatch])
 
     // useEffect(() => {
     //     if(confirmed) {

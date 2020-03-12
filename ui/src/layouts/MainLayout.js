@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Content, Notification, Delete } from "rbx"
+import { Content } from "rbx"
 
 import { HeaderContainer } from '../containers/HeaderContainer'
 import { FooterContainer } from '../containers/FooterContainer'

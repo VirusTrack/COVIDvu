@@ -1,7 +1,6 @@
 // Action Types
 import {call, put, takeEvery} from "redux-saga/effects"
 
-import store from 'store'
 import DataService from '../services'
 
 import { createAction } from '@reduxjs/toolkit'
@@ -45,6 +44,7 @@ export default function (state = initialState, action) {
                 ...state,
                 global: { 
                     confirmed: action.confirmed,
+                    sortedConfirmed: action.sortedConfirmed,
                     deaths: action.deaths,
                     recovered: action.recovered,
                     mortality: action.mortality,
@@ -105,7 +105,20 @@ const calculateMortalityAndRecovery = (deaths, confirmed, recovered) => {
     }
 
     return { mortality, recovery }
+}
 
+const extractLatestCounts = (confirmed) => {
+    const countryWithLatestCounts = []
+
+    for(const country of Object.keys(confirmed)) {
+        const dates = Object.keys(confirmed[country])
+
+        const lastDate = dates[dates.length - 1]
+
+        countryWithLatestCounts.push({ country: country, confirmed: confirmed[country][lastDate] })
+    }
+
+    return countryWithLatestCounts
 }
 
 // Sagas
@@ -116,6 +129,10 @@ export function* fetchGlobal() {
         const confirmed = yield call(dataService.getConfirmed)
         const deaths = yield call(dataService.getDeaths)
         const recovered = yield call(dataService.getRecovered)
+
+        const latestCounts = extractLatestCounts(confirmed)
+
+        const sortedConfirmed = latestCounts.sort((a, b) => b.confirmed - a.confirmed)
 
         const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
 
@@ -129,6 +146,7 @@ export function* fetchGlobal() {
             { 
                 type: types.FETCH_GLOBAL_SUCCESS, 
                 confirmed: confirmed, 
+                sortedConfirmed: sortedConfirmed,
                 deaths: deaths, 
                 recovered: recovered,
                 mortality: mortality,

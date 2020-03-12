@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import Plot from 'react-plotly.js'
 
 import numeral from 'numeral'
-import moment from 'moment'
 
 export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, width, height}) => {
 

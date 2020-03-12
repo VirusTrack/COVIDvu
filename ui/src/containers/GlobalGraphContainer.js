@@ -25,6 +25,7 @@ export const GlobalGraphContainer = () => {
     const availableCountries = COUNTRIES
 
     const confirmed = useSelector(state => state.services.global.confirmed)
+    const sortedConfirmed = useSelector(state => state.services.global.sortedConfirmed)
     const recovered = useSelector(state => state.services.global.recovered)
     const deaths = useSelector(state => state.services.global.deaths)
     const mortality = useSelector(state => state.services.global.mortality)
@@ -35,13 +36,22 @@ export const GlobalGraphContainer = () => {
 
     const COUNTRY_COUNT = Object.keys(COUNTRIES).length - 2
 
+    const [sortedConfirmedAsText, setSortedConfirmedAsText] = useState([])
+
+    useEffect(() => {
+
+        if(sortedConfirmed) {
+            setSortedConfirmedAsText(sortedConfirmed.map(elem => elem.country))
+        }
+    }, [sortedConfirmed])
+
     /**
      * Fetch all the data
      */
     useEffect(() => {
         dispatch(actions.fetchGlobal())
 
-    }, [])
+    }, [dispatch])
 
     useEffect(() => {
         if(confirmed) {
@@ -67,7 +77,7 @@ export const GlobalGraphContainer = () => {
                 <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
 
                 <SelectRegionComponent
-                    data={availableCountries}
+                    data={sortedConfirmedAsText}
                     selected={selectedCountries}
                     handleSelected={(dataList) => {
                         setSelectedCountries(dataList)

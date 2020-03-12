@@ -35,7 +35,7 @@ export const USGraphContainer = () => {
 
     useEffect(() => {
         dispatch(actions.fetchUSStates())
-    }, [])
+    }, [dispatch])
 
     useEffect(() => {
         if(confirmed) {
