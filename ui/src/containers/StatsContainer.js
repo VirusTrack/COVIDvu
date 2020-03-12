@@ -1,64 +1,64 @@
 import React, { useEffect, useState } from 'react'
 
+import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import { COUNTRIES } from '../constants'
-
-import { Table } from 'rbx'
+import { Table, Title, Tab } from 'rbx'
 
 import numeral from 'numeral'
 
-export const StatsContainer = () => {
+export const StatsContainer = ({filter='Global'}) => {
 
     const dispatch = useDispatch()
-      
-    const [selectedCountries, setSelectedCountries] = useState(['!Global', '!Outside Mainland China'])
-    const [secondaryGraph, setSecondaryGraph] = useState('Deaths')
+    const history = useHistory()
 
-    const availableCountries = COUNTRIES
+    const [selectedTab, setSelectedTab] = useState(filter)
 
-    const confirmed = useSelector(state => state.services.global.confirmed)
-    const recovered = useSelector(state => state.services.global.recovered)
-    const deaths = useSelector(state => state.services.global.deaths)
-    const mortality = useSelector(state => state.services.global.mortality)
-    const recovery = useSelector(state => state.services.global.recovery)
+    const statsTotals = useSelector(state => state.services.global.statsTotals)
+    const usStatsTotals = useSelector(state => state.services.usStates.statsTotals)
 
-    const [confirmedTotal, setConfirmedTotal] = useState(0)
-    const [totalCountries, setTotalCountries] = useState(0)
+    const [statsForGraph, setStatsForGraph] = useState([])
 
-    const COUNTRY_COUNT = Object.keys(COUNTRIES).length - 2
+    const renderDisplay = (value) => {
+        return value.startsWith('!') ? value.substring(1) : value            
+    }
 
     /**
      * Fetch all the data
      */
     useEffect(() => {
         dispatch(actions.fetchGlobal())
+        dispatch(actions.fetchUSStates())
 
-    }, [])
+    }, [dispatch])
 
-    // useEffect(() => {
-    //     if(confirmed) {
-    //         const totalGlobal = Object.values(confirmed['!Global'])
-    //         setConfirmedTotal(totalGlobal[totalGlobal.length - 1])
 
-    //         let confirmedCountries = 0
-    //         for(const country of Object.keys(confirmed)) {
-    //             const total = Object.values(confirmed[country]).reduce((total, value) => total + value)
-                
-    //             if(total > 0 && country !== '!Global' && country !== '!Outside Mainland China') {
-    //                 ++confirmedCountries
-    //             }
-    //         }
-    //         setTotalCountries(confirmedCountries)
-    //     }
-    // }, [confirmed])
+    useEffect(() => {
+
+        if(selectedTab === 'Global' && statsTotals) {
+            setStatsForGraph(statsTotals)
+            history.replace('/stats?filter=Global')
+        } else if(selectedTab === 'US' && usStatsTotals) {
+            setStatsForGraph(usStatsTotals)
+            history.replace('/stats?filter=US')
+        }
+    }, [selectedTab, statsTotals, usStatsTotals, history])
+
+    if(!statsTotals) {
+        return (
+            <h1>Loading...</h1>
+        )
+    }
 
     return (
         <>
-        <h1>Global</h1>
+        <Tab.Group size="large">
+            <Tab active={selectedTab === 'Global'} onClick={() => { setSelectedTab('Global')}}>Global</Tab>
+            <Tab active={selectedTab === 'US'} onClick={() => { setSelectedTab('US')}}>US</Tab>
+        </Tab.Group>
 
-        <Table fullwidth>
+        <Table fullwidth hoverable>
             <Table.Head>
                 <Table.Row>
                     <Table.Heading>
@@ -82,17 +82,28 @@ export const StatsContainer = () => {
                 </Table.Row>
             </Table.Head>
             <Table.Body>
-                <Table.Row>
+                { statsForGraph.map((stat, idx) => (
+                <Table.Row key={idx}>
                     <Table.Cell>
-                        Mainland China
+                        {renderDisplay(stat.region)}
                     </Table.Cell>
                     <Table.Cell>
+                        <Title size={5} style={{color: 'hsl(141, 53%, 53%)'}}>{stat.confirmed}</Title>
                     </Table.Cell>
                     <Table.Cell>
+                        <Title size={5} style={{color: 'hsl(348, 100%, 61%)'}}>{stat.deaths}</Title>
                     </Table.Cell>
                     <Table.Cell>
+                        <Title size={5} style={{color: 'hsl(204, 86%, 53%)'}}>{stat.recovered}</Title>
+                    </Table.Cell>
+                    <Table.Cell>
+                        <Title size={6}>{numeral(stat.mortality).format('0%')}</Title>
+                    </Table.Cell>
+                    <Table.Cell>
+                        <Title size={6}>{numeral(stat.recovery).format('0%')}</Title>
                     </Table.Cell>
                 </Table.Row>
+                ))}
             </Table.Body>
         </Table>
         </>

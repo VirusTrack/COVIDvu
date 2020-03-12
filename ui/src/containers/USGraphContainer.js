@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
+import { useHistory, useLocation } from 'react-router'
+import queryString from 'query-string'
+
 import { actions } from '../ducks/services'
 
 import { Tag, Tab } from "rbx"
@@ -11,21 +14,20 @@ import GraphWithLoader from '../components/GraphWithLoader'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
-import { US_STATES } from '../constants'
-
 import numeral from 'numeral'
 
-export const USGraphContainer = () => {
+export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => {
 
     const dispatch = useDispatch()
+    const history = useHistory()
+    const { search } = useLocation()
 
-    const [selectedStates, setSelectedStates] = useState(['!Total US'])
+    const [selectedStates, setSelectedStates] = useState(region)
 
-    const [secondaryGraph, setSecondaryGraph] = useState('Deaths')
-
-    const availableStates = US_STATES
+    const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
     const confirmed = useSelector(state => state.services.usStates.confirmed)
+    const sortedConfirmed = useSelector(state => state.services.usStates.sortedConfirmed)
     const recovered = useSelector(state => state.services.usStates.recovered)
     const deaths = useSelector(state => state.services.usStates.deaths)
     const mortality = useSelector(state => state.services.usStates.mortality)
@@ -35,7 +37,22 @@ export const USGraphContainer = () => {
 
     useEffect(() => {
         dispatch(actions.fetchUSStates())
+    }, [dispatch])
+
+    useEffect(() => {
+        if(!search) {
+            handleHistory(selectedStates, secondaryGraph)
+        }
     }, [])
+
+    const handleHistory = (region, graph) => {        
+        const query = queryString.stringify({
+            region,
+            graph
+        })
+
+        history.replace(`/covid/us?${query}`)
+    }
 
     useEffect(() => {
         if(confirmed) {
@@ -44,17 +61,32 @@ export const USGraphContainer = () => {
         }
     }, [confirmed])
     
+    const handleSelectedRegion = (regionList) => {
+        setSelectedStates(regionList)
+        handleHistory(regionList, graph)
+    }
+
+    const handleSelectedGraph = (selectedGraph) => {
+        setSecondaryGraph(selectedGraph)
+        handleHistory(selectedStates, graph)
+    }
+
+
+    if(!sortedConfirmed) {
+        return (
+            <h1>Loading...</h1>
+        )
+    }
+
     return (
         <ThreeGraphLayout>
             <>                        
                 <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
 
                 <SelectRegionComponent
-                    data={availableStates}
+                    data={sortedConfirmed}
                     selected={selectedStates}
-                    handleSelected={(dataList) => {
-                        setSelectedStates(dataList)
-                    }} />
+                    handleSelected={dataList => handleSelectedRegion(dataList)} />
 
             </>
 
@@ -74,10 +106,10 @@ export const USGraphContainer = () => {
 
             <>
                 <Tab.Group>
-                    <Tab active={secondaryGraph === 'Deaths'} onClick={() => { setSecondaryGraph('Deaths')}}>Deaths</Tab>
-                    <Tab active={secondaryGraph === 'Recovered'} onClick={() => { setSecondaryGraph('Recovered')}}>Recovered</Tab>
-                    <Tab active={secondaryGraph === 'Mortality'} onClick={() => { setSecondaryGraph('Mortality')}}>Mortality</Tab>
-                    <Tab active={secondaryGraph === 'Recovery'} onClick={() => { setSecondaryGraph('Recovery')}}>Recovery</Tab>
+                    <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
+                    <Tab active={secondaryGraph === 'Recovered'} onClick={() => { handleSelectedGraph('Recovered')}}>Recovered</Tab>
+                    <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
+                    <Tab active={secondaryGraph === 'Recovery'} onClick={() => { handleSelectedGraph('Recovery')}}>Recovery</Tab>
                 </Tab.Group>
 
                 <GraphWithLoader 

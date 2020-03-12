@@ -4,6 +4,10 @@ import { Select } from 'rbx'
 
 export const SelectRegionComponent = ({data, selected, handleSelected}) => {
 
+    const renderDisplay = (value) => {
+        return value.startsWith('!') ? value.substring(1) : value            
+    }
+
     const onChange = (event) => {
         const options = event.target.options
 
@@ -22,7 +26,7 @@ export const SelectRegionComponent = ({data, selected, handleSelected}) => {
         <Select.Container style={{marginTop: '0.5rem'}}>
             <Select multiple size={10} value={selected} onChange={onChange}>
                 {data.map(element => (
-                    <Select.Option key={element} value={element}>{element}</Select.Option>
+                    <Select.Option key={element.region} value={element.region}>{renderDisplay(`${element.region} ${element.stats}`)}</Select.Option>
                 ))}
             </Select>
         </Select.Container>
