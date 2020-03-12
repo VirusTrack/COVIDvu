@@ -13,7 +13,13 @@ export const AboutPage = () => {
                     <h2>About Us</h2>
                 </Message.Header>
                 <Message.Body>
-                    More links coming soon. For now you can look us up on <a href="https://github.com/pr3d4t0r/covidvu" target="_new">GitHub</a>.
+                    <p>
+                        More links coming soon. For now you can look us up on <a href="https://github.com/pr3d4t0r/covidvu" target="_new">GitHub</a>.                        
+                    </p>
+                    <br />
+                    <p>
+                        <a href="https://t.me/covidvudev" target="_new">Join us on Telegram.</a>
+                    </p>
                 </Message.Body>
             </Message>
         </ContentLayout>

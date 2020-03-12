@@ -14,12 +14,6 @@ export const MainLayout = ({ children }) => {
 
             <Content style={{ margin: '0.5rem' }}>
 
-                <Notification color="warning">
-                    <Delete as="button" />
-
-                    Our data source only updates once a day, but we'd love help to get data faster. If you'd like to contribute please reach out to us on <a href="https://github.com/pr3d4t0r/covidvu" target="_new">GitHub</a>.
-                </Notification>
-
                 {nodes[0]}
 
             </Content>
