@@ -31,6 +31,7 @@ def allUSCounties(fileName = JH_CSSE_FILE_CONFIRMED):
 
     casesUSCounty       = casesUSCounty.reindex(sorted(casesUSCounty.columns), axis=1)
     casesUSCounty.index = pd.to_datetime(casesUSCounty.index)
+    casesUSCounty.fillna(method='ffill', axis=0, inplace=True)
     return casesUSCounty
 
 
