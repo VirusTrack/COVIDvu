@@ -188,7 +188,7 @@ def dumpGlobalCasesAsJSONFor(cases, target = None, indent = 2):
         target: string or file stream; if None, return a JSON string
     """
     keys        = cases.keys()
-    cases.index = cases.index.map(lambda s: s.strftime('%m/%d/%Y'))
+    cases.index = cases.index.map(lambda s: s.strftime('%Y-%m-%d'))
     result      = cases[keys].to_dict()
 
     if target:
@@ -199,7 +199,7 @@ def dumpGlobalCasesAsJSONFor(cases, target = None, indent = 2):
 
 def dumpUSCasesAsJSONFor(cases, target = None, scope = 'US', indent = 2):
     keys        = cases.keys()
-    cases.index = cases.index.map(lambda s: s.strftime('%m/%d/%Y'))
+    cases.index = cases.index.map(lambda s: s.strftime('%Y-%m-%d'))
     result      = cases[keys].to_dict()
     target      = target.replace('.json', '-%s.json' % scope)
 
