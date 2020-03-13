@@ -21,7 +21,7 @@ COUNTRY_NAMES = {
                     'TOTAL'          : '!Global',
                     'U.S. TOTAL'     : '!Total US',
                     'UAE'            : 'United Arab Emirates',
-                    'United Kingdom' : 'UK',
+#                    'United Kingdom' : 'UK',
                     'United States'  : 'US',
                 }
 SCRAPED_WORLD_DATA = os.path.join(SITE_DATA, 'scraped-world.tsv')
@@ -124,7 +124,7 @@ def _patchWorldData(target, columnRef):
     for country in updateWorld.keys():
         dataWorld[country][SCRAPED_TODAY] = updateWorld[country][SCRAPED_TODAY]
     
-    dataWorld['!Outside Mainland China'][SCRAPED_TODAY] = dataWorld['!Global'][SCRAPED_TODAY]-dataWorld['Mainland China'][SCRAPED_TODAY]
+    # dataWorld['!Outside Mainland China'][SCRAPED_TODAY] = dataWorld['!Global'][SCRAPED_TODAY]-dataWorld['Mainland China'][SCRAPED_TODAY]
 
     _dumpJSON(dataWorld, target)
 
@@ -177,8 +177,8 @@ def _main(target):
         columnRef = 'Recovered'
 
     _patchWorldData(target, columnRef)
-    _patchUSData(target, columnRef)
-    _patchUSRegionsData(target, columnRef)
+#     _patchUSData(target, columnRef)
+#     _patchUSRegionsData(target, columnRef)
 
 
 # +++ main +++

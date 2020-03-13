@@ -5,8 +5,8 @@
 from covidvu.vujson import STATE_CODES_PATH
 from covidvu.vujson import US_REGIONS
 from covidvu.vujson import allCases
-from covidvu.vujson import _resampleByStateUS
-from covidvu.vujson import _resampleByRegionUS
+from covidvu.vujson import _resampleByStateUS_mode1
+from covidvu.vujson import _resampleByRegionUS_mode1
 from covidvu.vujson import allUSCases
 from covidvu.vujson import _dumpJSON
 from covidvu.vujson import dumpGlobalCasesAsJSONFor
@@ -53,7 +53,7 @@ def test__resampleByStateUS():
     casesUS        = casesUS.iloc[2:]
     casesUS.index  = pd.to_datetime(casesUS.index)
     casesUS.index  = casesUS.index.map(lambda s: s.date())
-    casesByStateUS =  _resampleByStateUS(casesUS.copy())
+    casesByStateUS =  _resampleByStateUS_mode1(casesUS.copy())
     states = pd.read_csv(STATE_CODES_PATH)['state']
     assert isinstance(casesByStateUS, DataFrame)
     assert isinstance(casesByStateUS.index, DatetimeIndex)
@@ -63,7 +63,7 @@ def test__resampleByStateUS():
 
 def test__resampleByRegionUS():
     casesUS         = test__resampleByStateUS()
-    casesByRegionUS = _resampleByRegionUS(casesUS)
+    casesByRegionUS = _resampleByRegionUS_mode1(casesUS)
     assert isinstance(casesByRegionUS, DataFrame)
     assert isinstance(casesByRegionUS.index, DatetimeIndex)
     assert pd.DataFrame(US_REGIONS.keys()).isin(casesByRegionUS.columns).values.all()
