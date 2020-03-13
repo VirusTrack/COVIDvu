@@ -124,7 +124,7 @@ def _patchWorldData(target, columnRef):
     for country in updateWorld.keys():
         dataWorld[country][SCRAPED_TODAY] = updateWorld[country][SCRAPED_TODAY]
     
-    dataWorld['!Outside Mainland China'][SCRAPED_TODAY] = dataWorld['!Global'][SCRAPED_TODAY]-dataWorld['Mainland China'][SCRAPED_TODAY]
+    # dataWorld['!Outside Mainland China'][SCRAPED_TODAY] = dataWorld['!Global'][SCRAPED_TODAY]-dataWorld['Mainland China'][SCRAPED_TODAY]
 
     _dumpJSON(dataWorld, target)
 
