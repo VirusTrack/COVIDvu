@@ -1,6 +1,6 @@
 ## Frequently Asked Questions
 
-1. What is this project?
+### 1. What is this project?
 
 This project was created for developers and scientists to have a place 
 to look at available COVID-19 data for analysis and prediction. The environment
@@ -13,6 +13,10 @@ The project provides a place to work and the ability to display and view this wo
 based on refreshed public data for COVID-19.
  
 
-2. How do I easily checkout this project and run a visualization to see the COVID-19 data?
+### 2. How do I easily checkout this project and run a visualization to see the COVID-19 data?
 
-3. How do I pitch in and help evolve, improve, or solve issues related to this project?
+Text here ..
+
+###3. How do I pitch in and help evolve, improve, or solve issues related to this project?
+
+Text here ..
