@@ -4,6 +4,16 @@ COVID-19 data visualization.
 
 
 ---
+## Overview
+
+This project provides for the strategy to evolve data obtained for COVID-19. 
+It also provides a sandbox of sorts for developers and scientists to use freely available
+open source technology and tools to inspect, analyze, and view COVID-19 data from
+any public source.
+
+Please read FAQ.md for better understanding of how to get started and give us a
+hand. 
+
 ## Developers
 
 This project is designed so that developers and scientists can work in a
