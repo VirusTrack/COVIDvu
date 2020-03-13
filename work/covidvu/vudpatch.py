@@ -21,7 +21,7 @@ COUNTRY_NAMES = {
                     'TOTAL'          : '!Global',
                     'U.S. TOTAL'     : '!Total US',
                     'UAE'            : 'United Arab Emirates',
-                    'United Kingdom' : 'UK',
+#                    'United Kingdom' : 'UK',
                     'United States'  : 'US',
                 }
 SCRAPED_WORLD_DATA = os.path.join(SITE_DATA, 'scraped-world.tsv')
@@ -177,8 +177,8 @@ def _main(target):
         columnRef = 'Recovered'
 
     _patchWorldData(target, columnRef)
-    _patchUSData(target, columnRef)
-    _patchUSRegionsData(target, columnRef)
+#     _patchUSData(target, columnRef)
+#     _patchUSRegionsData(target, columnRef)
 
 
 # +++ main +++
