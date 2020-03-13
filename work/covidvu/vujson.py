@@ -118,6 +118,10 @@ STATE_NAMES = {
                     'Washington, D.C.': 'Washington D.C.',
                 }
 
+BOAT_NAMES = {
+                    'From Diamond Princess': 'Diamond Princess',
+                }
+
 
 # *** functions ***
 def _isCounty(c):
@@ -143,36 +147,37 @@ def splitCSSEDataByParsingBoundary(cases):
     return cases
 
 def splitCSSEData(cases):
-    cases = cases.T.reset_index()
-    casesBoats = cases[cases['Province/State'].apply(lambda p: any((b in str(p) for b in BOATS)))]
+    cases               = cases.T.reset_index()
+    casesBoats          = cases[cases['Province/State'].apply(lambda p: any((b in str(p) for b in BOATS)))]
 
-    cases = cases[~cases['Province/State'].isin(BOATS)]
-    casesUS = cases[cases['Country/Region'] == 'US'].drop('Country/Region', axis=1)
+    cases               = cases[~cases['Province/State'].isin(BOATS)]
+    casesUS             = cases[cases['Country/Region'] == 'US'].drop('Country/Region', axis=1)
 
-    casesUSCounties = casesUS[casesUS['Province/State'].apply(lambda c: _isCounty(c))]
-    casesUSStates = casesUS[casesUS['Province/State'].apply(lambda c: not _isCounty(c))]
+    casesUSCounties     = casesUS[casesUS['Province/State'].apply(lambda c: _isCounty(c))]
+    casesUSStates       = casesUS[casesUS['Province/State'].apply(lambda c: not _isCounty(c))]
 
-    casesUSStates = casesUSStates.set_index('Province/State').T
+    casesUSStates       = casesUSStates.set_index('Province/State').T
     casesUSStates.index = pd.to_datetime(casesUSStates.index)
-    casesUSStates = _resampleByStateUS_mode2(casesUSStates.copy())
+    casesUSStates       = _resampleByStateUS_mode2(casesUSStates.copy())
 
-    casesUSRegions = _resampleByRegionUS_mode2(casesUSStates.copy())
+    casesUSRegions      = _resampleByRegionUS_mode2(casesUSStates.copy())
 
 
-    casesGlobal = cases[~cases['Province/State'].isin(casesUSCounties['Province/State'])]
-    casesGlobal = casesGlobal.drop('Province/State', axis=1)
-    casesGlobal = casesGlobal.groupby('Country/Region').sum().T
-    casesGlobal = utils.computeGlobal(casesGlobal)
-    casesGlobal = utils.computeCasesOutside(casesGlobal,
+    casesGlobal         = cases[~cases['Province/State'].isin(casesUSCounties['Province/State'])]
+    casesGlobal         = casesGlobal.drop('Province/State', axis=1)
+    casesGlobal         = casesGlobal.groupby('Country/Region').sum().T
+    casesGlobal         = utils.computeGlobal(casesGlobal)
+    casesGlobal         = utils.computeCasesOutside(casesGlobal,
                                             ['China', '!Global'],
                                             '!Outside China')
 
-    casesUSCounties = casesUSCounties.set_index('Province/State').T
+    casesUSCounties       = casesUSCounties.set_index('Province/State').T
     casesUSCounties.index = casesUSCounties.index.map(lambda s: s.date())
 
-    casesBoats = casesBoats.drop('Country/Region', axis=1).set_index('Province/State').T
-
-
+    casesBoats       = casesBoats.drop('Country/Region', axis=1).set_index('Province/State').T
+    casesBoats.index = casesBoats.index.map(lambda s: s.date())
+    casesBoats.rename(BOAT_NAMES, axis=1, inplace=True)
+    casesBoats       = casesBoats.groupby(casesBoats.columns, axis=1).sum()
 
     return casesGlobal, casesUSRegions, casesUSStates, casesUSCounties, casesBoats
 
@@ -273,6 +278,16 @@ def _resampleByRegionUS_mode2(casesUS):
     casesUS.index        = pd.to_datetime(casesUS.index)
     return casesUS
 
+def _getBoats_mode1(cases):
+    casesNotBoats = cases.T.reset_index()
+    casesNotBoats = casesNotBoats[~casesNotBoats['Province/State'].isin(BOATS)]
+    casesNotBoats = casesNotBoats.set_index(['Province/State', 'Country/Region']).T
+
+    casesBoats = cases.loc[:, (BOATS, slice(None))]
+    casesBoats.columns = casesBoats.columns.droplevel(level=1)
+    casesBoats = casesBoats.groupby(casesBoats.columns, axis=1).sum()
+    return casesBoats, casesNotBoats
+
 def _getCounties_mode1(cases):
     casesUS = cases.loc[:, (slice(None), 'US')]
     casesUS = casesUS.T.reset_index()
@@ -350,43 +365,53 @@ def _main(target):
 
     cases = splitCSSEDataByParsingBoundary(cases)
 
-    # Parsing type 1
-    casesUS,  casesUSRegions = allUSCases(cases[0])
-    casesUSCounties = _getCounties_mode1(cases[0])
+    # Parsing type 1 -- before 2020-03-10
 
-    casesGlobalCollection[0] = allCases(cases[0])
-    casesUSRegionsCollection[0] = casesUSRegions
-    casesUSStatesCollection[0] = casesUS
+
+
+    casesUS,  casesUSRegions  = allUSCases(cases[0])
+    casesUSCounties           = _getCounties_mode1(cases[0])
+    casesBoats, casesNotBoats =  _getBoats_mode1(cases[0])
+
+
+    casesGlobalCollection[0]     = allCases(casesNotBoats)
+    casesUSRegionsCollection[0]  = casesUSRegions
+    casesUSStatesCollection[0]   = casesUS
     casesUSCountiesCollection[0] = casesUSCounties
-    #casesBoatsCollection[0] =
+    casesBoatsCollection[0]      = casesBoats
 
-    # Parsing type 2
+    # Parsing type 2 -- after 2020-03-10
     casesGlobal2, casesUSRegions2, casesUSStates2, casesUSCounties2, casesBoats2 = splitCSSEData(cases[1])
 
-    casesGlobalCollection[1] = casesGlobal2
-    casesUSRegionsCollection[1] = casesUSRegions2
-    casesUSStatesCollection[1] = casesUSStates2
+    casesGlobalCollection[1]     = casesGlobal2
+    casesUSRegionsCollection[1]  = casesUSRegions2
+    casesUSStatesCollection[1]   = casesUSStates2
     casesUSCountiesCollection[1] = casesUSCounties2
+    casesBoatsCollection[1]      = casesBoats2
 
     # Concatenate
-    casesGlobal = pd.concat(casesGlobalCollection)
-    casesUSRegions = pd.concat(casesUSRegionsCollection)
+    casesGlobal     = pd.concat(casesGlobalCollection)
+    casesUSRegions  = pd.concat(casesUSRegionsCollection)
 
-    casesUSStates = pd.concat(casesUSStatesCollection)
+    casesUSStates   = pd.concat(casesUSStatesCollection)
     casesUSCounties = pd.concat(casesUSCountiesCollection)
 
-    casesGlobal   = casesGlobal.fillna(method='ffill', axis=0).fillna(0)
-    casesUSStates = casesUSStates.fillna(method='ffill', axis=0).fillna(0)
+    casesBoats = pd.concat(casesBoatsCollection)
+
+    casesGlobal     = casesGlobal.fillna(method='ffill', axis=0).fillna(0)
+    casesUSStates   = casesUSStates.fillna(method='ffill', axis=0).fillna(0)
+    casesUSRegions  = casesUSRegions.fillna(method='ffill', axis=0).fillna(0)
+    casesBoats      = casesBoats.fillna(method='ffill', axis=0).fillna(0)
 
 
     outputFileName = os.path.join(SITE_DATA, target+'.json')
     dumpGlobalCasesAsJSONFor(casesGlobal, outputFileName)
     dumpUSCasesAsJSONFor(casesUSRegions, outputFileName, 'US-Regions')
     dumpUSCasesAsJSONFor(casesUSStates, outputFileName)
+    dumpUSCasesAsJSONFor(casesBoats, outputFileName, 'Boats')
     #dumpUSCasesAsJSONFor(casesUSCounties, outputFileName, 'US-Counties')
 
-
-    return casesGlobal, casesUSRegions, casesUSStates #, casesUSCounties
+    return casesGlobal, casesUSRegions, casesUSStates, casesBoats #, casesUSCounties
 
 # *** main ***
 
