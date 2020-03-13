@@ -19,6 +19,9 @@ export const types = {
     FETCH_US_REGIONS_SUCCESS: 'FETCH_US_REGIONS_SUCCESS',
     FETCH_US_REGIONS_ERROR: 'FETCH_US_REGIONS_ERROR',
 
+    FETCH_LAST_UPDATE: 'FETCH_LAST_UPDATE',
+    FETCH_LAST_UPDATE_SUCCESS: 'FETCH_LAST_UPDATE_SUCCESS',
+    FETCH_LAST_UPDATE_ERROR: 'FETCH_LAST_UPDATE_ERROR',
 
 }
 
@@ -27,6 +30,7 @@ export const actions = {
     fetchGlobal: createAction(types.FETCH_GLOBAL),
     fetchUSStates: createAction(types.FETCH_US_STATES),
     fetchUSRegions: createAction(types.FETCH_US_REGIONS),
+    fetchLastUpdate: createAction(types.FETCH_LAST_UPDATE),
 }
 
 // Reducers
@@ -34,6 +38,7 @@ export const initialState = {
     global: {},
     usStates: {},
     usRegions: {},
+    lastUpdate: undefined
 }
 
 export default function (state = initialState, action) {
@@ -76,6 +81,11 @@ export default function (state = initialState, action) {
                     mortality: action.mortality,
                     recovery: action.recovery
                 }
+            }
+        case types.FETCH_LAST_UPDATE_SUCCESS:
+            return {
+                ...state,
+                lastUpdate: action.payload,
             }
         default:
             return state
@@ -301,6 +311,15 @@ export function* fetchUSStates() {
     }
 }
 
+export function* fetchLastUpdate() {
+    const dataService = new DataService()
+
+    const lastUpdate = yield call(dataService.fetchLastUpdate)
+
+    yield put({ type: types.FETCH_LAST_UPDATE_SUCCESS, payload: lastUpdate})
+}
+
+
 export function* fetchUSRegions() {
     const dataService = new DataService()
 
@@ -335,4 +354,5 @@ export const sagas = [
     takeEvery(types.FETCH_GLOBAL, fetchGlobal),
     takeEvery(types.FETCH_US_STATES, fetchUSStates),
     takeEvery(types.FETCH_US_REGIONS, fetchUSRegions),
+    takeEvery(types.FETCH_LAST_UPDATE, fetchLastUpdate),
 ]
