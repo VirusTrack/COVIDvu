@@ -2,7 +2,6 @@
 
 COVID-19 data visualization.
 
-
 ---
 ## Overview
 
@@ -11,7 +10,7 @@ It also provides a sandbox of sorts for developers and scientists to use freely 
 open source technology and tools to inspect, analyze, and view COVID-19 data from
 any public source.
 
-Please read FAQ.md for better understanding of how to get started and give us a
+Please read FAQ.md for more specifics on how to get started and give us a
 hand. 
 
 ## Developers
@@ -23,10 +22,18 @@ preferred IDE and other Python tools and work on the file system, without ever
 runnint the dockersized version.  This instructions show how to install and run
 this zero install container.
 
+As a convenience to those that just want to dive in and look at the COVID-19
+data, the Jupyter.org team created a data science notebook environment within
+a Docker image so that you can install and run the image locally. All of the 
+project dependencies are built into the image. This saves time and disk space.
+
+You will have to checkout COVIDvu from Github into the docker image. Think of 
+it as an extra step but without the hassle of all the Python configuration and
+installs.
 
 ### Run from a Docker container, zero install
 
-Prerrequisites:  `docker-compose` must be available in the target system.  These
+Prerequisites:  `docker-compose` must be available in the target system.  These
 instrutions are UNIX-specific.
 
 - Clone this repository
@@ -90,11 +97,27 @@ instrutions are UNIX-specific.
   authentication token in the appropriate box; choose a password to avoid this
   step in the future
 
+- Initially, when you open a terminal in the JupyterLab environment, you will not find any
+  work related to this project specifically. Git is, however installed with the Docker image. 
+  Clone the repo again for this project again, but this time using a terminal within your 
+  JupyterLab environment. The repo will be installed on the file system within your new  
+  running Docker image. See [https://hub.docker.com/r/jupyter/datascience-notebook/](https://hub.docker.com/r/jupyter/datascience-notebook/)
 
-- Open a terminal to verify that files and other work are managed by Git
+  ```
+  # Enter this command in a JupyterLab terminal!
+  git clone https://github.com/pr3d4t0r/COVIDvu.git
+
+  ```
+
+- Now, open a terminal to verify that files and other work are managed by Git. Please note
+  that the docker image was a convenience to provide you an isolated and zero-install working
+  environment to work within the confines of this Git repo. Now verify that you now have
+  the COVIDvu repo local to your JupyterLab environment. Note: the output for the current
+  branches may have changed.
 
   ```
   # Enter these commands in a JupyterLab terminal!
+  cd ~/COVIDvu # the local repo (maybe you overrode the name)
   git branch -a
 
   # Output: 
