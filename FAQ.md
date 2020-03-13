@@ -17,6 +17,6 @@ based on refreshed public data for COVID-19.
 
 Text here ..
 
-###3. How do I pitch in and help evolve, improve, or solve issues related to this project?
+### 3. How do I pitch in and help evolve, improve, or solve issues related to this project?
 
 Text here ..
