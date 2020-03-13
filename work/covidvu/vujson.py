@@ -167,12 +167,11 @@ def splitCSSEData(cases):
     return casesGlobal, casesUSRegions, casesUSStates, casesUSCounties, casesBoats
 
 
-def allCases(fileName = JH_CSSE_FILE_CONFIRMED, includeGeoLocation = False):
-    cases = pd.read_csv(fileName).groupby(['Country/Region']).sum().T
+def allCases(cases, includeGeoLocation = False):
+    cases.columns = cases.columns.droplevel()
+    cases         = cases.groupby(cases.columns, axis=1).sum()
 
     if not includeGeoLocation:
-        cases       = cases.iloc[2:]
-        cases.index = pd.to_datetime(cases.index)
         cases       = utils.computeGlobal(cases)
         cases       = utils.computeCasesOutside( cases,
                                                  [ 'China', '!Global' ],
@@ -343,30 +342,33 @@ def _main(target):
     casesUS,  casesUSRegions = allUSCases(cases[0])
     casesUSCounties = _getCounties_mode1(cases[0])
 
-    casesGlobalCollection[0] = allCases(sourceFileName)
-    casesUSStatesCollection[0] = casesUS
+    casesGlobalCollection[0] = allCases(cases[0])
     casesUSRegionsCollection[0] = casesUSRegions
+    casesUSStatesCollection[0] = casesUS
     casesUSCountiesCollection[0] = casesUSCounties
     #casesBoatsCollection[0] =
 
     # Parsing type 2
-    casesGlobal, casesUSRegions, casesUSStates, casesUSCounties, casesBoats = splitCSSEData(cases[1])
+    casesGlobal2, casesUSRegions2, casesUSStates2, casesUSCounties2, casesBoats2 = splitCSSEData(cases[1])
 
-    casesGlobalCollection[1] = casesGlobal
-    casesUSStatesCollection[1] = casesUS
-    casesUSRegionsCollection[1] = casesUSRegions
-    casesUSCountiesCollection[1] = casesUSCounties
-    #casesBoatsCollection[1] = casesBoats
+    casesGlobalCollection[1] = casesGlobal2
+    casesUSRegionsCollection[1] = casesUSRegions2
+    casesUSStatesCollection[1] = casesUSStates2
+    casesUSCountiesCollection[1] = casesUSCounties2
 
-
-
-
+    # Concatenate
+    casesGlobal = pd.concat(casesGlobalCollection)
+    casesUSRegions = pd.concat(casesUSRegionsCollection)
+    # TODO: Pick up from here
+    casesUSStates = pd.concat(casesUSStatesCollection)
+    casesUSCounties = pd.concat(casesUSCountiesCollection)
 
 
     outputFileName = os.path.join(SITE_DATA, target+'.json')
-    dumpGlobalCasesAsJSONFor(allCases(sourceFileName), outputFileName)
-    dumpUSCasesAsJSONFor(casesUS, outputFileName)
+    dumpGlobalCasesAsJSONFor(casesGlobal, outputFileName)
     dumpUSCasesAsJSONFor(casesUSRegions, outputFileName, 'US-Regions')
+    dumpUSCasesAsJSONFor(casesUSStates, outputFileName)
+    dumpUSCasesAsJSONFor(casesUSCounties, outputFileName, 'US-Counties')
 
 
 # *** main ***
