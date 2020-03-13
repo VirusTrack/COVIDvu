@@ -39,6 +39,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
         if(!search) {
             handleHistory(selectedRegions, secondaryGraph)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleHistory = (region, graph) => {
@@ -169,8 +170,8 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                 />
             </>
 
-            <Column.Group centered breakpoint="mobile">
-                <Column size="half">
+            <Column.Group centered>
+                <Column>
                 <Message size="small" style={{margin: '0.5rem'}} color="link">
                             <Message.Body>
                                 <p>

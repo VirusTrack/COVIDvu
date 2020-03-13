@@ -46,6 +46,13 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         setPlotsAsValues(Object.values(plots))
     }, [selected, data, y_type])
 
+    // let mergeConfig = { ...config,
+    //     displayModeBar: false,
+    //     showlegend: true,
+    //     editable: false,
+    //     scrollZoom: false
+    // }
+
     const layout = {
         title: title,
         width: width,

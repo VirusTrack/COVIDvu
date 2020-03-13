@@ -6,7 +6,9 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab } from "rbx"
+import { Tag, Tab, Notification, Generic, Title } from "rbx"
+
+import { REGION_URLS } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
@@ -35,6 +37,20 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
 
+    const renderDisplay = (value) => {
+        return value.startsWith('!') ? value.substring(1) : value            
+    }
+
+    const isExternalLinkAvailable = (key) => {
+        return REGION_URLS.hasOwnProperty(key)
+    }
+
+    const redirectToExternalLink = (key) => {
+        if(REGION_URLS.hasOwnProperty(key))
+            window.open(REGION_URLS[key], "_blank")
+    }
+
+
     useEffect(() => {
         dispatch(actions.fetchUSStates())
     }, [dispatch])
@@ -43,6 +59,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
         if(!search) {
             handleHistory(selectedStates, secondaryGraph)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleHistory = (region, graph) => {        
@@ -101,7 +118,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                 </Tab.Group>
 
                 <GraphWithLoader 
-                    graphName="Cases by State"
+                    graphName="Confirmed"
                     secondaryGraph={secondaryGraph}
                     graph={confirmed}
                     selected={selectedStates}
@@ -171,6 +188,19 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                         }
                     }
                 />              
+            </>
+
+            <>
+
+                <Notification color="info">
+                    <Title size={6}>Government Services</Title>
+                    {selectedStates.map((region, idx) => (
+                        <React.Fragment key={idx}>
+                            <Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"} textColor="white">{renderDisplay(region)}</Generic>
+                        </React.Fragment>
+                    ))}
+                </Notification>
+
             </>
         </TwoGraphLayout>
 

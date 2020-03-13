@@ -14,10 +14,11 @@ export const TwoGraphLayout = ({ children }) => {
                 <Column>
                     {nodes[1]}
                 </Column>
+                <Column size={2}>
+                    {children.slice(2)}                
+                </Column>
 
             </Column.Group>
-
-            {children.slice(2)}
         </>
     )
 }

@@ -20,7 +20,7 @@ import numeral from 'numeral'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
-export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], graph = 'Cases'}) => {
+export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'Cases'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -53,6 +53,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
         if(!search) {
             handleHistory(selectedCountries, secondaryGraph)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleHistory = (region, graph) => {
@@ -130,7 +131,9 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
                     config={
                         {
                             displayModeBar: false,
-                            showlegend: true,                           
+                            showlegend: true,
+                            editable: false,
+                            scrollZoom: false
                         }
                     }
                 />

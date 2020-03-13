@@ -141,7 +141,7 @@ const extractLatestCounts = (stats) => {
     return regionWithLatestCounts
 }
 
-const filterCountries = ['!Outside Mainland China', 'China', 'Korea, South', 'United Kingdom', 'Czechia', 'Taiwan*', 'Iran (Islamic Republic of)', 'Viet Nam']
+const filterCountries = ['!Outside Mainland China', 'Mainland China', 'Korea, South', 'United Kingdom', 'Czechia', 'Taiwan*', 'Iran (Islamic Republic of)', 'Viet Nam']
 
 // Sagas
 export function* fetchGlobal() {

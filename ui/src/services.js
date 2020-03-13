@@ -31,10 +31,7 @@ class DataService {
 
     async fetchLastUpdate() {
         const response = await axios.get(`${DATA_URL}/last-update.txt`)
-
         const lines = response.data.split('\n')
-
-        console.log(`line count: ${lines.length}`)
 
         let lastUpdate = undefined
 

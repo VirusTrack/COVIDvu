@@ -13,7 +13,7 @@ export const FooterContainer = () =>{
 
     useEffect(() => {
         dispatch(actions.fetchLastUpdate())
-    }, [])
+    }, [dispatch])
 
     return (
         <Footer>
