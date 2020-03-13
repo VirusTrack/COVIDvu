@@ -48,7 +48,13 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
 
     const layout = {
         title: title,
-        height: height
+        width: width,
+        height: height,
+        margin: {
+            l: 50,
+            t: 0,
+        },
+        
     }
         
     if(y_title) {

@@ -4,6 +4,9 @@ import Graph from './Graph'
 
 export const GraphWithLoader = ({graphName, title, secondaryGraph, x_title, y_type, y_title, graph, selected, config, width, height}) => {
 
+    console.log(`graphName: ${graphName}`)
+    console.dir(graph)
+
     return (
         <>
         { secondaryGraph === graphName &&

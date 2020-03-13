@@ -135,6 +135,8 @@ const filterCountries = ['!Outside Mainland China', 'China', 'Korea, South', 'Un
 
 // Sagas
 export function* fetchGlobal() {
+    console.time('fetchGlobal')
+
     const dataService = new DataService()
 
     try {
@@ -212,6 +214,8 @@ export function* fetchGlobal() {
     } catch(error) {
         console.error(error)
     }
+
+    console.timeEnd('fetchGlobal')
 }
 
 const filterStates = ['Unassigned']

@@ -9,7 +9,8 @@ import { actions } from '../ducks/services'
 
 import { Tag, Tab } from "rbx"
 
-import ThreeGraphLayout from '../layouts/ThreeGraphLayout'
+import TwoGraphLayout from '../layouts/TwoGraphLayout'
+// import ThreeGraphLayout from '../layouts/ThreeGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
@@ -19,7 +20,7 @@ import numeral from 'numeral'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
-export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], graph = 'Deaths'}) => {
+export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], graph = 'Cases'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -96,7 +97,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
         )
     }
     return (
-        <ThreeGraphLayout>
+        <TwoGraphLayout>
 
             <>
                 <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
@@ -112,27 +113,27 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
             </>
 
             <>
-            <GraphWithLoader 
-                graphName="Cases"
-                secondaryGraph="Cases"
-                graph={confirmed}
-                selected={selectedCountries}
-                y_title="Total confirmed cases"
-                config={
-                    {
-                        displayModeBar: false,
-                        showlegend: true,
-                    }
-                }
-            />
-            </>
-            <>
                 <Tab.Group>
+                    <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
                     <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
                     <Tab active={secondaryGraph === 'Recovered'} onClick={() => { handleSelectedGraph('Recovered')}}>Recovered</Tab>
                     <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
                     <Tab active={secondaryGraph === 'Recovery'} onClick={() => { handleSelectedGraph('Recovery')}}>Recovery</Tab>
                 </Tab.Group>
+
+                <GraphWithLoader 
+                    graphName="Cases"
+                    secondaryGraph={secondaryGraph}
+                    graph={confirmed}
+                    selected={selectedCountries}
+                    y_title="Total confirmed cases"
+                    config={
+                        {
+                            displayModeBar: false,
+                            showlegend: true,                           
+                        }
+                    }
+                />
 
                 <GraphWithLoader 
                     graphName="Deaths"
@@ -194,7 +195,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
                     }
                 />
             </>
-        </ThreeGraphLayout>
+        </TwoGraphLayout>
     )    
 }
 
