@@ -100,7 +100,7 @@ instrutions are UNIX-specific.
 - Initially, when you open a terminal in the JupyterLab environment, you will not find any
   work related to this project specifically. Git is, however installed with the Docker image. 
   Clone the repo again for this project again, but this time using a terminal within your 
-  JupyterLab environment. The repo will be installed on the file system within your new  
+  JupyterLab environment. The repo will be installed on the file system within your new 
   running Docker image. See [https://hub.docker.com/r/jupyter/datascience-notebook/](https://hub.docker.com/r/jupyter/datascience-notebook/)
 
   ```
