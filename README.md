@@ -1,6 +1,25 @@
 # COVIDvu
 
-COVID-19 data visualization.
+Looking for the latest COVID-19 country and state level numbers?  Head to the
+[virustrack.live COVID-19 dashboard](https://virustrack.live).
+
+<img src='./resources/website-00.png'>
+
+This project hosts the COVID-19 Virus Track live website and provides a
+the COVIDvu (COVID-19 viewer) zero-install data science lab for exploring the
+pandemic.  The project is divided in these phases:
+
+1. Build and deploy the zero install data science lab - DONE
+1. Build and deploy the virustrack.live website to provide near real-time
+   pandemic information in the form of comparative trend plots - DONE
+1. Ensure data ingress from reliable, consistent, robust data sources - IN 
+   PROGRESS - only JH CSSE and BNO News seem to be up-to-date and their data
+   sources are in flux
+1. Evolve the website and tools from data extraction and trend display toward
+   prediction
+1. Expand the lab and website to provide tools and information for tracking
+   and visualizing other zoonotic spillovers, or to revisit previous spillovers
+   like Ebola and SARS.
 
 
 ---
