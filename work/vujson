@@ -2,25 +2,8 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
-
-REFRESHDATA_CONFIG="./refreshdata.config"
-[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
-
-
-# *** functions ***
-
-
-# *** main ***
-
-if [[ "Linux" == $(uname) ]]
-then
-    awk '/docker/ || /lxc/ { exit(99); }' "$CONTAINER_SIG_FILE"
-    if [[ "$?" == 0 ]]
-    then
-        source ./bin/activate
-    fi
-fi
+source ./pyrunner
 
 python3 -m covidvu.vujson confirmed deaths recovered
-python3 -m covidvu.vucounty confirmed deaths recovered
+ls -Alrt "$SITE_DATA_DIR"
 

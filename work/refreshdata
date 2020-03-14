@@ -6,12 +6,13 @@
 # crontab compliant :)
 
 
+refreshdata_config="./refreshdata.config"
+[[ -e "$refreshdata_config" ]] && source "$refreshdata_config"
+
+
 CONFIG_rclone="rclone.conf"
 COVID_19_DIR="COVID-19"
 JSON_DATA_BUNDLE="COVID19-cases.tar.gz"
-REFRESHDATA_CONFIG="./refreshdata.config"
-SITE_BUCKET="virustrack.live"
-SITE_DATA_DIR="site-data"
 TMP_OUTPUT="/tmp/refreshdata.log"
 UPDATE_NOTICE_FILE="last-update.txt"
 UPDATE_NOTICE="$SITE_DATA_DIR/$UPDATE_NOTICE_FILE"
@@ -27,6 +28,7 @@ function die {
 
 
 function assertSiteDataExists {
+    echo "assert $SITE_DATA_DIR directory exists"
     if [[ ! -d "$SITE_DATA_DIR" ]]
     then
         echo "creating $SITE_DATA_DIR"
@@ -36,11 +38,13 @@ function assertSiteDataExists {
 
 
 function resetErrorNotification {
+    echo "reset error notification file"
     [[ -e "$UPDATE_ERROR" ]] && rm -f "$UPDATE_ERROR"
 } # resetErrorNotification
 
 
 function assertCOVID19DirExists {
+    echo "assert $COVID_19_DIR directory exists"
     [[ -d "./COVID-19" ]] || die "" 1 # nothing to do; silent fail
 } # assertCOVID19DirExists
 
@@ -71,7 +75,7 @@ function resetSiteData {
 
 
 function updateCOVID19DataSources {
-    echo "refreshing COVID-19 JS CSSE dataset" | tee "$TMP_OUTPUT"
+    echo "refreshing COVID-19 JS CSSE dataset from GitHub" | tee "$TMP_OUTPUT"
 
     pushd "$COVID_19_DIR" >> "$TMP_OUTPUT"
     git checkout master >> "$TMP_OUTPUT" 2> /dev/null
@@ -90,10 +94,6 @@ function updateCOVID19DataSources {
 function generateVirusUpdateJSONFiles {
     echo "generating virus update JSON files"
     ./vujson
-
-    pushd "$SITE_DATA_DIR" > /dev/null
-    tar czf "$JSON_DATA_BUNDLE" *.json
-    popd > /dev/null
 } # generateVirusUpdateJSONFiles
 
 
@@ -110,12 +110,9 @@ function deployVirusUpdateJSON {
 } # deployVirusUpdateJSON
 
 
-function patchCSSEData {
-    python -m covidvu.vudpatch confirmed deaths recovered
-} # patchCSSEData
-
-
 # *** main ***
+
+echo "*** COVIDvu - website refresh tool ***"
 
 assertSiteDataExists
 resetErrorNotification
@@ -124,11 +121,18 @@ assertCOVID19DirExists
 updateCOVID19DataSources
 generateVirusUpdateJSONFiles
 
+# TODO: Document the command line arguments in the README.md page:
+#
+#       ./refreshdata publish patch
+#
+#       ./refreshdata noop patch
+#
+#       ./refreshdata
 if [[ "patch" = "$2" ]]
 then
     echo "patching stale JH CSSE data with BNO, calculated updates"
     ./pyavka
-    patchCSSEData
+    ./vudpatch
 fi
 
 case "$1" in
