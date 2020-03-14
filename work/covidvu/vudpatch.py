@@ -26,6 +26,24 @@ COUNTRY_NAMES = {
                     'Czech Republic': 'Czechia',
                     'Taiwan'        : 'Taiwan*'
                 }
+NIXED_ROWS_INDEX = (
+    'American Samoa',
+    'Diamond Princess',
+    'Grand Princess',
+    'Guam',
+    'Marshall Islands',
+    'Micronesia',
+    'Northern Mariana Islands',
+    'Northern Marianas',
+    'Palau',
+    'Puerto Rico',
+    'Queue',
+    'TBD',
+    'U.S. Virgin Islands',
+    'Unassigned',
+    'Virgin Islands',
+    'Wuhan',
+)
 SCRAPED_WORLD_DATA = os.path.join(SITE_DATA, 'scraped-world.tsv')
 SCRAPED_US_DATA    = os.path.join(SITE_DATA, 'scraped-US.tsv')
 SCRAPED_TODAY      = pytz.utc.localize(datetime.datetime.today()).astimezone(pytz.timezone('America/Los_Angeles')).strftime('%Y-%m-%d')
@@ -135,16 +153,8 @@ def _patchWorldData(target, columnRef):
 
 
 def _patchUSData(target, columnRef):
-#     updateUS = _fetchCurrentUpdatesUS(columnRef, 'UNITED STATES')
-#     updateUS = _homologizeUpdateData(updateUS, STATE_NAMES)
-    dataUS   = _fetchJSONData(target, "-US")
-#     dataUS   = _applyNewRecordsFrom(dataUS, updateUS)
-# 
-#     for state in updateUS.keys():
-#         dataUS[state][SCRAPED_TODAY] = updateUS[state][SCRAPED_TODAY]
-
-    # TODO:  Fix until we identify better data sources.
-    allTime   = list(dataUS['!Total US'].keys())
+    dataUS    = _fetchJSONData(target, "-US")
+    allTime   = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
     yesterday = dataUS['!Total US'][allTime[len(allTime)-2]]
     today     = dataUS['!Total US'][allTime[len(allTime)-1]]
 
@@ -154,55 +164,75 @@ def _patchUSData(target, columnRef):
     return dataUS
 
 
-def _patchUSRegionsData(target, columnRef):
+def _patchUSRegionsData(target, dataUS):
+    dataUSRegions   = _fetchJSONData(target, '-US-Regions')
     updateUSRegions = dict()
+    allTime         = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
 
-    updateUS      = _fetchCurrentUpdatesUS(columnRef, 'UNITED STATES')
-    updateUS      = _homologizeUpdateData(updateUS, STATE_NAMES)
-    dataUSRegions = _fetchJSONData(target, '-US-Regions')
-    totalUS       = 0.0
-
-    for state in updateUS:
+    for state in dataUS:
+        if state in NIXED_ROWS_INDEX:
+            continue
         region = US_REGIONS_LONG[state]
         if region not in updateUSRegions:
             updateUSRegions[region] = { SCRAPED_TODAY: 0.0, }
 
-        updateUSRegions[region][SCRAPED_TODAY] += float(updateUS[state][SCRAPED_TODAY])
-
-    for key in updateUSRegions.keys():
         try:
-            datum = updateUSRegions[key][SCRAPED_TODAY]
-            dataUSRegions[key][SCRAPED_TODAY] = datum
-            totalUS += datum
+            updateUSRegions[region][SCRAPED_TODAY] += float(dataUS[state][SCRAPED_TODAY])
         except:
-            continue
+            yesterday = dataUS[state][allTime[len(allTime)-2]]
+            updateUSRegions[region][SCRAPED_TODAY] = yesterday
 
-    dataUSRegions['!Total US'][SCRAPED_TODAY] = totalUS
-    _dumpJSON(dataUSRegions, target, "-US-Regions")
+    try:
+        dataUSRegions['!Total US'][SCRAPED_TODAY] = dataUS['!Total US'][SCRAPED_TODAY]
+    except:
+        yesterday = dataUS['!Total US'][allTime[len(allTime)-2]]
+        dataUSRegions['!Total US'][SCRAPED_TODAY] = yesterday
+
+#     if 'Unassigned' in dataUSRegions:
+#         del(dataUSRegions['Unassigned'])
+    if 'Unassigned' not in dataUSRegions:
+        dataUSRegions['Unassigned'] = { SCRAPED_TODAY: 0.0, }
+
+    return dataUSRegions
 
 
-def syncAllUSDataReportsIn(dataWorld, dataUS):
-    if dataWorld['US'][SCRAPED_TODAY] > dataUS['!Total US'][SCRAPED_TODAY]:
+def syncAllUSDataReportsIn(dataWorld, dataUS, dataUSRegions):
+    try:
+        if dataWorld['US'][SCRAPED_TODAY] > dataUS['!Total US'][SCRAPED_TODAY]:
+            dataUS['!Total US'][SCRAPED_TODAY] = dataWorld['US'][SCRAPED_TODAY]
+            dataUSRegions['!Total US'][SCRAPED_TODAY] = dataWorld['US'][SCRAPED_TODAY]
+        else:
+            dataWorld['US'][SCRAPED_TODAY] = dataUS['!Total US'][SCRAPED_TODAY]
+            dataUSRegions['!Total US'][SCRAPED_TODAY] = dataUS['!Total US'][SCRAPED_TODAY]
+    except:
         dataUS['!Total US'][SCRAPED_TODAY] = dataWorld['US'][SCRAPED_TODAY]
-    else:
-        dataWorld['US'][SCRAPED_TODAY] = dataUS['!Total US'][SCRAPED_TODAY]
+        dataUSRegions['!Total US'][SCRAPED_TODAY] = dataWorld['US'][SCRAPED_TODAY]
 
 
-def estimatedUnconfirmedCasesIn(dataset, totalTag = '!Total US'):
+def estimatedUnassignedCasesIn(dataset, totalTag = '!Total US'):
     # EXPERIMENTAL:  Don't use this for the world estimates; the heuristics are
     #                different from the country level.
     grandTotal = 0.0
+    allTime    = list(dataset[totalTag].keys())    # TODO:  Fix until we identify better data sources.
+    yesterday  = dataset[totalTag][allTime[len(allTime)-2]]
+    dataset['Unassigned'][SCRAPED_TODAY] = grandTotal
 
     for key in dataset.keys():
         if totalTag == key:
             total = dataset[key][SCRAPED_TODAY]
         else:
-            grandTotal += dataset[key][SCRAPED_TODAY]
+            try:
+                grandTotal += dataset[key][SCRAPED_TODAY]
+            except:
+                grandTotal += yesterday
+                break
+                
 
     dataset['Unassigned'][SCRAPED_TODAY] = abs(grandTotal-total)
 
 
 def _main(target):
+    print('patching the JSON files with current data')
     if target == 'confirmed':
         columnRef = 'Cases'
     elif target == 'deaths':
@@ -210,16 +240,17 @@ def _main(target):
     elif target == 'recovered':
         columnRef = 'Recovered'
 
-    dataWorld = _patchWorldData(target, columnRef)
-    dataUS    = _patchUSData(target, columnRef)
+    dataWorld     = _patchWorldData(target, columnRef)
+    dataUS        = _patchUSData(target, columnRef)
+    dataUSRegions = _patchUSRegionsData(target, dataUS)
 
-    syncAllUSDataReportsIn(dataWorld, dataUS)
-    estimatedUnconfirmedCasesIn(dataUS, totalTag = '!Total US')
+    syncAllUSDataReportsIn(dataWorld, dataUS, dataUSRegions)
+    estimatedUnassignedCasesIn(dataUS, totalTag = '!Total US')
+    estimatedUnassignedCasesIn(dataUSRegions, totalTag = '!Total US')
 
     _dumpJSON(dataWorld, target)
     _dumpJSON(dataUS, target, "-US")
-    
-#     _patchUSRegionsData(target, columnRef)
+    _dumpJSON(dataUSRegions, target, "-US-Regions")
 
 
 # +++ main +++

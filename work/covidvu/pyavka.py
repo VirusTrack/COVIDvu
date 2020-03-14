@@ -15,18 +15,6 @@ import os
 
 # --- constants ---
 
-NIXED_ROWS_INDEX = (
-    'American Samoa',
-    'Diamond Princess',
-    'Grand Princess',
-    'Guam',
-    'Northern Mariana Islands',
-    'Puerto Rico',
-    'Queue',
-    'TBD',
-    'U.S. Virgin Islands',
-    'Wuhan',
-)
 US_TABLE_HTML    = os.path.join(SITE_DATA, 'table-01.html')
 WORLD_TABLE_HTML = os.path.join(SITE_DATA, 'table-00.html')
 
