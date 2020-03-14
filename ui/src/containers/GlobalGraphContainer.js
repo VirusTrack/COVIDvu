@@ -10,7 +10,6 @@ import { actions } from '../ducks/services'
 import { Tag, Tab } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
-// import ThreeGraphLayout from '../layouts/ThreeGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
@@ -107,10 +106,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     data={sortedConfirmed}
                     selected={selectedCountries}
                     handleSelected={dataList => handleSelectedRegion(dataList)} />
-
-                <br />
-                <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br />
-                
             </>
 
             <>
@@ -128,14 +123,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     graph={confirmed}
                     selected={selectedCountries}
                     y_title="Total confirmed cases"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true,
-                            editable: false,
-                            scrollZoom: false
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -144,12 +131,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     graph={deaths}
                     selected={selectedCountries}
                     y_title="Number of deaths"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -158,12 +139,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     graph={recovered}
                     selected={selectedCountries}
                     y_title="Number of recovered"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
         
 
@@ -174,12 +149,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     selected={selectedCountries}
                     y_type="percent"
                     y_title="Mortality Rate Percentage"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
         
 
@@ -190,14 +159,13 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     selected={selectedCountries}
                     y_type="percent"
                     y_title="Recovery Rate Percentage"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
             </>
+
+            <>
+                <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br />
+            </>
+
         </TwoGraphLayout>
     )    
 }

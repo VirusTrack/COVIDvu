@@ -5,6 +5,8 @@ import { actions } from '../ducks/services'
 
 import {Content, Footer, Tag} from "rbx"
 
+import moment from 'moment'
+
 export const FooterContainer = () =>{
 
     const dispatch = useDispatch()
@@ -20,7 +22,7 @@ export const FooterContainer = () =>{
             <Content textAlign="centered">
                 { lastUpdate && 
                     <p>
-                        <Tag color="primary">Last updated: {lastUpdate}</Tag>
+                        <Tag color="primary">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
                     </p>
                 }
                 <p>

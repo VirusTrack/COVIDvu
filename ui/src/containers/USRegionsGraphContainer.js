@@ -6,7 +6,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Column, Tag, Message, Tab } from "rbx"
+import { Column, Tag, Message, Tab, Notification } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
@@ -30,6 +30,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     const recovery = useSelector(state => state.services.usRegions.recovery)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
+    const [unassignedCases, setUnassignedCases] = useState(0)
 
     useEffect(() => {
         dispatch(actions.fetchUSRegions())
@@ -54,7 +55,10 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     useEffect(() => {
         if(confirmed) {
             const totalRegions = Object.values(confirmed['!Total US'])
+            const unassignedRegions = Object.values(confirmed['Unassigned'])
+
             setConfirmedTotal(totalRegions[totalRegions.length - 1])
+            setUnassignedCases(unassignedRegions[unassignedRegions.length - 1])
         }
     }, [confirmed])    
 
@@ -103,11 +107,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     graph={confirmed}
                     selected={selectedRegions}
                     y_title="Total confirmed cases"
-                    config={
-                        {
-                            displayModeBar: false
-                        }
-                    }
                 />
                 
                 <GraphWithLoader 
@@ -116,12 +115,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     graph={deaths}
                     selected={selectedRegions}
                     y_title="Number of deaths"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -130,12 +123,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     graph={recovered}
                     selected={selectedRegions}
                     y_title='Number of recovered'
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -145,12 +132,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     selected={selectedRegions}
                     y_type='percent'
                     y_title='Mortality Rate Percentage'
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
 
@@ -161,12 +142,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     selected={selectedRegions}
                     y_type='percent'
                     y_title='Recovery Rate Percentage'
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
             </>
 
@@ -190,6 +165,13 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                         </Message>                    
                 </Column>                
             </Column.Group>
+
+            <>
+                <Notification color="warning">
+                    The sum of all regions may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
+                </Notification>
+            </>
+
         </TwoGraphLayout>
 
     )

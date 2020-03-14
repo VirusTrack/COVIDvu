@@ -108,10 +108,10 @@ export const StatsContainer = ({filter='Global'}) => {
                         <Title size={5} style={{color: 'hsl(204, 86%, 53%)'}}>{stat.recovered}</Title>
                     </Table.Cell>
                     <Table.Cell>
-                        <Title size={6}>{numeral(stat.mortality).format('0%')}</Title>
+                        <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
                     </Table.Cell>
                     <Table.Cell>
-                        <Title size={6}>{numeral(stat.recovery).format('0%')}</Title>
+                        <Title size={6}>{numeral(stat.recovery).format('0.0 %')}</Title>
                     </Table.Cell>
                 </Table.Row>
                 ))}

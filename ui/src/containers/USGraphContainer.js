@@ -36,6 +36,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
     const recovery = useSelector(state => state.services.usStates.recovery)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
+    const [unassignedCases, setUnassignedCases] = useState(0)
 
     const renderDisplay = (value) => {
         return value.startsWith('!') ? value.substring(1) : value            
@@ -74,7 +75,10 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
     useEffect(() => {
         if(confirmed) {
             const totalStates = Object.values(confirmed['!Total US'])
+            const unassignedStates = Object.values(confirmed['Unassigned'])
+
             setConfirmedTotal(totalStates[totalStates.length - 1])
+            setUnassignedCases(unassignedStates[unassignedStates.length - 1])
         }
     }, [confirmed])
     
@@ -123,12 +127,6 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                     graph={confirmed}
                     selected={selectedStates}
                     y_title="Total confirmed cases"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true,
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -137,12 +135,6 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                     graph={deaths}
                     selected={selectedStates}
                     y_title="Number of deaths"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -151,12 +143,6 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                     graph={recovered}
                     selected={selectedStates}
                     y_title="Number of recovered"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
             
                 <GraphWithLoader 
@@ -166,12 +152,6 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                     selected={selectedStates}
                     y_type='percent'
                     y_title="Mortality Rate Percentage"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
             
                 <GraphWithLoader 
@@ -181,12 +161,6 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                     selected={selectedStates}
                     y_type='percent'
                     y_title="Recovery Rate Percentage"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />              
             </>
 
@@ -196,11 +170,17 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                     <Title size={6}>Government Services</Title>
                     {selectedStates.map((region, idx) => (
                         <React.Fragment key={idx}>
-                            <Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"} textColor="white">{renderDisplay(region)}</Generic>
+                            <Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"} textColor="white">{renderDisplay(region)}</Generic><br />
                         </React.Fragment>
                     ))}
                 </Notification>
 
+            </>
+
+            <>
+                <Notification color="warning">
+                    The sum of all states and territories may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
+                </Notification>
             </>
         </TwoGraphLayout>
 

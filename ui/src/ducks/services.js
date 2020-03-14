@@ -1,11 +1,18 @@
-// Action Types
 import {call, put, takeEvery} from "redux-saga/effects"
 
 import DataService from '../services'
 
+import { LAST_UPDATE_KEY } from '../constants'
+
 import { createAction } from '@reduxjs/toolkit'
 
+import store from 'store'
+import moment from "moment"
+
+///////////////////////////////////////////////////////////////////////////////
 // Action Types
+///////////////////////////////////////////////////////////////////////////////
+
 export const types = {
     FETCH_GLOBAL: 'FETCH_GLOBAL',
     FETCH_GLOBAL_SUCCESS: 'FETCH_GLOBAL_SUCCESS',
@@ -25,7 +32,10 @@ export const types = {
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // Action Creators
+///////////////////////////////////////////////////////////////////////////////
+
 export const actions = {
     fetchGlobal: createAction(types.FETCH_GLOBAL),
     fetchUSStates: createAction(types.FETCH_US_STATES),
@@ -33,7 +43,10 @@ export const actions = {
     fetchLastUpdate: createAction(types.FETCH_LAST_UPDATE),
 }
 
+///////////////////////////////////////////////////////////////////////////////
 // Reducers
+///////////////////////////////////////////////////////////////////////////////
+
 export const initialState = {
     global: {},
     usStates: {},
@@ -141,18 +154,46 @@ const extractLatestCounts = (stats) => {
     return regionWithLatestCounts
 }
 
-const filterCountries = ['!Outside Mainland China', 'Mainland China', 'Korea, South', 'United Kingdom', 'Czechia', 'Taiwan*', 'Iran (Islamic Republic of)', 'Viet Nam']
-
+///////////////////////////////////////////////////////////////////////////////
 // Sagas
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Fetch last update timestamp from server
+ */
+export function* fetchLastUpdate() {
+    const dataService = new DataService()
+
+    const lastUpdate = yield call(dataService.fetchLastUpdate)
+
+    const lastUpdateAsNumeric = moment(lastUpdate).valueOf()
+
+    const lastUpdateLocalStorage = store.get(LAST_UPDATE_KEY)
+
+    if(!lastUpdateLocalStorage || lastUpdateLocalStorage < lastUpdateAsNumeric) {
+        store.set(LAST_UPDATE_KEY, lastUpdateAsNumeric)
+    }
+    
+    yield put({ type: types.FETCH_LAST_UPDATE_SUCCESS, payload: lastUpdateAsNumeric})
+}
+
+
+
+const filterCountries = [
+    '!Outside China', 
+]
+
 export function* fetchGlobal() {
     console.time('fetchGlobal')
 
     const dataService = new DataService()
 
     try {
+        console.time('fetchGlobal.axios')
         let confirmed = yield call(dataService.getConfirmed)
         let deaths = yield call(dataService.getDeaths)
         let recovered = yield call(dataService.getRecovered)
+        console.timeEnd('fetchGlobal.axios')
         
         for(let filterCountry of filterCountries) {
             if(confirmed.hasOwnProperty(filterCountry)) {
@@ -199,14 +240,16 @@ export function* fetchGlobal() {
         
         for(const confirmData of sortedConfirmed) {
             const region = confirmData.region
-            statsTotals.push({
-                region: region,
-                confirmed: confirmData.stats,
-                deaths: deathByCountryKey[region].stats,
-                recovered: recoveredByCountryKey[region].stats,
-                mortality: mortalityByCountryKey[region].stats,
-                recovery: recoveryByCountryKey[region].stats
-            })
+            if(deathByCountryKey.hasOwnProperty(region)) {
+                statsTotals.push({
+                    region: region,
+                    confirmed: confirmData.stats,
+                    deaths: deathByCountryKey[region].stats,
+                    recovered: recoveredByCountryKey[region].stats,
+                    mortality: mortalityByCountryKey[region].stats,
+                    recovery: recoveryByCountryKey[region].stats
+                })
+            }
         }
 
         yield put(
@@ -228,15 +271,19 @@ export function* fetchGlobal() {
     console.timeEnd('fetchGlobal')
 }
 
-const filterStates = ['Unassigned']
+const filterStates = []
 
 export function* fetchUSStates() {
+    console.time('fetchUSStates')
+
     const dataService = new DataService()
 
     try {
+        console.time('fetchUSStates.axios')
         let confirmed = yield call(dataService.getConfirmed, '-US')
         let deaths = yield call(dataService.getDeaths, '-US')
         let recovered = yield call(dataService.getRecovered, '-US')
+        console.timeEnd('fetchUSStates.axios')
 
         for(let filterState of filterStates) {
             if(confirmed.hasOwnProperty(filterState)) {
@@ -284,14 +331,17 @@ export function* fetchUSStates() {
         
         for(const confirmData of sortedConfirmed) {
             const region = confirmData.region
-            statsTotals.push({
-                region: region,
-                confirmed: confirmData.stats,
-                deaths: deathByRegionKey[region].stats,
-                recovered: recoveredByRegionKey[region].stats,
-                mortality: mortalityByRegionKey[region].stats,
-                recovery: recoveryByRegionKey[region].stats
-            })
+
+            if(deathByRegionKey.hasOwnProperty(region)) {
+                statsTotals.push({
+                    region: region,
+                    confirmed: confirmData.stats,
+                    deaths: deathByRegionKey[region].stats,
+                    recovered: recoveredByRegionKey[region].stats,
+                    mortality: mortalityByRegionKey[region].stats,
+                    recovery: recoveryByRegionKey[region].stats
+                })
+            }
         }
 
         yield put(
@@ -309,24 +359,21 @@ export function* fetchUSStates() {
     } catch(error) {
         console.error(error)
     }
+
+    console.timeEnd('fetchUSStates')
 }
-
-export function* fetchLastUpdate() {
-    const dataService = new DataService()
-
-    const lastUpdate = yield call(dataService.fetchLastUpdate)
-
-    yield put({ type: types.FETCH_LAST_UPDATE_SUCCESS, payload: lastUpdate})
-}
-
 
 export function* fetchUSRegions() {
+    console.time('fetchUSRegions')
+
     const dataService = new DataService()
 
     try {
+        console.time('fetchUSRegions.axios')
         const confirmed = yield call(dataService.getConfirmed, '-US-Regions')
         const deaths = yield call(dataService.getDeaths, '-US-Regions')
         const recovered = yield call(dataService.getRecovered, '-US-Regions')
+        console.timeEnd('fetchUSRegions.axios')
 
         const latestCounts = extractLatestCounts(confirmed)
 
@@ -348,6 +395,8 @@ export function* fetchUSRegions() {
     } catch(error) {
         console.error(error)
     }
+
+    console.timeEnd('fetchUSRegions')
 }
 
 export const sagas = [
