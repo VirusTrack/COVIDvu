@@ -4,9 +4,11 @@ import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import { Table, Title, Tab } from 'rbx'
+import { Table, Title, Tab, Generic } from 'rbx'
 
 import numeral from 'numeral'
+
+import { REGION_URLS } from '../constants'
 
 export const StatsContainer = ({filter='Global'}) => {
 
@@ -24,6 +26,14 @@ export const StatsContainer = ({filter='Global'}) => {
         return value.startsWith('!') ? value.substring(1) : value            
     }
 
+    const isExternalLinkAvailable = (key) => {
+        return REGION_URLS.hasOwnProperty(key)
+    }
+
+    const redirectToExternalLink = (key) => {
+        if(REGION_URLS.hasOwnProperty(key))
+            window.open(REGION_URLS[key], "_blank")
+    }
     /**
      * Fetch all the data
      */
@@ -55,9 +65,10 @@ export const StatsContainer = ({filter='Global'}) => {
         <>
         <Tab.Group size="large">
             <Tab active={selectedTab === 'Global'} onClick={() => { setSelectedTab('Global')}}>Global</Tab>
-            <Tab active={selectedTab === 'US'} onClick={() => { setSelectedTab('US')}}>US</Tab>
+            <Tab active={selectedTab === 'US'} onClick={() => { setSelectedTab('US')}}>United States</Tab>
         </Tab.Group>
 
+        <div className="table-container">
         <Table fullwidth hoverable>
             <Table.Head>
                 <Table.Row>
@@ -84,8 +95,8 @@ export const StatsContainer = ({filter='Global'}) => {
             <Table.Body>
                 { statsForGraph.map((stat, idx) => (
                 <Table.Row key={idx}>
-                    <Table.Cell>
-                        {renderDisplay(stat.region)}
+                    <Table.Cell>                        
+                        <Generic as="a" tooltipPosition="right" onClick={()=>{ redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>{renderDisplay(stat.region)}</Generic>
                     </Table.Cell>
                     <Table.Cell>
                         <Title size={5} style={{color: 'hsl(141, 53%, 53%)'}}>{stat.confirmed}</Title>
@@ -97,15 +108,16 @@ export const StatsContainer = ({filter='Global'}) => {
                         <Title size={5} style={{color: 'hsl(204, 86%, 53%)'}}>{stat.recovered}</Title>
                     </Table.Cell>
                     <Table.Cell>
-                        <Title size={6}>{numeral(stat.mortality).format('0%')}</Title>
+                        <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
                     </Table.Cell>
                     <Table.Cell>
-                        <Title size={6}>{numeral(stat.recovery).format('0%')}</Title>
+                        <Title size={6}>{numeral(stat.recovery).format('0.0 %')}</Title>
                     </Table.Cell>
                 </Table.Row>
                 ))}
             </Table.Body>
         </Table>
+        </div>
         </>
     )    
 }

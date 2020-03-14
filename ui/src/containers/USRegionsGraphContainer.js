@@ -6,14 +6,14 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Column, Tag, Message, Tab } from "rbx"
+import { Column, Tag, Message, Tab, Notification } from "rbx"
 
-import ThreeGraphLayout from '../layouts/ThreeGraphLayout'
+import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
-export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => {
+export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
     const dispatch = useDispatch()
     const history = useHistory()
     const { search } = useLocation()
@@ -30,6 +30,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
     const recovery = useSelector(state => state.services.usRegions.recovery)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
+    const [unassignedCases, setUnassignedCases] = useState(0)
 
     useEffect(() => {
         dispatch(actions.fetchUSRegions())
@@ -39,6 +40,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
         if(!search) {
             handleHistory(selectedRegions, secondaryGraph)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleHistory = (region, graph) => {
@@ -53,7 +55,10 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
     useEffect(() => {
         if(confirmed) {
             const totalRegions = Object.values(confirmed['!Total US'])
+            const unassignedRegions = Object.values(confirmed['Unassigned'])
+
             setConfirmedTotal(totalRegions[totalRegions.length - 1])
+            setUnassignedCases(unassignedRegions[unassignedRegions.length - 1])
         }
     }, [confirmed])    
 
@@ -74,7 +79,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
     }
 
     return (
-        <ThreeGraphLayout>
+        <TwoGraphLayout>
             <>                        
                     
                 <Tag size="large" color="danger">Total Cases: {confirmedTotal}</Tag><br />
@@ -86,22 +91,9 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
 
             </>
 
-            <GraphWithLoader 
-                graphName="Confirmed"
-                secondaryGraph="Confirmed"
-                title="Cases US Regions"
-                graph={confirmed}
-                selected={selectedRegions}
-                y_title="Total confirmed cases"
-                config={
-                    {
-                        displayModeBar: false
-                    }
-                }
-            />
-            
             <>
                 <Tab.Group>
+                    <Tab active={secondaryGraph === 'Confirmed'} onClick={() => { handleSelectedGraph('Confirmed')}}>Confirmed</Tab>
                     <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
                     <Tab active={secondaryGraph === 'Recovered'} onClick={() => { handleSelectedGraph('Recovered')}}>Recovered</Tab>
                     <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
@@ -109,17 +101,20 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
                 </Tab.Group>
 
                 <GraphWithLoader 
+                    graphName="Confirmed"
+                    secondaryGraph={secondaryGraph}
+                    title="Cases US Regions"
+                    graph={confirmed}
+                    selected={selectedRegions}
+                    y_title="Total confirmed cases"
+                />
+                
+                <GraphWithLoader 
                     graphName="Deaths"
                     secondaryGraph={secondaryGraph}
                     graph={deaths}
                     selected={selectedRegions}
                     y_title="Number of deaths"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -128,12 +123,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
                     graph={recovered}
                     selected={selectedRegions}
                     y_title='Number of recovered'
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -143,12 +132,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
                     selected={selectedRegions}
                     y_type='percent'
                     y_title='Mortality Rate Percentage'
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
 
@@ -159,17 +142,11 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
                     selected={selectedRegions}
                     y_type='percent'
                     y_title='Recovery Rate Percentage'
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
             </>
 
-            <Column.Group centered breakpoint="mobile">
-                <Column size="half">
+            <Column.Group centered>
+                <Column>
                 <Message size="small" style={{margin: '0.5rem'}} color="link">
                             <Message.Body>
                                 <p>
@@ -188,7 +165,14 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Deaths
                         </Message>                    
                 </Column>                
             </Column.Group>
-        </ThreeGraphLayout>
+
+            <>
+                <Notification color="warning">
+                    The sum of all regions may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
+                </Notification>
+            </>
+
+        </TwoGraphLayout>
 
     )
 }
