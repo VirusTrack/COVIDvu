@@ -6,9 +6,11 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab } from "rbx"
+import { Tag, Tab, Notification, Generic, Title } from "rbx"
 
-import ThreeGraphLayout from '../layouts/ThreeGraphLayout'
+import { REGION_URLS } from '../constants'
+
+import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
@@ -16,7 +18,7 @@ import SelectRegionComponent from '../components/SelectRegionComponent'
 
 import numeral from 'numeral'
 
-export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => {
+export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -34,6 +36,21 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => 
     const recovery = useSelector(state => state.services.usStates.recovery)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
+    const [unassignedCases, setUnassignedCases] = useState(0)
+
+    const renderDisplay = (value) => {
+        return value.startsWith('!') ? value.substring(1) : value            
+    }
+
+    const isExternalLinkAvailable = (key) => {
+        return REGION_URLS.hasOwnProperty(key)
+    }
+
+    const redirectToExternalLink = (key) => {
+        if(REGION_URLS.hasOwnProperty(key))
+            window.open(REGION_URLS[key], "_blank")
+    }
+
 
     useEffect(() => {
         dispatch(actions.fetchUSStates())
@@ -43,6 +60,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => 
         if(!search) {
             handleHistory(selectedStates, secondaryGraph)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleHistory = (region, graph) => {        
@@ -57,7 +75,10 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => 
     useEffect(() => {
         if(confirmed) {
             const totalStates = Object.values(confirmed['!Total US'])
+            const unassignedStates = Object.values(confirmed['Unassigned'])
+
             setConfirmedTotal(totalStates[totalStates.length - 1])
+            setUnassignedCases(unassignedStates[unassignedStates.length - 1])
         }
     }, [confirmed])
     
@@ -79,7 +100,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => 
     }
 
     return (
-        <ThreeGraphLayout>
+        <TwoGraphLayout>
             <>                        
                 <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
 
@@ -90,22 +111,10 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => 
 
             </>
 
-            <GraphWithLoader 
-                graphName="Cases by State"
-                secondaryGraph="Cases by State"
-                graph={confirmed}
-                selected={selectedStates}
-                y_title="Total confirmed cases"
-                config={
-                    {
-                        displayModeBar: false,
-                        showlegend: true
-                    }
-                }
-            />
 
             <>
                 <Tab.Group>
+                    <Tab active={secondaryGraph === 'Confirmed'} onClick={() => { handleSelectedGraph('Confirmed')}}>Confirmed</Tab>
                     <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
                     <Tab active={secondaryGraph === 'Recovered'} onClick={() => { handleSelectedGraph('Recovered')}}>Recovered</Tab>
                     <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
@@ -113,17 +122,19 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => 
                 </Tab.Group>
 
                 <GraphWithLoader 
+                    graphName="Confirmed"
+                    secondaryGraph={secondaryGraph}
+                    graph={confirmed}
+                    selected={selectedStates}
+                    y_title="Total confirmed cases"
+                />
+
+                <GraphWithLoader 
                     graphName="Deaths"
                     secondaryGraph={secondaryGraph}
                     graph={deaths}
                     selected={selectedStates}
                     y_title="Number of deaths"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -132,12 +143,6 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => 
                     graph={recovered}
                     selected={selectedStates}
                     y_title="Number of recovered"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
             
                 <GraphWithLoader 
@@ -147,12 +152,6 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => 
                     selected={selectedStates}
                     y_type='percent'
                     y_title="Mortality Rate Percentage"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
             
                 <GraphWithLoader 
@@ -162,15 +161,28 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Deaths'}) => 
                     selected={selectedStates}
                     y_type='percent'
                     y_title="Recovery Rate Percentage"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />              
             </>
-        </ThreeGraphLayout>
+
+            <>
+
+                <Notification color="info">
+                    <Title size={6}>Government Services</Title>
+                    {selectedStates.map((region, idx) => (
+                        <React.Fragment key={idx}>
+                            <Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"} textColor="white">{renderDisplay(region)}</Generic><br />
+                        </React.Fragment>
+                    ))}
+                </Notification>
+
+            </>
+
+            <>
+                <Notification color="warning">
+                    The sum of all states and territories may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
+                </Notification>
+            </>
+        </TwoGraphLayout>
 
     )
 }

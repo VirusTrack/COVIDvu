@@ -9,7 +9,7 @@ import { actions } from '../ducks/services'
 
 import { Tag, Tab } from "rbx"
 
-import ThreeGraphLayout from '../layouts/ThreeGraphLayout'
+import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
@@ -19,7 +19,7 @@ import numeral from 'numeral'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
-export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], graph = 'Deaths'}) => {
+export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'Cases'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -52,6 +52,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
         if(!search) {
             handleHistory(selectedCountries, secondaryGraph)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleHistory = (region, graph) => {
@@ -96,7 +97,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
         )
     }
     return (
-        <ThreeGraphLayout>
+        <TwoGraphLayout>
 
             <>
                 <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
@@ -105,29 +106,11 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
                     data={sortedConfirmed}
                     selected={selectedCountries}
                     handleSelected={dataList => handleSelectedRegion(dataList)} />
-
-                <br />
-                <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br />
-                
             </>
 
-            <>
-            <GraphWithLoader 
-                graphName="Cases"
-                secondaryGraph="Cases"
-                graph={confirmed}
-                selected={selectedCountries}
-                y_title="Total confirmed cases"
-                config={
-                    {
-                        displayModeBar: false,
-                        showlegend: true,
-                    }
-                }
-            />
-            </>
             <>
                 <Tab.Group>
+                    <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
                     <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
                     <Tab active={secondaryGraph === 'Recovered'} onClick={() => { handleSelectedGraph('Recovered')}}>Recovered</Tab>
                     <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
@@ -135,17 +118,19 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
                 </Tab.Group>
 
                 <GraphWithLoader 
+                    graphName="Cases"
+                    secondaryGraph={secondaryGraph}
+                    graph={confirmed}
+                    selected={selectedCountries}
+                    y_title="Total confirmed cases"
+                />
+
+                <GraphWithLoader 
                     graphName="Deaths"
                     secondaryGraph={secondaryGraph}
                     graph={deaths}
                     selected={selectedCountries}
                     y_title="Number of deaths"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
 
                 <GraphWithLoader 
@@ -154,12 +139,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
                     graph={recovered}
                     selected={selectedCountries}
                     y_title="Number of recovered"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
         
 
@@ -170,12 +149,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
                     selected={selectedCountries}
                     y_type="percent"
                     y_title="Mortality Rate Percentage"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
         
 
@@ -186,15 +159,14 @@ export const GlobalGraphContainer = ({country = ['!Global', 'Mainland China'], g
                     selected={selectedCountries}
                     y_type="percent"
                     y_title="Recovery Rate Percentage"
-                    config={
-                        {
-                            displayModeBar: false,
-                            showlegend: true
-                        }
-                    }
                 />
             </>
-        </ThreeGraphLayout>
+
+            <>
+                <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br />
+            </>
+
+        </TwoGraphLayout>
     )    
 }
 
