@@ -47,7 +47,7 @@ function assertCOVID19DirExists {
 
 function assertCloudFrontConfig {
     [[ -n "$AWS_ACCESS_KEY_ID" ]] || die "AWS_ACCESS_KEY_ID is not set" 4
-    [[ -n "$AWS_SECRET_ACCESS_KEY_ID" ]] || die "AWS_SECRET_ACCESS_KEY_ID is not set" 5
+    [[ -n "$AWS_SECRET_ACCESS_KEY" ]] || die "AWS_SECRET_ACCESS_KEY is not set" 5
     [[ -n "$VIRUSTRACK_CLOUDFRONT_ID" ]] || die "VIRUSTRACK_CLOUDFRONT_ID not defined" 7
     [[ -n $(which aws) ]] || die "aws command not installed - run apt-get install awscli" 6
 } # assertCloudFrontConfig
@@ -61,9 +61,12 @@ function assert_rcloneConfig {
 function resetSiteData {
     # Weird S3 bug that makes rclone "hang" forever if the 
     # files are already there and haven't finished propagating.
+    local publishFlag="$1"
     echo "resetting $SITE_DATA_DIR"
     rm -f "$SITE_DATA_DIR"/*
-    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
+    [[ -n "$publishFlag" ]] && \
+        [[ "publish" == "$publishFlag" ]] && \
+        rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
 } # resetSiteData
 
 
@@ -94,13 +97,16 @@ function generateVirusUpdateJSONFiles {
 } # generateVirusUpdateJSONFiles
 
 
+function invalidateCloudFrontCache {
+    aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths "/*"
+} # invalidateCloudFrontCache
+
+
 function deployVirusUpdateJSON {
     echo "cloning $SITE_DATA_DIR to the virustrack.live website"
     rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
 
-    # TODO: Figure out why this doesn't work well
-    # echo "invalidating CloudFront cache"
-    # aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths '/site-data/*' || die "CloudFront invalidation failed" 8
+    invalidateCloudFrontCache
 } # deployVirusUpdateJSON
 
 
@@ -109,30 +115,27 @@ function patchCSSEData {
 } # patchCSSEData
 
 
-function invalidateCloudFrontCache {
-    aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths "/*"
-} # invalidateCloudFrontCache
-
-
 # *** main ***
 
 assertSiteDataExists
 resetErrorNotification
+resetSiteData "$1"
 assertCOVID19DirExists
-resetSiteData
 updateCOVID19DataSources
+generateVirusUpdateJSONFiles
+
+if [[ "patch" = "$2" ]]
+then
+    echo "patching stale JH CSSE data with BNO, calculated updates"
+    ./pyavka
+    patchCSSEData
+fi
 
 case "$1" in
     "publish")
         [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
         assertCloudFrontConfig
         assert_rcloneConfig
-        generateVirusUpdateJSONFiles
-        if [[ "patch" = "$2" ]]
-        then
-            ./pyavka
-            patchCSSEData
-        fi
         deployVirusUpdateJSON
         ;;
 esac
