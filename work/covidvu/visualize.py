@@ -159,3 +159,27 @@ def plotTimeSeriesInteractive(df,
     fig.update_layout(title_text=title)
 
     return fig
+
+
+
+def plot(nRows=1, nCols=1, figSize=5):
+    """
+    Generate a matplotlib plot and axis handle
+
+    Parameters
+    -----------------
+    nRows : An int, number of rows for subplotting
+    nCols : An int, number of columns for subplotting
+    figSize : Numeric or array (xFigSize, yFigSize). The size of each axis.
+    """
+    if isinstance(figSize, (list, tuple)):
+        xFigSize, yFigSize = figSize
+    elif isinstance(figSize, (int, float)):
+        xFigSize = yFigSize = figSize
+    else:
+        raise Exception('figSize type {} not recognised'.format(type(figSize)))
+
+    fig, axs = plt.subplots(nRows, nCols, figsize=(nCols * xFigSize, nRows * yFigSize))
+    if nRows * nCols > 1:
+        axs = axs.ravel()
+    return fig, axs
