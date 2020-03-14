@@ -2,6 +2,8 @@ import axios from "axios"
 
 import { DATA_URL } from './constants'
 
+import moment from 'moment'
+
 class DataService {
 
     async getConfirmed(distinct = '') {
@@ -27,6 +29,21 @@ class DataService {
         return response.data
     }
 
+    async fetchLastUpdate() {
+        const response = await axios.get(`${DATA_URL}/last-update.txt`)
+        const lines = response.data.split('\n')
+
+        let lastUpdate = undefined
+
+        for(const line of lines) {
+            if(line.startsWith('Completed on')) {
+                const justDate = line.substring('Completed on '.length)
+                lastUpdate = moment(justDate).format('YYYY-MM-DD HH:mm:ss')
+            }
+        }
+
+        return lastUpdate
+    }
 }
 
 export default DataService

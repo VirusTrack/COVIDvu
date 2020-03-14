@@ -46,9 +46,22 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         setPlotsAsValues(Object.values(plots))
     }, [selected, data, y_type])
 
+    let mergeConfig = { ...config,
+        displayModeBar: false,
+        showlegend: true,
+        editable: false,
+        scrollZoom: false
+    }
+
     const layout = {
         title: title,
-        height: height
+        width: width,
+        height: height,
+        margin: {
+            l: 50,
+            t: 0,
+        },
+        
     }
         
     if(y_title) {
@@ -62,11 +75,11 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         }
     }
 
-    layout['legend'] = {
-        x: 1,
-        xanchor: 'right',
-        y: 1
-    }
+    // layout['legend'] = {
+    //     x: 1,
+    //     xanchor: 'right',
+    //     y: 1
+    // }
 
     return (
         <Plot

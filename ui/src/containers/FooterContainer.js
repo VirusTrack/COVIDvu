@@ -1,12 +1,30 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
-import {Content, Footer} from "rbx"
+import { useDispatch, useSelector } from 'react-redux'
+import { actions } from '../ducks/services'
+
+import {Content, Footer, Tag} from "rbx"
+
+import moment from 'moment'
 
 export const FooterContainer = () =>{
+
+    const dispatch = useDispatch()
+
+    const lastUpdate = useSelector(state => state.services.lastUpdate)
+
+    useEffect(() => {
+        dispatch(actions.fetchLastUpdate())
+    }, [dispatch])
 
     return (
         <Footer>
             <Content textAlign="centered">
+                { lastUpdate && 
+                    <p>
+                        <Tag color="primary">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
+                    </p>
+                }
                 <p>
                     Data sources: <a href="https://github.com/CSSEGISandData/COVID-19" target="_new">Johns Hopkins CSSE</a>, <a href="https://www.who.int/emergencies/diseases/novel-coronavirus-2019/situation-reports" target="_new">WHO</a>, <a href="https://www.cdc.gov/coronavirus/2019-ncov/index.html" target="_new">CDC</a>, <a href="https://www.ecdc.europa.eu/en/geographical-distribution-2019-ncov-cases" target="_new">ECDC</a>, <a href="http://www.nhc.gov.cn/xcs/yqtb/list_gzbd.shtml" target="_new">NHC</a> and <a href="https://3g.dxy.cn/newh5/view/pneumonia?scene=2&clicktime=1579582238&enterid=1579582238&from=singlemessage&isappinstalled=0" target="_new">DXY</a>
                 </p>

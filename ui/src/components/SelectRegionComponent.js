@@ -23,7 +23,7 @@ export const SelectRegionComponent = ({data, selected, handleSelected}) => {
 
 
     return (
-        <Select.Container style={{marginTop: '0.5rem'}}>
+        <Select.Container style={{marginTop: '0.5rem'}} tooltipPosition="right" tooltip="Ctrl or Cmd-Click to select multiple regions">
             <Select multiple size={10} value={selected} onChange={onChange}>
                 {data.map(element => (
                     <Select.Option key={element.region} value={element.region}>{renderDisplay(`${element.region} ${element.stats}`)}</Select.Option>
