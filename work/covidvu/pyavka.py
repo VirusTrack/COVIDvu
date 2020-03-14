@@ -55,7 +55,7 @@ def _generateCSVTo(targetFileName, dataSource = WORLD_TABLE_HTML, ignoreRows = 6
             for column in tableRow.find_all('td'):
                 row.append(column.text.replace(',', '')) # number format comma
             
-            if any(location in row for location in NIXED_ROWS_INDEX) or not len(row[0]):
+            if not len(row[0]):
                 continue    # skip to next record
             
             rows.append(row)
