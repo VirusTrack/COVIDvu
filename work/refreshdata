@@ -71,7 +71,8 @@ function resetSiteData {
 function nukeDeploymentSite {
     resetSiteData
     echo "nuking $SITE_DATA_DIR"
-    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
+    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$STAGE_BUCKET/$SITE_DATA_DIR"
+    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
 } # nukeDeploymentSite
 
 
@@ -104,10 +105,13 @@ function invalidateCloudFrontCache {
 
 
 function deployVirusUpdateJSON {
-    echo "cloning $SITE_DATA_DIR to the virustrack.live website"
+    [[ -n "$1" ]] || die "deployment failed; target bucket not specified" 10
 
+    local targetBucket="$1"
+
+    echo "cloning $SITE_DATA_DIR to the $targetBucket website"
     rm -f "$SITE_DATA_DIR"/*html "$SITE_DATA_DIR"/*tsv
-    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
+    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$targetBucket/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
 
     invalidateCloudFrontCache
 } # deployVirusUpdateJSON
@@ -142,11 +146,14 @@ assertCloudFrontConfig
 assert_rcloneConfig
 
 case "$1" in
-    "publish")
-        deployVirusUpdateJSON
-        ;;
     "nuke")
         nukeDeploymentSite
+        ;;
+    "publish")
+        deployVirusUpdateJSON "$SITE_BUCKET"
+        ;;
+    "stage")
+        deployVirusUpdateJSON "$STAGE_BUCKET"
         ;;
 esac
 
