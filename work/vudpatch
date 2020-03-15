@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+# crontab compliant :)
+
+
+source ./pyrunner
+
+
+python -m covidvu.vudpatch confirmed deaths recovered
+
+ls -Alrt "$SITE_DATA_DIR"/*json
+

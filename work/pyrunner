@@ -1,0 +1,39 @@
+#!/bin/bash
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
+refreshdata_config="./refreshdata.config"
+[[ -e "$refreshdata_config" ]] && source "$refreshdata_config"
+
+
+# *** functions ***
+
+function die {
+    echo "[Error $2] - $1" 
+    exit "$2"
+} # die
+
+
+function assertContainerSigFileIsDefined {
+    echo "  asserting CONTAINER_SIG_FILE exists"
+    [[ -n "$CONTAINER_SIG_FILE" ]] || die "CONTAINER_SIG_FILE environment variable undefined" 2
+} # assertContainerSigFileIsDefined
+
+
+function runtimePythonEnvironment {
+if [[ "Linux" == $(uname) ]]
+then
+    echo "  host system: " $(uname) " looking for $CONTAINER_SIG_FILE"
+    awk '/docker/ || /lxc/ { exit(99); }' "$CONTAINER_SIG_FILE"
+    if [[ "$?" == 0 ]]
+    then
+        echo "activating the virtual environment"
+        source ./bin/activate || die "unable to start virtualenv" 1
+    fi
+fi
+} # runtimePythonEnvironment
+
+
+assertContainerSigFileIsDefined
+# -------- DO NOT WRITE ANYTHING BELOW THIS LINE --------
