@@ -8,8 +8,8 @@ export VIRUSTRACK_CLOUDFRONT_ID="E000000aa000aI"
 #
 # --- config
 #
-CONTAINER_SIG_FILE="/proc/1/cgroup"
-STAGE_BUCKET="staging.virustrack.live"
-SITE_BUCKET="virustrack.live"
-SITE_DATA_DIR="site-data"
+export CONTAINER_SIG_FILE="/proc/1/cgroup"
+export STAGE_BUCKET="staging.virustrack.live"
+export SITE_BUCKET="virustrack.live"
+export SITE_DATA_DIR="site-data"
 
