@@ -42,6 +42,7 @@ NIXED_ROWS_INDEX = (
     'U.S. Virgin Islands',
     'Unassigned',
     'Virgin Islands',
+    'Virgin Islands, U.S.',
     'Wuhan',
 )
 SCRAPED_WORLD_DATA = os.path.join(SITE_DATA, 'scraped-world.tsv')
@@ -172,15 +173,19 @@ def _patchUSRegionsData(target, dataUS):
     for state in dataUS:
         if state in NIXED_ROWS_INDEX:
             continue
-        region = US_REGIONS_LONG[state]
-        if region not in updateUSRegions:
-            updateUSRegions[region] = { SCRAPED_TODAY: 0.0, }
-
         try:
-            updateUSRegions[region][SCRAPED_TODAY] += float(dataUS[state][SCRAPED_TODAY])
-        except:
-            yesterday = dataUS[state][allTime[len(allTime)-2]]
-            updateUSRegions[region][SCRAPED_TODAY] = yesterday
+            region = US_REGIONS_LONG[state]
+            if region not in updateUSRegions:
+                updateUSRegions[region] = { SCRAPED_TODAY: 0.0, }
+
+            try:
+                updateUSRegions[region][SCRAPED_TODAY] += float(dataUS[state][SCRAPED_TODAY])
+            except:
+                yesterday = dataUS[state][allTime[len(allTime)-2]]
+                updateUSRegions[region][SCRAPED_TODAY] = yesterday
+        except KeyError:
+            print(' >> Invalid state: %s' % state)
+            continue
 
     try:
         dataUSRegions['!Total US'][SCRAPED_TODAY] = dataUS['!Total US'][SCRAPED_TODAY]
