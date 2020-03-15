@@ -4,6 +4,7 @@
 
 source ./pyrunner
 
+env | awk '/VIRT/' | sort
 python3 -m covidvu.vujson confirmed deaths recovered
 ls -Alrt "$SITE_DATA_DIR"
 

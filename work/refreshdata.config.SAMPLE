@@ -1,8 +1,15 @@
-#!/bin/bash
-# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
-# vim: set fileencoding=utf-8:
+#
+# *** AWS
+#
+export AWS_ACCESS_KEY_ID="AAFALADFJHLAFWHATEVERDUDE"
+export AWS_SECRET_ACCESS_KEY="someverylongprivatekeyhere"
+export VIRUSTRACK_CLOUDFRONT_ID="E000000aa000aI"
 
-
-# *** main ***
-
+#
+# --- config
+#
+export CONTAINER_SIG_FILE="/proc/1/cgroup"
+export STAGE_BUCKET="staging.virustrack.live"
+export SITE_BUCKET="virustrack.live"
+export SITE_DATA_DIR="site-data"
 
