@@ -7,3 +7,4 @@ pandas
 plotly
 pudb
 pytest
+pymc3
