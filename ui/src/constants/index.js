@@ -1,4 +1,5 @@
 const DATA_URL = `https://virustrack.live/site-data`
+const STAGING_DATA_URL = `https://staging.virustrack.live/site-data`
 
 const LAST_UPDATE_KEY = 'covid-lastUpdated'
 
@@ -337,4 +338,4 @@ const COUNTRIES = [
     "US": "https://www.cdc.gov/coronavirus/2019-ncov/index.html",
     }
 
-  export { COUNTRIES, US_REGIONS, US_STATES, DATA_URL, REGION_URLS, LAST_UPDATE_KEY }
+  export { COUNTRIES, US_REGIONS, US_STATES, DATA_URL, STAGING_DATA_URL, REGION_URLS, LAST_UPDATE_KEY }
