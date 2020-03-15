@@ -6,8 +6,8 @@
 # crontab compliant :)
 
 
-refreshdata_config="./refreshdata.config"
-[[ -e "$refreshdata_config" ]] && source "$refreshdata_config"
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
 
 
 CONFIG_rclone="rclone.conf"
@@ -63,15 +63,16 @@ function assert_rcloneConfig {
 
 
 function resetSiteData {
-    # Weird S3 bug that makes rclone "hang" forever if the 
-    # files are already there and haven't finished propagating.
-    local publishFlag="$1"
     echo "resetting $SITE_DATA_DIR"
     rm -f "$SITE_DATA_DIR"/*
-    [[ -n "$publishFlag" ]] && \
-        [[ "publish" == "$publishFlag" ]] && \
-        rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
 } # resetSiteData
+
+
+function nukeDeploymentSite {
+    resetSiteData
+    echo "nuking $SITE_DATA_DIR"
+    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR"
+} # nukeDeploymentSite
 
 
 function updateCOVID19DataSources {
@@ -104,7 +105,9 @@ function invalidateCloudFrontCache {
 
 function deployVirusUpdateJSON {
     echo "cloning $SITE_DATA_DIR to the virustrack.live website"
-    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
+
+    rm -f "$SITE_DATA_DIR"/*html "$SITE_DATA_DIR"/*tsv
+    rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$SITE_BUCKET/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
 
     invalidateCloudFrontCache
 } # deployVirusUpdateJSON
@@ -135,12 +138,15 @@ then
     ./vudpatch
 fi
 
+assertCloudFrontConfig
+assert_rcloneConfig
+
 case "$1" in
     "publish")
-        [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
-        assertCloudFrontConfig
-        assert_rcloneConfig
         deployVirusUpdateJSON
+        ;;
+    "nuke")
+        nukeDeploymentSite
         ;;
 esac
 
