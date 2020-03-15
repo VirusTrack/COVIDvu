@@ -1,14 +1,31 @@
 import axios from "axios"
 
-import { DATA_URL } from './constants'
+import { DATA_URL, STAGING_DATA_URL } from './constants'
 
 import moment from 'moment'
+
+function dataUrl() {
+    const { REACT_APP_DEPLOY_ENV, REACT_APP_API_HOST } = process.env
+    if (REACT_APP_API_HOST) {
+        return REACT_APP_API_HOST
+    }
+
+    switch (REACT_APP_DEPLOY_ENV) {
+        case "staging":
+            return STAGING_DATA_URL
+        case "prod":
+            return DATA_URL
+        default:
+            return DATA_URL
+    }
+}
+
 
 class DataService {
 
     async getConfirmed(distinct = '') {
         try {
-            const response = await axios.get(`${DATA_URL}/confirmed${distinct}.json`)
+            const response = await axios.get(`${dataUrl()}/confirmed${distinct}.json`)
 
             return response.data
         } catch(error) {
@@ -18,19 +35,19 @@ class DataService {
     }
 
     async getDeaths(distinct = '') {
-        const response = await axios.get(`${DATA_URL}/deaths${distinct}.json`)
+        const response = await axios.get(`${dataUrl()}/deaths${distinct}.json`)
 
         return response.data
     }
 
     async getRecovered(distinct = '') {
-        const response = await axios.get(`${DATA_URL}/recovered${distinct}.json`)
+        const response = await axios.get(`${dataUrl()}/recovered${distinct}.json`)
 
         return response.data
     }
 
     async fetchLastUpdate() {
-        const response = await axios.get(`${DATA_URL}/last-update.txt`)
+        const response = await axios.get(`${dataUrl()}/last-update.txt`)
         const lines = response.data.split('\n')
 
         let lastUpdate = undefined

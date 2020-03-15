@@ -85,7 +85,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         <Plot
             data={plotsAsValues}
             layout={layout}
-            config={config}
+            config={mergeConfig}
         />
 
     )
