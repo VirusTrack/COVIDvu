@@ -3,30 +3,26 @@
 # vim: set fileencoding=utf-8:
 
 
-REFRESHDATA_CONFIG="./refreshdata.config"
-[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+source ./pyrunner
 
-SITE_DATA_DIR="site-data"
 
 HTML_FILE_NAME="$SITE_DATA_DIR/table-%02d.html"
 RAW_DATA_SOURCE="https://docs.google.com/spreadsheets/d/e/2PACX-1vR30F8lYP3jG7YOq8es0PBpJIE5yvRVZffOyaqC0GgMBN6yt0Q-NI8pxS7hd1F9dYXnowSC6zpZmW9D/pubhtml?gid=0&amp;single=false&amp;widget=true&amp;headers=true"
 
 
+# ::: functions :::
+
+function fetchBNODataSource {
+    curl -s "$RAW_DATA_SOURCE" | \
+        awk '/<table/ { gsub("<table", "\n<table"); gsub("/table>", "/table>\n"); print; }' | \
+        awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
+} # fetchBNODataSource
+
+
 # *** main ***
 
-if [[ "Linux" == $(uname) ]]
-then
-    awk '/docker/ || /lxc/ { exit(99); }' "$CONTAINER_SIG_FILE"
-    if [[ "$?" == 0 ]]
-    then
-        echo "start virtual environment in " $(pwd)
-        source ./bin/activate
-    fi
-fi
-
-curl -s "$RAW_DATA_SOURCE" | \
-    awk '/<table/ { gsub("<table", "\n<table"); gsub("\/table>", "/table>\n"); print; }' | \
-    awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
-
+fetchBNODataSource
 python3 -m covidvu.pyavka
+
+ls -Alrt "$SITE_DATA_DIR"/*html
 
