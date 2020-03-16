@@ -23,38 +23,32 @@ all: ALWAYS
 	make publish
 
 
-# Going to a different directory is necessary for deinstalling a package in
-# a native Python environment; this has no effect in a virtualenv.
 clean:
 	rm -Rf $(BUILD)/*
 	rm -Rf $(DIST)/*
-	rm -Rfv $$(find alian | awk '/__pycache__$$/')
+	rm -Rfv $$(find covidvu | awk '/__pycache__$$/')
 	rm -Rfv $$(find test | awk '/__pycache__$$/')
 	pushd ./resources ; pip uninstall -y $(MODULE)==$(VERSION) || true ; popd
     
 
 install:
-	pushd ./resources ; devpi install $(MODULE)==$(VERSION) ; popd
-	pip list | awk 'NR < 3 { print; } /alian/'
+	pip install -e .
+	pip list | awk 'NR < 3 { print; } /covidvu/'
 
 
 module:
-	devpi install $(REQUIREMENTS)
+	pip install -r $(REQUIREMENTS)
 	python setup.py bdist_wheel
 
 
 publish:
-	devpi upload dist/*whl
-	@echo /$(DEVPI_USER)/dev/$(MODULE) "package versions:"
-	@devpi getjson /$(DEVPI_USER)/dev/$(MODULE) | jq -M '.result[].version'
+	@echo "publishing NOOP"
 
 
-#	pip uninstall -y $$(pip list --format=columns | awk 'NR > 2 && !/setuptools/ && !/wheel/ && $$1 != "pip" { print($$1); }')
 nuke: ALWAYS
 	make clean
-	rm -Rf $(shell find alian | awk '/__pycache__$$/')
+	rm -Rf $(shell find covidvu | awk '/__pycache__$$/')
 	rm -Rf $(shell find test/ | awk '/__pycache__$$/')
-	rm -Rfv ./bin ./include ./lib .Python 
 
 
 # Delete the Python virtual environment - necessary when updating the
@@ -68,17 +62,8 @@ test: ALWAYS
 	pip install -e .
 	pytest -v ./test
 	pushd ./resources ; pip uninstall -y $(MODULE)==$(VERSION) || true ; popd
-	rm -Rfv $$(find alian | awk '/__pycache__$$/')
+	rm -Rfv $$(find covidvu | awk '/__pycache__$$/')
 	rm -Rfv $$(find test | awk '/__pycache__$$/')
-
-
-# devpi configuration:
-devpi: ALWAYS
-	./pipsetup
-	devpi logoff
-	devpi use http://$(DEVPI_HOST) --set-cfg
-	devpi login "$(DEVPI_USER)" --password "$(DEVPI_PASSWORD)" > /dev/null
-	devpi use alian/dev
 
 
 ALWAYS:
