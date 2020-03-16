@@ -4,8 +4,8 @@ import pandas as pd
 from pandas.core.indexes.datetimes import DatetimeIndex
 import pymc3 as pm
 
-import covidvu.vujson as vujson
-from covidvu.vujson import _dumpJSON
+import covidvu.pipeline.vujson as vujson
+from covidvu.pipeline.vujson import _dumpJSON
 
 N_SAMPLES        = 500
 N_TUNE           = 100
@@ -215,7 +215,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                                                                        )
 
     countryTS.index = pd.to_datetime(countryTS.index)
-    return countryTS, predictionsMeanTS, predictionsPercentilesTS, countryName
+    return countryTS, predictionsMeanTS, predictionsPercentilesTS, countryName, trace, countryTSClean
 
 
 def _castDatetimeIndexToStr(timeSeries, dateCode = '%Y-%m-%d'):
@@ -261,7 +261,7 @@ def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
 def _main(countryTrainIndex,
           predictionsPercentiles = PREDICTIONS_PERCENTILES,
           ):
-    _, predictionsMeanTS, predictionsPercentilesTS, countryName = predictLogisticGrowth(
+    _, predictionsMeanTS, predictionsPercentilesTS, countryName, trace = predictLogisticGrowth(
         countryTrainIndex = countryTrainIndex,
         predictionsPercentiles = predictionsPercentiles,
     )
