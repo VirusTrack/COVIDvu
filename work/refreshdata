@@ -88,7 +88,7 @@ function updateCOVID19DataSources {
     cat "$TMP_OUTPUT" | tee -a "$UPDATE_NOTICE"
     rm -f "$TMP_OUTPUT"
 
-    timeStamp=$(date +"%Y-%m-%d %H:%M:%S")
+    timeStamp=$(TZ=":Etc/UTC" date +"%Y-%m-%dT%H:%M:%SZ")
     printf "\nCompleted on %s\n" "$timeStamp" >> "$UPDATE_NOTICE"
 } # updateCOVID19DataSources
 
@@ -170,6 +170,8 @@ case "$1" in
     "publish")
         deployVirusUpdateJSON "$SITE_BUCKET"
         ;;
+    "staging")
+        ;&
     "stage")
         deployVirusUpdateJSON "$STAGE_BUCKET"
         ;;
