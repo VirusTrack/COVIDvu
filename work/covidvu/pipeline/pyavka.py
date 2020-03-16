@@ -5,9 +5,9 @@
 
 from bs4 import BeautifulSoup
 
-from covidvu.vujson import SITE_DATA
-from covidvu.vudpatch import SCRAPED_US_DATA
-from covidvu.vudpatch import SCRAPED_WORLD_DATA
+from covidvu.pipeline.vujson import SITE_DATA
+from covidvu.pipeline.vudpatch import SCRAPED_US_DATA
+from covidvu.pipeline.vudpatch import SCRAPED_WORLD_DATA
 
 import csv
 import os

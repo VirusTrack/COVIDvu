@@ -99,6 +99,31 @@ function generateVirusUpdateJSONFiles {
 } # generateVirusUpdateJSONFiles
 
 
+function patchJSONFiles {
+    local subCommand="$1"
+    # TODO: Document the command line arguments in the README.md page:
+    #
+    #       ./refreshdata publish patch
+    #
+    #       ./refreshdata noop patch
+    #
+    #       ./refreshdata
+    if [[ "patch" = "$subCommand" ]]
+    then
+        echo "patching stale JH CSSE data with BNO, calculated updates"
+        ./pyavka
+        ./vudpatch
+    fi
+} # patchJSONFiles
+
+
+function packJSONFiles {
+    # TODO: Define the virtual environment for this whole script instead of lots
+    #       of little scripts scattered all over the disk.
+    ./jsonpack
+} # packJSONFiles
+
+
 function invalidateCloudFrontCache {
     aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths "/*"
 } # invalidateCloudFrontCache
@@ -127,25 +152,18 @@ resetSiteData "$1"
 assertCOVID19DirExists
 updateCOVID19DataSources
 generateVirusUpdateJSONFiles
-
-# TODO: Document the command line arguments in the README.md page:
-#
-#       ./refreshdata publish patch
-#
-#       ./refreshdata noop patch
-#
-#       ./refreshdata
-if [[ "patch" = "$2" ]]
-then
-    echo "patching stale JH CSSE data with BNO, calculated updates"
-    ./pyavka
-    ./vudpatch
-fi
-
+patchJSONFiles "$2"
+packJSONFiles
 assertCloudFrontConfig
 assert_rcloneConfig
 
+[[ "$#" < 1 ]] && exit 0 
+
 case "$1" in
+    "local")
+        ;&
+    "noop")
+        ;;
     "nuke")
         nukeDeploymentSite
         ;;
@@ -154,6 +172,9 @@ case "$1" in
         ;;
     "stage")
         deployVirusUpdateJSON "$STAGE_BUCKET"
+        ;;
+    *)
+        die "invalid command - use stage|publish|nuke|noop" 11
         ;;
 esac
 
