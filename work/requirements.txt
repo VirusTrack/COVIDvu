@@ -8,3 +8,4 @@ plotly
 pudb
 pytest
 pymc3
+pre-commit
