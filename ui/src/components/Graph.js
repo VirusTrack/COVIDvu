@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react'
 
 import Plot from 'react-plotly.js'
 
-import numeral from 'numeral'
-
 export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, width, height}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
@@ -35,9 +33,9 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
 
                 let value = regionData[key]
 
-                if(y_type === 'percent') {
-                    value = numeral(value).format('0%')
-                }
+                // if(y_type === 'percent') {
+                //     value = numeral(value).format('0%')
+                // }
 
                 plots[region].y.push(value)
             }
@@ -55,31 +53,40 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
 
     const layout = {
         title: title,
-        width: width,
-        height: height,
+        // width: width,
+        // height: height,
         margin: {
             l: 50,
             t: 0,
-        },
-        
+        },        
     }
         
+    if(width < 800) {
+        layout['width'] = width    
+    }
+
     if(y_title) {
         layout['yaxis'] = {
             title: y_title
         }        
     }
+
+    if(y_title === 'Mortality Rate Percentage') {
+        layout['yaxis'] = { ...layout['yaxis'], tickformat: '.1%'}
+    }
+
     if(x_title) {
         layout['xaxis'] = {
             title: x_title
         }
     }
 
-    // layout['legend'] = {
-    //     x: 1,
-    //     xanchor: 'right',
-    //     y: 1
-    // }
+    layout['legend'] = {
+        xanchor: 'center',
+        yanchor: 'top',
+        y:-0.1,
+        x:0.5
+    }
 
     return (
         <Plot

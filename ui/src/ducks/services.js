@@ -2,7 +2,15 @@ import {call, put, takeEvery} from "redux-saga/effects"
 
 import DataService from '../services'
 
-import { LAST_UPDATE_KEY } from '../constants'
+import { 
+    LAST_UPDATE_KEY, 
+    GLOBAL_KEY, 
+    US_STATES_KEY, 
+    US_REGIONS_KEY, 
+    CACHE_INVALIDATE_GLOBAL_KEY,
+    CACHE_INVALIDATE_US_STATES_KEY,
+    CACHE_INVALIDATE_US_REGIONS_KEY
+} from '../constants'
 
 import { createAction } from '@reduxjs/toolkit'
 
@@ -131,8 +139,8 @@ const calculateMortalityAndRecovery = (deaths, confirmed, recovered) => {
                 if(!recovery.hasOwnProperty(country)) {
                     recovery[country] = {}
                 }
-                mortality[country][date] = deathAtDate / confirmedAtDate
-                recovery[country][date] = recoveredAtDate / confirmedAtDate
+                mortality[country][date] = (deathAtDate / confirmedAtDate)
+                recovery[country][date] = (recoveredAtDate / confirmedAtDate)
             }
         }
     }
@@ -171,6 +179,9 @@ export function* fetchLastUpdate() {
     const lastUpdateLocalStorage = store.get(LAST_UPDATE_KEY)
 
     if(!lastUpdateLocalStorage || lastUpdateLocalStorage < lastUpdateAsNumeric) {
+        store.set(CACHE_INVALIDATE_GLOBAL_KEY, true)
+        store.set(CACHE_INVALIDATE_US_STATES_KEY, true)
+        store.set(CACHE_INVALIDATE_US_REGIONS_KEY, true)
         store.set(LAST_UPDATE_KEY, lastUpdateAsNumeric)
     }
     
@@ -190,9 +201,21 @@ export function* fetchGlobal() {
 
     try {
         console.time('fetchGlobal.axios')
-        let confirmed = yield call(dataService.getConfirmed)
-        let deaths = yield call(dataService.getDeaths)
-        let recovered = yield call(dataService.getRecovered)
+
+        let global = undefined
+
+        if(!store.get(CACHE_INVALIDATE_GLOBAL_KEY) && store.get(GLOBAL_KEY)) {
+            global = store.get(GLOBAL_KEY)
+        } else {
+            global = yield call(dataService.getBundle, "global")
+
+            store.set(GLOBAL_KEY, global)
+            store.remove(CACHE_INVALIDATE_GLOBAL_KEY)
+        }
+
+        let confirmed = global.confirmed
+        let deaths = global.deaths
+        let recovered = global.recovered
         console.timeEnd('fetchGlobal.axios')
         
         for(let filterCountry of filterCountries) {
@@ -280,9 +303,20 @@ export function* fetchUSStates() {
 
     try {
         console.time('fetchUSStates.axios')
-        let confirmed = yield call(dataService.getConfirmed, '-US')
-        let deaths = yield call(dataService.getDeaths, '-US')
-        let recovered = yield call(dataService.getRecovered, '-US')
+
+        let us_states = undefined
+        if(!store.get(CACHE_INVALIDATE_US_STATES_KEY) && store.get(US_STATES_KEY)) {
+            us_states = store.get(US_STATES_KEY)
+        } else {
+            us_states = yield call(dataService.getBundle, "US")
+
+            store.set(US_STATES_KEY, us_states)
+            store.remove(CACHE_INVALIDATE_US_STATES_KEY)
+        }
+
+        let confirmed = us_states.confirmed
+        let deaths = us_states.deaths
+        let recovered = us_states.recovered
         console.timeEnd('fetchUSStates.axios')
 
         for(let filterState of filterStates) {
@@ -370,9 +404,21 @@ export function* fetchUSRegions() {
 
     try {
         console.time('fetchUSRegions.axios')
-        const confirmed = yield call(dataService.getConfirmed, '-US-Regions')
-        const deaths = yield call(dataService.getDeaths, '-US-Regions')
-        const recovered = yield call(dataService.getRecovered, '-US-Regions')
+
+        let us_regions = undefined
+
+        if(!store.get(CACHE_INVALIDATE_US_REGIONS_KEY) && store.get(US_REGIONS_KEY)) {
+            us_regions = store.get(US_REGIONS_KEY)
+        } else {
+            us_regions = yield call(dataService.getBundle, "US-Regions")
+
+            store.set(US_REGIONS_KEY, us_regions)
+            store.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
+        }
+
+        let confirmed = us_regions.confirmed
+        let deaths = us_regions.deaths
+        let recovered = us_regions.recovered
         console.timeEnd('fetchUSRegions.axios')
 
         const latestCounts = extractLatestCounts(confirmed)
