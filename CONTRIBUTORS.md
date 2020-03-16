@@ -8,6 +8,7 @@ Listed in the order in which they joined this development effort.
 | [jaryaman](https://www.linkedin.com/in/juvid-aryaman/) | Dr. Juvid Aryaman |
 | [kinabalu](https://www.linkedin.com/in/andrewlombardi/) | Andrew Lombardi   |
 | [goodwolf](https://www.linkedin.com/in/connorgoodwolf/) | Connor Goodwolf |
+| [dlwhitehurst](https://www.linkedin.com/in/dlwhitehurst/) | David L. Whitehurst |
 
 
 ---
