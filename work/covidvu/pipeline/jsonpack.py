@@ -17,7 +17,7 @@ import sys
 # TODO: This would be better served in a config file
 GROUPINGS = { 
                 ''           : 'bundle-global',
-                '-Boats'     : 'bundle-boats',
+                # '-Boats'     : 'bundle-boats',
                 '-US'        : 'bundle-US',
                 '-US-Regions': 'bundle-US-Regions',
             }
@@ -47,7 +47,6 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
 
 def main():
     scrubFlag = len(sys.argv) <= 1
-    x = sys.argv
     for grouping in GROUPINGS:
         packDataset(grouping, scrub = scrubFlag)
 
