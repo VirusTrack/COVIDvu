@@ -9,6 +9,7 @@ from covidvu.pipeline.vujson import resolveReportFileName
 
 import json
 import os
+import sys
 
 
 # *** constants ***
@@ -45,8 +46,10 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
 
 
 def main():
+    scrubFlag = len(sys.argv) <= 1
+    x = sys.argv
     for grouping in GROUPINGS:
-        packDataset(grouping)
+        packDataset(grouping, scrub = scrubFlag)
 
 
 # *** main ***
