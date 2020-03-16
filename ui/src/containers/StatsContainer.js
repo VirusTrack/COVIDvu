@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import { useInterval } from '../hooks/ui'
+
 import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
@@ -8,7 +10,9 @@ import { Table, Title, Tab, Generic } from 'rbx'
 
 import numeral from 'numeral'
 
-import { REGION_URLS } from '../constants'
+import store from 'store'
+
+import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
 export const StatsContainer = ({filter='Global'}) => {
 
@@ -43,6 +47,14 @@ export const StatsContainer = ({filter='Global'}) => {
 
     }, [dispatch])
 
+    useInterval(() => {
+        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+            dispatch(actions.fetchGlobal())
+        }
+        if(store.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+            dispatch(actions.fetchUSStates())
+        }
+    }, ONE_MINUTE)
 
     useEffect(() => {
 

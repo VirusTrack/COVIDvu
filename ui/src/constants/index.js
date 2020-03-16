@@ -1,7 +1,18 @@
 const DATA_URL = `https://virustrack.live/site-data`
-const STAGING_DATA_URL = `https://staging.virustrack.live/site-data`
+const STAGING_DATA_URL = `http://staging.virustrack.live/site-data`
 
 const LAST_UPDATE_KEY = 'covid-lastUpdated'
+const CACHE_INVALIDATE_GLOBAL_KEY = 'covid-cache-invalidate-global'
+const CACHE_INVALIDATE_US_STATES_KEY = 'covid-cache-invalidate-us-states'
+const CACHE_INVALIDATE_US_REGIONS_KEY = 'covid-cache-invalidate-us-regions'
+
+const CACHE_TIMER = 5 * 60 * 1000
+
+const ONE_MINUTE = 1 * 60 * 1000
+
+const GLOBAL_KEY = 'covid-global'
+const US_STATES_KEY = 'covid-us-states'
+const US_REGIONS_KEY = 'covid-us-regions'
 
 const COUNTRIES = [
   "!Global",
@@ -338,4 +349,20 @@ const COUNTRIES = [
     "US": "https://www.cdc.gov/coronavirus/2019-ncov/index.html",
     }
 
-  export { COUNTRIES, US_REGIONS, US_STATES, DATA_URL, STAGING_DATA_URL, REGION_URLS, LAST_UPDATE_KEY }
+  export { 
+    COUNTRIES,
+    US_REGIONS,
+    US_STATES,
+    DATA_URL,
+    STAGING_DATA_URL,
+    REGION_URLS,
+    CACHE_TIMER,
+    ONE_MINUTE,
+    LAST_UPDATE_KEY,
+    GLOBAL_KEY,
+    US_STATES_KEY,
+    US_REGIONS_KEY,
+    CACHE_INVALIDATE_GLOBAL_KEY,
+    CACHE_INVALIDATE_US_STATES_KEY,
+    CACHE_INVALIDATE_US_REGIONS_KEY,
+  }
