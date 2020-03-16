@@ -23,6 +23,17 @@ function dataUrl() {
 
 class DataService {
 
+    async getBundle(distinct = '') {
+        try {
+            const response = await axios.get(`${dataUrl()}/bundle-${distinct}.json`)
+
+            return response.data
+        } catch(error) {
+            console.error(error)
+            return null
+        }
+    }
+
     async getConfirmed(distinct = '') {
         try {
             const response = await axios.get(`${dataUrl()}/confirmed${distinct}.json`)
@@ -48,6 +59,7 @@ class DataService {
 
     async fetchLastUpdate() {
         const response = await axios.get(`${dataUrl()}/last-update.txt`)
+
         const lines = response.data.split('\n')
 
         let lastUpdate = undefined
