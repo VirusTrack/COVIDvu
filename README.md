@@ -21,9 +21,60 @@ pandemic.  The project is divided in these phases:
    and visualizing other zoonotic spillovers, or to revisit previous spillovers
    like Ebola and SARS.
 
+## License
 
----
-## Developers
+COVIDvu is released under the terms of the BSD 3-Clause License. See LICENSE.txt for
+ more information or see https://opensource.org/licenses/BSD-3-Clause.
+
+## Data Visualization (Curious?)
+
+The goal of this project is to visualize the public COVID-19 data using software
+modules to aggregate and display this data (with integrity) to the public. Anyone
+can clone this repo and see the data gathered so far using a Jupyter notebook. See
+[https://jupyter.org/](https://jupyter.org/)
+
+Seeing this data may require some technical configuration and software installation
+on your machine. The foundation of this project is driven with Python. Jupyter notebooks
+are already part of this project and they contain Python instructions to render the
+data currently being analyzed.
+
+We recommend NOT using the Docker environment if your goal is to just view the data
+in the same manner as our developers and not via the website [virustrack.live COVID-19 dashboard]
+(https://virustrack.live).
+
+### Prerequisites
+
+Running Jupyter notebook requires Python 3.3+ and the notebooks for this project require
+specific Python modules that may or may not be installed on your machine. We recommend
+using virtualenv with the Python package installer (pip) to configure any missing
+modules for this effort.
+
+```bash
+$ cd work
+$ python3 --version # python3 installed?
+$ python3 -m pip install --user virtualenv
+$ python3 -m pip install -r requirements.txt
+$ python3 -m pip install jupyter
+```
+
+Your Python environment should now be ready
+
+### Using Jupyter Notebook
+
+In the same terminal, run the Jupyter Notebook application and you will be able to then
+run the preparatory Python code and then the visualizations that have been created to
+date.
+
+```bash
+$ jupyter notebook
+# A web server should start and NPM will open a browser tab with the Jupyter Notebook environment
+``` 
+
+Begin by navigating into the work/ folder and opening the README.ipynb (Interactive Python Notebook). 
+This will look very much like a standard README, but the Python blocks (visually noted) can be run
+interactively just like you would in the Python interpreter (>>>).
+
+## Developers (Contributing)
 
 This project is designed so that developers and scientists can work in a
 zero install environment by pulling a Docker image and performing all research
