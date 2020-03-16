@@ -3,8 +3,8 @@
 # vim: set fileencoding=utf-8:
 
 
-refreshdata_config="./refreshdata.config"
-[[ -e "$refreshdata_config" ]] && source "$refreshdata_config"
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
 
 
 # *** functions ***
