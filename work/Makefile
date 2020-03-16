@@ -11,7 +11,9 @@ DEVPI_USER=pr3d4t0r
 DEVPI_PASSWORD=nopasswordsetyet
 DIST=./dist
 MODULE=$(shell cat modulename.txt)
-REQUIREMENTS=$(shell cat requirements.txt)
+# Preparation for devpi?
+# REQUIREMENTS=$(shell cat requirements.txt)
+REQUIREMENTS=requirements.txt
 VERSION=$(shell cat version.txt)
 
 
@@ -58,10 +60,9 @@ resetpy: ALWAYS
 
 
 test: ALWAYS
-	devpi install $(REQUIREMENTS)
 	pip install -e .
 	pytest -v ./test
-	pushd ./resources ; pip uninstall -y $(MODULE)==$(VERSION) || true ; popd
+	pip uninstall -y $(MODULE)==$(VERSION) || true
 	rm -Rfv $$(find covidvu | awk '/__pycache__$$/')
 	rm -Rfv $$(find test | awk '/__pycache__$$/')
 

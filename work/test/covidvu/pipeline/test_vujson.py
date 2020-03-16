@@ -2,15 +2,15 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE
 # vim: set fileencoding=utf-8:
 
-from covidvu.vujson import STATE_CODES_PATH
-from covidvu.vujson import US_REGIONS
-from covidvu.vujson import allCases
-from covidvu.vujson import _resampleByStateUS_mode1
-from covidvu.vujson import _resampleByRegionUS_mode1
-from covidvu.vujson import allUSCases
-from covidvu.vujson import _dumpJSON
-from covidvu.vujson import dumpGlobalCasesAsJSONFor
-from covidvu.vujson import dumpUSCasesAsJSONFor
+from covidvu.pipeline.vujson import STATE_CODES_PATH
+from covidvu.pipeline.vujson import US_REGIONS
+from covidvu.pipeline.vujson import allCases
+from covidvu.pipeline.vujson import _resampleByStateUS_mode1
+from covidvu.pipeline.vujson import _resampleByRegionUS_mode1
+from covidvu.pipeline.vujson import allUSCases
+from covidvu.pipeline.vujson import _dumpJSON
+from covidvu.pipeline.vujson import dumpGlobalCasesAsJSONFor
+from covidvu.pipeline.vujson import dumpUSCasesAsJSONFor
 
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.datetimes import DatetimeIndex
@@ -40,6 +40,7 @@ def test_US_REGIONS():
 
 
 def test_allCases():
+    # TODO: Juvid - https://github.com/pr3d4t0r/COVIDvu/issues/162
     confirmedCases = allCases(fileName = TEST_JH_CSSE_FILE_CONFIRMED)
     assert isinstance(confirmedCases, DataFrame)
     assert isinstance(confirmedCases.index, DatetimeIndex)
@@ -70,6 +71,7 @@ def test__resampleByRegionUS():
 
 
 def test_allUSCases():
+    # TODO: Juvid - https://github.com/pr3d4t0r/COVIDvu/issues/162
     casesByStateUS, casesByRegionUS = allUSCases(TEST_JH_CSSE_FILE_CONFIRMED)
     states = pd.read_csv(STATE_CODES_PATH)['state']
 

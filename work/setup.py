@@ -21,9 +21,10 @@ if '__main__' == __name__:
     requirements = readToList('requirements.txt')
 
     setup(
-        author               = 'the COVIDvu contributors',
+        author               = 'The COVIDvu contributors',
         author_email         = 'covidvu.support@virustrack.live',
         description          = 'COVIDvu common tools',
+        include_package_data = True,
         install_requires     = requirements,
         license              = open('../LICENSE.txt').read(),
         long_description     = open('../README.md').read(),
@@ -31,6 +32,7 @@ if '__main__' == __name__:
         namespace_packages   = [ ],
         packages             = find_packages(),
         url                  = 'http://virustrack.live/covid',
+        version              = open('version.txt').read().strip(),
     )
 
 sys.exit(0)
