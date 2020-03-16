@@ -22,7 +22,7 @@ function fetchBNODataSource {
 # *** main ***
 
 fetchBNODataSource
-python3 -m covidvu.pyavka
+python3 -m covidvu.pipeline.pyavka
 
 ls -Alrt "$SITE_DATA_DIR"/*html
 

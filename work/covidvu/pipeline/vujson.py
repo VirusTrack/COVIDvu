@@ -11,7 +11,7 @@ import pandas as pd
 import re
 
 from covidvu import utils
-from pdb import set_trace
+
 
 # *** initializations ***
 
@@ -108,9 +108,14 @@ US_REGIONS_LONG = {
 }
 
 
-BOATS = ('Diamond Princess',
+BOATS = (
+         'Diamond Princess',
          'Grand Princess',
         )
+
+BOAT_NAMES = {
+                'From Diamond Princess': 'Diamond Princess',
+             }
 
 COUNTRY_NAMES = {
                     'Mainland China': 'China',
@@ -118,10 +123,6 @@ COUNTRY_NAMES = {
 
 STATE_NAMES = {
                     'Washington, D.C.': 'Washington D.C.',
-                }
-
-BOAT_NAMES = {
-                    'From Diamond Princess': 'Diamond Princess',
                 }
 
 
@@ -344,6 +345,10 @@ def dumpUSCasesAsJSONFor(cases, target = None, scope = 'US', indent = 2):
     return result
 
 
+def resolveReportFileName(siteDataDirectory, report, region):
+    return os.path.join(siteDataDirectory, report+('%s.json' % region))
+
+
 def _main(target):
     if 'confirmed' == target:
         sourceFileName = JH_CSSE_FILE_CONFIRMED
@@ -406,11 +411,11 @@ def _main(target):
     casesBoats      = casesBoats.fillna(method='ffill', axis=0).fillna(0)
 
 
-    outputFileName = os.path.join(SITE_DATA, target+'.json')
+    outputFileName = resolveReportFileName(SITE_DATA, target, '')
     dumpGlobalCasesAsJSONFor(casesGlobal, outputFileName)
     dumpUSCasesAsJSONFor(casesUSRegions, outputFileName, 'US-Regions')
     dumpUSCasesAsJSONFor(casesUSStates, outputFileName)
-    dumpUSCasesAsJSONFor(casesBoats, outputFileName, 'Boats')
+    dumpUSCasesAsJSONFor(casesBoats, outputFileName, 'boats')
     #dumpUSCasesAsJSONFor(casesUSCounties, outputFileName, 'US-Counties')
 
     return casesGlobal, casesUSRegions, casesUSStates, casesBoats #, casesUSCounties

@@ -9,7 +9,7 @@
 source ./pyrunner
 
 
-python -m covidvu.vudpatch confirmed deaths recovered
+python -m covidvu.pipeline.vudpatch confirmed deaths recovered
 
 ls -Alrt "$SITE_DATA_DIR"/*json
 

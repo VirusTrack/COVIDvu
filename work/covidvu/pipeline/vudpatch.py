@@ -3,8 +3,9 @@
 # vim: set fileencoding=utf-8:
 
 
-from covidvu.vujson import SITE_DATA
-from covidvu.vujson import US_REGIONS_LONG
+from covidvu.pipeline.vujson import SITE_DATA
+from covidvu.pipeline.vujson import US_REGIONS_LONG
+from covidvu.pipeline.vujson import resolveReportFileName
 
 import csv
 import datetime
@@ -98,8 +99,8 @@ def _fetchCurrentUpdatesUS(columnRef, index = 'UNITED STATES'):
     return updatesDataset
 
 
-def _fetchJSONData(target, region = ""):
-    dataFileName = os.path.join(SITE_DATA, target+('%s.json' % region))
+def fetchJSONData(report, region = "", siteDataDirectory = SITE_DATA):
+    dataFileName = resolveReportFileName(siteDataDirectory, report, region)
 
     with open(dataFileName, 'r') as inputFile:
         dataset = json.load(inputFile)
@@ -142,7 +143,7 @@ def _applyNewRecordsFrom(dataset, updates):
 def _patchWorldData(target, columnRef):
     updateWorld = _fetchCurrentUpdates(columnRef)
     updateWorld = _homologizeUpdateData(updateWorld, COUNTRY_NAMES)
-    dataWorld   = _fetchJSONData(target)
+    dataWorld   = fetchJSONData(target)
     dataWorld   = _applyNewRecordsFrom(dataWorld, updateWorld)
 
     for country in updateWorld.keys():
@@ -154,7 +155,7 @@ def _patchWorldData(target, columnRef):
 
 
 def _patchUSData(target, columnRef):
-    dataUS    = _fetchJSONData(target, "-US")
+    dataUS    = fetchJSONData(target, "-US")
     allTime   = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
     yesterday = dataUS['!Total US'][allTime[len(allTime)-2]]
     today     = dataUS['!Total US'][allTime[len(allTime)-1]]
@@ -166,7 +167,7 @@ def _patchUSData(target, columnRef):
 
 
 def _patchUSRegionsData(target, dataUS):
-    dataUSRegions   = _fetchJSONData(target, '-US-Regions')
+    dataUSRegions   = fetchJSONData(target, '-US-Regions')
     updateUSRegions = dict()
     allTime         = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
 
