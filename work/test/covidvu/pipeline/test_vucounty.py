@@ -2,8 +2,8 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE
 # vim: set fileencoding=utf-8:
 
-from covidvu.vucounty import _isCounty
-from covidvu.vucounty import allUSCounties
+from covidvu.pipeline.vucounty import _isCounty
+from covidvu.pipeline.vucounty import allUSCounties
 
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.datetimes import DatetimeIndex

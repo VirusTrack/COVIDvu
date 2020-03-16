@@ -2,11 +2,11 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE
 # vim: set fileencoding=utf-8:
 
-from covidvu.vujson import dumpUSCasesAsJSONFor
-from covidvu.vujson import JH_CSSE_FILE_CONFIRMED
-from covidvu.vujson import JH_CSSE_FILE_DEATHS
-from covidvu.vujson import JH_CSSE_FILE_RECOVERED
-from covidvu.vujson import SITE_DATA
+from covidvu.pipeline.vujson import dumpUSCasesAsJSONFor
+from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
+from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
+from covidvu.pipeline.vujson import JH_CSSE_FILE_RECOVERED
+from covidvu.pipeline.vujson import SITE_DATA
 
 import os
 import pandas as pd

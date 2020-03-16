@@ -4,10 +4,11 @@ Listed in the order in which they joined this development effort.
 
 |  GitHub  | Name              |
 |----------|-------------------|
-| [pr3d4t0r](https://www.linkedin.com/in/ciurana/) | Eugene Ciurana    |
-| [jaryaman](https://www.linkedin.com/in/juvid-aryaman/) | Dr. Juvid Aryaman |
-| [kinabalu](https://www.linkedin.com/in/andrewlombardi/) | Andrew Lombardi   |
-| [goodwolf](https://www.linkedin.com/in/connorgoodwolf/) | Connor Goodwolf |
+|[pr3d4t0r](https://www.linkedin.com/in/ciurana/)|Eugene Ciurana|
+|[jaryaman](https://www.linkedin.com/in/juvid-aryaman/)| Dr. Juvid Aryaman|
+|[kinabalu](https://www.linkedin.com/in/andrewlombardi/)| Andrew Lombardi|
+|[goodwolf](https://www.linkedin.com/in/connorgoodwolf/)| Connor Goodwolf |
+||[StriderWilson](https://www.linkedin.com/in/strider-wilson/)|Strider Wilson|
 
 
 ---
