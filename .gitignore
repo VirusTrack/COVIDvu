@@ -164,3 +164,6 @@ work/env
 
 # pycharm
 **.idea
+
+# figures
+./work/figures
