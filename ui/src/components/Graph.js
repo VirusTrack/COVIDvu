@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react'
 
 import Plot from 'react-plotly.js'
 
+import { useMobileDetect } from '../hooks/ui'
+
 export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, width, height}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
+
+    const detectMobile = useMobileDetect()
 
     useEffect(() => {
         let plots = {}
@@ -19,25 +23,17 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
                 mode: 'lines+markers',
                 name: region,
                 marker: {
-                    size: 5
+                    size: 8
                 }
             }            
         }
 
-        for(const region of selectedData) {
-            
+        for(const region of selectedData) {            
             const regionData = data[region]
             
             for(const key of Object.keys(regionData)) {
                 plots[region].x.push(key)
-
-                let value = regionData[key]
-
-                // if(y_type === 'percent') {
-                //     value = numeral(value).format('0%')
-                // }
-
-                plots[region].y.push(value)
+                plots[region].y.push(regionData[key])
             }
         }
     
@@ -46,9 +42,12 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
 
     let mergeConfig = { ...config,
         displayModeBar: false,
-        showlegend: true,
-        editable: false,
-        scrollZoom: false
+        showlegend: true
+    }
+
+    if(detectMobile.isMobile()) {
+        console.log('you are on mobile eh')
+        mergeConfig['staticPlot'] = true
     }
 
     const layout = {

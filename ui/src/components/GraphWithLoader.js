@@ -3,7 +3,7 @@ import React from 'react'
 import Graph from './Graph'
 
 export const GraphWithLoader = ({graphName, title, secondaryGraph, x_title, y_type, y_title, graph, selected, config, width, height}) => {
-
+    
     return (
         <>
         { secondaryGraph === graphName &&
