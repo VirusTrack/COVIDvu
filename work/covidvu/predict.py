@@ -8,9 +8,9 @@ import covidvu.pipeline.vujson as vujson
 from covidvu.pipeline.vujson import _dumpJSON
 
 N_SAMPLES        = 500
-N_TUNE           = 100
+N_TUNE           = 200
 N_BURN           = 100
-N_CHAINS         = 1
+N_CHAINS         = 2
 N_DAYS_PREDICT   = 14
 MIN_CASES_FILTER = 10
 
