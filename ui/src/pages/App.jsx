@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { DashboardPage } from './DashboardPage'
 import { CovidGlobalPage } from './CovidGlobalPage'
 import { CovidUSPage } from './CovidUSPage'
 import { CovidUSRegionsPage } from './CovidUSRegionsPage'
@@ -15,8 +16,11 @@ import { NotFoundPage } from './NotFoundPage'
 
 const App = () => (
     <Switch>
-        <Redirect exact from="/" to="/covid" />
+        <Redirect exact from="/" to="/dashboard" />
 
+        <Route path="/dashboard">
+            <DashboardPage />
+        </Route>
         <Route path="/covid/us/regions">
             <CovidUSRegionsPage />
         </Route>
