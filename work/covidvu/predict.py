@@ -152,6 +152,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                           priorGrowthRate               = PRIOR_GROWTH_RATE,
                           priorSigma                    = PRIOR_SIGMA,
                           predictionsPercentiles        = PREDICTIONS_PERCENTILES,
+                          init                          = None,
                           ):
     """Predict the country with the nth highest number of cases
 
@@ -188,7 +189,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     countryTSClean.index = pd.to_datetime(countryTSClean.index)
 
     t = np.arange(countryTSClean.shape[0])
-    countryTSCleanLog = np.log(countryTSClean.values)
+    countryTSCleanLog = np.log(countryTSClean.values + 1)
 
     logRegModel = _initializeLogisticModel(t, countryTSCleanLog,
                                            priorLogCarryingCapacity=priorLogCarryingCapacity,
@@ -198,7 +199,10 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                                            )
 
     with logRegModel:
-        trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains)
+        if isinstance(init, str):
+            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, init=init)
+        else:
+            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains)
 
     predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(
         t,
