@@ -4,12 +4,13 @@ import pandas as pd
 from pandas.core.indexes.datetimes import DatetimeIndex
 import pymc3 as pm
 
-import covidvu.vujson as vujson
-from covidvu.vujson import _dumpJSON
+import covidvu.pipeline.vujson as vujson
+from covidvu.pipeline.vujson import _dumpJSON
 
 N_SAMPLES        = 500
-N_TUNE           = 100
-N_CHAINS         = 1
+N_TUNE           = 200
+N_BURN           = 100
+N_CHAINS         = 2
 N_DAYS_PREDICT   = 14
 MIN_CASES_FILTER = 10
 
@@ -82,17 +83,18 @@ def _getPredictionsFromPosteriorSamples(t,
                                         nDaysPredict,
                                         nSamples,
                                         predictionsPercentiles,
+                                        nBurn,
                                         ):
-    tStartPredict = t[-1] + 1
-    tPredict = np.arange(tStartPredict, tStartPredict + nDaysPredict)
 
-    predictions = np.zeros((nDaysPredict, nSamples))
+    tPredict = np.arange(len(t) + nDaysPredict)
 
-    for i in range(nSamples):
-        carryingCap = 10 ** trace['logCarryingCapacity'][i]
+    predictions = np.zeros((len(t)+nDaysPredict, nSamples))
+
+    for i in range(len(trace[nBurn:])):
+        carryingCap = 10 ** trace['logCarryingCapacity'][nBurn+i]
 
         predictions[:, i] = carryingCap / (
-                1 + np.exp(-1.0 * trace['growthRate'][i] * (tPredict - trace['midPoint'][i])))
+                1 + np.exp(-1.0 * trace['growthRate'][nBurn+i] * (tPredict - trace['midPoint'][nBurn+i])))
 
     predictionsPercentilesTS = []
     for qLow, qHigh in predictionsPercentiles:
@@ -111,7 +113,7 @@ def _castPredictionsAsTS(countryTSClean,
                          ):
     predictionsMeanTS = pd.Series(
         index = pd.date_range(
-                                start = countryTSClean.index[-1] + pd.Timedelta(1, 'D'),
+                                start = countryTSClean.index[0],
                                 end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                              ),
         data  = predictionsMean,
@@ -122,7 +124,7 @@ def _castPredictionsAsTS(countryTSClean,
 
         predictionsLow  = pd.Series(
             index = pd.date_range(
-                                    start = countryTSClean.index[-1] + pd.Timedelta(1, 'D'),
+                                    start = countryTSClean.index[0],
                                     end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                                  ),
             data=qLow,
@@ -130,7 +132,7 @@ def _castPredictionsAsTS(countryTSClean,
 
         predictionsHigh = pd.Series(
             index = pd.date_range(
-                                    start = countryTSClean.index[-1] + pd.Timedelta(1, 'D'),
+                                    start = countryTSClean.index[0],
                                     end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                                  ),
             data=qHigh,
@@ -145,6 +147,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                           nSamples                      = N_SAMPLES,
                           nTune                         = N_TUNE,
                           nChains                       = N_CHAINS,
+                          nBurn                         = N_BURN,
                           nDaysPredict                  = N_DAYS_PREDICT,
                           minCasesFilter                = MIN_CASES_FILTER,
                           priorLogCarryingCapacity      = PRIOR_LOG_CARRYING_CAPACITY,
@@ -152,6 +155,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                           priorGrowthRate               = PRIOR_GROWTH_RATE,
                           priorSigma                    = PRIOR_SIGMA,
                           predictionsPercentiles        = PREDICTIONS_PERCENTILES,
+                          init                          = None,
                           ):
     """Predict the country with the nth highest number of cases
 
@@ -159,21 +163,28 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     ----------
     countryTrainIndex: Order countries from highest to lowest, and train the ith country
     countryName: Overwrites countryTrainIndex as the country to train
-    target
-    nSamples
-    nTune
-    nChains
-    nDaysPredict
-    minCasesFilter
-    priorLogCarryingCapacity
-    priorMidPoint
-    priorGrowthRate
-    priorSigma
-    predictionsPercentiles
+    target: string in ['confirmed', 'deaths', 'recovered']
+    nSamples: Number of samples per chain of MCMC
+    nTune: Number of iterations for tuning MCMC
+    nChains: Number of independent chains MCMC
+    nBurn: Number of initial iterations to discard for MCMC
+    nDaysPredict: Number of days ahead to predict
+    minCasesFilter: Minimum number of cases for prediction
+    priorLogCarryingCapacity: Bounds for the uniform prior for log10 carrying capacity
+    priorMidPoint: Bounds for the uniform prior for the mid-point
+    priorGrowthRate: Bounds for the uniform prior for the growth rate
+    priorSigma: Bounds for the uniform prior for sigma
+    predictionsPercentiles: Bayesian confidence intervals to evaluate
+    init: Initialization method for pymc3 sampler
 
     Returns
     -------
-
+    countryTS: All data for the queried country
+    predictionsMeanTS: Posterior mean prediction
+    predictionsPercentilesTS: Posterior percentiles
+    countryName: Country name
+    trace: pymc3 trace object
+    countryTSClean: Data used for training
     """
 
     confirmedCases, _, _, _ = vujson._main(target)
@@ -188,7 +199,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     countryTSClean.index = pd.to_datetime(countryTSClean.index)
 
     t = np.arange(countryTSClean.shape[0])
-    countryTSCleanLog = np.log(countryTSClean.values)
+    countryTSCleanLog = np.log(countryTSClean.values + 1)
 
     logRegModel = _initializeLogisticModel(t, countryTSCleanLog,
                                            priorLogCarryingCapacity=priorLogCarryingCapacity,
@@ -198,7 +209,10 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                                            )
 
     with logRegModel:
-        trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains)
+        if isinstance(init, str):
+            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, init=init)
+        else:
+            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains)
 
     predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(
         t,
@@ -206,6 +220,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
         nDaysPredict,
         nSamples,
         predictionsPercentiles,
+        nBurn,
     )
 
     predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(countryTSClean,
@@ -215,7 +230,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                                                                        )
 
     countryTS.index = pd.to_datetime(countryTS.index)
-    return countryTS, predictionsMeanTS, predictionsPercentilesTS, countryName
+    return countryTS, predictionsMeanTS, predictionsPercentilesTS, countryName, trace, countryTSClean
 
 
 def _castDatetimeIndexToStr(timeSeries, dateCode = '%Y-%m-%d'):
@@ -261,7 +276,7 @@ def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
 def _main(countryTrainIndex,
           predictionsPercentiles = PREDICTIONS_PERCENTILES,
           ):
-    _, predictionsMeanTS, predictionsPercentilesTS, countryName = predictLogisticGrowth(
+    countryTS, predictionsMeanTS, predictionsPercentilesTS, countryName, trace, countryTSClean = predictLogisticGrowth(
         countryTrainIndex = countryTrainIndex,
         predictionsPercentiles = predictionsPercentiles,
     )
@@ -269,13 +284,10 @@ def _main(countryTrainIndex,
     predictionsMeanTS.name = countryName.replace(' ', '')
     _dumpTimeSeriesAsJSON(predictionsMeanTS, 'prediction-mean-%s.json' % predictionsMeanTS.name)
 
-
-
     _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
                                     predictionsMeanTS.name,
                                     predictionsPercentiles,
                                     'prediction-conf-int-%s.json' % predictionsMeanTS.name)
-
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
