@@ -23,7 +23,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
                 mode: 'lines+markers',
                 name: region,
                 marker: {
-                    size: 8
+                    size: 6
                 }
             }            
         }
@@ -45,11 +45,6 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         showlegend: true
     }
 
-    if(detectMobile.isMobile()) {
-        console.log('you are on mobile eh')
-        mergeConfig['staticPlot'] = true
-    }
-
     const layout = {
         title: title,
         // width: width,
@@ -59,7 +54,21 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             t: 0,
         },        
     }
-        
+
+    if(detectMobile.isMobile()) {
+        console.log('you are on mobile eh')
+
+        // mergeConfig['staticPlot'] = true
+
+        layout['xaxis'] = {
+            fixedrange: true
+        }
+        layout['yaxis'] = {
+            fixedrange: true
+        }
+    }
+
+    
     if(width < 800) {
         layout['width'] = width    
     }
