@@ -182,7 +182,14 @@ def splitCSSEData(cases):
     casesBoats.rename(BOAT_NAMES, axis=1, inplace=True)
     casesBoats       = casesBoats.groupby(casesBoats.columns, axis=1).sum()
 
-    return casesGlobal, casesUSRegions, casesUSStates, casesUSCounties, casesBoats
+    output = {
+                'casesGlobal':    casesGlobal,
+                'casesUSRegions': casesUSRegions,
+                'casesUSStates':  casesUSStates,
+                'casesBoats':     casesBoats,
+                # 'casesUSCounties': casesUSCounties  # Not implemented
+             }
+    return output
 
 
 def allCases(cases, includeGeoLocation = False):
@@ -362,7 +369,7 @@ def _main(target):
     casesGlobalCollection = [0, 0]
     casesUSStatesCollection = [0, 0]
     casesUSRegionsCollection = [0, 0]
-    casesUSCountiesCollection = [0, 0]
+    #casesUSCountiesCollection = [0, 0]
     casesBoatsCollection = [0, 0]
 
     cases = pd.read_csv(sourceFileName)
@@ -373,35 +380,32 @@ def _main(target):
     cases = splitCSSEDataByParsingBoundary(cases)
 
     # Parsing type 1 -- before 2020-03-10
-
-
-
-    casesUS,  casesUSRegions  = allUSCases(cases[0])
-    casesUSCounties           = _getCounties_mode1(cases[0])
-    casesBoats, casesNotBoats =  _getBoats_mode1(cases[0])
+    casesBoats, casesNotBoats = _getBoats_mode1(cases[0])
+    casesUS,  casesUSRegions  = allUSCases(casesNotBoats)
+    #casesUSCounties           = _getCounties_mode1(casesNotBoats)  # Not implemented since JH CSSE stopped supplying US counties
 
 
     casesGlobalCollection[0]     = allCases(casesNotBoats)
     casesUSRegionsCollection[0]  = casesUSRegions
     casesUSStatesCollection[0]   = casesUS
-    casesUSCountiesCollection[0] = casesUSCounties
+    #casesUSCountiesCollection[0] = casesUSCounties
     casesBoatsCollection[0]      = casesBoats
 
     # Parsing type 2 -- after 2020-03-10
-    casesGlobal2, casesUSRegions2, casesUSStates2, casesUSCounties2, casesBoats2 = splitCSSEData(cases[1])
+    output = splitCSSEData(cases[1])
 
-    casesGlobalCollection[1]     = casesGlobal2
-    casesUSRegionsCollection[1]  = casesUSRegions2
-    casesUSStatesCollection[1]   = casesUSStates2
-    casesUSCountiesCollection[1] = casesUSCounties2
-    casesBoatsCollection[1]      = casesBoats2
+    casesGlobalCollection[1]     = output['casesGlobal']
+    casesUSRegionsCollection[1]  = output['casesUSRegions']
+    casesUSStatesCollection[1]   = output['casesUSStates']
+    #casesUSCountiesCollection[1] = casesUSCounties2 # Not implemented since JH CSSE stopped supplying US counties
+    casesBoatsCollection[1]      = output['casesBoats']
 
     # Concatenate
     casesGlobal     = pd.concat(casesGlobalCollection)
     casesUSRegions  = pd.concat(casesUSRegionsCollection)
 
     casesUSStates   = pd.concat(casesUSStatesCollection)
-    casesUSCounties = pd.concat(casesUSCountiesCollection)
+    #casesUSCounties = pd.concat(casesUSCountiesCollection)
 
     casesBoats = pd.concat(casesBoatsCollection)
 
