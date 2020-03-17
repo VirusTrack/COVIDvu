@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 
+import { useHistory } from 'react-router'
+
 import { useWindowSize, useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Title, Level, Heading } from "rbx"
+import { Tag, Title, Level, Heading, Button } from "rbx"
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
-import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
+import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
 import numeral from 'numeral'
 
@@ -21,10 +23,12 @@ import moment from 'moment'
 export const DashboardContainer = () => {
 
     const dispatch = useDispatch()
+    const history = useHistory()
 
     useEffect(() => {
         dispatch(actions.fetchGlobal())
         dispatch(actions.fetchUSStates())
+        dispatch(actions.fetchUSRegions())
     }, [dispatch])
 
     useInterval(() => {
@@ -33,6 +37,9 @@ export const DashboardContainer = () => {
         }
         if(store.get(CACHE_INVALIDATE_US_STATES_KEY)) {
             dispatch(actions.fetchUSStates())
+        }
+        if(store.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
+            dispatch(actions.fetchUSRegions())
         }
     }, ONE_MINUTE)
 
@@ -68,6 +75,7 @@ export const DashboardContainer = () => {
     const deathsUS = useSelector(state => state.services.usStates.deaths)
     const recoveredUS = useSelector(state => state.services.usStates.recovered)
 
+    const confirmedUSRegions = useSelector(state => state.services.usRegions.confirmed)
     // const sortedConfirmed = useSelector(state => state.services.global.sortedConfirmed)
 
     const statsTotals = useSelector(state => state.services.global.statsTotals)
@@ -164,8 +172,6 @@ export const DashboardContainer = () => {
             </Level.Item>
         </Level>        
         
-        <hr />
-
         <Level>
             <Level.Item textAlign="centered">
                 <div>
@@ -180,20 +186,6 @@ export const DashboardContainer = () => {
                 </div>
             </Level.Item>
         </Level>
-
-        <hr />
-
-
-        <Level><Level.Item>
-        <GraphWithLoader 
-            graphName="Overview"
-            secondaryGraph="Overview"
-            graph={globalMergedStats}
-            width={width}
-            height={height}
-            selected={['Confirmed', 'Deaths', 'Recovered']}
-        />
-        </Level.Item></Level>
 
         <hr />
 
@@ -217,6 +209,15 @@ export const DashboardContainer = () => {
         </Level>
 
         <hr />
+
+        <Level>
+            <Level.Item>
+                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid')}}>View Global Graphs</Button>
+            </Level.Item>
+        </Level>
+
+        <hr />
+
 
         <Level>
             <Level.Item>
@@ -245,7 +246,6 @@ export const DashboardContainer = () => {
             </Level.Item>
         </Level>        
         
-        <hr />
 
         <Level>
             <Level.Item textAlign="centered">
@@ -262,16 +262,7 @@ export const DashboardContainer = () => {
             </Level.Item>
         </Level>
 
-        <Level><Level.Item>
-        <GraphWithLoader 
-            graphName="Overview"
-            secondaryGraph="Overview"
-            graph={usMergedStats}
-            width={width}
-            height={height}
-            selected={['Confirmed', 'Deaths', 'Recovered']}
-        />
-        </Level.Item></Level>
+        <hr />
 
         <Level>
             <Level.Item>
@@ -292,43 +283,39 @@ export const DashboardContainer = () => {
             </Level.Item>
         </Level>
 
+        <Level>
+            <Level.Item>
+                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us')}}>View US State Graphs</Button>
+            </Level.Item>
+        </Level>
 
-        {/* 
-        <Level><Level.Item>
-            <Heading>Deaths</Heading>
-        </Level.Item></Level>
+        <hr />
+        
+        <Level>
+            <Level.Item>
+                <Heading>Top Regions</Heading>
+            </Level.Item>
+        </Level>
 
-        <Level><Level.Item>
+        <Level>
+            <Level.Item>
+                <GraphWithLoader 
+                    graphName="Top Regions Cases"
+                    secondaryGraph="Top Regions Cases"
+                    graph={confirmedUSRegions}
+                    width={width}
+                    height={height}
+                    selected={['Midwest', 'Northeast', 'South', 'West']}
+                />
+            </Level.Item>
+        </Level>
 
-        <GraphWithLoader 
-            graphName="Deaths"
-            secondaryGraph="Deaths"
-            graph={deaths}
-            width={width}
-            height={height}
-            selected={selectedCountries}
-            y_title="Number of deaths"
-        />
-        </Level.Item></Level>
+        <Level>
+            <Level.Item>
+                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>View US Region Graphs</Button>
+            </Level.Item>
+        </Level>
 
-        <Level><Level.Item>
-            <Heading>Mortality Rate</Heading>
-        </Level.Item></Level>
-
-        <Level><Level.Item>
-
-        <GraphWithLoader 
-            graphName="Mortality"
-            secondaryGraph="Mortality"
-            graph={mortality}
-            width={width}
-            height={height}
-            selected={selectedCountries}
-            y_type="percent"
-            y_title="Mortality Rate Percentage"
-        />
-        </Level.Item></Level>
-        */}
         </>
     )    
 }

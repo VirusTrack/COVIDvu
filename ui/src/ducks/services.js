@@ -22,6 +22,8 @@ import moment from "moment"
 ///////////////////////////////////////////////////////////////////////////////
 
 export const types = {
+    CLEAR_GRAPHS: 'CLEAR_GRAPHS',
+
     FETCH_GLOBAL: 'FETCH_GLOBAL',
     FETCH_GLOBAL_SUCCESS: 'FETCH_GLOBAL_SUCCESS',
     FETCH_GLOBAL_ERROR: 'FETCH_GLOBAL_ERROR',
@@ -45,6 +47,7 @@ export const types = {
 ///////////////////////////////////////////////////////////////////////////////
 
 export const actions = {
+    clearGraphs: createAction(types.CLEAR_GRAPHS),
     fetchGlobal: createAction(types.FETCH_GLOBAL),
     fetchUSStates: createAction(types.FETCH_US_STATES),
     fetchUSRegions: createAction(types.FETCH_US_REGIONS),
@@ -65,6 +68,13 @@ export const initialState = {
 export default function (state = initialState, action) {
     // const message = action && action.error ? action.error.message : null
     switch (action.type) {
+        case types.CLEAR_GRAPHS:
+            return {
+                ...state,
+                global: {},
+                usStates: {},
+                usRegions: {}
+            }
         case types.FETCH_GLOBAL_SUCCESS:
             return {
                 ...state,
