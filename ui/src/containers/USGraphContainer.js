@@ -111,13 +111,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
 
     return (
         <TwoGraphLayout>
-            <>              
-                <Level>
-                    <Level.Item>
-                        <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
-                    </Level.Item>
-                </Level>
-
+            <>
                 <Level>
                     <Level.Item>
                         <SelectRegionComponent
@@ -171,6 +165,13 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
             </>
 
             <>
+
+                <Level>
+                    <Level.Item>
+                        <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
+                    </Level.Item>
+                </Level>
+
 
                 <Level>
                     <Level.Item>

@@ -4,7 +4,7 @@ import pandas as pd
 from pandas.core.indexes.datetimes import DatetimeIndex
 import pymc3 as pm
 
-import covidvu.pipeline.vujson as vujson
+from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import _dumpJSON
 
 N_SAMPLES        = 500
@@ -144,6 +144,7 @@ def _castPredictionsAsTS(countryTSClean,
 def predictLogisticGrowth(countryTrainIndex: int        = None,
                           countryName: str              = None,
                           target                        = 'confirmed',
+                          subGroup                      = 'casesGlobal',
                           nSamples                      = N_SAMPLES,
                           nTune                         = N_TUNE,
                           nChains                       = N_CHAINS,
@@ -164,6 +165,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     countryTrainIndex: Order countries from highest to lowest, and train the ith country
     countryName: Overwrites countryTrainIndex as the country to train
     target: string in ['confirmed', 'deaths', 'recovered']
+    subGroup: A key in the output of covidvu.pipeline.vujson.parseCSSE
     nSamples: Number of samples per chain of MCMC
     nTune: Number of iterations for tuning MCMC
     nChains: Number of independent chains MCMC
@@ -187,7 +189,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     countryTSClean: Data used for training
     """
 
-    confirmedCases, _, _, _ = vujson._main(target)
+    confirmedCases = parseCSSE(target)[subGroup]
 
     if countryName is None:
         countryName = _getCountryToTrain(int(countryTrainIndex), confirmedCases)
