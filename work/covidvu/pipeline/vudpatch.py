@@ -166,7 +166,7 @@ def _patchUSData(target, columnRef):
 
                 dataUS[location][SCRAPED_TODAY] = updateUS[location][SCRAPED_TODAY]
         except:
-            print('  || Invalid state: %s' % location)
+            print('  || Invalid location: %s' % location)
             continue
 
     if today == 0.0:
@@ -180,21 +180,21 @@ def _patchUSRegionsData(target, dataUS):
     updateUSRegions = dict()
     allTime         = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
 
-    for state in dataUS:
-        if state in NIXED_ROWS_INDEX:
+    for location in dataUS:
+        if location in NIXED_ROWS_INDEX:
             continue
         try:
-            region = US_REGIONS_LONG[state]
+            region = US_REGIONS_LONG[location]
             if region not in updateUSRegions:
                 updateUSRegions[region] = { SCRAPED_TODAY: 0.0, }
 
             try:
-                updateUSRegions[region][SCRAPED_TODAY] += float(dataUS[state][SCRAPED_TODAY])
+                updateUSRegions[region][SCRAPED_TODAY] += float(dataUS[location][SCRAPED_TODAY])
             except:
-                yesterday = dataUS[state][allTime[len(allTime)-2]]
+                yesterday = dataUS[location][allTime[len(allTime)-2]]
                 updateUSRegions[region][SCRAPED_TODAY] = yesterday
         except KeyError:
-            print('  >> Invalid state: %s' % state)
+            print('  >> Invalid location: %s' % location)
             continue
 
     try:
@@ -246,6 +246,11 @@ def estimatedUnassignedCasesIn(dataset, totalTag = '!Total US'):
     dataset['Unassigned'][SCRAPED_TODAY] = abs(grandTotal-total)
 
 
+def _nukeUnassignedIn(dataset):
+    # TODO: Experimental - wait for data science to decide what we do about these guys
+    del(dataset['Unassigned'])
+
+
 def _main(target):
     print('patching the JSON files with latest data')
     if target == 'confirmed':
@@ -261,7 +266,7 @@ def _main(target):
 
     syncAllUSDataReportsIn(dataWorld, dataUS, dataUSRegions)
     estimatedUnassignedCasesIn(dataUS, totalTag = '!Total US')
-    estimatedUnassignedCasesIn(dataUSRegions, totalTag = '!Total US')
+    _nukeUnassignedIn(dataUSRegions)
 
     _dumpJSON(dataWorld, target)
     _dumpJSON(dataUS, target, "-US")
