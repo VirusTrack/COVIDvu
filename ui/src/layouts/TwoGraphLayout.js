@@ -1,14 +1,23 @@
 import React from 'react'
 
-import { Column } from 'rbx'
+import { Column, Notification } from 'rbx'
 
 export const TwoGraphLayout = ({ children }) => {
     const nodes = React.Children.toArray(children);
 
     return (
         <>
+
             <Column.Group gapless>
-                <Column size={2}>
+                <Column>
+                    <Notification>
+                        <p>Compare specific regions using the multi-select below. Ctrl or Cmd-click to select multiple regions.</p>
+                    </Notification>
+                </Column>
+            </Column.Group>
+
+            <Column.Group gapless>
+                <Column size={3}>
                     {nodes[0]}
                 </Column>
                 <Column>
