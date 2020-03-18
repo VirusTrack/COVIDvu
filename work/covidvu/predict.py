@@ -6,6 +6,8 @@ import pymc3 as pm
 
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import _dumpJSON
+from covidvu.pipeline.vujson import SITE_DATA
+from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
 
 N_SAMPLES        = 500
 N_TUNE           = 200
@@ -157,6 +159,8 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                           priorSigma                    = PRIOR_SIGMA,
                           predictionsPercentiles        = PREDICTIONS_PERCENTILES,
                           init                          = None,
+                          randomSeed                    = 2020,
+                          **kwargs
                           ):
     """Predict the country with the nth highest number of cases
 
@@ -178,18 +182,19 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     priorSigma: Bounds for the uniform prior for sigma
     predictionsPercentiles: Bayesian confidence intervals to evaluate
     init: Initialization method for pymc3 sampler
+    randomSeed: Seed for pymc3 sampler
+    kwargs: Optional named arguments passed to covidvu.pipeline.vujson.parseCSSE
 
     Returns
     -------
     countryTS: All data for the queried country
     predictionsMeanTS: Posterior mean prediction
     predictionsPercentilesTS: Posterior percentiles
-    countryName: Country name
     trace: pymc3 trace object
     countryTSClean: Data used for training
     """
 
-    confirmedCases = parseCSSE(target)[subGroup]
+    confirmedCases = parseCSSE(target, **kwargs)[subGroup]
 
     if countryName is None:
         countryName = _getCountryToTrain(int(countryTrainIndex), confirmedCases)
@@ -212,9 +217,9 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
 
     with logRegModel:
         if isinstance(init, str):
-            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, init=init)
+            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, init=init, random_seed=randomSeed)
         else:
-            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains)
+            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, random_seed=randomSeed)
 
     predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(
         t,
@@ -232,7 +237,14 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                                                                        )
 
     countryTS.index = pd.to_datetime(countryTS.index)
-    return countryTS, predictionsMeanTS, predictionsPercentilesTS, countryName, trace, countryTSClean
+    prediction = {
+                    'countryTS':                countryTS,
+                    'predictionsMeanTS':        predictionsMeanTS,
+                    'predictionsPercentilesTS': predictionsPercentilesTS,
+                    'trace':                    trace,
+                    'countryTSClean':           countryTSClean,
+                 }
+    return prediction
 
 
 def _castDatetimeIndexToStr(timeSeries, dateCode = '%Y-%m-%d'):
