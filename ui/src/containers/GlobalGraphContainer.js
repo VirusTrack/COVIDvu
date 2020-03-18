@@ -93,7 +93,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
 
             let theConfirmedTotal = 0
 
-            // setConfirmedTotal(sortedConfirmed['!Global'].stats)
             for(let confirm of sortedConfirmed) {
                 if(confirm.region === '!Global') {
                     theConfirmedTotal += confirm.stats
@@ -111,7 +110,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
             }
             setTotalCountries(confirmedCountries)
         }
-    }, [confirmed, selectedCountries])
+    }, [confirmed, selectedCountries, sortedConfirmed])
 
     const handleSelectedRegion = (regionList) => {
         setSelectedCountries(regionList)
@@ -132,11 +131,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
         <TwoGraphLayout>
 
             <>
-                <Level>
-                    <Level.Item>
-                        {renderCaseTags()}
-                    </Level.Item>
-                </Level>
                 <Level>
                     <Level.Item>
                         <SelectRegionComponent
@@ -190,7 +184,13 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
             <>
                 <Level>
                     <Level.Item>
-                        <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br />
+                        {renderCaseTags()}
+                    </Level.Item>
+                </Level>
+
+                <Level>
+                    <Level.Item>
+                        <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br /><br />
                     </Level.Item>
                 </Level>
             </>

@@ -45,7 +45,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         showlegend: true
     }
 
-    const layout = {
+    let layout = {
         title: title,
         // width: width,
         // height: height,
@@ -56,27 +56,23 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
     }
 
     if(detectMobile.isMobile()) {
-        console.log('you are on mobile eh')
-
-        // mergeConfig['staticPlot'] = true
-
-        layout['xaxis'] = {
-            fixedrange: true
+        layout = {
+            ...layout,
+            xaxis: {
+                fixedrange: true
+            },
+            yaxis: {
+                fixedrange: true
+            },
+            width: width
         }
-        layout['yaxis'] = {
-            fixedrange: true
-        }
-    }
-
-    
-    if(width < 800) {
-        layout['width'] = width    
     }
 
     if(y_title) {
-        layout['yaxis'] = {
-            title: y_title
-        }        
+        layout = {
+            ...layout,
+            yaxis: {...layout.yaxis, title: y_title}
+        }
     }
 
     if(y_title === 'Mortality Rate Percentage') {
@@ -84,9 +80,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
     }
 
     if(x_title) {
-        layout['xaxis'] = {
-            title: x_title
-        }
+        layout['xaxis'].title = x_title
     }
 
     layout['legend'] = {

@@ -166,7 +166,12 @@ const extractLatestCounts = (stats) => {
 
         const lastDate = dates[dates.length - 1]
 
-        regionWithLatestCounts.push({ region: region, stats: stats[region][lastDate] })
+        const yesterDate = dates[dates.length - 2]
+
+        const currentNumbers = stats[region][lastDate]
+        const yesterdayNumbers = stats[region][yesterDate]
+
+        regionWithLatestCounts.push({ region: region, stats: currentNumbers, dayChange: (currentNumbers - yesterdayNumbers) })
     }
 
     return regionWithLatestCounts
@@ -277,7 +282,9 @@ export function* fetchGlobal() {
                 statsTotals.push({
                     region: region,
                     confirmed: confirmData.stats,
+                    confirmedDayChange: confirmData.dayChange,
                     deaths: deathByCountryKey[region].stats,
+                    deathsDayChange: deathByCountryKey[region].dayChange,
                     recovered: recoveredByCountryKey[region].stats,
                     mortality: mortalityByCountryKey[region].stats,
                     recovery: recoveryByCountryKey[region].stats
@@ -380,7 +387,9 @@ export function* fetchUSStates() {
                 statsTotals.push({
                     region: region,
                     confirmed: confirmData.stats,
+                    confirmedDayChange: confirmData.dayChange,
                     deaths: deathByRegionKey[region].stats,
+                    deathsDayChange: deathByRegionKey[region].dayChange,
                     recovered: recoveredByRegionKey[region].stats,
                     mortality: mortalityByRegionKey[region].stats,
                     recovery: recoveryByRegionKey[region].stats

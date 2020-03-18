@@ -55,6 +55,7 @@ export const HeaderContainer = () => {
             </Navbar.Brand>
             <Navbar.Menu>
                 <Navbar.Segment align="start">
+                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/dashboard')}}>Dashboard</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid')}}>Global</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>US States</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>US Regions</Navbar.Item>

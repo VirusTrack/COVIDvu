@@ -88,10 +88,16 @@ export const StatsContainer = ({filter='Global'}) => {
                         Region
                     </Table.Heading>
                     <Table.Heading>
-                        Confirmed
+                        Total Cases
                     </Table.Heading>
                     <Table.Heading>
-                        Deceased
+                        New Cases
+                    </Table.Heading>
+                    <Table.Heading>
+                        Deaths
+                    </Table.Heading>
+                    <Table.Heading>
+                        New Deaths
                     </Table.Heading>
                     <Table.Heading>
                         Recovered
@@ -111,13 +117,19 @@ export const StatsContainer = ({filter='Global'}) => {
                         <Generic as="a" tooltipPosition="right" onClick={()=>{ redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>{renderDisplay(stat.region)}</Generic>
                     </Table.Cell>
                     <Table.Cell>
-                        <Title size={5} style={{color: 'hsl(141, 53%, 53%)'}}>{stat.confirmed}</Title>
+                        <Title size={5}>{stat.confirmed}</Title>
                     </Table.Cell>
                     <Table.Cell>
-                        <Title size={5} style={{color: 'hsl(348, 100%, 61%)'}}>{stat.deaths}</Title>
+                        <Title size={5}>{numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')}</Title>
                     </Table.Cell>
                     <Table.Cell>
-                        <Title size={5} style={{color: 'hsl(204, 86%, 53%)'}}>{stat.recovered}</Title>
+                        <Title size={5}>{stat.deaths}</Title>
+                    </Table.Cell>
+                    <Table.Cell>
+                        <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')}</Title>
+                    </Table.Cell>
+                    <Table.Cell>
+                        <Title size={5}>{stat.recovered}</Title>
                     </Table.Cell>
                     <Table.Cell>
                         <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>

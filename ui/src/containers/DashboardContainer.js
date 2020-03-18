@@ -52,7 +52,9 @@ export const DashboardContainer = () => {
         deaths: 0,
         mortality: 0,
         recovered: 0,
-        recovery: 0
+        recovery: 0,
+        newConfirmed: 0,
+        newDeaths: 0
     })
 
     const [usTotal, setUSTotal] = useState({
@@ -68,77 +70,73 @@ export const DashboardContainer = () => {
     }, [dispatch])
 
     const confirmed = useSelector(state => state.services.global.confirmed)
-    const deaths = useSelector(state => state.services.global.deaths)
-    const recovered = useSelector(state => state.services.global.recovered)
-
     const confirmedUS = useSelector(state => state.services.usStates.confirmed)
-    const deathsUS = useSelector(state => state.services.usStates.deaths)
-    const recoveredUS = useSelector(state => state.services.usStates.recovered)
-
     const confirmedUSRegions = useSelector(state => state.services.usRegions.confirmed)
-    // const sortedConfirmed = useSelector(state => state.services.global.sortedConfirmed)
 
     const statsTotals = useSelector(state => state.services.global.statsTotals)
     const usStatsTotals = useSelector(state => state.services.usStates.statsTotals)
 
-    const [globalMergedStats, setGlobalMergedStats] = useState(null)
-    const [usMergedStats, setUSMergedStats] = useState(null)
-
     useEffect(() => {
 
         if(statsTotals) {
-            for(const stat of statsTotals) {
-                if(stat.region === '!Global') {
-                    setGlobalTotal(stat)
-                }
-            }
+
+            const byRegion = statsTotals.reduce((obj, item) => {
+                obj[item.region] = item
+                return obj
+            }, {})
+
+            // setGlobalTotalsByRegion(byRegion)
+            setGlobalTotal({
+                confirmed: byRegion['!Global'].confirmed,
+                deaths: byRegion['!Global'].deaths,
+                mortality: byRegion['!Global'].mortality,
+                recovered: byRegion['!Global'].recovered,
+                recovery: byRegion['!Global'].recovery,
+                newConfirmed: byRegion['!Global'].confirmedDayChange,
+                newDeaths: byRegion['!Global'].deathsDayChange,
+            })
         }
     }, [statsTotals])
 
     useEffect(() => {
 
         if(usStatsTotals) {
-            for(const stat of usStatsTotals) {
-                if(stat.region === '!Total US') {
-                    setUSTotal(stat)
-                }
-            }
+            const byRegion = usStatsTotals.reduce((obj, item) => {
+                obj[item.region] = item
+                return obj
+            }, {})
+
+            // setUSTotalsByRegion(byRegion)
+            setUSTotal({
+                confirmed: byRegion['!Total US'].confirmed,
+                deaths: byRegion['!Total US'].deaths,
+                mortality: byRegion['!Total US'].mortality,
+                recovered: byRegion['!Total US'].recovered,
+                recovery: byRegion['!Total US'].recovery,
+                newConfirmed: byRegion['!Total US'].confirmedDayChange,
+                newDeaths: byRegion['!Total US'].deathsDayChange,
+            })
         }
     }, [usStatsTotals])
 
+    const renderChangeDifference = (value) => {
+        
+        const greenColor = {color: 'hsl(141, 53%, 53%)'}
+        const redColor = {color: 'hsl(348, 100%, 61%)'}
 
-    useEffect(() => {
+        const colorBasedOnChange = value >= 0 ? redColor : greenColor
 
-        if(confirmed && deaths && recovered) {
-            let merged = {
-                'Confirmed': confirmed['!Global'],
-                'Deaths': deaths['!Global'],
-                'Recovered': recovered['!Global']
-            }
-
-            setGlobalMergedStats(merged)
-        }
-    }, [confirmed, deaths, recovered])
-
-    useEffect(() => {
-
-        if(confirmedUS && deathsUS && recoveredUS) {
-            let merged = {
-                'Confirmed': confirmedUS['!Total US'],
-                'Deaths': deathsUS['!Total US'],
-                'Recovered': recoveredUS['!Total US']
-            }
-
-            setUSMergedStats(merged)
-        }
-    }, [confirmedUS, deathsUS, recoveredUS])
+        return (
+            <Title as="p" style={colorBasedOnChange}>{numeral(value).format('+0,0')}</Title>
+        )
+    }
 
     return (
         <>
         <Level>
             <Level.Item>
                 { lastUpdate && 
-                    <Tag size="large" color="primary">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
+                    <Tag color="primary">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
                 }
             </Level.Item>
 
@@ -146,7 +144,7 @@ export const DashboardContainer = () => {
 
         <Level>
             <Level.Item>
-                <Title size={3}>Global</Title>
+                <Title size={2}>Today's Global Totals</Title>
             </Level.Item>
         </Level>
 
@@ -154,20 +152,14 @@ export const DashboardContainer = () => {
         <Level>
             <Level.Item textAlign="centered">
                 <div>
-                <Heading>Confirmed</Heading>
+                <Heading>Total Cases</Heading>
                 <Title as="p">{numeral(globalTotal.confirmed).format('0,0')}</Title>
                 </div>
             </Level.Item>
             <Level.Item textAlign="centered">
                 <div>
-                <Heading>Deaths</Heading>
+                <Heading>Total Deaths</Heading>
                 <Title as="p">{numeral(globalTotal.deaths).format('0,0')}</Title>
-                </div>
-            </Level.Item>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Recovered</Heading>
-                <Title as="p">{numeral(globalTotal.recovered).format('0,0')}</Title>
                 </div>
             </Level.Item>
         </Level>        
@@ -175,14 +167,28 @@ export const DashboardContainer = () => {
         <Level>
             <Level.Item textAlign="centered">
                 <div>
-                <Heading>Mortality Rate</Heading>
-                <Title as="p">{numeral(globalTotal.mortality).format('0.0 %')}</Title>
+                <Heading>New Cases (as of today)</Heading>
+                { renderChangeDifference(globalTotal.newConfirmed)}
                 </div>
             </Level.Item>
             <Level.Item textAlign="centered">
                 <div>
+                <Heading>New Deaths (as of today)</Heading>
+                { renderChangeDifference(globalTotal.newDeaths)}
+                </div>
+            </Level.Item>
+        </Level>
+        <Level>
+            <Level.Item textAlign="centered">
+                <div>
                 <Heading>Recovery Rate</Heading>
                 <Title as="p">{numeral(globalTotal.recovery).format('0.0 %')}</Title>
+                </div>
+            </Level.Item>
+            <Level.Item textAlign="centered">
+                <div>
+                <Heading>Mortality Rate</Heading>
+                <Title as="p">{numeral(globalTotal.mortality).format('0.0 %')}</Title>
                 </div>
             </Level.Item>
         </Level>
@@ -191,7 +197,7 @@ export const DashboardContainer = () => {
 
         <Level>
             <Level.Item>
-                <Heading>Top 10 Confirmed</Heading>
+                <Heading>Top 10 Confirmed Cases (by Country)</Heading>
             </Level.Item>
         </Level>
 
@@ -212,7 +218,7 @@ export const DashboardContainer = () => {
 
         <Level>
             <Level.Item>
-                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid')}}>View Global Graphs</Button>
+                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid')}}>Compare Country Stats</Button>
             </Level.Item>
         </Level>
 
@@ -221,31 +227,40 @@ export const DashboardContainer = () => {
 
         <Level>
             <Level.Item>
-                <Title size={3}>United States</Title>
+                <Title size={3}>Today's United States Totals</Title>
             </Level.Item>
         </Level>
 
         <Level>
             <Level.Item textAlign="centered">
                 <div>
-                <Heading>Confirmed</Heading>
+                <Heading>Total Cases</Heading>
                 <Title as="p">{numeral(usTotal.confirmed).format('0,0')}</Title>
                 </div>
             </Level.Item>
             <Level.Item textAlign="centered">
                 <div>
-                <Heading>Deaths</Heading>
+                <Heading>Total Deaths</Heading>
                 <Title as="p">{numeral(usTotal.deaths).format('0,0')}</Title>
-                </div>
-            </Level.Item>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Recovered</Heading>
-                <Title as="p">{numeral(usTotal.recovered).format('0,0')}</Title>
                 </div>
             </Level.Item>
         </Level>        
         
+
+        <Level>
+            <Level.Item textAlign="centered">
+                <div>
+                <Heading>New Cases</Heading>
+                { renderChangeDifference(usTotal.newConfirmed)}
+                </div>
+            </Level.Item>
+            <Level.Item textAlign="centered">
+                <div>
+                <Heading>New Deaths</Heading>
+                { renderChangeDifference(usTotal.newDeaths)}
+                </div>
+            </Level.Item>
+        </Level>
 
         <Level>
             <Level.Item textAlign="centered">
@@ -266,7 +281,7 @@ export const DashboardContainer = () => {
 
         <Level>
             <Level.Item>
-                <Heading>Top 10 Confirmed</Heading>
+                <Heading>Top 10 Confirmed Cases (by State)</Heading>
             </Level.Item>
         </Level>
 
@@ -285,7 +300,7 @@ export const DashboardContainer = () => {
 
         <Level>
             <Level.Item>
-                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us')}}>View US State Graphs</Button>
+                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Compare U.S. Stats</Button>
             </Level.Item>
         </Level>
 
@@ -293,7 +308,7 @@ export const DashboardContainer = () => {
         
         <Level>
             <Level.Item>
-                <Heading>Top Regions</Heading>
+                <Heading>Top U.S. Regions</Heading>
             </Level.Item>
         </Level>
 
@@ -312,7 +327,7 @@ export const DashboardContainer = () => {
 
         <Level>
             <Level.Item>
-                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>View US Region Graphs</Button>
+                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>Compare U.S. Regions</Button>
             </Level.Item>
         </Level>
 
