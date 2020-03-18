@@ -18,42 +18,34 @@ import sys
 # --- constants ---
 
 COUNTRY_NAMES = {
-                    'Bosnia'        : 'Bosnia and Herzegovina',
-                    'TOTAL'         : '!Global',
-                    'U.S. TOTAL'    : '!Total US',
-                    'UAE'           : 'United Arab Emirates',
-                    'United States' : 'US',
-                    'South Korea'   : 'Korea, South',
-                    'Czech Republic': 'Czechia',
-                    'Taiwan'        : 'Taiwan*'
+                    'Bosnia'             : 'Bosnia and Herzegovina',
+                    'Czech Republic'     : 'Czechia',
+                    'South Korea'        : 'Korea, South',
+                    'TOTAL'              : '!Global',
+                    'Taiwan'             : 'Taiwan*',
+                    'U.S. TOTAL'         : '!Total US',
+                    'UAE'                : 'United Arab Emirates',
+                    'United States'      : 'US',
                 }
 NIXED_ROWS_INDEX = (
-    'American Samoa',
+    'Diamond Princess (repatriated)',
     'Diamond Princess',
+    'Grand Princess (repatriated)',
     'Grand Princess',
-    'Guam',
-    'Marshall Islands',
-    'Micronesia',
-    'Northern Mariana Islands',
-    'Northern Marianas',
-    'Palau',
-    'Puerto Rico',
     'Queue',
     'TBD',
-    'U.S. Virgin Islands',
     'Unassigned',
-    'Virgin Islands',
-    'Virgin Islands, U.S.',
+    'Wuhan (repatriated)',
     'Wuhan',
 )
+US_STATE_NAMES = {
+                    'U.S. TOTAL'              : '!Total US',
+                    'Northern Mariana Islands': 'Northern Marianas',
+                    'U.S. Virgin Islands'     : 'Virgin Islands',
+                 }
 SCRAPED_WORLD_DATA = os.path.join(SITE_DATA, 'scraped-world.tsv')
 SCRAPED_US_DATA    = os.path.join(SITE_DATA, 'scraped-US.tsv')
 SCRAPED_TODAY      = pytz.utc.localize(datetime.datetime.today()).astimezone(pytz.timezone('America/Los_Angeles')).strftime('%Y-%m-%d')
-
-STATE_NAMES = {
-                    'District of Columbia': 'Washington D.C.',
-                    'U.S. TOTAL'          : '!Total US',
-              }
 
 
 # --- globals ---
@@ -155,10 +147,27 @@ def _patchWorldData(target, columnRef):
 
 
 def _patchUSData(target, columnRef):
+    updateUS  = _fetchCurrentUpdatesUS(columnRef = columnRef)
+    # TODO:  Determine if there's need to homologize them
+    updateUS  = _homologizeUpdateData(updateUS, US_STATE_NAMES)
     dataUS    = fetchJSONData(target, "-US")
+
+    # Heuristic - CSSE data includes DC twice; the deleted one is empty.
+    del(dataUS['Washington D.C.'])
+
     allTime   = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
     yesterday = dataUS['!Total US'][allTime[len(allTime)-2]]
     today     = dataUS['!Total US'][allTime[len(allTime)-1]]
+
+    for location in updateUS.keys():
+        try:
+                if location in NIXED_ROWS_INDEX:
+                    continue
+
+                dataUS[location][SCRAPED_TODAY] = updateUS[location][SCRAPED_TODAY]
+        except:
+            print('  || Invalid state: %s' % location)
+            continue
 
     if today == 0.0:
        dataUS['!Total US'][allTime[len(allTime)-1]] = yesterday
@@ -185,7 +194,7 @@ def _patchUSRegionsData(target, dataUS):
                 yesterday = dataUS[state][allTime[len(allTime)-2]]
                 updateUSRegions[region][SCRAPED_TODAY] = yesterday
         except KeyError:
-            print(' >> Invalid state: %s' % state)
+            print('  >> Invalid state: %s' % state)
             continue
 
     try:
@@ -238,7 +247,7 @@ def estimatedUnassignedCasesIn(dataset, totalTag = '!Total US'):
 
 
 def _main(target):
-    print('patching the JSON files with current data')
+    print('patching the JSON files with latest data')
     if target == 'confirmed':
         columnRef = 'Cases'
     elif target == 'deaths':

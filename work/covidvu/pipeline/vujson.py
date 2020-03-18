@@ -105,6 +105,13 @@ US_REGIONS_LONG = {
     'West Virginia': 'South',
     'Wisconsin': 'Midwest',
     'Wyoming': 'West',
+    'Guam': 'Other',
+    'Marshall Islands': 'Other',
+    'Micronesia': 'Other',
+    'Northern Marianas': 'Other',
+    'Palau': 'Other',
+    'Puerto Rico': 'Other',
+    'Virgin Islands': 'Other',
 }
 
 
