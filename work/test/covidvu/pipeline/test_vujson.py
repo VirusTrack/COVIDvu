@@ -3,27 +3,26 @@
 # vim: set fileencoding=utf-8:
 
 from covidvu.pipeline.vujson import STATE_CODES_PATH
+from covidvu.pipeline.vujson import STATE_NAMES
 from covidvu.pipeline.vujson import PARSING_MODE_BOUNDARY_1
 from covidvu.pipeline.vujson import BOATS
 from covidvu.pipeline.vujson import US_REGIONS
 from covidvu.pipeline.vujson import splitCSSEDataByParsingBoundary
 from covidvu.pipeline.vujson import _getBoats_mode1
 from covidvu.pipeline.vujson import allUSCases
-from covidvu.pipeline.vujson import splitCSSEData
-
-# from covidvu.pipeline.vujson import allCases
-# from covidvu.pipeline.vujson import _resampleByStateUS_mode1
-# from covidvu.pipeline.vujson import _resampleByRegionUS_mode1
-# from covidvu.pipeline.vujson import allUSCases
-#
-# from covidvu.pipeline.vujson import _dumpJSON
-# from covidvu.pipeline.vujson import dumpGlobalCasesAsJSONFor
-# from covidvu.pipeline.vujson import dumpUSCasesAsJSONFor
+from covidvu.pipeline.vujson import _parseBoundary1
+from covidvu.pipeline.vujson import _parseBoundary2
+from covidvu.pipeline.vujson import _readSource
+from covidvu.pipeline.vujson import parseCSSE
+from covidvu.pipeline.vujson import resolveReportFileName
 
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.datetimes import DatetimeIndex
+from datetime import date
 import os
 import pandas as pd
+import re
+import json
 
 
 # *** constants ***
@@ -33,9 +32,13 @@ TEST_JH_CSSE_FILE_CONFIRMED = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_
 TEST_JH_CSSE_FILE_DEATHS    = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Deaths.csv')
 TEST_JH_CSSE_FILE_RECOVERED = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Recovered.csv')
 TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
+TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test-site-data')
 
 # *** functions ***
-
+def _purge(purgeDirectory, pattern):
+    for f in os.listdir(purgeDirectory):
+        if re.search(pattern, f):
+            os.remove(os.path.join(purgeDirectory, f))
 
 # *** tests ***
 def test_STATE_CODES_PATH():
@@ -76,34 +79,93 @@ def test_allUSCases():
     assert pd.DataFrame(US_REGIONS.keys()).isin(casesByRegionUS.columns).values.all()
 
 
-def test_splitCSSEData():
-    stateCodes     = pd.read_csv(STATE_CODES_PATH)
-    casesSplit     = test_splitCSSEDataByParsingBoundary()
-    output         = splitCSSEData(casesSplit[1])
-    casesGlobal    = output['casesGlobal']
-    casesUSRegions = output['casesUSRegions']
-    casesUSStates  = output['casesUSStates']
-    casesBoats     = output['casesBoats']
-
+def assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoats):
+    stateCodes = pd.read_csv(STATE_CODES_PATH)
     assert "!Global" in casesGlobal.columns
     assert "!Outside China" in casesGlobal.columns
-    assert (casesGlobal.loc[:,casesGlobal.columns.map(lambda c: c[0]!='!')].sum(axis=1) == casesGlobal["!Global"]).all()
-    assert (casesGlobal.loc[:, casesGlobal.columns.map(lambda c: c[0] != '!' and c != 'China')].sum(axis=1) == casesGlobal[
-        "!Outside China"]).all()
-    # TODO: Pick up from here!
+    assert isinstance(casesGlobal, DataFrame)
+    assert isinstance(casesGlobal.index[0], date)
+    assert (casesGlobal.loc[:, casesGlobal.columns.map(lambda c: c[0] != '!')].sum(axis=1) == casesGlobal[
+        "!Global"]).all()
+    assert (casesGlobal.loc[:, casesGlobal.columns.map(lambda c: c[0] != '!' and c != 'China')].sum(axis=1) ==
+            casesGlobal[
+                "!Outside China"]).all()
 
-#
-# def test_allUSCases():
-#     # TODO: Juvid - https://github.com/pr3d4t0r/COVIDvu/issues/162
-#     casesByStateUS, casesByRegionUS = allUSCases(TEST_JH_CSSE_FILE_CONFIRMED)
-#     states = pd.read_csv(STATE_CODES_PATH)['state']
-#
-#     assert isinstance(casesByStateUS, DataFrame)
-#     assert isinstance(casesByStateUS.index, DatetimeIndex)
-#     assert states.isin(casesByStateUS.columns).all()
-#     assert isinstance(casesByRegionUS, DataFrame)
-#     assert isinstance(casesByRegionUS.index, DatetimeIndex)
-#     assert pd.DataFrame(US_REGIONS.keys()).isin(casesByRegionUS.columns).values.all()
+    assert isinstance(casesUSStates, DataFrame)
+    assert isinstance(casesUSStates.index[0], date)
+    assert stateCodes.state.isin(casesUSStates.columns).all()
+    assert (casesUSStates.loc[:, casesUSStates.columns.map(lambda c: c[0] != '!' and c != 'Unassigned')].sum(axis=1) ==
+            casesUSStates[
+                "!Total US"]).all()
+
+    assert isinstance(casesUSRegions, DataFrame)
+    assert isinstance(casesUSRegions.index[0], date)
+    assert pd.DataFrame(US_REGIONS.keys()).isin(casesUSRegions.columns).values.all()
+
+    assert isinstance(casesBoats, DataFrame)
+    assert isinstance(casesBoats.index[0], date)
+    assert (casesBoats.columns.isin(BOATS)).all()
+
+
+def test__parseBoundary1():
+    casesSplit = test_splitCSSEDataByParsingBoundary()
+    output     = _parseBoundary1(casesSplit[0])
+
+    casesGlobal    = output['casesGlobal']
+    casesUSStates  = output['casesUSStates']
+    casesUSRegions = output['casesUSRegions']
+    casesBoats     = output['casesBoats']
+
+    assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoats)
+
+
+def test__parseBoundary2():
+    casesSplit     = test_splitCSSEDataByParsingBoundary()
+    output         = _parseBoundary2(casesSplit[1])
+    casesGlobal    = output['casesGlobal']
+    casesUSStates  = output['casesUSStates']
+    casesUSRegions = output['casesUSRegions']
+    casesBoats     = output['casesBoats']
+    assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoats)
+
+
+def test__readSource():
+    cases = _readSource(TEST_JH_CSSE_FILE_CONFIRMED)
+    assert not (cases['Province/State'].isin(STATE_NAMES.keys())).any()
+
+
+def assertValidJSON(fname):
+    fname = os.path.join(TEST_SITE_DATA, fname)
+    assert os.path.exists(fname)
+    with open(fname) as f:
+        casesUSRegions = json.load(f)
+    assert isinstance(casesUSRegions, dict)
+
+def test_parseCSSE():
+    try:
+        output = parseCSSE('confirmed',
+                            siteData=TEST_SITE_DATA,
+                            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+                           )
+        casesGlobal = output['casesGlobal']
+        casesUSStates = output['casesUSStates']
+        casesUSRegions = output['casesUSRegions']
+        casesBoats = output['casesBoats']
+        assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoats)
+        assertValidJSON('confirmed-US-Regions.json')
+        assertValidJSON('confirmed-US.json')
+        assertValidJSON('confirmed-boats.json')
+        assertValidJSON('confirmed.json')
+
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')
+
+
+def test_resolveReportFileName():
+    # TODO
+    pass
 
 
 def test__dumpJSON():
