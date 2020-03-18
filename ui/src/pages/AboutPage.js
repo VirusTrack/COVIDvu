@@ -25,10 +25,10 @@ export const AboutPage = () => {
 
                 <Title size={4}>Helpful Links</Title>
                 <ul>
-                    <li><a href="https://github.com/pr3d4t0r/COVIDvu/wiki/FAQ" target="_blank">The FAQ</a></li>
-                    <li><a href="https://github.com/pr3d4t0r/covidvu" target="_blank">On GitHub</a></li>
-                    <li><a href="https://twitter.com/covidvu" target="_blank">On Twitter @covidvu</a></li>
-                    <li><a href="https://covidvu.slack.com" target="_blank">On Slack</a> -- Reach out for an invite by DM on Twitter</li>
+                    <li><a href="https://github.com/pr3d4t0r/COVIDvu/wiki/FAQ" target="_new" rel="noopener noreferrer">The FAQ</a></li>
+                    <li><a href="https://github.com/pr3d4t0r/covidvu" target="_new" rel="noopener noreferrer">On GitHub</a></li>
+                    <li><a href="https://twitter.com/covidvu" target="_new" rel="noopener noreferrer">On Twitter @covidvu</a></li>
+                    <li><a href="https://covidvu.slack.com" target="_new" rel="noopener noreferrer">On Slack</a> -- Reach out for an invite by DM on Twitter</li>
                 </ul>
 
                 <Title size={4}>What else</Title>
