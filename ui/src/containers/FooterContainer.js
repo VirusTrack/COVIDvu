@@ -11,6 +11,8 @@ import { CACHE_TIMER } from '../constants'
 
 import CCSAByLogo from '../images/cc_sa.png'
 
+import CookieConsent from "react-cookie-consent";
+
 import moment from 'moment'
 
 export const FooterContainer = () =>{
@@ -63,7 +65,19 @@ export const FooterContainer = () =>{
                     </p>
                 </Column>
 
+                <CookieConsent
+                    location="bottom"
+                    buttonText="Accept"
+                    cookieName="covid-cookie-consent"
+                    style={{ background: "#2B373B" }}
+                    buttonStyle={{ color: "#4e503b", fontSize: "13px" }}
+                    expires={150}
+                >
+                    This website uses cookies to enhance the user experience.{" "}
+                </CookieConsent>
+
             </Column.Group>
+
 
         </Footer>
     )

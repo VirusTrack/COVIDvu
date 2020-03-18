@@ -22,13 +22,18 @@ import {
     CACHE_INVALIDATE_US_REGIONS_KEY 
 } from '../constants'
 
+import ReactGA from 'react-ga';
+
 export const HeaderContainer = () => {
     const history = useHistory()
     const dispatch = useDispatch()
     const location = useLocation()
 
     const selectedNav = location.pathname
-    
+
+    ReactGA.initialize('UA-574325-5');
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
     const forceRefresh = () => {
         store.remove(LAST_UPDATE_KEY)
         store.remove(GLOBAL_KEY)
