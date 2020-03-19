@@ -87,7 +87,7 @@ export const PrivacyPolicyPage = () => {
         
         
         
-        <a name="what_information_do_we_collect" /><Title size={3}>1. WHAT INFORMATION DO WE COLLECT?</Title>
+        <Title id="what_information_do_we_collect" size={3}>1. WHAT INFORMATION DO WE COLLECT?</Title>
         
         <Title size={5}>Personal information you disclose to us</Title>
         
@@ -130,7 +130,7 @@ export const PrivacyPolicyPage = () => {
         </p>
         
         
-        <a name="how_do_we_use_your_information"></a><Title size={3}>2. HOW DO WE USE YOUR INFORMATION?</Title>
+        <Title id="how_do_we_use_your_information" size={3}>2. HOW DO WE USE YOUR INFORMATION?</Title>
         
         <p>
             In Short: We process your information for purposes based on legitimate business interests, the fulfillment of our contract with you, compliance with our legal obligations, and/or your consent.
@@ -168,7 +168,7 @@ export const PrivacyPolicyPage = () => {
             </ul>
         
         
-        <a name="will_your_information_be_shared_with_anyone"></a><Title size={3}>3. WILL YOUR INFORMATION BE SHARED WITH ANYONE?</Title>
+        <Title id="will_your_information_be_shared_with_anyone" size={3}>3. WILL YOUR INFORMATION BE SHARED WITH ANYONE?</Title>
         
         <p>
             In Short: We only share information with your consent, to comply with laws, to provide you with services, to protect your rights, or to fulfill business obligations.
@@ -219,7 +219,7 @@ export const PrivacyPolicyPage = () => {
         </ul>
         
         
-        <a name="do_we_use_cookies_and_other_tracking_technologies"></a><Title size={3}>4. DO WE USE COOKIES AND OTHER TRACKING TECHNOLOGIES?</Title>
+        <Title id="do_we_use_cookies_and_other_tracking_technologies" size={3}>4. DO WE USE COOKIES AND OTHER TRACKING TECHNOLOGIES?</Title>
         <p>
             In Short: We may use cookies and other tracking technologies to collect and store your information.
         </p>
@@ -230,7 +230,7 @@ export const PrivacyPolicyPage = () => {
         
         
         
-        <a name="how_long_do_we_keep_your_information"></a><Title size={3}>5. HOW LONG DO WE KEEP YOUR INFORMATION?</Title>
+        <Title id="do_we_use_cookies_and_other_tracking_technologies" size={3}>5. HOW LONG DO WE KEEP YOUR INFORMATION?</Title>
         
         <p>
             In Short: We keep your information for as long as necessary to fulfill the purposes outlined in this privacy policy unless otherwise required by law.
@@ -245,7 +245,7 @@ export const PrivacyPolicyPage = () => {
         </p>
         
         
-        <a name="how_do_we_keep_your_information_safe"></a><Title size={3}>6. HOW DO WE KEEP YOUR INFORMATION SAFE?</Title>
+        <Title id="how_do_we_keep_your_information_safe" size={3}>6. HOW DO WE KEEP YOUR INFORMATION SAFE?</Title>
         
         <p>
             In Short: We aim to protect your personal information through a system of organizational and technical security measures.
@@ -255,7 +255,7 @@ export const PrivacyPolicyPage = () => {
             We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process. However, please also remember that we cannot guarantee that the internet itself is 100% secure. Although we will do our best to protect your personal information, transmission of personal information to and from our Services or Apps is at your own risk. You should only access the services within a secure environment.
         </p>
         
-        <a name="do_we_collect_information_from_minors"></a><Title size={3}>7. DO WE COLLECT INFORMATION FROM MINORS?</Title>
+        <Title id="do_we_collect_information_from_minors" size={3}>7. DO WE COLLECT INFORMATION FROM MINORS?</Title>
         
         <p>
             In Short: We do not knowingly collect data from or market to children under 18 years of age.
@@ -265,7 +265,7 @@ export const PrivacyPolicyPage = () => {
             We do not knowingly solicit data from or market to children under 18 years of age. By using the Services or Apps, you represent that you are at least 18 or that you are the parent or guardian of such a minor and consent to such minor dependentâ€™s use of the Services or Apps. If we learn that personal information from users less than 18 years of age has been collected, we will deactivate the account and take reasonable measures to promptly delete such data from our records. If you become aware of any data we have collected from children under age 18, please contact us at covidvu.gdpr@virustrack.live.
         </p>
         
-        <a name="what_are_your_privacy_rights"></a><Title size={3}>8. WHAT ARE YOUR PRIVACY RIGHTS?</Title>
+        <Title id="what_are_your_privacy_rights" size={3}>8. WHAT ARE YOUR PRIVACY RIGHTS?</Title>
         
         <p>
             In Short: In some regions, such as the European Economic Area, you have rights that allow you greater access to and control over your personal information. You may review, change, or terminate your account at any time.
@@ -289,7 +289,7 @@ export const PrivacyPolicyPage = () => {
         
         
         
-        <a name="controls_for_do_not_track_features"></a><Title size={3}>9. CONTROLS FOR DO-NOT-TRACK FEATURES</Title>
+        <Title id="controls_for_do_not_track_features" size={3}>9. CONTROLS FOR DO-NOT-TRACK FEATURES</Title>
         
         <p>
             Most web browsers and some mobile operating systems and mobile applications include a Do-Not-Track (â€œDNTâ€) feature or setting you can activate to signal your privacy preference not to have data about your online browsing activities monitored and collected. No uniform technology standard for recognizing and implementing DNT signals has been finalized. As such, we do not currently respond to DNT browser signals or any other mechanism that automatically communicates your choice not to be tracked online. If a standard for online tracking is adopted that we must follow in the future, we will inform you about that practice in a revised version of this privacy policy.
@@ -297,7 +297,7 @@ export const PrivacyPolicyPage = () => {
         
         
         
-        <a name="do_california_residents_have_specific_privacy_rights"></a><Title size={3}>10. DO CALIFORNIA RESIDENTS HAVE SPECIFIC PRIVACY RIGHTS?</Title>
+        <Title id="do_california_residents_have_specific_privacy_rights" size={3}>10. DO CALIFORNIA RESIDENTS HAVE SPECIFIC PRIVACY RIGHTS?</Title>
         
         <p>
             In Short: Yes, if you are a resident of California, you are granted specific rights regarding access to your personal information.
@@ -313,7 +313,7 @@ export const PrivacyPolicyPage = () => {
         
         
         
-        <a name="do_we_make_updates_to_this_policy"></a><Title size={3}>11. DO WE MAKE UPDATES TO THIS POLICY?</Title>
+        <Title id="do_we_make_updates_to_this_policy" size={3}>11. DO WE MAKE UPDATES TO THIS POLICY?</Title>
         
         <p>
             In Short: Yes, we will update this policy as necessary to stay compliant with relevant laws.
@@ -325,7 +325,7 @@ export const PrivacyPolicyPage = () => {
         
         
         
-        <a name="how_can_you_contact_us_about_this_policy"></a><Title size={3}>12. HOW CAN YOU CONTACT US ABOUT THIS POLICY?</Title>
+        <Title id="how_can_you_contact_us_about_this_policy" size={3}>12. HOW CAN YOU CONTACT US ABOUT THIS POLICY?</Title>
         
         <p>
             If you have questions or comments about this policy, you may contact our Data Protection Officer (DPO), Eugene Ciurana, by email at covidvu.gdpr@virustrack.live, or by post to:
