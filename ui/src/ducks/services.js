@@ -25,6 +25,10 @@ export const types = {
     FETCH_GLOBAL_SUCCESS: 'FETCH_GLOBAL_SUCCESS',
     FETCH_GLOBAL_ERROR: 'FETCH_GLOBAL_ERROR',
 
+    FETCH_CONTINENTAL: 'FETCH_CONTINENTAL',
+    FETCH_CONTINENTAL_SUCCESS: 'FETCH_CONTINENTAL_SUCCESS',
+    FETCH_CONTINENTAL_ERROR: 'FETCH_CONTINENTAL_ERROR',
+
     FETCH_US_STATES: 'FETCH_US_STATES',
     FETCH_US_STATES_SUCCESS: 'FETCH_US_STATES_SUCCESS',
     FETCH_US_STATES_ERROR: 'FETCH_US_STATES_ERROR',
@@ -69,6 +73,8 @@ export const types = {
 export const actions = {
     clearGraphs: createAction(types.CLEAR_GRAPHS),
     fetchGlobal: createAction(types.FETCH_GLOBAL),
+    fetchContinental: createAction(types.FETCH_CONTINENTAL),
+
     fetchUSStates: createAction(types.FETCH_US_STATES),
     fetchUSRegions: createAction(types.FETCH_US_REGIONS),
     fetchLastUpdate: createAction(types.FETCH_LAST_UPDATE),
@@ -87,6 +93,7 @@ export const actions = {
 
 export const initialState = {
     global: {},
+    continental: {},
     globalTop10: {},
     globalStats: undefined, 
     totalGlobalStats: {}, 
@@ -105,6 +112,7 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 global: {},
+                continental: {},
                 globalTop10: {},
                 globalStats: undefined,
                 totalGlobalStats: {},
@@ -128,6 +136,19 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 global: { 
+                    confirmed: action.confirmed,
+                    sortedConfirmed: action.sortedConfirmed,
+                    statsTotals: action.statsTotals,
+                    deaths: action.deaths,
+                    recovered: action.recovered,
+                    mortality: action.mortality,
+                    recovery: action.recovery
+                }
+            }
+        case types.FETCH_CONTINENTAL_SUCCESS:
+            return {
+                ...state,
+                continental: { 
                     confirmed: action.confirmed,
                     sortedConfirmed: action.sortedConfirmed,
                     statsTotals: action.statsTotals,
@@ -604,15 +625,6 @@ export function* fetchGlobal() {
 
         const global = yield call(dataService.getGlobal)
 
-        // if(!store.get(CACHE_INVALIDATE_GLOBAL_KEY) && store.get(GLOBAL_KEY)) {
-        //     global = store.get(GLOBAL_KEY)
-        // } else {
-        //     global = yield call(dataService.getBundle, "global")
-
-        //     store.set(GLOBAL_KEY, global)
-        //     store.remove(CACHE_INVALIDATE_GLOBAL_KEY)
-        // }
-
         let confirmed = global.confirmed
         let deaths = global.deaths
         let recovered = global.recovered
@@ -696,6 +708,91 @@ export function* fetchGlobal() {
     console.timeEnd('fetchGlobal')
 }
 
+export function* fetchContinental() {
+    console.time('fetchContinental')
+
+    const dataService = new DataService()
+
+    try {
+        console.time('fetchContinental.axios')
+
+        const continental = yield call(dataService.getContinental)
+
+        let confirmed = continental.confirmed
+        let deaths = continental.deaths
+        let recovered = continental.recovered
+        console.timeEnd('fetchContinental.axios')
+
+        delete confirmed['Continental Region']
+        delete deaths['Continental Region']
+        delete recovered['Continental Region']
+        
+        const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
+
+        const confirmedCounts = extractLatestCounts(confirmed)
+        const deathsCounts = extractLatestCounts(deaths)
+        const recoveredCounts = extractLatestCounts(recovered)
+        const mortalityCounts = extractLatestCounts(mortality)
+        const recoveryCounts = extractLatestCounts(recovery)
+        const sortedConfirmed = confirmedCounts.sort((a, b) => b.stats - a.stats)
+        
+        const deathByRegionKey = deathsCounts.reduce((obj, item) => {
+            obj[item.region] = item
+            return obj
+        }, {})
+
+        const recoveredByRegionKey = recoveredCounts.reduce((obj, item) => {
+            obj[item.region] = item
+            return obj
+        }, {})
+
+        const mortalityByRegionKey = mortalityCounts.reduce((obj, item) => {
+            obj[item.region] = item
+            return obj
+        }, {})
+
+        const recoveryByRegionKey = recoveryCounts.reduce((obj, item) => {
+            obj[item.region] = item
+            return obj
+        }, {})
+
+        let statsTotals = []
+        
+        for(const confirmData of sortedConfirmed) {
+            const region = confirmData.region
+            if(deathByRegionKey.hasOwnProperty(region)) {
+                statsTotals.push({
+                    region: region,
+                    confirmed: confirmData.stats,
+                    confirmedDayChange: confirmData.dayChange,
+                    deaths: deathByRegionKey[region].stats,
+                    deathsDayChange: deathByRegionKey[region].dayChange,
+                    recovered: recoveredByRegionKey[region].stats,
+                    mortality: mortalityByRegionKey[region].stats,
+                    recovery: recoveryByRegionKey[region].stats
+                })
+            }
+        }
+
+        yield put(
+            { 
+                type: types.FETCH_CONTINENTAL_SUCCESS, 
+                confirmed: confirmed, 
+                sortedConfirmed: sortedConfirmed,
+                statsTotals: statsTotals,
+                deaths: deaths, 
+                recovered: recovered,
+                mortality: mortality,
+                recovery: recovery
+            }
+        )    
+    } catch(error) {
+        console.error(error)
+    }
+
+    console.timeEnd('fetchContinental')
+}
+
 const filterStates = []
 
 export function* fetchUSStates() {
@@ -707,14 +804,6 @@ export function* fetchUSStates() {
         console.time('fetchUSStates.axios')
 
         const us_states = yield call(dataService.getUSStates)
-        // if(!store.get(CACHE_INVALIDATE_US_STATES_KEY) && store.get(US_STATES_KEY)) {
-        //     us_states = store.get(US_STATES_KEY)
-        // } else {
-        //     us_states = yield call(dataService.getBundle, "US")
-
-        //     store.set(US_STATES_KEY, us_states)
-        //     store.remove(CACHE_INVALIDATE_US_STATES_KEY)
-        // }
 
         let confirmed = us_states.confirmed
         let deaths = us_states.deaths
@@ -811,15 +900,6 @@ export function* fetchUSRegions() {
 
         const us_regions = yield call(dataService.getUSRegions)
 
-        // if(!store.get(CACHE_INVALIDATE_US_REGIONS_KEY) && store.get(US_REGIONS_KEY)) {
-        //     us_regions = store.get(US_REGIONS_KEY)
-        // } else {
-        //     us_regions = yield call(dataService.getBundle, "US-Regions")
-
-        //     store.set(US_REGIONS_KEY, us_regions)
-        //     store.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
-        // }
-
         let confirmed = us_regions.confirmed
         let deaths = us_regions.deaths
         let recovered = us_regions.recovered
@@ -851,6 +931,7 @@ export function* fetchUSRegions() {
 
 export const sagas = [
     takeEvery(types.FETCH_GLOBAL, fetchGlobal),
+    takeEvery(types.FETCH_CONTINENTAL, fetchContinental),
     takeEvery(types.FETCH_US_STATES, fetchUSStates),
     takeEvery(types.FETCH_US_REGIONS, fetchUSRegions),
     takeEvery(types.FETCH_LAST_UPDATE, fetchLastUpdate),

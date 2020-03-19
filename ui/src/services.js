@@ -4,9 +4,11 @@ import {
     DATA_URL, 
     STAGING_DATA_URL, 
     GLOBAL_KEY, 
+    CONTINENTAL_KEY, 
     US_STATES_KEY, 
     US_REGIONS_KEY, 
     CACHE_INVALIDATE_GLOBAL_KEY,
+    CACHE_INVALIDATE_CONTINENTAL_KEY,
     CACHE_INVALIDATE_US_STATES_KEY,
     CACHE_INVALIDATE_US_REGIONS_KEY
 } from './constants'
@@ -49,6 +51,29 @@ class DataService {
             }
     
             return global
+        } catch(error) {
+            console.error(error)
+            return null
+        }
+    }
+
+    async getContinental() {
+        try {
+            let continental = undefined
+
+            if(!store.get(CACHE_INVALIDATE_CONTINENTAL_KEY) && store.get(CONTINENTAL_KEY)) {
+                continental = store.get(CONTINENTAL_KEY)
+            } else {
+                const response = await axios.get(`${dataUrl()}/bundle-continental-regions.json`)
+                
+                console.dir(response.data)
+                
+                continental = response.data
+                store.set(CONTINENTAL_KEY, continental)
+                store.remove(CACHE_INVALIDATE_CONTINENTAL_KEY)
+            }
+    
+            return continental
         } catch(error) {
             console.error(error)
             return null

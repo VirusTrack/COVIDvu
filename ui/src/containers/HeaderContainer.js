@@ -15,9 +15,11 @@ import store from 'store'
 import { 
     LAST_UPDATE_KEY, 
     GLOBAL_KEY, 
+    CONTINENTAL_KEY,
     US_STATES_KEY, 
     US_REGIONS_KEY, 
     CACHE_INVALIDATE_GLOBAL_KEY, 
+    CACHE_INVALIDATE_CONTINENTAL_KEY,
     CACHE_INVALIDATE_US_STATES_KEY, 
     CACHE_INVALIDATE_US_REGIONS_KEY 
 } from '../constants'
@@ -37,9 +39,11 @@ export const HeaderContainer = () => {
     const forceRefresh = () => {
         store.remove(LAST_UPDATE_KEY)
         store.remove(GLOBAL_KEY)
+        store.remove(CONTINENTAL_KEY)
         store.remove(US_STATES_KEY)
         store.remove(US_REGIONS_KEY)
         store.remove(CACHE_INVALIDATE_GLOBAL_KEY)
+        store.remove(CACHE_INVALIDATE_CONTINENTAL_KEY)
         store.remove(CACHE_INVALIDATE_US_STATES_KEY)
         store.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
     
@@ -47,6 +51,7 @@ export const HeaderContainer = () => {
         dispatch(actions.fetchGlobal())
         dispatch(actions.fetchUSStates())
         dispatch(actions.fetchUSRegions())
+        dispatch(actions.fetchContinental())
     }
 
     const changePage = (pageLocation) => {
@@ -60,7 +65,7 @@ export const HeaderContainer = () => {
         <Navbar color="dark">
             <Navbar.Brand>
                 <Navbar.Item onClick={() => { changePage('/dashboard') }}>
-                    <img src={VirusTrackLogo} alt="" role="presentation" />&nbsp;
+                    <img src={VirusTrackLogo} alt="Virus Track Logo" role="presentation" />&nbsp;
                     <Title style={{color: 'white'}} size={5}>Coronavirus COVID-19 Cases</Title>
                 </Navbar.Item>
                 <Navbar.Burger />
@@ -71,6 +76,7 @@ export const HeaderContainer = () => {
                     <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid')}}>Global</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>US States</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>US Regions</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/covid/continental'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Continental</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/stats'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/stats')}}>Stats</Navbar.Item>
                 </Navbar.Segment>
 
