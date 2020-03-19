@@ -138,8 +138,9 @@ def assertValidJSON(fname):
     fname = os.path.join(TEST_SITE_DATA, fname)
     assert os.path.exists(fname)
     with open(fname) as f:
-        casesUSRegions = json.load(f)
-    assert isinstance(casesUSRegions, dict)
+        jsonObject = json.load(f)
+    assert isinstance(jsonObject, dict)
+    assert len(jsonObject.keys()) > 0
 
 def test_parseCSSE():
     try:

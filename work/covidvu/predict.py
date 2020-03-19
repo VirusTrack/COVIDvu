@@ -129,7 +129,7 @@ def _castPredictionsAsTS(countryTSClean,
                                     start = countryTSClean.index[0],
                                     end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                                  ),
-            data=qLow,
+            data  = qLow,
         )
 
         predictionsHigh = pd.Series(
@@ -137,7 +137,7 @@ def _castPredictionsAsTS(countryTSClean,
                                     start = countryTSClean.index[0],
                                     end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                                  ),
-            data=qHigh,
+            data  = qHigh,
         )
         predictionsPercentilesTS.append([predictionsLow, predictionsHigh])
 
@@ -267,7 +267,8 @@ def _dumpTimeSeriesAsJSON(timeSeries, target = None):
 def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
                                     countryName,
                                     predictionsPercentiles,
-                                    target = None):
+                                    target,
+                                    ):
     result = {}
 
     for i, (qLow, qHigh) in enumerate(predictionsPercentiles):
