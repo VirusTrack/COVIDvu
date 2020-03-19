@@ -625,6 +625,15 @@ export function* fetchGlobal() {
 
         const global = yield call(dataService.getGlobal)
 
+        // if(!store.get(CACHE_INVALIDATE_GLOBAL_KEY) && store.get(GLOBAL_KEY)) {
+        //     global = store.get(GLOBAL_KEY)
+        // } else {
+        //     global = yield call(dataService.getBundle, "global")
+
+        //     store.set(GLOBAL_KEY, global)
+        //     store.remove(CACHE_INVALIDATE_GLOBAL_KEY)
+        // }
+
         let confirmed = global.confirmed
         let deaths = global.deaths
         let recovered = global.recovered
@@ -899,6 +908,15 @@ export function* fetchUSRegions() {
         console.time('fetchUSRegions.axios')
 
         const us_regions = yield call(dataService.getUSRegions)
+
+        // if(!store.get(CACHE_INVALIDATE_US_REGIONS_KEY) && store.get(US_REGIONS_KEY)) {
+        //     us_regions = store.get(US_REGIONS_KEY)
+        // } else {
+        //     us_regions = yield call(dataService.getBundle, "US-Regions")
+
+        //     store.set(US_REGIONS_KEY, us_regions)
+        //     store.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
+        // }
 
         let confirmed = us_regions.confirmed
         let deaths = us_regions.deaths
