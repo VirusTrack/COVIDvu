@@ -150,6 +150,7 @@ dmypy.json
 *swp
 .viminfo
 work/*.json
+**/.theano
 
 # Python virtual environment
 
