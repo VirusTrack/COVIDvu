@@ -40,6 +40,9 @@ export const types = {
     FETCH_LAST_UPDATE_SUCCESS: 'FETCH_LAST_UPDATE_SUCCESS',
     FETCH_LAST_UPDATE_ERROR: 'FETCH_LAST_UPDATE_ERROR',
 
+    FETCH_TOP_10_COUNTRIES: 'FETCH_TOP_10_COUNTRIES',
+    FETCH_TOP_10_COUNTRIES_SUCCESS: 'FETCH_TOP_10_COUNTRIES_SUCCESS',
+    FETCH_TOP_10_COUNTRIES_ERROR: 'FETCH_TOP_10_COUNTRIES_ERROR',
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,6 +55,7 @@ export const actions = {
     fetchUSStates: createAction(types.FETCH_US_STATES),
     fetchUSRegions: createAction(types.FETCH_US_REGIONS),
     fetchLastUpdate: createAction(types.FETCH_LAST_UPDATE),
+    fetchTop10Countries: createAction(types.FETCH_TOP_10_COUNTRIES),
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -203,6 +207,18 @@ export function* fetchLastUpdate() {
     yield put({ type: types.FETCH_LAST_UPDATE_SUCCESS, payload: lastUpdateAsNumeric})
 }
 
+
+export function* fetchTop10Countries() {
+
+    const dataService = new DataService()
+
+    try {
+
+        
+    } catch(error) {
+        console.error(error)
+    }
+}
 
 
 const filterCountries = [
@@ -469,4 +485,5 @@ export const sagas = [
     takeEvery(types.FETCH_US_STATES, fetchUSStates),
     takeEvery(types.FETCH_US_REGIONS, fetchUSRegions),
     takeEvery(types.FETCH_LAST_UPDATE, fetchLastUpdate),
+    takeEvery(types.FETCH_TOP_10_COUNTRIES, fetchTop10Countries),
 ]
