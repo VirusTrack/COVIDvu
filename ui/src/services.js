@@ -1,6 +1,17 @@
 import axios from "axios"
 
-import { DATA_URL, STAGING_DATA_URL } from './constants'
+import { 
+    DATA_URL, 
+    STAGING_DATA_URL, 
+    GLOBAL_KEY, 
+    US_STATES_KEY, 
+    US_REGIONS_KEY, 
+    CACHE_INVALIDATE_GLOBAL_KEY,
+    CACHE_INVALIDATE_US_STATES_KEY,
+    CACHE_INVALIDATE_US_REGIONS_KEY
+} from './constants'
+
+import store from 'store'
 
 import moment from 'moment'
 
@@ -23,38 +34,66 @@ function dataUrl() {
 
 class DataService {
 
-    async getBundle(distinct = '') {
+    async getGlobal() {
         try {
-            const response = await axios.get(`${dataUrl()}/bundle-${distinct}.json`)
+            let global = undefined
 
-            return response.data
+            if(!store.get(CACHE_INVALIDATE_GLOBAL_KEY) && store.get(GLOBAL_KEY)) {
+                global = store.get(GLOBAL_KEY)
+            } else {
+                const response = await axios.get(`${dataUrl()}/bundle-global.json`)
+                
+                global = response.data
+                store.set(GLOBAL_KEY, global)
+                store.remove(CACHE_INVALIDATE_GLOBAL_KEY)
+            }
+    
+            return global
         } catch(error) {
             console.error(error)
             return null
         }
     }
 
-    async getConfirmed(distinct = '') {
+    async getUSStates() {
         try {
-            const response = await axios.get(`${dataUrl()}/confirmed${distinct}.json`)
+            let us_states = undefined
+            if(!store.get(CACHE_INVALIDATE_US_STATES_KEY) && store.get(US_STATES_KEY)) {
+                us_states = store.get(US_STATES_KEY)
+            } else {
+                const response = await axios.get(`${dataUrl()}/bundle-US.json`)
+    
+                us_states = response.data
+                store.set(US_STATES_KEY, us_states)
+                store.remove(CACHE_INVALIDATE_US_STATES_KEY)
+            }
 
-            return response.data
+            return us_states
         } catch(error) {
             console.error(error)
             return null
         }
     }
 
-    async getDeaths(distinct = '') {
-        const response = await axios.get(`${dataUrl()}/deaths${distinct}.json`)
+    async getUSRegions() {
+        try {
+            let us_regions = undefined
 
-        return response.data
-    }
+            if(!store.get(CACHE_INVALIDATE_US_REGIONS_KEY) && store.get(US_REGIONS_KEY)) {
+                us_regions = store.get(US_REGIONS_KEY)
+            } else {
+                const response = await axios.get(`${dataUrl()}/bundle-US-Regions.json`)
+                us_regions = response.data
+    
+                store.set(US_REGIONS_KEY, us_regions)
+                store.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
+            }
 
-    async getRecovered(distinct = '') {
-        const response = await axios.get(`${dataUrl()}/recovered${distinct}.json`)
-
-        return response.data
+            return us_regions
+        } catch(error) {
+            console.error(error)
+            return null
+        }
     }
 
     async fetchLastUpdate() {
