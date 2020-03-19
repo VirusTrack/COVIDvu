@@ -124,6 +124,11 @@ function packJSONFiles {
 } # packJSONFiles
 
 
+function generateRegionsJSONBundle {
+    ./vuregions
+} # generateRegionsJSONBundle
+
+
 function invalidateCloudFrontCache {
     aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths "/*"
 } # invalidateCloudFrontCache
@@ -154,6 +159,7 @@ updateCOVID19DataSources
 generateVirusUpdateJSONFiles
 patchJSONFiles "$2"
 packJSONFiles
+generateRegionsJSONBundle
 assertCloudFrontConfig
 assert_rcloneConfig
 
