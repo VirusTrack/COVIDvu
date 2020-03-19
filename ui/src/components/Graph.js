@@ -4,6 +4,8 @@ import Plot from 'react-plotly.js'
 
 import { useMobileDetect } from '../hooks/ui'
 
+import { Generic } from 'rbx'
+
 export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, width, height}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
@@ -91,12 +93,13 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
     }
 
     return (
-        <Plot
-            data={plotsAsValues}
-            layout={layout}
-            config={mergeConfig}
-        />
-
+        <Generic tooltipPosition="right" tooltip="Clicking on legend items will remove them from graph">
+            <Plot
+                data={plotsAsValues}
+                layout={layout}
+                config={mergeConfig}
+            />
+        </Generic>
     )
 }
 
