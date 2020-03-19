@@ -78,7 +78,6 @@ COUNTRIES_REGIONS = {
     'Bhutan': 'Asia',
     'Brunei': 'Asia',
     'Cambodia': 'Asia',
-    'China': 'Asia',
     'India': 'Asia',
     'Indonesia': 'Asia',
     'Iran': 'Asia',
@@ -137,6 +136,8 @@ COUNTRIES_REGIONS = {
     'Saint Lucia': 'Central America',
     'Saint Vincent and the Grenadines': 'Central America',
     'Trinidad and Tobago': 'Central America',
+    
+    'China': 'Mainland China',
 
     # https://www.countries-ofthe-world.com/countries-of-europe.html
     'Albania': 'Europe',
