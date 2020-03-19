@@ -27,10 +27,10 @@ export const DashboardContainer = () => {
 
     useEffect(() => {
         dispatch(actions.fetchTop10Countries())
-        dispatch(actions.fetchGlobalStats())
+        dispatch(actions.fetchTotalGlobalStats())
 
         dispatch(actions.fetchTop10USStates())
-        dispatch(actions.fetchUSStatesStats())
+        dispatch(actions.fetchTotalUSStatesStats())
 
         dispatch(actions.fetchUSRegions())
 
@@ -39,11 +39,11 @@ export const DashboardContainer = () => {
     useInterval(() => {
         if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
             dispatch(actions.fetchTop10Countries())
-            dispatch(actions.fetchGlobalStats())
+            dispatch(actions.fetchTotalGlobalStats())
         }
         if(store.get(CACHE_INVALIDATE_US_STATES_KEY)) {
             dispatch(actions.fetchTop10USStates())
-            dispatch(actions.fetchUSStatesStats())
+            dispatch(actions.fetchTotalUSStatesStats())
         }
         if(store.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
             dispatch(actions.fetchUSRegions())
@@ -59,10 +59,10 @@ export const DashboardContainer = () => {
     }, [dispatch])
 
     const globalTop10 = useSelector(state => state.services.globalTop10)
-    const globalStats = useSelector(state => state.services.globalStats)
+    const globalStats = useSelector(state => state.services.totalGlobalStats)
     
     const usStatesTop10 = useSelector(state => state.services.usStatesTop10)
-    const usStatesStats = useSelector(state => state.services.usStatesStats)
+    const usStatesStats = useSelector(state => state.services.totalUSStatesStats)
     
     const confirmedUSRegions = useSelector(state => state.services.usRegions.confirmed)
 
