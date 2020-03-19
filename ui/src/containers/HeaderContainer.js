@@ -49,10 +49,17 @@ export const HeaderContainer = () => {
         dispatch(actions.fetchUSRegions())
     }
 
+    const changePage = (pageLocation) => {
+        if(location.pathname !== pageLocation) {
+            dispatch(actions.clearGraphs())
+            history.push('/dashboard')
+        }
+    }
+
     return (
         <Navbar color="dark">
             <Navbar.Brand>
-                <Navbar.Item onClick={() => { history.push('/') }}>
+                <Navbar.Item onClick={() => { changePage('/dashboard') }}>
                     <img src={VirusTrackLogo} alt="" role="presentation" />&nbsp;
                     <Title style={{color: 'white'}} size={5}>Coronavirus COVID-19 Cases</Title>
                 </Navbar.Item>
@@ -60,7 +67,7 @@ export const HeaderContainer = () => {
             </Navbar.Brand>
             <Navbar.Menu>
                 <Navbar.Segment align="start">
-                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/dashboard')}}>Dashboard</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{changePage('/dashboard')}}>Dashboard</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid')}}>Global</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>US States</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>US Regions</Navbar.Item>
