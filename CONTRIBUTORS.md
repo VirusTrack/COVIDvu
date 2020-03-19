@@ -9,6 +9,8 @@ Listed in the order in which they joined this development effort.
 |[kinabalu](https://www.linkedin.com/in/andrewlombardi/)| Andrew Lombardi|
 |[goodwolf](https://www.linkedin.com/in/connorgoodwolf/)| Connor Goodwolf |
 ||[StriderWilson](https://www.linkedin.com/in/strider-wilson/)|Strider Wilson|
+|n/a/d|[Alice Bonasio](https://www.linkedin.com/in/alicebonasio/)|
+|[dermidgen](https://www.linkedin.com/in/dermidgen/)|Danny Graham|
 
 
 ---

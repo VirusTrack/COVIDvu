@@ -92,12 +92,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     return (
         <TwoGraphLayout>
             <>                        
-                    
-                <Level>
-                    <Level.Item>
-                        <Tag size="large" color="danger">Total Cases: {confirmedTotal}</Tag><br />
-                    </Level.Item>
-                </Level>
 
                 <Level>
                     <Level.Item>
@@ -149,6 +143,12 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     y_title='Mortality Rate Percentage'
                 />
             </>
+
+            <Level>
+                <Level.Item>
+                    <Tag size="large" color="danger">Total Cases: {confirmedTotal}</Tag><br />
+                </Level.Item>
+            </Level>
 
             <Column.Group centered>
                 <Column>

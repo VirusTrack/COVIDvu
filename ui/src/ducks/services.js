@@ -22,6 +22,8 @@ import moment from "moment"
 ///////////////////////////////////////////////////////////////////////////////
 
 export const types = {
+    CLEAR_GRAPHS: 'CLEAR_GRAPHS',
+
     FETCH_GLOBAL: 'FETCH_GLOBAL',
     FETCH_GLOBAL_SUCCESS: 'FETCH_GLOBAL_SUCCESS',
     FETCH_GLOBAL_ERROR: 'FETCH_GLOBAL_ERROR',
@@ -45,6 +47,7 @@ export const types = {
 ///////////////////////////////////////////////////////////////////////////////
 
 export const actions = {
+    clearGraphs: createAction(types.CLEAR_GRAPHS),
     fetchGlobal: createAction(types.FETCH_GLOBAL),
     fetchUSStates: createAction(types.FETCH_US_STATES),
     fetchUSRegions: createAction(types.FETCH_US_REGIONS),
@@ -65,6 +68,13 @@ export const initialState = {
 export default function (state = initialState, action) {
     // const message = action && action.error ? action.error.message : null
     switch (action.type) {
+        case types.CLEAR_GRAPHS:
+            return {
+                ...state,
+                global: {},
+                usStates: {},
+                usRegions: {}
+            }
         case types.FETCH_GLOBAL_SUCCESS:
             return {
                 ...state,
@@ -156,7 +166,12 @@ const extractLatestCounts = (stats) => {
 
         const lastDate = dates[dates.length - 1]
 
-        regionWithLatestCounts.push({ region: region, stats: stats[region][lastDate] })
+        const yesterDate = dates[dates.length - 2]
+
+        const currentNumbers = stats[region][lastDate]
+        const yesterdayNumbers = stats[region][yesterDate]
+
+        regionWithLatestCounts.push({ region: region, stats: currentNumbers, dayChange: (currentNumbers - yesterdayNumbers) })
     }
 
     return regionWithLatestCounts
@@ -267,7 +282,9 @@ export function* fetchGlobal() {
                 statsTotals.push({
                     region: region,
                     confirmed: confirmData.stats,
+                    confirmedDayChange: confirmData.dayChange,
                     deaths: deathByCountryKey[region].stats,
+                    deathsDayChange: deathByCountryKey[region].dayChange,
                     recovered: recoveredByCountryKey[region].stats,
                     mortality: mortalityByCountryKey[region].stats,
                     recovery: recoveryByCountryKey[region].stats
@@ -370,7 +387,9 @@ export function* fetchUSStates() {
                 statsTotals.push({
                     region: region,
                     confirmed: confirmData.stats,
+                    confirmedDayChange: confirmData.dayChange,
                     deaths: deathByRegionKey[region].stats,
+                    deathsDayChange: deathByRegionKey[region].dayChange,
                     recovered: recoveredByRegionKey[region].stats,
                     mortality: mortalityByRegionKey[region].stats,
                     recovery: recoveryByRegionKey[region].stats
