@@ -247,6 +247,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                     'predictionsPercentilesTS': predictionsPercentilesTS,
                     'trace':                    trace,
                     'countryTSClean':           countryTSClean,
+                    'countryName':              countryName,
                  }
     return prediction
 
