@@ -180,9 +180,9 @@ def test__dumpPredictionCollectionAsJSON():
         _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
                                         'US',
                                         PREDICTIONS_PERCENTILES,
-                                        join(TEST_SITE_DATA,'test-ts-collection.js'),
+                                        join(TEST_SITE_DATA,'test-ts-collection.json'),
                                         )
-        _assertValidJSON(join(TEST_SITE_DATA, 'test-ts-collection.js'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'test-ts-collection.json'))
     except Exception as e:
         raise e
     finally:
