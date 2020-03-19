@@ -3,42 +3,64 @@
 # vim: set fileencoding=utf-8:
 
 
+from covidvu.pipeline.vuregions import DEFAULT_OUTPUT_JSON_FILE_NAME
 from covidvu.pipeline.vuregions import RegionsAggregator
+
+import os
+
+
+# --- constants ---
+
+TEST_SITE_DATA = './resources/test_pipeline'
 
 
 # +++ tests +++
 
+expectedPath      = None
 regionsAggregator = None    # global object - used in all tests
 
 
 def test_RegionsAggregator_object():
     global regionsAggregator
 
-    regionsAggregator = RegionsAggregator()
+    regionsAggregator = RegionsAggregator(siteData = TEST_SITE_DATA)
 
-    assert len(regionsAggregator.buckets) >= 2
-    assert 'North America' in regionsAggregator.buckets
+    assert 'confirmed' in regionsAggregator.buckets
+    assert 'North America' in regionsAggregator.buckets['confirmed']
     assert regionsAggregator.globalInputDatasets
 
     assert 'confirmed' in regionsAggregator.globalInputDatasets
-    assert 'US' in regionsAggregator.globalInputDatasets['confirmed'].index
+    assert 'Region' in regionsAggregator.globalInputDatasets['confirmed'].index
     dataset = regionsAggregator.globalInputDatasets['confirmed']
-    dataset = dataset[dataset.index == 'US']
-    assert dataset['2020-03-15']['US'] > 0
+    dataset = dataset[dataset.index == 'Region']
+    assert dataset['2020-03-15']['Region'] > 0
 
     assert isinstance(regionsAggregator.globalDatasets, dict)
 
+    continentalRegions = regionsAggregator.buckets
 
-def test_RegionsAggregator_groupContinentalRegions():
-    continentalRegions = regionsAggregator.groupContinentalRegions()
+    assert 'confirmed' in continentalRegions
+    assert 'North America' in continentalRegions['confirmed']
 
-    assert 'North America' in continentalRegions
-    
-    continentalRegion = continentalRegions['North America']
-    for x in continentalRegion.index:
-        print(x)
+    assert isinstance(continentalRegions['confirmed']['Continental Region'], dict)
+    assert len(continentalRegions['confirmed']['Continental Region']) > 0
+
+
+def test_RegionsAggregator_getCanonicalOutputFileName():
+    global expectedPath
+
+    expectedPath = os.path.join(TEST_SITE_DATA, DEFAULT_OUTPUT_JSON_FILE_NAME)
+    assert expectedPath == regionsAggregator.getCanonicalOutputFileName()
+
+
+def test_RegionsAggregator_JSON():
+    regionsAggregator.toJSONFile()
+
+    assert os.path.exists(expectedPath)
+    os.unlink(expectedPath)
 
 
 test_RegionsAggregator_object()
-test_RegionsAggregator_groupContinentalRegions()
+test_RegionsAggregator_getCanonicalOutputFileName()
+test_RegionsAggregator_JSON()
 
