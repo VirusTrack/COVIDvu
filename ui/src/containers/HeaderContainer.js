@@ -76,3 +76,5 @@ export const HeaderContainer = () => {
     )
 
 }
+
+export default HeaderContainer

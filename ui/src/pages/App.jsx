@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { DashboardPage } from './DashboardPage'
+import { PrivacyPolicyPage } from './PrivacyPolicyPage'
 import { CovidGlobalPage } from './CovidGlobalPage'
 import { CovidUSPage } from './CovidUSPage'
 import { CovidUSRegionsPage } from './CovidUSRegionsPage'
@@ -35,6 +36,9 @@ const App = () => (
         </Route>
         <Route path="/about">
             <AboutPage />
+        </Route>
+        <Route path="/privacy">
+            <PrivacyPolicyPage />
         </Route>
         <Route>
             <NotFoundPage />

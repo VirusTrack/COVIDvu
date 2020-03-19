@@ -5,7 +5,7 @@ import { useInterval } from '../hooks/ui'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import {Content, Footer, Tag, Level, Column} from "rbx"
+import {Content, Footer, Tag, Column} from "rbx"
 
 import { CACHE_TIMER } from '../constants'
 
@@ -51,13 +51,13 @@ export const FooterContainer = () =>{
                         <strong><a href="https://github.com/pr3d4t0r/covidvu" target="_new" rel="noopener noreferrer">COVIDvu GitHub</a></strong> Support by: <a href="https://cime.net" target="_new" rel="noopener noreferrer">CIME</a>, <a href="https://mysticcoders.com" target="_new" rel="noopener noreferrer">Mystic Coders</a> and <a href="https://farad.ai" target="_new" rel="noopener noreferrer">Farad.ai</a>
                     </p>
                     <p>
-                        We don't store cookies, so no cookie notice is provided.
+                        <a href="/privacy" rel="noopener noreferrer">Privacy Policy</a>
                     </p>
 
                 </Column>
                 <Column>
                     <p>                    
-                        <img src={CCSAByLogo} /> <br />
+                        <img src={CCSAByLogo} alt="Creative Commons Attribution-ShareAlike 4.0 International license" /> <br />
                         <em>Except where otherwise noted, content on this site is licensed under 
                             the <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_new" rel="noopener noreferrer">Creative Commons Attribution-ShareAlike 4.0 International license.</a>
                             by the COVIDvu Open Source Virus Tracking Team.
@@ -82,3 +82,5 @@ export const FooterContainer = () =>{
         </Footer>
     )
 }
+
+export default FooterContainer
