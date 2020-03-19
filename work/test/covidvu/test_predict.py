@@ -17,23 +17,25 @@ from pandas.core.indexes.datetimes import DatetimeIndex
 from pymc3.backends.base import MultiTrace
 from pymc3.model import Model
 
-from covidvu.predict import predictLogisticGrowth
+from covidvu.predict import _castPredictionsAsTS
+from covidvu.predict import _dumpPredictionCollectionAsJSON
+from covidvu.predict import _dumpTimeSeriesAsJSON
+from covidvu.predict import _getPredictionsFromPosteriorSamples
+from covidvu.predict import _initializeLogisticModel
+from covidvu.predict import _main
 from covidvu.predict import MIN_CASES_FILTER
 from covidvu.predict import PREDICTIONS_PERCENTILES
-from covidvu.predict import _initializeLogisticModel
-from covidvu.predict import _getPredictionsFromPosteriorSamples
-from covidvu.predict import _castPredictionsAsTS
-from covidvu.predict import _dumpTimeSeriesAsJSON
-from covidvu.predict import _dumpPredictionCollectionAsJSON
+from covidvu.predict import predictLogisticGrowth
+from covidvu.predict import PRIOR_GROWTH_RATE
 from covidvu.predict import PRIOR_LOG_CARRYING_CAPACITY
 from covidvu.predict import PRIOR_MID_POINT
-from covidvu.predict import PRIOR_GROWTH_RATE
 from covidvu.predict import PRIOR_SIGMA
+
 
 # *** constants ***
 TEST_JH_CSSE_DATA_HOME      = join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
                                            'csse_covid_19_time_series')
-TEST_SITE_DATA              = join(os.getcwd(), 'resources', 'test-site-data')
+TEST_SITE_DATA              = join(os.getcwd(), 'resources', 'test_site_data')
 TEST_JH_CSSE_FILE_CONFIRMED = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed.csv')
 
 # *** functions ***
@@ -43,8 +45,7 @@ def _purge(purgeDirectory, pattern):
             os.remove(join(purgeDirectory, f))
 
 
-def assertValidJSON(fname):
-    fname = os.path.join(TEST_SITE_DATA, fname)
+def _assertValidJSON(fname):
     assert os.path.exists(fname)
     with open(fname) as f:
         jsonObject = json.load(f)
@@ -165,7 +166,7 @@ def test__dumpTimeSeriesAsJSON():
                    )
     try:
         _dumpTimeSeriesAsJSON(ts, target=join(TEST_SITE_DATA, 'test-ts.json'))
-        assertValidJSON(join(TEST_SITE_DATA,'test-ts.json'))
+        _assertValidJSON(join(TEST_SITE_DATA,'test-ts.json'))
 
     except Exception as e:
         raise e
@@ -181,9 +182,26 @@ def test__dumpPredictionCollectionAsJSON():
                                         PREDICTIONS_PERCENTILES,
                                         join(TEST_SITE_DATA,'test-ts-collection.js'),
                                         )
-        assertValidJSON('test-ts-collection.js')
+        _assertValidJSON(join(TEST_SITE_DATA, 'test-ts-collection.js'))
     except Exception as e:
         raise e
     finally:
         _purge(TEST_SITE_DATA, '.json')
 
+
+def test__main():
+    try:
+        _main(0, siteData=TEST_SITE_DATA,
+              nSamples            = 10,
+              nTune               = 10,
+              nChains             = 1,
+              nBurn               = 0,
+              nDaysPredict        = 10,
+              )
+        _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
+
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')

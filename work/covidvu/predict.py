@@ -4,10 +4,14 @@ import pandas as pd
 from pandas.core.indexes.datetimes import DatetimeIndex
 import pymc3 as pm
 
+from os.path import join
+
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import _dumpJSON
 from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
+from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
+from covidvu.pipeline.vujson import JH_CSSE_FILE_RECOVERED
 
 N_SAMPLES        = 500
 N_TUNE           = 200
@@ -289,20 +293,30 @@ def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
 
 
 def _main(countryTrainIndex,
+          target = 'confirmed',
           predictionsPercentiles = PREDICTIONS_PERCENTILES,
+          siteData               = SITE_DATA,
+          **kwargs
           ):
-    countryTS, predictionsMeanTS, predictionsPercentilesTS, countryName, trace, countryTSClean = predictLogisticGrowth(
+
+    prediction = predictLogisticGrowth(
         countryTrainIndex = countryTrainIndex,
         predictionsPercentiles = predictionsPercentiles,
+        target=target,
+        siteData = siteData,
+        **kwargs
     )
 
-    predictionsMeanTS.name = countryName.replace(' ', '')
-    _dumpTimeSeriesAsJSON(predictionsMeanTS, 'prediction-mean-%s.json' % predictionsMeanTS.name)
+    prediction['predictionsMeanTS'].name = prediction['countryName'].replace(' ', '')
+    _dumpTimeSeriesAsJSON(prediction['predictionsMeanTS'],
+                          join(siteData, 'prediction-mean-%s.json' % prediction['predictionsMeanTS'].name),
+                         )
 
-    _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
-                                    predictionsMeanTS.name,
+    _dumpPredictionCollectionAsJSON(prediction['predictionsPercentilesTS'],
+                                    prediction['predictionsMeanTS'].name,
                                     predictionsPercentiles,
-                                    'prediction-conf-int-%s.json' % predictionsMeanTS.name)
+                                    join(siteData, 'prediction-conf-int-%s.json' % prediction['predictionsMeanTS'].name),
+                                   )
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:

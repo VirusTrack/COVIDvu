@@ -146,6 +146,7 @@ dmypy.json
 **rclone.conf
 **run.env
 **site-data*
+!work/resources/test_site_data/
 *swp
 .viminfo
 work/*.json
