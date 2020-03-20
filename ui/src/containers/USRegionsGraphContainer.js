@@ -17,7 +17,7 @@ import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import GraphWithLoader from '../components/GraphWithLoader'
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
-import store from 'store'
+import store from 'store2'
 
 export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
     const dispatch = useDispatch()
@@ -42,7 +42,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     }, [dispatch])
 
     useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
             dispatch(actions.fetchUSRegions())
         }
     }, ONE_MINUTE)
@@ -66,10 +66,12 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     useEffect(() => {
         if(confirmed) {
             const totalRegions = Object.values(confirmed['!Total US'])
-            const unassignedRegions = Object.values(confirmed['Unassigned'])
-
             setConfirmedTotal(totalRegions[totalRegions.length - 1])
-            setUnassignedCases(unassignedRegions[unassignedRegions.length - 1])
+
+            if(confirmed.hasOwnProperty('Unassigned')) {
+                const unassignedRegions = Object.values(confirmed['Unassigned'])
+                setUnassignedCases(unassignedRegions[unassignedRegions.length - 1])
+            }
         }
     }, [confirmed])    
 

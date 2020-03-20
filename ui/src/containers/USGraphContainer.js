@@ -21,7 +21,7 @@ import SelectRegionComponent from '../components/SelectRegionComponent'
 
 import numeral from 'numeral'
 
-import store from 'store'
+import store from 'store2'
 
 export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
 
@@ -61,7 +61,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
     }, [dispatch])
 
     useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
             dispatch(actions.fetchUSStates())
         }
     }, ONE_MINUTE)

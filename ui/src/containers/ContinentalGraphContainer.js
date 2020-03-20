@@ -10,21 +10,19 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Level } from "rbx"
+import { Tab, Level } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
-import { COUNTRIES, CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
-
-import numeral from 'numeral'
+import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 
 import store from 'store2'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
-export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'Cases'}) => {
+export const ContinentalGraphContainer = ({continent = ['North America', 'Europe', 'Asia'], graph = 'Cases'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -32,52 +30,34 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
 
     const [width, height] = useWindowSize()
 
-    const [selectedCountries, setSelectedCountries] = useState(country)
+    const [selectedContinents, setSelectedContinents] = useState(continent)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
-    const confirmed = useSelector(state => state.services.global.confirmed)
-    const sortedConfirmed = useSelector(state => state.services.global.sortedConfirmed)
-    const deaths = useSelector(state => state.services.global.deaths)
-    const mortality = useSelector(state => state.services.global.mortality)
-
-    const [confirmedTotal, setConfirmedTotal] = useState(0)
-    const [totalCountries, setTotalCountries] = useState(0)
-
-    const COUNTRY_COUNT = Object.keys(COUNTRIES).length - 2
+    const confirmed = useSelector(state => state.services.continental.confirmed)
+    const sortedConfirmed = useSelector(state => state.services.continental.sortedConfirmed)
+    const deaths = useSelector(state => state.services.continental.deaths)
+    const mortality = useSelector(state => state.services.continental.mortality)
 
     /**
      * Fetch all the data
      */
     useEffect(() => {
-        dispatch(actions.fetchGlobal())
+        dispatch(actions.fetchContinental())
     }, [dispatch])
 
 
     useInterval(() => {
-        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchGlobal())
+        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+            dispatch(actions.fetchContinental())
         }
     }, ONE_MINUTE)
 
     useEffect(() => {
         if(!search) {
-            handleHistory(selectedCountries, secondaryGraph)
+            handleHistory(selectedContinents, secondaryGraph)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-
-    const renderCaseTags = () => {        
-        if(selectedCountries.indexOf('!Global') !== -1) {
-            return (
-                <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
-            )
-        } else {
-            return (
-                <Tag size="large" color="danger">Selected Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
-            )
-        }
-    }
 
     const handleHistory = (region, graph) => {
         const query = queryString.stringify({
@@ -85,41 +65,17 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
             graph
         })
 
-        history.replace(`/covid?${query}`)
+        history.replace(`/covid/continental?${query}`)
     }
 
-    useEffect(() => {
-        if(confirmed) {
-
-            let theConfirmedTotal = 0
-
-            for(let confirm of sortedConfirmed) {
-                if(confirm.region === '!Global') {
-                    theConfirmedTotal += confirm.stats
-                }
-            }
-            setConfirmedTotal(theConfirmedTotal)
-
-            let confirmedCountries = 0
-            for(const country of Object.keys(confirmed)) {
-                const total = Object.values(confirmed[country]).reduce((total, value) => total + value)
-                
-                if(total > 0 && country !== '!Global' && country !== '!Outside Mainland China') {
-                    ++confirmedCountries
-                }
-            }
-            setTotalCountries(confirmedCountries)
-        }
-    }, [confirmed, selectedCountries, sortedConfirmed])
-
     const handleSelectedRegion = (regionList) => {
-        setSelectedCountries(regionList)
+        setSelectedContinents(regionList)
         handleHistory(regionList, secondaryGraph)
     }
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
-        handleHistory(selectedCountries, selectedGraph)
+        handleHistory(selectedContinents, selectedGraph)
     }
     
     if(!sortedConfirmed) {
@@ -135,7 +91,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     <Level.Item>
                         <SelectRegionComponent
                             data={sortedConfirmed}
-                            selected={selectedCountries}
+                            selected={selectedContinents}
                             handleSelected={dataList => handleSelectedRegion(dataList)} />
                     </Level.Item>                        
                 </Level>
@@ -154,7 +110,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     graph={confirmed}
                     width={width}
                     height={height}
-                    selected={selectedCountries}
+                    selected={selectedContinents}
                     y_title="Total confirmed cases"
                 />
 
@@ -164,7 +120,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     graph={deaths}
                     width={width}
                     height={height}
-                    selected={selectedCountries}
+                    selected={selectedContinents}
                     y_title="Number of deaths"
                 />        
 
@@ -174,7 +130,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                     graph={mortality}
                     width={width}
                     height={height}
-                    selected={selectedCountries}
+                    selected={selectedContinents}
                     y_type="percent"
                     y_title="Mortality Rate Percentage"
                 />
@@ -182,21 +138,11 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
             </>
 
             <>
-                <Level>
-                    <Level.Item>
-                        {renderCaseTags()}
-                    </Level.Item>
-                </Level>
 
-                <Level>
-                    <Level.Item>
-                        <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br /><br />
-                    </Level.Item>
-                </Level>
             </>
 
         </TwoGraphLayout>
     )    
 }
 
-export default GlobalGraphContainer
+export default ContinentalGraphContainer
