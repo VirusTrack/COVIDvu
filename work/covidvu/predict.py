@@ -93,7 +93,7 @@ def _getPredictionsFromPosteriorSamples(t,
 
     tPredict = np.arange(len(t) + nDaysPredict)
 
-    predictions = np.zeros((len(t)+nDaysPredict, nSamples))
+    predictions = np.zeros((len(t)+nDaysPredict, nSamples - nBurn))
 
     for i in range(len(trace[nBurn:])):
         carryingCap = 10 ** trace['logCarryingCapacity'][nBurn+i]
@@ -248,7 +248,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                     'countryTSClean':           countryTSClean,
                     'countryName':              countryName,
                  }
-    set_trace()
+
     return prediction
 
 
