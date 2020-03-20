@@ -1,19 +1,26 @@
-import urllib
-import json
-import pandas as pd
-from tqdm.auto import tqdm
-from covidvu.pipeline.vujson import _dumpJSON
+#!/usr/bin/env python3
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
 
-import os
-from os.path import join
 
 from os.path import join
 from time import sleep
+from tqdm.auto import tqdm
+
+from covidvu.pipeline.vujson import SITE_DATA
+from covidvu.pipeline.vujson import dumpJSON
+
+import json
+import os
+import urllib
+
+import pandas as pd
+
 
 # *** constants ***
+
 STATE_CODES_PATH = join(os.getcwd(), 'stateCodesUS.csv')
-SITE_DATA               = './site-data'
-OUT_FILE_NAME = 'hospital_bed_count.json'
+OUT_FILE_NAME    = 'hospital-beds-count-US.json'
 
 
 def resolveFileName(siteDataDirectory, outFileName):
@@ -48,9 +55,10 @@ def _main(siteDataDirectory = SITE_DATA,
     postCodes = pd.read_csv(STATE_CODES_PATH)
     bedCount = _getTotalBedCount(postCodes, nStateLimit=nStateLimit)
 
-    _dumpJSON(bedCount, resolveFileName(siteDataDirectory, outFileName))
+    dumpJSON(bedCount, resolveFileName(siteDataDirectory, outFileName))
 
 
 # *** main ***
+
 if '__main__' == __name__:
     _main()

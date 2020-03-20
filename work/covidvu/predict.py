@@ -7,7 +7,7 @@ import pymc3 as pm
 from os.path import join
 
 from covidvu.pipeline.vujson import parseCSSE
-from covidvu.pipeline.vujson import _dumpJSON
+from covidvu.pipeline.vujson import dumpJSON
 from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
 from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
@@ -264,7 +264,7 @@ def _dumpTimeSeriesAsJSON(timeSeries, target = None):
                        }
 
     if target:
-        _dumpJSON(result, target)
+        dumpJSON(result, target)
 
     return result
 
@@ -288,7 +288,7 @@ def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
         countryName: result
     }
     if target:
-        _dumpJSON(result, target)
+        dumpJSON(result, target)
 
     return result
 
