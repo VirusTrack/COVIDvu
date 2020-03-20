@@ -32,7 +32,9 @@ def _getTotalBedsForPostalCode(postalCode):
     return totalBeds
 
 
-def _getTotalBedCount(postCodes):
+def _getTotalBedCount(postCodes, nStateLimit = None):
+    if nStateLimit:
+        postCodes = postCodes.iloc[:nStateLimit, :]
     bedCount = {}
     for n, row in tqdm(postCodes.iterrows(), total=postCodes.shape[0]):
         bedCount[row['state']] = _getTotalBedsForPostalCode(row['postalCode'])
@@ -41,9 +43,10 @@ def _getTotalBedCount(postCodes):
 
 def _main(siteDataDirectory = SITE_DATA,
           outFileName = OUT_FILE_NAME,
+          nStateLimit = None,
           ):
     postCodes = pd.read_csv(STATE_CODES_PATH)
-    bedCount = _getTotalBedCount(postCodes)
+    bedCount = _getTotalBedCount(postCodes, nStateLimit=nStateLimit)
 
     _dumpJSON(bedCount, resolveFileName(siteDataDirectory, outFileName))
 
