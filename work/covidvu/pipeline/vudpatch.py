@@ -64,8 +64,6 @@ def _fetchCurrentUpdates(columnRef, index = 'WORLD'):
                 continue
             if 'Diamond' not in row[index]:
                 try:
-                    if ref == 'TOTAL':
-                        x = float(row[columnRef])
                     bodyCount = float(row[columnRef]) if row[columnRef] != '' else 0.0
                 except:
                     bodyCount = 0.0
