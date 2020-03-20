@@ -329,9 +329,9 @@ def allUSCases(cases):
     return casesByStateUS, casesByRegionUS
 
 
-def _dumpJSON(cases, target):
+def _dumpJSON(outputDict, target):
     with open(target, 'w') as outputJSON:
-        json.dump(cases, outputJSON, ensure_ascii = False)
+        json.dump(outputDict, outputJSON, ensure_ascii = False)
 
 
 def dumpGlobalCasesAsJSONFor(cases, target = None, indent = 2):
