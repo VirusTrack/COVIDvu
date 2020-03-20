@@ -9,9 +9,8 @@ from os.path import join
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import _dumpJSON
 from covidvu.pipeline.vujson import SITE_DATA
-from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
-from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
-from covidvu.pipeline.vujson import JH_CSSE_FILE_RECOVERED
+
+from pdb import set_trace
 
 N_SAMPLES        = 500
 N_TUNE           = 200
@@ -249,6 +248,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                     'countryTSClean':           countryTSClean,
                     'countryName':              countryName,
                  }
+    set_trace()
     return prediction
 
 
