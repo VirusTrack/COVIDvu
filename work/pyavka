@@ -13,9 +13,11 @@ RAW_DATA_SOURCE="https://docs.google.com/spreadsheets/d/e/2PACX-1vR30F8lYP3jG7YO
 # ::: functions :::
 
 function fetchBNODataSource {
+    echo "-----"
     curl -s "$RAW_DATA_SOURCE" | \
         awk '/<table/ { gsub("<table", "\n<table"); gsub("/table>", "/table>\n"); print; }' | \
         awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
+    echo "+++++"
 } # fetchBNODataSource
 
 
