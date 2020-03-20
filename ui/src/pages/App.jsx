@@ -3,6 +3,7 @@ import React from 'react'
 import { DashboardPage } from './DashboardPage'
 import { PrivacyPolicyPage } from './PrivacyPolicyPage'
 import { CovidGlobalPage } from './CovidGlobalPage'
+import { CovidContinentalPage } from './CovidContinentalPage'
 import { CovidUSPage } from './CovidUSPage'
 import { CovidUSRegionsPage } from './CovidUSRegionsPage'
 import { StatsPage } from './StatsPage'
@@ -27,6 +28,9 @@ const App = () => (
         </Route>
         <Route path="/covid/us">
             <CovidUSPage />
+        </Route>
+        <Route path="/covid/continental">
+            <CovidContinentalPage />
         </Route>
         <Route path="/covid">
             <CovidGlobalPage />

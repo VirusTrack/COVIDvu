@@ -8,7 +8,7 @@ import { useWindowSize, useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Column, Tag, Message, Tab, Notification, Level } from "rbx"
+import { Hero, Title, Container, Box, Column, Tag, Message, Tab, Notification, Level } from "rbx"
 
 import { CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
@@ -17,7 +17,7 @@ import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import GraphWithLoader from '../components/GraphWithLoader'
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
-import store from 'store'
+import store from 'store2'
 
 export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
     const dispatch = useDispatch()
@@ -42,7 +42,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     }, [dispatch])
 
     useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
             dispatch(actions.fetchUSRegions())
         }
     }, ONE_MINUTE)
@@ -66,10 +66,12 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     useEffect(() => {
         if(confirmed) {
             const totalRegions = Object.values(confirmed['!Total US'])
-            const unassignedRegions = Object.values(confirmed['Unassigned'])
-
             setConfirmedTotal(totalRegions[totalRegions.length - 1])
-            setUnassignedCases(unassignedRegions[unassignedRegions.length - 1])
+
+            if(confirmed.hasOwnProperty('Unassigned')) {
+                const unassignedRegions = Object.values(confirmed['Unassigned'])
+                setUnassignedCases(unassignedRegions[unassignedRegions.length - 1])
+            }
         }
     }, [confirmed])    
 
@@ -83,15 +85,36 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
         handleHistory(selectedRegions, selectedGraph)
     }    
 
+    const HeroElement = (props) => {
+        return (
+            <Hero size="medium">
+                <Hero.Body>
+                <Container>
+                    <Title size={1}>Coronavirus Cases <br/>by U.S. Region</Title>
+                </Container>
+                </Hero.Body>
+            </Hero>
+        )
+    }
+
     if(!sortedConfirmed) {
         return (
-            <h1>Loading...</h1>
+        <>
+            <HeroElement />
+            <Box>
+                <h1>Loading...</h1>
+            </Box>
+        </>
         )
     }
 
     return (
+        <>  
+        <HeroElement/>
+        
+        <Box>
         <TwoGraphLayout>
-            <>                        
+                                 
 
                 <Level>
                     <Level.Item>
@@ -102,7 +125,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     </Level.Item>
                 </Level>
 
-            </>
+           
 
             <>
                 <Tab.Group>
@@ -171,18 +194,15 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                 </Column>                
             </Column.Group>
 
-            <>
-                <Level>
-                    <Level.Item>
-                        <Notification color="warning">
-                            The sum of all regions may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
-                        </Notification>
-                    </Level.Item>
-                </Level>
-            </>
+            
+            <Notification color="warning">
+                The sum of all regions may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
+            </Notification>
+            
 
         </TwoGraphLayout>
-
+        </Box>
+        </>
     )
 }
 

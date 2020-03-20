@@ -27,12 +27,22 @@ body
     @media screen and (min-width: 700px)
       background-size: 150vw
 
+a 
+  color: #{$primary}
+  &:hover 
+    color: #{$secondary}
+
+p 
+  color: hsla(189,4,47,1)
 
 code 
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace
 
 
 .hero
+  @media screen and (min-width: 1024px)
+    .buttons .button:not(:last-child)
+      margin-right: 1rem
   @media screen and (max-width: 1025px)
     text-align: center
     align-content: center
@@ -119,6 +129,11 @@ code
   border: 0
   box-shadow: #{$drop-shadow-large}
   border-radius: 1rem
+  position: relative
+  z-index: 2
+  overflow: hidden
+  .notification 
+    border-bottom: .1rem solid #{$offwhite}
   &:not(:last-child)
     margin-bottom: 5rem
   .buttons 
@@ -126,6 +141,8 @@ code
     margin: auto
     display: block
     background: #F4F5F8
+    border-bottom-left-radius: .5rem
+    border-bottom-right-radius: .5rem
   > *:not(hr)
     padding: 1.5rem 2rem
   > .title:first-child
@@ -167,9 +184,25 @@ hr
   &.is-secondary
     background-color: #{$primary}
   &.is-large
-    padding: 2rem 4rem 
+    padding: 0rem 4rem
+    min-height: 4rem 
     box-shadow: #{$drop-shadow-large}
 
+.chart > .title:first-of-type 
+  margin-bottom: 2rem
 
 .footer 
-  background: transparent
+  padding: 47rem 2rem 20rem 2rem
+  margin-top: -35rem
+  background: url('./images/footer.svg') center bottom no-repeat
+  background-position: center bottom
+  min-height: 80rem
+  z-index: 1
+  position: relative
+  .tag 
+    font-size: 1.2rem
+    margin-right: 2rem
+    background-color: #{$secondary}
+    color: white
+  p
+    margin-bottom: 2rem

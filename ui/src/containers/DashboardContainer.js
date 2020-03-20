@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -12,34 +12,54 @@ import { Hero, Tag, Title, Level, Heading, Container, Button, Box, Column } from
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
-import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
+import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_CONTINENTAL_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
 import numeral from 'numeral'
 
-import store from 'store'
+import store from 'store2'
 
 import moment from 'moment'
 
 export const DashboardContainer = () => {
 
+    const session = store.session
     const dispatch = useDispatch()
     const history = useHistory()
 
     useEffect(() => {
-        dispatch(actions.fetchGlobal())
-        dispatch(actions.fetchUSStates())
+        console.log("Same ")
+    }, [])
+
+    useEffect(() => {
+        dispatch(actions.fetchTop10Countries({
+            excludeChina: true
+        }))
+        dispatch(actions.fetchTotalGlobalStats())
+
+        dispatch(actions.fetchTop10USStates())
+        dispatch(actions.fetchTotalUSStatesStats())
+
         dispatch(actions.fetchUSRegions())
+        dispatch(actions.fetchContinental())
+
     }, [dispatch])
 
     useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchGlobal())
+        if(session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+            dispatch(actions.fetchTop10Countries({
+                excludeChina: true
+            }))
+            dispatch(actions.fetchTotalGlobalStats())
         }
-        if(store.get(CACHE_INVALIDATE_US_STATES_KEY)) {
-            dispatch(actions.fetchUSStates())
+        if(session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+            dispatch(actions.fetchTop10USStates())
+            dispatch(actions.fetchTotalUSStatesStats())
         }
-        if(store.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
+        if(session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
             dispatch(actions.fetchUSRegions())
+        }
+        if(session.get(CACHE_INVALIDATE_CONTINENTAL_KEY)) {
+            dispatch(actions.fetchContinental())
         }
     }, ONE_MINUTE)
 
@@ -47,77 +67,18 @@ export const DashboardContainer = () => {
 
     const [width, height] = useWindowSize()
 
-    const [globalTotal, setGlobalTotal] = useState({
-        confirmed: 0,
-        deaths: 0,
-        mortality: 0,
-        recovered: 0,
-        recovery: 0,
-        newConfirmed: 0,
-        newDeaths: 0
-    })
-
-    const [usTotal, setUSTotal] = useState({
-        confirmed: 0,
-        deaths: 0,
-        mortality: 0,
-        recovered: 0,
-        recovery: 0
-    })
-
     useEffect(() => {
         dispatch(actions.fetchLastUpdate())
     }, [dispatch])
 
-    const confirmed = useSelector(state => state.services.global.confirmed)
-    const confirmedUS = useSelector(state => state.services.usStates.confirmed)
+    const globalTop10 = useSelector(state => state.services.globalTop10)
+    const globalStats = useSelector(state => state.services.totalGlobalStats)
+    
+    const usStatesTop10 = useSelector(state => state.services.usStatesTop10)
+    const usStatesStats = useSelector(state => state.services.totalUSStatesStats)
+    
     const confirmedUSRegions = useSelector(state => state.services.usRegions.confirmed)
-
-    const statsTotals = useSelector(state => state.services.global.statsTotals)
-    const usStatsTotals = useSelector(state => state.services.usStates.statsTotals)
-
-    useEffect(() => {
-
-        if(statsTotals) {
-
-            const byRegion = statsTotals.reduce((obj, item) => {
-                obj[item.region] = item
-                return obj
-            }, {})
-
-            // setGlobalTotalsByRegion(byRegion)
-            setGlobalTotal({
-                confirmed: byRegion['!Global'].confirmed,
-                deaths: byRegion['!Global'].deaths,
-                mortality: byRegion['!Global'].mortality,
-                recovered: byRegion['!Global'].recovered,
-                recovery: byRegion['!Global'].recovery,
-                newConfirmed: byRegion['!Global'].confirmedDayChange,
-                newDeaths: byRegion['!Global'].deathsDayChange,
-            })
-        }
-    }, [statsTotals])
-
-    useEffect(() => {
-
-        if(usStatsTotals) {
-            const byRegion = usStatsTotals.reduce((obj, item) => {
-                obj[item.region] = item
-                return obj
-            }, {})
-
-            // setUSTotalsByRegion(byRegion)
-            setUSTotal({
-                confirmed: byRegion['!Total US'].confirmed,
-                deaths: byRegion['!Total US'].deaths,
-                mortality: byRegion['!Total US'].mortality,
-                recovered: byRegion['!Total US'].recovered,
-                recovery: byRegion['!Total US'].recovery,
-                newConfirmed: byRegion['!Total US'].confirmedDayChange,
-                newDeaths: byRegion['!Total US'].deathsDayChange,
-            })
-        }
-    }, [usStatsTotals])
+    const confirmedContinental = useSelector(state => state.services.continental.confirmed)
 
     const renderChangeDifference = (value) => {
         
@@ -131,23 +92,28 @@ export const DashboardContainer = () => {
         )
     }
 
+    const HeroElement = (props) => {
+        return (
+            <Hero size="medium">
+                <Hero.Body>
+                <Container>
+                    <Title size={1}>Coronavirus <br/>COVID-19 Cases</Title>
+                    <Button.Group>
+                        <Button size="large" color="primary">Global</Button>
+                        <Button size="large" color="primary">United States</Button>
+                    </Button.Group>
+                    { lastUpdate && 
+                            <Tag as="p">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
+                        }
+                </Container>
+                </Hero.Body>
+            </Hero>
+        )
+    }
+
     return (
         <>
-        <Hero size="medium">
-            <Hero.Body>
-            <Container>
-                <Title size={1}>Coronavirus <br/>COVID-19 Cases</Title>
-                <Button.Group>
-                    <Button size="large" color="primary">Global</Button>
-                    <Button size="large" color="primary">United States</Button>
-                </Button.Group>
-                { lastUpdate && 
-                        <Tag as="p">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
-                    }
-            </Container>
-            </Hero.Body>
-        </Hero>
-       
+        <HeroElement />
         <Box>
 
             <Title size={4}>Today's Global Totals</Title>
@@ -159,7 +125,7 @@ export const DashboardContainer = () => {
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Total Cases</Heading>
-                        <Title as="p">{numeral(globalTotal.confirmed).format('0,0')}</Title>
+                        <Title as="p">{numeral(globalStats.confirmed).format('0,0')}</Title>
                         </div>
                     </Level.Item>
                     
@@ -169,13 +135,13 @@ export const DashboardContainer = () => {
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Total Deaths</Heading>
-                        <Title as="p">{numeral(globalTotal.deaths).format('0,0')}</Title>
+                        <Title as="p">{numeral(globalStats.deaths).format('0,0')}</Title>
                         </div>
                     </Level.Item>
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>New Cases (as of today)</Heading>
-                        { renderChangeDifference(globalTotal.newConfirmed)}
+                        { renderChangeDifference(globalStats.newConfirmed)}
                         </div>
                     </Level.Item>
                 </Level>
@@ -185,14 +151,14 @@ export const DashboardContainer = () => {
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Recovered</Heading>
-                        <Title as="p">{numeral(globalTotal.recovered).format('0,0')}</Title>
+                        <Title as="p">{numeral(globalStats.recovered).format('0,0')}</Title>
                         </div>
                     </Level.Item>
 
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>New Deaths (as of today)</Heading>
-                        { renderChangeDifference(globalTotal.newDeaths)}
+                        { renderChangeDifference(globalStats.newDeaths)}
                         </div>
                     </Level.Item>
                 </Level>
@@ -201,13 +167,13 @@ export const DashboardContainer = () => {
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Recovery Rate</Heading>
-                        <Title as="p">{numeral(globalTotal.recovery).format('0.0 %')}</Title>
+                        <Title as="p">{numeral(globalStats.recovery).format('0.0 %')}</Title>
                         </div>
                     </Level.Item>
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Mortality Rate</Heading>
-                        <Title as="p">{numeral(globalTotal.mortality).format('0.0 %')}</Title>
+                        <Title as="p">{numeral(globalStats.mortality).format('0.0 %')}</Title>
                         </div>
                     </Level.Item>
                 </Level>
@@ -228,7 +194,7 @@ export const DashboardContainer = () => {
                         <GraphWithLoader 
                             graphName="Top 10 Confirmed Cases"
                             secondaryGraph="Top 10 Confirmed Cases"
-                            graph={confirmed}
+                            graph={globalTop10}
                             width={width}
                             height={height}
                             selected={['Italy', 'Iran', 'Korea, South', 'Spain', 'Germany', 'France', 'US', 'Switzerland', 'United Kingdom', 'Netherlands']}
@@ -237,13 +203,36 @@ export const DashboardContainer = () => {
                 </Level>
             </Container>
             </Level.Item>
-            </Level>
-            <hr />
+
+            <Level.Item>
+                <Container className="chart">
+                    <Title size={2} align="center">
+                        <Heading align="center">Top 10 Confirmed</Heading>
+                        Cases by Continent
+                    </Title>
+
+                    <Level>
+                        <Level.Item>
+                            <GraphWithLoader 
+                                graphName="continental_graph"
+                                secondaryGraph="continental_graph"
+                                graph={confirmedContinental}
+                                width={width}
+                                height={height}
+                                selected={['North America', 'Asia', 'Europe', 'South America']}
+                            />
+                        </Level.Item>
+                    </Level>
+
+                </Container>
+            </Level.Item>
+        </Level>
 
             <Button.Group align="center">
                 <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid')}}>Compare Country Stats</Button>
+                <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Compare Continental Stats</Button>
             </Button.Group>
-
+            
         </Box>
         <Box>
 
@@ -256,7 +245,7 @@ export const DashboardContainer = () => {
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Total Cases</Heading>
-                        <Title as="p">{numeral(usTotal.confirmed).format('0,0')}</Title>
+                        <Title as="p">{numeral(usStatesStats.confirmed).format('0,0')}</Title>
                         </div>
                     </Level.Item>
                     
@@ -266,13 +255,13 @@ export const DashboardContainer = () => {
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Total Deaths</Heading>
-                        <Title as="p">{numeral(usTotal.deaths).format('0,0')}</Title>
+                        <Title as="p">{numeral(usStatesStats.deaths).format('0,0')}</Title>
                         </div>
                     </Level.Item>
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>New Cases (as of today)</Heading>
-                        { renderChangeDifference(usTotal.newConfirmed)}
+                        { renderChangeDifference(usStatesStats.newConfirmed)}
                         </div>
                     </Level.Item>
                 </Level>
@@ -282,14 +271,14 @@ export const DashboardContainer = () => {
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Recovered</Heading>
-                        <Title as="p">{numeral(usTotal.recovered).format('0,0')}</Title>
+                        <Title as="p">{numeral(usStatesStats.recovered).format('0,0')}</Title>
                         </div>
                     </Level.Item>
 
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>New Deaths (as of today)</Heading>
-                        { renderChangeDifference(usTotal.newDeaths)}
+                        { renderChangeDifference(usStatesStats.newDeaths)}
                         </div>
                     </Level.Item>
                 </Level>
@@ -298,13 +287,13 @@ export const DashboardContainer = () => {
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Recovery Rate</Heading>
-                        <Title as="p">{numeral(usTotal.recovery).format('0.0 %')}</Title>
+                        <Title as="p">{numeral(usStatesStats.recovery).format('0.0 %')}</Title>
                         </div>
                     </Level.Item>
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Mortality Rate</Heading>
-                        <Title as="p">{numeral(usTotal.mortality).format('0.0 %')}</Title>
+                        <Title as="p">{numeral(usStatesStats.mortality).format('0.0 %')}</Title>
                         </div>
                     </Level.Item>
                 </Level>
@@ -320,7 +309,7 @@ export const DashboardContainer = () => {
                         <GraphWithLoader 
                             graphName="Top 10 Confirmed Cases"
                             secondaryGraph="Top 10 Confirmed Cases"
-                            graph={confirmedUS}
+                            graph={usStatesTop10}
                             width={width}
                             height={height}
                             selected={['New York', 'Washington', 'California', 'Massachusetts', 'New Jersey', 'Colorado', 'Florida', 'Louisiana', 'Georgia', 'Illinois']}

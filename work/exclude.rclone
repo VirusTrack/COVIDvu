@@ -1,8 +1,10 @@
+*csv
+*html
 *swp
+*tsv
 .git/**
 .gitignore
 README.md
 bucket-policy.json
 exclude.rclone
 rclone.conf
-

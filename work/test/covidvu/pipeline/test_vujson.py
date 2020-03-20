@@ -32,7 +32,7 @@ TEST_JH_CSSE_FILE_CONFIRMED = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_
 TEST_JH_CSSE_FILE_DEATHS    = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Deaths.csv')
 TEST_JH_CSSE_FILE_RECOVERED = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Recovered.csv')
 TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
-TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test-site-data')
+TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test_site_data')
 
 # *** functions ***
 def _purge(purgeDirectory, pattern):
@@ -138,8 +138,9 @@ def assertValidJSON(fname):
     fname = os.path.join(TEST_SITE_DATA, fname)
     assert os.path.exists(fname)
     with open(fname) as f:
-        casesUSRegions = json.load(f)
-    assert isinstance(casesUSRegions, dict)
+        jsonObject = json.load(f)
+    assert isinstance(jsonObject, dict)
+    assert len(jsonObject.keys()) > 0
 
 def test_parseCSSE():
     try:

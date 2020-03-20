@@ -8,9 +8,13 @@ Listed in the order in which they joined this development effort.
 |[jaryaman](https://www.linkedin.com/in/juvid-aryaman/)| Dr. Juvid Aryaman|
 |[kinabalu](https://www.linkedin.com/in/andrewlombardi/)| Andrew Lombardi|
 |[goodwolf](https://www.linkedin.com/in/connorgoodwolf/)| Connor Goodwolf |
-||[StriderWilson](https://www.linkedin.com/in/strider-wilson/)|Strider Wilson|
-|n/a/d|[Alice Bonasio](https://www.linkedin.com/in/alicebonasio/)|
+|[StriderWilson](https://www.linkedin.com/in/strider-wilson/)|Strider Wilson|
+|n/a/d*|[Alice Bonasio](https://www.linkedin.com/in/alicebonasio/)|
 |[dermidgen](https://www.linkedin.com/in/dermidgen/)|Danny Graham|
+|[mangosense](https://www.linkedin.com/in/jaggs83/)|Jagdish Repaswal|
+|[lukemarohn](https://www.linkedin.com/in/lucasmarohn/)|Lucas Marohn|
+
+&#42; _Not a developer_
 
 
 ---

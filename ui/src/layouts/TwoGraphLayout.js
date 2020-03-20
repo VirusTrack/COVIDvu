@@ -8,13 +8,10 @@ export const TwoGraphLayout = ({ children }) => {
     return (
         <>
 
-            <Column.Group gapless>
-                <Column>
-                    <Notification>
-                        <p>Compare specific regions using the multi-select below. Ctrl or Cmd-click to select multiple regions.</p>
-                    </Notification>
-                </Column>
-            </Column.Group>
+        <Notification>
+            <p>Compare specific regions using the multi-select below. Ctrl or Cmd-click to select multiple regions.</p>
+        </Notification>
+            
 
             <Column.Group gapless>
                 <Column size={3}>

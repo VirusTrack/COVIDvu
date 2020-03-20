@@ -9,7 +9,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Notification, Generic, Title, Level } from "rbx"
+import { Hero, Container, Box, Tag, Tab, Notification, Generic, Title, Level } from "rbx"
 
 import { REGION_URLS, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
@@ -21,7 +21,7 @@ import SelectRegionComponent from '../components/SelectRegionComponent'
 
 import numeral from 'numeral'
 
-import store from 'store'
+import store from 'store2'
 
 export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
 
@@ -61,7 +61,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
     }, [dispatch])
 
     useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
             dispatch(actions.fetchUSStates())
         }
     }, ONE_MINUTE)
@@ -102,14 +102,34 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
         handleHistory(selectedStates, graph)
     }
 
+    const HeroElement = (props) => {
+        return (
+            <Hero size="medium">
+            <Hero.Body>
+            <Container>
+                <Title size={1}>Coronavirus <br/>COVID-19 US States</Title>
+            </Container>
+            </Hero.Body>
+        </Hero>
+        )
+    }
+
 
     if(!sortedConfirmed) {
         return (
-            <h1>Loading...</h1>
+            <>
+            <HeroElement />
+            <Box>
+                <h1>Loading...</h1>
+            </Box>
+            </>
         )
     }
 
     return (
+        <>
+        <HeroElement />
+        <Box>
         <TwoGraphLayout>
             <>
                 <Level>
@@ -198,7 +218,8 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                 </Level>
             </>
         </TwoGraphLayout>
-
+        </Box>
+        </>
     )
 }
 

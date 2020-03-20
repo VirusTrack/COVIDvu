@@ -4,8 +4,14 @@ import pandas as pd
 from pandas.core.indexes.datetimes import DatetimeIndex
 import pymc3 as pm
 
+from os.path import join
+
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import _dumpJSON
+from covidvu.pipeline.vujson import SITE_DATA
+from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
+from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
+from covidvu.pipeline.vujson import JH_CSSE_FILE_RECOVERED
 
 N_SAMPLES        = 500
 N_TUNE           = 200
@@ -127,7 +133,7 @@ def _castPredictionsAsTS(countryTSClean,
                                     start = countryTSClean.index[0],
                                     end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                                  ),
-            data=qLow,
+            data  = qLow,
         )
 
         predictionsHigh = pd.Series(
@@ -135,7 +141,7 @@ def _castPredictionsAsTS(countryTSClean,
                                     start = countryTSClean.index[0],
                                     end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                                  ),
-            data=qHigh,
+            data  = qHigh,
         )
         predictionsPercentilesTS.append([predictionsLow, predictionsHigh])
 
@@ -157,6 +163,8 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                           priorSigma                    = PRIOR_SIGMA,
                           predictionsPercentiles        = PREDICTIONS_PERCENTILES,
                           init                          = None,
+                          randomSeed                    = 2020,
+                          **kwargs
                           ):
     """Predict the country with the nth highest number of cases
 
@@ -178,18 +186,19 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     priorSigma: Bounds for the uniform prior for sigma
     predictionsPercentiles: Bayesian confidence intervals to evaluate
     init: Initialization method for pymc3 sampler
+    randomSeed: Seed for pymc3 sampler
+    kwargs: Optional named arguments passed to covidvu.pipeline.vujson.parseCSSE
 
     Returns
     -------
     countryTS: All data for the queried country
     predictionsMeanTS: Posterior mean prediction
     predictionsPercentilesTS: Posterior percentiles
-    countryName: Country name
     trace: pymc3 trace object
     countryTSClean: Data used for training
     """
 
-    confirmedCases = parseCSSE(target)[subGroup]
+    confirmedCases = parseCSSE(target, **kwargs)[subGroup]
 
     if countryName is None:
         countryName = _getCountryToTrain(int(countryTrainIndex), confirmedCases)
@@ -212,9 +221,9 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
 
     with logRegModel:
         if isinstance(init, str):
-            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, init=init)
+            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, init=init, random_seed=randomSeed)
         else:
-            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains)
+            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, random_seed=randomSeed)
 
     predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(
         t,
@@ -232,7 +241,15 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                                                                        )
 
     countryTS.index = pd.to_datetime(countryTS.index)
-    return countryTS, predictionsMeanTS, predictionsPercentilesTS, countryName, trace, countryTSClean
+    prediction = {
+                    'countryTS':                countryTS,
+                    'predictionsMeanTS':        predictionsMeanTS,
+                    'predictionsPercentilesTS': predictionsPercentilesTS,
+                    'trace':                    trace,
+                    'countryTSClean':           countryTSClean,
+                    'countryName':              countryName,
+                 }
+    return prediction
 
 
 def _castDatetimeIndexToStr(timeSeries, dateCode = '%Y-%m-%d'):
@@ -255,7 +272,8 @@ def _dumpTimeSeriesAsJSON(timeSeries, target = None):
 def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
                                     countryName,
                                     predictionsPercentiles,
-                                    target = None):
+                                    target,
+                                    ):
     result = {}
 
     for i, (qLow, qHigh) in enumerate(predictionsPercentiles):
@@ -276,20 +294,30 @@ def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
 
 
 def _main(countryTrainIndex,
+          target = 'confirmed',
           predictionsPercentiles = PREDICTIONS_PERCENTILES,
+          siteData               = SITE_DATA,
+          **kwargs
           ):
-    countryTS, predictionsMeanTS, predictionsPercentilesTS, countryName, trace, countryTSClean = predictLogisticGrowth(
+
+    prediction = predictLogisticGrowth(
         countryTrainIndex = countryTrainIndex,
         predictionsPercentiles = predictionsPercentiles,
+        target=target,
+        siteData = siteData,
+        **kwargs
     )
 
-    predictionsMeanTS.name = countryName.replace(' ', '')
-    _dumpTimeSeriesAsJSON(predictionsMeanTS, 'prediction-mean-%s.json' % predictionsMeanTS.name)
+    prediction['predictionsMeanTS'].name = prediction['countryName'].replace(' ', '')
+    _dumpTimeSeriesAsJSON(prediction['predictionsMeanTS'],
+                          join(siteData, 'prediction-mean-%s.json' % prediction['predictionsMeanTS'].name),
+                         )
 
-    _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
-                                    predictionsMeanTS.name,
+    _dumpPredictionCollectionAsJSON(prediction['predictionsPercentilesTS'],
+                                    prediction['predictionsMeanTS'].name,
                                     predictionsPercentiles,
-                                    'prediction-conf-int-%s.json' % predictionsMeanTS.name)
+                                    join(siteData, 'prediction-conf-int-%s.json' % prediction['predictionsMeanTS'].name),
+                                   )
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:

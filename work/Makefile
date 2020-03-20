@@ -34,7 +34,7 @@ clean:
     
 
 install:
-	pip install -e .
+	pushd resources/ && pip install -e .. && popd
 	pip list | awk 'NR < 3 { print; } /covidvu/'
 
 

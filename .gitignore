@@ -138,6 +138,7 @@ dmypy.json
 **.jupyter
 **.local
 **.ssh/
+**/*psd
 **/.cufflinks*
 **/.vim/*
 **/work/*.tar.gz
@@ -149,6 +150,7 @@ dmypy.json
 *swp
 .viminfo
 work/*.json
+**/.theano
 
 # Python virtual environment
 
@@ -166,4 +168,5 @@ work/env
 **.idea
 
 # figures
-./work/figures
+work/figures/*
+!work/figures/.gitkeep

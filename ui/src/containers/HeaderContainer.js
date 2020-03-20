@@ -10,14 +10,16 @@ import { Navbar, Title } from "rbx"
 
 import VirusTrackLogo from '../images/virus-pngrepo-icon.png'
 
-import store from 'store'
+import store from 'store2'
 
 import { 
     LAST_UPDATE_KEY, 
     GLOBAL_KEY, 
+    CONTINENTAL_KEY,
     US_STATES_KEY, 
     US_REGIONS_KEY, 
     CACHE_INVALIDATE_GLOBAL_KEY, 
+    CACHE_INVALIDATE_CONTINENTAL_KEY,
     CACHE_INVALIDATE_US_STATES_KEY, 
     CACHE_INVALIDATE_US_REGIONS_KEY 
 } from '../constants'
@@ -35,24 +37,42 @@ export const HeaderContainer = () => {
     ReactGA.pageview(window.location.pathname + window.location.search);
 
     const forceRefresh = () => {
-        store.remove(LAST_UPDATE_KEY)
-        store.remove(GLOBAL_KEY)
-        store.remove(US_STATES_KEY)
-        store.remove(US_REGIONS_KEY)
-        store.remove(CACHE_INVALIDATE_GLOBAL_KEY)
-        store.remove(CACHE_INVALIDATE_US_STATES_KEY)
-        store.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
+        store.session.remove(LAST_UPDATE_KEY)
+        store.session.remove(GLOBAL_KEY)
+        store.session.remove(CONTINENTAL_KEY)
+        store.session.remove(US_STATES_KEY)
+        store.session.remove(US_REGIONS_KEY)
+        store.session.remove(CACHE_INVALIDATE_GLOBAL_KEY)
+        store.session.remove(CACHE_INVALIDATE_CONTINENTAL_KEY)
+        store.session.remove(CACHE_INVALIDATE_US_STATES_KEY)
+        store.session.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
     
         dispatch(actions.clearGraphs())
         dispatch(actions.fetchGlobal())
         dispatch(actions.fetchUSStates())
         dispatch(actions.fetchUSRegions())
+        dispatch(actions.fetchContinental())
+        dispatch(actions.fetchTop10Countries({
+            excludeChina: true
+        }))
+        dispatch(actions.fetchTotalGlobalStats())
+
+        dispatch(actions.fetchTop10USStates())
+        dispatch(actions.fetchTotalUSStatesStats())
+
+    }
+
+    const changePage = (pageLocation) => {
+        if(location.pathname !== pageLocation) {
+            dispatch(actions.clearGraphs())
+            history.push('/dashboard')
+        }
     }
 
     return (
         <Navbar>
             <Navbar.Brand>
-                <Navbar.Item onClick={() => { history.push('/') }}>
+                <Navbar.Item onClick={() => { changePage('/dashboard') }}>
                     <img src={VirusTrackLogo} alt="" role="presentation" class="logomark"/>
                     <Title size={5} title="Coronavirus COVID-19 Cases"><span>Virus</span>Track</Title>
                 </Navbar.Item>
@@ -60,10 +80,11 @@ export const HeaderContainer = () => {
             </Navbar.Brand>
             <Navbar.Menu>
                 <Navbar.Segment align="start">
-                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/dashboard')}}>Dashboard</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{changePage('/dashboard')}}>Dashboard</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid')}}>Global</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>US States</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>US Regions</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/covid/continental'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Continental</Navbar.Item>
                     <Navbar.Item active={selectedNav === '/stats'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/stats')}}>Stats</Navbar.Item>
                 </Navbar.Segment>
 

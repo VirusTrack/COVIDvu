@@ -10,7 +10,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Level } from "rbx"
+import { Hero, Container, Box, Tag, Tab, Level, Button, Title } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
@@ -20,7 +20,7 @@ import { COUNTRIES, CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants
 
 import numeral from 'numeral'
 
-import store from 'store'
+import store from 'store2'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
@@ -54,7 +54,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
 
 
     useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
             dispatch(actions.fetchGlobal())
         }
     }, ONE_MINUTE)
@@ -121,13 +121,33 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
         setSecondaryGraph(selectedGraph)
         handleHistory(selectedCountries, selectedGraph)
     }
+
+    const HeroElement = (props) => {
+        return (
+            <Hero size="medium">
+                <Hero.Body>
+                <Container>
+                    <Title size={1}>Global Coronavirus<br/>COVID-19 Cases</Title>
+                </Container>
+                </Hero.Body>
+            </Hero>
+        )
+    }
     
     if(!sortedConfirmed) {
         return (
+            <>
+            <HeroElement />
+            <Box>
             <h1>Loading...</h1>
+            </Box>
+            </>
         )
     }
     return (
+        <>
+        <HeroElement/>
+        <Box>
         <TwoGraphLayout>
 
             <>
@@ -196,6 +216,8 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
             </>
 
         </TwoGraphLayout>
+        </Box>
+        </>
     )    
 }
 
