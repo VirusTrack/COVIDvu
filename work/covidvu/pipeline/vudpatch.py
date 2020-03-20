@@ -55,6 +55,7 @@ SCRAPED_TODAY      = pytz.utc.localize(datetime.datetime.today()).astimezone(pyt
 
 def _fetchCurrentUpdates(columnRef, index = 'WORLD'):
     updatesDataset = dict()
+    x = SCRAPED_WORLD_DATA
     with open(SCRAPED_WORLD_DATA, 'r') as inputFile:
         rawData = csv.DictReader(inputFile, delimiter = '\t')
         for row in rawData:
@@ -63,6 +64,8 @@ def _fetchCurrentUpdates(columnRef, index = 'WORLD'):
                 continue
             if 'Diamond' not in row[index]:
                 try:
+                    if ref == 'TOTAL':
+                        x = float(row[columnRef])
                     bodyCount = float(row[columnRef]) if row[columnRef] != '' else 0.0
                 except:
                     bodyCount = 0.0

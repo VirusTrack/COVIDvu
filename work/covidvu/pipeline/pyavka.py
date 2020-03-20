@@ -46,7 +46,7 @@ def _generateCSVTo(targetFileName, dataSource = WORLD_TABLE_HTML, ignoreRows = 6
             if not len(row[0]):
                 continue    # skip to next record
             
-            rows.append(row)
+            rows.append(row[0:7])
 
     with open(targetFileName, 'w') as outputFile:
         csv.writer(outputFile, delimiter = '\t').writerows(rows)

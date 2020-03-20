@@ -143,7 +143,8 @@ function deployVirusUpdateJSON {
     local targetBucket="$1"
 
     echo "cloning $SITE_DATA_DIR to the $targetBucket website"
-    rm -f "$SITE_DATA_DIR"/*html "$SITE_DATA_DIR"/*tsv
+    # TODO:  Decide whether to keep these or not.
+    # rm -f "$SITE_DATA_DIR"/*html "$SITE_DATA_DIR"/*tsv
     rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$targetBucket/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
 
     invalidateCloudFrontCache
