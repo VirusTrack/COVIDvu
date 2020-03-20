@@ -12,6 +12,7 @@ Listed in the order in which they joined this development effort.
 |n/a/d*|[Alice Bonasio](https://www.linkedin.com/in/alicebonasio/)|
 |[dermidgen](https://www.linkedin.com/in/dermidgen/)|Danny Graham|
 |[mangosense](https://www.linkedin.com/in/jaggs83/)|Jagdish Repaswal|
+|[lukemarohn](https://www.linkedin.com/in/lucasmarohn/)|Lucas Marohn|
 
 &#42; _Not a developer_
 

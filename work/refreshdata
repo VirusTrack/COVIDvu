@@ -94,7 +94,7 @@ function updateCOVID19DataSources {
 
 
 function generateVirusUpdateJSONFiles {
-    echo "generating virus update JSON files"
+    echo "vujson - generating virus update JSON files"
     ./vujson
 } # generateVirusUpdateJSONFiles
 
@@ -110,8 +110,9 @@ function patchJSONFiles {
     #       ./refreshdata
     if [[ "patch" = "$subCommand" ]]
     then
-        echo "patching stale JH CSSE data with BNO, calculated updates"
+        echo "pyavka - grabbing the spreadsheet"
         ./pyavka
+        echo "vudpatch - patching stale JH CSSE data with latest, calculated updates"
         ./vudpatch
     fi
 } # patchJSONFiles
@@ -120,11 +121,13 @@ function patchJSONFiles {
 function packJSONFiles {
     # TODO: Define the virtual environment for this whole script instead of lots
     #       of little scripts scattered all over the disk.
+    echo "jsonpack - combine individual JSON files into a single blob"
     ./jsonpack
 } # packJSONFiles
 
 
 function generateRegionsJSONBundle {
+    echo "vuregions - generate continental region summaries"
     ./vuregions
 } # generateRegionsJSONBundle
 
