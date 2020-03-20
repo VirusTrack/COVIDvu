@@ -10,7 +10,7 @@ import { Table, Title, Tab, Generic } from 'rbx'
 
 import numeral from 'numeral'
 
-import store from 'store'
+import store from 'store2'
 
 import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
@@ -53,11 +53,11 @@ export const StatsContainer = ({filter='Global'}) => {
     }, [dispatch])
 
     useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
             // dispatch(actions.fetchGlobal())
             dispatch(actions.fetchGlobalStats())
         }
-        if(store.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
             // dispatch(actions.fetchUSStates())
             dispatch(actions.fetchUSStatesStats())
         }

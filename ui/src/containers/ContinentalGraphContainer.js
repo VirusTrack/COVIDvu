@@ -18,7 +18,7 @@ import GraphWithLoader from '../components/GraphWithLoader'
 
 import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 
-import store from 'store'
+import store from 'store2'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
 

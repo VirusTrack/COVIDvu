@@ -12,41 +12,54 @@ import { Tag, Title, Level, Heading, Button } from "rbx"
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
-import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
+import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_CONTINENTAL_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
 import numeral from 'numeral'
 
-import store from 'store'
+import store from 'store2'
 
 import moment from 'moment'
 
 export const DashboardContainer = () => {
 
+    const session = store.session
     const dispatch = useDispatch()
     const history = useHistory()
 
     useEffect(() => {
-        dispatch(actions.fetchTop10Countries())
+        console.log("Same ")
+    }, [])
+
+    useEffect(() => {
+        dispatch(actions.fetchTop10Countries({
+            excludeChina: true
+        }))
         dispatch(actions.fetchTotalGlobalStats())
 
         dispatch(actions.fetchTop10USStates())
         dispatch(actions.fetchTotalUSStatesStats())
 
         dispatch(actions.fetchUSRegions())
+        dispatch(actions.fetchContinental())
 
     }, [dispatch])
 
     useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchTop10Countries())
+        if(session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+            dispatch(actions.fetchTop10Countries({
+                excludeChina: true
+            }))
             dispatch(actions.fetchTotalGlobalStats())
         }
-        if(store.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+        if(session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
             dispatch(actions.fetchTop10USStates())
             dispatch(actions.fetchTotalUSStatesStats())
         }
-        if(store.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
+        if(session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
             dispatch(actions.fetchUSRegions())
+        }
+        if(session.get(CACHE_INVALIDATE_CONTINENTAL_KEY)) {
+            dispatch(actions.fetchContinental())
         }
     }, ONE_MINUTE)
 
@@ -65,6 +78,7 @@ export const DashboardContainer = () => {
     const usStatesStats = useSelector(state => state.services.totalUSStatesStats)
     
     const confirmedUSRegions = useSelector(state => state.services.usRegions.confirmed)
+    const confirmedContinental = useSelector(state => state.services.continental.confirmed)
 
     const renderChangeDifference = (value) => {
         
@@ -151,8 +165,8 @@ export const DashboardContainer = () => {
         <Level>
             <Level.Item>
                 <GraphWithLoader 
-                    graphName="Top 10 Confirmed Cases"
-                    secondaryGraph="Top 10 Confirmed Cases"
+                    graphName="top_10_countries_graph"
+                    secondaryGraph="top_10_countries_graph"
                     graph={globalTop10}
                     width={width}
                     height={height}
@@ -171,6 +185,33 @@ export const DashboardContainer = () => {
 
         <hr />
 
+        <Level>
+            <Level.Item>
+                <Heading>Top 10 Confirmed Cases (by continent)</Heading>
+            </Level.Item>
+        </Level>
+
+        <Level>
+            <Level.Item>
+                <GraphWithLoader 
+                    graphName="continental_graph"
+                    secondaryGraph="continental_graph"
+                    graph={confirmedContinental}
+                    width={width}
+                    height={height}
+                    selected={['North America', 'Asia', 'Europe', 'South America']}
+                />
+            </Level.Item>
+        </Level>
+
+        <Level>
+            <Level.Item>
+                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Compare Continental Stats</Button>
+            </Level.Item>
+        </Level>
+
+        <hr />
+        
 
         <Level>
             <Level.Item>
@@ -212,14 +253,14 @@ export const DashboardContainer = () => {
         <Level>
             <Level.Item textAlign="centered">
                 <div>
-                <Heading>Mortality Rate</Heading>
-                <Title as="p">{numeral(usStatesStats.mortality).format('0.0 %')}</Title>
+                <Heading>Recovery Rate</Heading>
+                <Title as="p">{numeral(usStatesStats.recovery).format('0.0 %')}</Title>
                 </div>
             </Level.Item>
             <Level.Item textAlign="centered">
                 <div>
-                <Heading>Recovery Rate</Heading>
-                <Title as="p">{numeral(usStatesStats.recovery).format('0.0 %')}</Title>
+                <Heading>Mortality Rate</Heading>
+                <Title as="p">{numeral(usStatesStats.mortality).format('0.0 %')}</Title>
                 </div>
             </Level.Item>
         </Level>
@@ -235,8 +276,8 @@ export const DashboardContainer = () => {
         <Level>
             <Level.Item>
                 <GraphWithLoader 
-                    graphName="Top 10 Confirmed Cases"
-                    secondaryGraph="Top 10 Confirmed Cases"
+                    graphName="top_10_states_graph"
+                    secondaryGraph="top_10_states_graph"
                     graph={usStatesTop10}
                     width={width}
                     height={height}
@@ -262,8 +303,8 @@ export const DashboardContainer = () => {
         <Level>
             <Level.Item>
                 <GraphWithLoader 
-                    graphName="Top Regions Cases"
-                    secondaryGraph="Top Regions Cases"
+                    graphName="top_us_regions_graph"
+                    secondaryGraph="top_us_regions_graph"
                     graph={confirmedUSRegions}
                     width={width}
                     height={height}

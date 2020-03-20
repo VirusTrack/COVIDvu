@@ -25,7 +25,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
                 mode: 'lines+markers',
                 name: region,
                 marker: {
-                    size: 6
+                    size: 3
                 }
             }            
         }
@@ -44,7 +44,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
 
     let mergeConfig = { ...config,
         displayModeBar: false,
-        showlegend: true
+        showlegend: true,
     }
 
     let layout = {

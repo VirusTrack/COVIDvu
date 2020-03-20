@@ -11,7 +11,7 @@ import {
 
 import { createAction } from '@reduxjs/toolkit'
 
-import store from 'store'
+import store from 'store2'
 import moment from "moment"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -281,13 +281,13 @@ export function* fetchLastUpdate() {
 
     const lastUpdateAsNumeric = moment(lastUpdate).valueOf()
 
-    const lastUpdateLocalStorage = store.get(LAST_UPDATE_KEY)
+    const lastUpdateLocalStorage = store.session.get(LAST_UPDATE_KEY)
 
     if(!lastUpdateLocalStorage || lastUpdateLocalStorage < lastUpdateAsNumeric) {
-        store.set(CACHE_INVALIDATE_GLOBAL_KEY, true)
-        store.set(CACHE_INVALIDATE_US_STATES_KEY, true)
-        store.set(CACHE_INVALIDATE_US_REGIONS_KEY, true)
-        store.set(LAST_UPDATE_KEY, lastUpdateAsNumeric)
+        store.session.set(CACHE_INVALIDATE_GLOBAL_KEY, true)
+        store.session.set(CACHE_INVALIDATE_US_STATES_KEY, true)
+        store.session.set(CACHE_INVALIDATE_US_REGIONS_KEY, true)
+        store.session.set(LAST_UPDATE_KEY, lastUpdateAsNumeric)
     }
     
     yield put({ type: types.FETCH_LAST_UPDATE_SUCCESS, payload: lastUpdateAsNumeric})
@@ -441,12 +441,10 @@ export function* fetchUSStatesStats({payload}) {
             }
         }
 
-        yield put(
-            { 
+        yield put({
                 type: types.FETCH_US_STATES_STATS_SUCCESS, 
                 payload: statsTotals
-            }
-        )    
+        })
     } catch(error) {
         console.error(error)
     }
@@ -593,10 +591,24 @@ export function* fetchTop10Countries({payload}) {
     try {
         const global = yield call(dataService.getGlobal)
 
+        delete global.confirmed['!Global']
+        delete global.deaths['!Global']
+        delete global.recovered['!Global']
+
+        delete global.confirmed['!Outside China']
+        delete global.deaths['!Outside China']
+        delete global.recovered['!Outside China']
+
+        if(payload && payload.excludeChina) {
+            delete global.confirmed['China']
+            delete global.deaths['China']
+            delete global.recovered['China']
+        }
+
         const confirmedCounts = extractLatestCounts(global.confirmed)
         const sortedConfirmed = confirmedCounts.sort((a, b) => b.stats - a.stats)
 
-        const top10Countries = sortedConfirmed.slice(2, 12).map(countryWithStat => countryWithStat.region)
+        const top10Countries = sortedConfirmed.slice(0, 10).map(countryWithStat => countryWithStat.region)
 
         let top10 = {}
 
@@ -624,15 +636,6 @@ export function* fetchGlobal() {
         console.time('fetchGlobal.axios')
 
         const global = yield call(dataService.getGlobal)
-
-        // if(!store.get(CACHE_INVALIDATE_GLOBAL_KEY) && store.get(GLOBAL_KEY)) {
-        //     global = store.get(GLOBAL_KEY)
-        // } else {
-        //     global = yield call(dataService.getBundle, "global")
-
-        //     store.set(GLOBAL_KEY, global)
-        //     store.remove(CACHE_INVALIDATE_GLOBAL_KEY)
-        // }
 
         let confirmed = global.confirmed
         let deaths = global.deaths
@@ -908,15 +911,6 @@ export function* fetchUSRegions() {
         console.time('fetchUSRegions.axios')
 
         const us_regions = yield call(dataService.getUSRegions)
-
-        // if(!store.get(CACHE_INVALIDATE_US_REGIONS_KEY) && store.get(US_REGIONS_KEY)) {
-        //     us_regions = store.get(US_REGIONS_KEY)
-        // } else {
-        //     us_regions = yield call(dataService.getBundle, "US-Regions")
-
-        //     store.set(US_REGIONS_KEY, us_regions)
-        //     store.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
-        // }
 
         let confirmed = us_regions.confirmed
         let deaths = us_regions.deaths

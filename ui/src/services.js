@@ -13,7 +13,7 @@ import {
     CACHE_INVALIDATE_US_REGIONS_KEY
 } from './constants'
 
-import store from 'store'
+import store from 'store2'
 
 import moment from 'moment'
 
@@ -40,14 +40,14 @@ class DataService {
         try {
             let global = undefined
 
-            if(!store.get(CACHE_INVALIDATE_GLOBAL_KEY) && store.get(GLOBAL_KEY)) {
-                global = store.get(GLOBAL_KEY)
+            if(!store.session(CACHE_INVALIDATE_GLOBAL_KEY) && store.session(GLOBAL_KEY)) {
+                global = store.session(GLOBAL_KEY)
             } else {
                 const response = await axios.get(`${dataUrl()}/bundle-global.json`)
                 
                 global = response.data
-                store.set(GLOBAL_KEY, global)
-                store.remove(CACHE_INVALIDATE_GLOBAL_KEY)
+                store.session(GLOBAL_KEY, global)
+                store.session.remove(CACHE_INVALIDATE_GLOBAL_KEY)
             }
     
             return global
@@ -61,16 +61,15 @@ class DataService {
         try {
             let continental = undefined
 
-            if(!store.get(CACHE_INVALIDATE_CONTINENTAL_KEY) && store.get(CONTINENTAL_KEY)) {
-                continental = store.get(CONTINENTAL_KEY)
+            if(!store.session(CACHE_INVALIDATE_CONTINENTAL_KEY) && store.session(CONTINENTAL_KEY)) {
+                continental = store.session(CONTINENTAL_KEY)
             } else {
                 const response = await axios.get(`${dataUrl()}/bundle-continental-regions.json`)
-                
-                console.dir(response.data)
-                
+                                
                 continental = response.data
-                store.set(CONTINENTAL_KEY, continental)
-                store.remove(CACHE_INVALIDATE_CONTINENTAL_KEY)
+
+                store.session.set(CONTINENTAL_KEY, continental)
+                store.session.remove(CACHE_INVALIDATE_CONTINENTAL_KEY)
             }
     
             return continental
@@ -83,14 +82,14 @@ class DataService {
     async getUSStates() {
         try {
             let us_states = undefined
-            if(!store.get(CACHE_INVALIDATE_US_STATES_KEY) && store.get(US_STATES_KEY)) {
-                us_states = store.get(US_STATES_KEY)
+            if(!store.session(CACHE_INVALIDATE_US_STATES_KEY) && store.session(US_STATES_KEY)) {
+                us_states = store.session(US_STATES_KEY)
             } else {
                 const response = await axios.get(`${dataUrl()}/bundle-US.json`)
     
                 us_states = response.data
-                store.set(US_STATES_KEY, us_states)
-                store.remove(CACHE_INVALIDATE_US_STATES_KEY)
+                store.session(US_STATES_KEY, us_states)
+                store.session.remove(CACHE_INVALIDATE_US_STATES_KEY)
             }
 
             return us_states
@@ -104,14 +103,14 @@ class DataService {
         try {
             let us_regions = undefined
 
-            if(!store.get(CACHE_INVALIDATE_US_REGIONS_KEY) && store.get(US_REGIONS_KEY)) {
-                us_regions = store.get(US_REGIONS_KEY)
+            if(!store.session(CACHE_INVALIDATE_US_REGIONS_KEY) && store.session(US_REGIONS_KEY)) {
+                us_regions = store.session(US_REGIONS_KEY)
             } else {
                 const response = await axios.get(`${dataUrl()}/bundle-US-Regions.json`)
                 us_regions = response.data
     
-                store.set(US_REGIONS_KEY, us_regions)
-                store.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
+                store.session(US_REGIONS_KEY, us_regions)
+                store.session.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
             }
 
             return us_regions

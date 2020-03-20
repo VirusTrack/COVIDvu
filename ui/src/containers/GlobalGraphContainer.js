@@ -20,7 +20,7 @@ import { COUNTRIES, CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants
 
 import numeral from 'numeral'
 
-import store from 'store'
+import store from 'store2'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
 
@@ -54,7 +54,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
 
 
     useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
             dispatch(actions.fetchGlobal())
         }
     }, ONE_MINUTE)

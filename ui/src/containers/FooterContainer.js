@@ -38,8 +38,7 @@ export const FooterContainer = () =>{
                     </p>
                 }
             </Content>
-            <Column.Group>
-            
+            <Column.Group>            
                 <Column>
                     <p>
                         Follow us on Twitter <a href="https://twitter.com/covidvu" target="_new" rel="noopener noreferrer">@covidvu</a>
@@ -55,7 +54,7 @@ export const FooterContainer = () =>{
                     </p>
 
                 </Column>
-                <Column>
+                <Column align="left">
                     <p>                    
                         <img src={CCSAByLogo} alt="Creative Commons Attribution-ShareAlike 4.0 International license" /> <br />
                         <em>Except where otherwise noted, content on this site is licensed under 
