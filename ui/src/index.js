@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import './index.css';
+import "rbx/index.css"
+import './index.sass';
 
 import { Provider } from 'react-redux'
 import { createBrowserHistory } from 'history'
@@ -12,7 +13,7 @@ import App from './pages/App'
 
 // import * as serviceWorker from './serviceWorker';
 
-import "rbx/index.css"
+
 
 const history = createBrowserHistory()
 const store = configureStore({}, history)

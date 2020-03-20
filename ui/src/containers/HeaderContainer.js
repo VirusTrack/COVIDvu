@@ -50,11 +50,11 @@ export const HeaderContainer = () => {
     }
 
     return (
-        <Navbar color="dark">
+        <Navbar>
             <Navbar.Brand>
                 <Navbar.Item onClick={() => { history.push('/') }}>
-                    <img src={VirusTrackLogo} alt="" role="presentation" />&nbsp;
-                    <Title style={{color: 'white'}} size={5}>Coronavirus COVID-19 Cases</Title>
+                    <img src={VirusTrackLogo} alt="" role="presentation" class="logomark"/>
+                    <Title size={5} title="Coronavirus COVID-19 Cases"><span>Virus</span>Track</Title>
                 </Navbar.Item>
                 <Navbar.Burger />
             </Navbar.Brand>

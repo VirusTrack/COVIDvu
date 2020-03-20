@@ -1,0 +1,175 @@
+$tertiary: hsla(5,87,70,1)
+$secondary: hsla(188,80,38,1)
+$primary: hsla(221,63,33,1)
+
+$offwhite: hsla(216,17,94,1)
+
+$drop-shadow-large: 0px 10px 30px rgba(11, 56, 156, 0.05), 0px 7px 20px rgba(11, 56, 156, 0.05);
+
+html 
+  font-size: 10px
+
+body 
+  margin: 0
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  --tertiary: hsla(5,87,70,1)
+  --secondary: hsla(188,80,38,1)
+  --primary: hsla(221,63,33,1)
+  font-size: 1.6rem
+  background: url('./images/hero-tall.svg') #FAFAFA no-repeat
+  background-size: 100%
+  
+  @media screen and (max-width: 1024px)
+    background-size: 200vw
+    background-position: center top
+    @media screen and (min-width: 700px)
+      background-size: 150vw
+
+
+code 
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace
+
+
+.hero
+  @media screen and (max-width: 1025px)
+    text-align: center
+    align-content: center
+    .buttons
+      justify-content: center
+      .button:not(:last-child)
+        margin-right: 1rem
+  .title 
+    color: white
+    font-family: archivo
+    font-size: 3.6rem
+    @media screen and (min-width: 1024px)
+      font-size: 6.4rem
+  .tag 
+    font-size: 1.2rem
+    background-color: transparent
+    color: white
+  
+
+.navbar 
+  box-shadow: #{$drop-shadow-large}
+  background: white
+  .logomark
+    width: 3.6rem
+    height: auto
+    display: block
+    max-height: none
+    margin: -1rem 1rem -1rem 0
+  .navbar-brand
+    padding: 1rem 1rem
+  .navbar-burger.is-active
+    background: transparent
+  .navbar-menu
+    box-shadow: none
+    font-family: archivo
+    background: #{$offwhite}
+    padding: 2rem
+    font-size: 2.8rem
+    @media screen and (min-width: 1024px)
+      background: white
+      font-size: 1.6rem
+      justify-content: flex-end
+      .navbar-start
+        margin: 0 auto
+        justify-self: center
+      .navbar-end 
+        margin-left: 0
+        justify-self: flex-end
+    &.is-active
+      min-height: 100vh
+      display: flex
+      flex-direction: column
+      justify-content: center
+      text-align: right
+      .navbar-end 
+        margin-top: 3rem
+    .navbar-item 
+      margin: 0 1rem
+      border-radius: .5rem
+    .navbar-item.is-active,
+    .navbar-item:hover 
+      @media screen and (max-width: 1025px)
+        background: transparent
+        color: #{$secondary}
+
+#root > .content
+  padding: 0 1rem
+  .main-svg 
+    max-width: 100%
+
+.navbar-brand 
+  .title
+    font-family: 'Archivo'
+    text-transform: uppercase
+    font-size: 1.4rem
+    color: #{$primary}
+    span 
+      color: #{$tertiary}
+    @media screen and (min-width: 1024px)
+      font-size: 1.6rem
+
+.box 
+  padding: 0
+  border: 0
+  box-shadow: #{$drop-shadow-large}
+  border-radius: 1rem
+  &:not(:last-child)
+    margin-bottom: 5rem
+  .buttons 
+    text-align: center
+    margin: auto
+    display: block
+    background: #F4F5F8
+  > *:not(hr)
+    padding: 1.5rem 2rem
+  > .title:first-child
+      padding-bottom: 0
+      text-align: center
+
+hr 
+  height: .1rem
+  background-color: hsla(221,87,33,.1)
+
+.heading
+    margin-bottom: 0rem
+    text-transform: none
+    letter-spacing: 0
+    font-weight: 400
+
+.statistics
+  .level 
+    margin-bottom: 3rem
+    .level-item
+      width: 50%
+      margin: 0 auto
+    .heading
+      margin-bottom: 0
+    .title 
+      font-weight: 700
+      font-size: 3.2rem
+  .level:first-of-type 
+    .level-item
+      width: 100%
+    .title
+      font-size: 5.6rem
+
+.button
+  &.is-primary
+    background-color: #{$secondary}
+    &:hover
+      background-color: #{lighten($secondary, 5%)}
+  &.is-secondary
+    background-color: #{$primary}
+  &.is-large
+    padding: 2rem 4rem 
+    box-shadow: #{$drop-shadow-large}
+
+
+.footer 
+  background: transparent
