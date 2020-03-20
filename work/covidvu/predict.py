@@ -10,7 +10,6 @@ from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import _dumpJSON
 from covidvu.pipeline.vujson import SITE_DATA
 
-from pdb import set_trace
 
 N_SAMPLES        = 500
 N_TUNE           = 200
@@ -28,8 +27,6 @@ PREDICTIONS_PERCENTILES = (
                                 (2.5, 97.5),
                                 (25, 75),
                           )
-
-from pdb import set_trace
 
 
 def _getCountryToTrain(countryTrainIndex, confirmedCases):
