@@ -169,7 +169,7 @@ def test_resolveReportFileName():
     pass
 
 
-def test__dumpJSON():
+def test_dumpJSON():
     #TODO
     pass
 
