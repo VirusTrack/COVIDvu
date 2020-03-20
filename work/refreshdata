@@ -110,6 +110,7 @@ function patchJSONFiles {
     #       ./refreshdata
     if [[ "patch" = "$subCommand" ]]
     then
+        now=$(date)
         echo "pyavka - grabbing the spreadsheet"
         ./pyavka
         echo "vudpatch - patching stale JH CSSE data with latest, calculated updates"
