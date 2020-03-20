@@ -55,7 +55,6 @@ SCRAPED_TODAY      = pytz.utc.localize(datetime.datetime.today()).astimezone(pyt
 
 def _fetchCurrentUpdates(columnRef, index = 'WORLD'):
     updatesDataset = dict()
-    x = SCRAPED_WORLD_DATA
     with open(SCRAPED_WORLD_DATA, 'r') as inputFile:
         rawData = csv.DictReader(inputFile, delimiter = '\t')
         for row in rawData:
