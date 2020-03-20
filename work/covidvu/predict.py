@@ -9,9 +9,7 @@ from os.path import join
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import dumpJSON
 from covidvu.pipeline.vujson import SITE_DATA
-from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
-from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
-from covidvu.pipeline.vujson import JH_CSSE_FILE_RECOVERED
+
 
 N_SAMPLES        = 500
 N_TUNE           = 200
@@ -29,8 +27,6 @@ PREDICTIONS_PERCENTILES = (
                                 (2.5, 97.5),
                                 (25, 75),
                           )
-
-from pdb import set_trace
 
 
 def _getCountryToTrain(countryTrainIndex, confirmedCases):
@@ -94,7 +90,7 @@ def _getPredictionsFromPosteriorSamples(t,
 
     tPredict = np.arange(len(t) + nDaysPredict)
 
-    predictions = np.zeros((len(t)+nDaysPredict, nSamples))
+    predictions = np.zeros((len(t)+nDaysPredict, nSamples - nBurn))
 
     for i in range(len(trace[nBurn:])):
         carryingCap = 10 ** trace['logCarryingCapacity'][nBurn+i]
@@ -249,6 +245,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                     'countryTSClean':           countryTSClean,
                     'countryName':              countryName,
                  }
+
     return prediction
 
 
