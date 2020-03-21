@@ -1,0 +1,11 @@
+#!/bin/bash
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+source ./pyrunner
+
+env | awk '/VIRT/' | sort
+python3 -m covidvu.pipeline.vuregions
+ls -Alrt "$SITE_DATA_DIR"
+
+
