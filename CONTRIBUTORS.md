@@ -13,6 +13,8 @@ Listed in the order in which they joined this development effort.
 |[dermidgen](https://www.linkedin.com/in/dermidgen/)|Danny Graham|
 |[mangosense](https://www.linkedin.com/in/jaggs83/)|Jagdish Repaswal|
 |[lukemarohn](https://www.linkedin.com/in/lucasmarohn/)|Lucas Marohn|
+|[kotiek14](https://github.com/kotek14/)|Stepan Sgibnev|
+|n/a/d|[Jim Key](https://www.linkedin.com/in/jimkey/)|
 
 &#42; _Not a developer_
 
