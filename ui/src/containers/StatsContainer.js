@@ -6,7 +6,7 @@ import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import { Table, Title, Tab, Generic } from 'rbx'
+import { Hero, Container, Box, Table, Title, Tab, Generic } from 'rbx'
 
 import numeral from 'numeral'
 
@@ -40,6 +40,19 @@ export const StatsContainer = ({filter='Global'}) => {
         if(REGION_URLS.hasOwnProperty(key))
             window.open(REGION_URLS[key], "_blank")
     }
+
+    const HeroElement = (props) => {
+        return (
+        <Hero size="medium">
+            <Hero.Body>
+            <Container>
+                <Title size={1}>Coronavirus <br/>COVID-19 Statistics</Title>
+            </Container>
+            </Hero.Body>
+        </Hero>
+        )
+    }
+
     /**
      * Fetch all the data
      */
@@ -76,12 +89,20 @@ export const StatsContainer = ({filter='Global'}) => {
 
     if(!statsTotals) {
         return (
-            <h1>Loading...</h1>
+            <>
+            <HeroElement/>
+            <Box>
+                <h1>Loading...</h1>
+            </Box>
+        </>
         )
     }
 
     return (
         <>
+        <HeroElement/>
+
+        <Box>
         <Tab.Group size="large">
             <Tab active={selectedTab === 'Global'} onClick={() => { setSelectedTab('Global')}}>Global</Tab>
             <Tab active={selectedTab === 'US'} onClick={() => { setSelectedTab('US')}}>United States</Tab>
@@ -155,6 +176,7 @@ export const StatsContainer = ({filter='Global'}) => {
             </Table.Body>
         </Table>
         </div>
+        </Box>
         </>
     )    
 }

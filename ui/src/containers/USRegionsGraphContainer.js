@@ -8,7 +8,7 @@ import { useWindowSize, useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Column, Tag, Message, Tab, Notification, Level } from "rbx"
+import { Hero, Title, Container, Box, Button, Tag, Tab, Notification, Level } from "rbx"
 
 import { CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
@@ -85,29 +85,48 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
         handleHistory(selectedRegions, selectedGraph)
     }    
 
+    const HeroElement = (props) => {
+        return (
+            <Hero size="medium">
+                <Hero.Body>
+                <Container>
+                    <Title subtitle size={2}>United States</Title>
+                    <Title size={1}>Coronavirus Cases <br/>by Region</Title>
+                    <Button.Group>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Cases By State</Button>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>Cases By Region</Button>
+                    </Button.Group>
+                </Container>
+                </Hero.Body>
+            </Hero>
+        )
+    }
+
     if(!sortedConfirmed) {
         return (
-            <h1>Loading...</h1>
+        <>
+            <HeroElement />
+            <Box>
+                <h1>Loading...</h1>
+            </Box>
+        </>
         )
     }
 
     return (
+        <>  
+        <HeroElement/>
+        
+        <Box>
         <TwoGraphLayout>
-            <>                        
-
-                <Level>
-                    <Level.Item>
-                        <SelectRegionComponent
-                            data={sortedConfirmed}
-                            selected={selectedRegions}
-                            handleSelected={dataList => handleSelectedRegion(dataList)} />
-                    </Level.Item>
-                </Level>
-
+            <>            
+            <SelectRegionComponent
+                data={sortedConfirmed}
+                selected={selectedRegions}
+                handleSelected={dataList => handleSelectedRegion(dataList)} />
             </>
-
             <>
-                <Tab.Group>
+                <Tab.Group size="large" kind="boxed">
                     <Tab active={secondaryGraph === 'Confirmed'} onClick={() => { handleSelectedGraph('Confirmed')}}>Confirmed</Tab>
                     <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
                     <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
@@ -152,39 +171,28 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                 </Level.Item>
             </Level>
 
-            <Column.Group centered>
-                <Column>
-                <Message size="small" style={{margin: '0.5rem'}} color="link">
-                            <Message.Body>
-                                <p>
-                                    Northeast - CT, MA, ME, NH, NJ, NY, PA, RI, VT
-                                </p>
-                                <p>
-                                    Midwest - IA, IL, IN, KS, MI, MN, MO, ND, NE, OH, SD, WI
-                                </p>
-                                <p>
-                                    South - AL, AR, DC, DE, FL, GA, KY, LA, MD, MS, NC, OK, SC, TN, TX, VA, WV
-                                </p>
-                                <p>
-                                    West - AK, AZ, CA, CO, HI, ID, MI, NM, NV, OR, UT, WA, WY
-                                </p>
-                            </Message.Body>
-                        </Message>                    
-                </Column>                
-            </Column.Group>
-
-            <>
-                <Level>
-                    <Level.Item>
-                        <Notification color="warning">
-                            The sum of all regions may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
-                        </Notification>
-                    </Level.Item>
-                </Level>
-            </>
+            <Notification color="warning">
+                The sum of all regions may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
+            </Notification>
+                             
+            <Notification style={{fontSize: '1.4rem'}}>
+                    <p>
+                        Northeast - CT, MA, ME, NH, NJ, NY, PA, RI, VT
+                    </p>
+                    <p>
+                        Midwest - IA, IL, IN, KS, MI, MN, MO, ND, NE, OH, SD, WI
+                    </p>
+                    <p>
+                        South - AL, AR, DC, DE, FL, GA, KY, LA, MD, MS, NC, OK, SC, TN, TX, VA, WV
+                    </p>
+                    <p>
+                        West - AK, AZ, CA, CO, HI, ID, MI, NM, NV, OR, UT, WA, WY
+                    </p>
+            </Notification> 
 
         </TwoGraphLayout>
-
+        </Box>
+        </>
     )
 }
 

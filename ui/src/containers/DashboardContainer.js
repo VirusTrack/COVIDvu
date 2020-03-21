@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useHistory } from 'react-router'
 
-import { useWindowSize, useInterval } from '../hooks/ui'
+import { useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Title, Level, Heading, Button } from "rbx"
+import { Hero, Tag, Title, Level, Heading, Container, Button, Box, Column } from "rbx"
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
@@ -19,6 +19,9 @@ import numeral from 'numeral'
 import store from 'store2'
 
 import moment from 'moment'
+
+import globeImg from '../images/fa-icon-globe.svg'
+import usflagImg from '../images/fa-icon-usflag.svg'
 
 export const DashboardContainer = () => {
 
@@ -65,8 +68,6 @@ export const DashboardContainer = () => {
 
     const lastUpdate = useSelector(state => state.services.lastUpdate)
 
-    const [width, height] = useWindowSize()
-
     useEffect(() => {
         dispatch(actions.fetchLastUpdate())
     }, [dispatch])
@@ -82,8 +83,8 @@ export const DashboardContainer = () => {
 
     const renderChangeDifference = (value) => {
         
-        const greenColor = {color: 'hsl(141, 53%, 53%)'}
-        const redColor = {color: 'hsl(348, 100%, 61%)'}
+        const greenColor = {color: 'hsl(188, 80%, 38%)'}
+        const redColor = {color: 'hsl(5, 87%, 70%)'}
 
         const colorBasedOnChange = value >= 0 ? redColor : greenColor
 
@@ -92,232 +93,191 @@ export const DashboardContainer = () => {
         )
     }
 
+    const HeroElement = (props) => {
+        return (
+            <Hero size="medium">
+                <Hero.Body>
+                <Container>
+                    <Title size={1}>Coronavirus <br/>COVID-19 Cases</Title>
+                    <Button.Group>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid')}}>Global</Button>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>United States</Button>
+                    </Button.Group>
+                    { lastUpdate && 
+                            <Tag as="p">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
+                        }
+                </Container>
+                </Hero.Body>
+            </Hero>
+        )
+    }
+
     return (
         <>
-        <Level>
-            <Level.Item>
-                { lastUpdate && 
-                    <Tag color="primary">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
-                }
-            </Level.Item>
+        <HeroElement />
+        <Box>
+            <Title size={2}><img src={globeImg} alt=""/>Global Coronavirus Totals</Title>
+            <Column.Group breakpoint="desktop" gapless className="separated">
+            <Column narrow>
 
-        </Level>
+                <Container className="statistics">
+                    <Level>
+                        <Level.Item textAlign="centered">
+                            <div>
+                            <Heading>Total Cases</Heading>
+                            <Title as="p">{numeral(globalStats.confirmed).format('0,0')}</Title>
+                            </div>
+                        </Level.Item>
+                        
+                    </Level>        
+                    
+                    <Level breakpoint="mobile">
+                        <Level.Item textAlign="centered">
+                            <div>
+                            <Heading>Total Deaths</Heading>
+                            <Title as="p">{numeral(globalStats.deaths).format('0,0')}</Title>
+                            </div>
+                        </Level.Item>
+                        <Level.Item textAlign="centered">
+                            <div>
+                            <Heading>New Cases (as of today)</Heading>
+                            { renderChangeDifference(globalStats.newConfirmed)}
+                            </div>
+                        </Level.Item>
+                    </Level>
 
-        <Level>
-            <Level.Item>
-                <Title size={2}>Today's Global Totals</Title>
-            </Level.Item>
-        </Level>
+                    <Level breakpoint="mobile"> 
+                        <Level.Item textAlign="centered">
+                            <div>
+                            <Heading>Mortality Rate</Heading>
+                            <Title as="p">{numeral(globalStats.mortality).format('0.0 %')}</Title>
+                            </div>
+                        </Level.Item>
+                        <Level.Item textAlign="centered">
+                            <div>
+                            <Heading>New Deaths (as of today)</Heading>
+                            { renderChangeDifference(globalStats.newDeaths)}
+                            </div>
+                        </Level.Item>
+                    </Level>
+                </Container>
+            </Column>
+                
+            <Column>
+                <Container className="chart">
+                    <Title size={2} align="center">
+                        <Heading align="center">Top 10 Confirmed</Heading>
+                        Cases by Country
+                    </Title>
+                    <GraphWithLoader 
+                        graphName="Top 10 Confirmed Cases"
+                        secondaryGraph="Top 10 Confirmed Cases"
+                        graph={globalTop10}
+                        selected={['Italy', 'Iran', 'Korea, South', 'Spain', 'Germany', 'France', 'US', 'Switzerland', 'United Kingdom', 'Netherlands']}
+                    />
+                </Container>
+            </Column>
+
+            <Column>
+                <Container className="chart">
+                    <Title size={2} align="center">
+                        <Heading align="center">Top 10 Confirmed</Heading>
+                        Cases by Continent
+                    </Title>
+                    <GraphWithLoader 
+                        graphName="continental_graph"
+                        secondaryGraph="continental_graph"
+                        graph={confirmedContinental}
+                        selected={['North America', 'Asia', 'Europe', 'South America']}
+                        style={{width: '100%', height: '100%'}}
+                    />
+                </Container>
+            </Column>
+
+            </Column.Group>
+
+            <Button.Group align="center">
+                <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid')}}>Compare Country Stats</Button>
+                <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Compare Continental Stats</Button>
+            </Button.Group>
+        </Box>
 
 
-        <Level>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Total Cases</Heading>
-                <Title as="p">{numeral(globalStats.confirmed).format('0,0')}</Title>
-                </div>
-            </Level.Item>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Total Deaths</Heading>
-                <Title as="p">{numeral(globalStats.deaths).format('0,0')}</Title>
-                </div>
-            </Level.Item>
-        </Level>        
-        
-        <Level>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>New Cases (as of today)</Heading>
-                { renderChangeDifference(globalStats.newConfirmed)}
-                </div>
-            </Level.Item>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>New Deaths (as of today)</Heading>
-                { renderChangeDifference(globalStats.newDeaths)}
-                </div>
-            </Level.Item>
-        </Level>
-        <Level>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Recovery Rate</Heading>
-                <Title as="p">{numeral(globalStats.recovery).format('0.0 %')}</Title>
-                </div>
-            </Level.Item>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Mortality Rate</Heading>
-                <Title as="p">{numeral(globalStats.mortality).format('0.0 %')}</Title>
-                </div>
-            </Level.Item>
-        </Level>
 
-        <hr />
+        <Box>
 
-        <Level>
-            <Level.Item>
-                <Heading>Top 10 Confirmed Cases (by Country)</Heading>
-            </Level.Item>
-        </Level>
+            <Title size={2}><img src={usflagImg} alt=""/>United States Coronavirus Totals</Title>
+            <Column.Group gapless breakpoint="desktop" className="separated">
+            <Column size="narrow"> 
+            <Container className="statistics">
+                <Level>
+                    <Level.Item textAlign="centered">
+                        <div>
+                        <Heading>Total Cases</Heading>
+                        <Title as="p">{numeral(usStatesStats.confirmed).format('0,0')}</Title>
+                        </div>
+                    </Level.Item>
+                    
+                </Level>        
+                
+                <Level breakpoint="mobile">
+                    <Level.Item textAlign="centered">
+                        <div>
+                        <Heading>Total Deaths</Heading>
+                        <Title as="p">{numeral(usStatesStats.deaths).format('0,0')}</Title>
+                        </div>
+                    </Level.Item>
+                    <Level.Item textAlign="centered">
+                        <div>
+                        <Heading>New Cases (as of today)</Heading>
+                        { renderChangeDifference(usStatesStats.newConfirmed)}
+                        </div>
+                    </Level.Item>
+                </Level>
 
-        <Level>
-            <Level.Item>
+                <Level breakpoint="mobile"> 
+                    <Level.Item textAlign="centered">
+                        <div>
+                        <Heading>Mortality Rate</Heading>
+                        <Title as="p">{numeral(usStatesStats.mortality).format('0.0 %')}</Title>
+                        </div>
+                    </Level.Item>
+
+                    <Level.Item textAlign="centered">
+                        <div>
+                        <Heading>New Deaths (as of today)</Heading>
+                        { renderChangeDifference(usStatesStats.newDeaths)}
+                        </div>
+                    </Level.Item>               
+                </Level>
+            </Container>
+            </Column>
+
+            <Column className="chart">
+                <Title size={2} align="center"><Heading>Top 10 Confirmed</Heading>Cases by State</Title>
                 <GraphWithLoader 
-                    graphName="top_10_countries_graph"
-                    secondaryGraph="top_10_countries_graph"
-                    graph={globalTop10}
-                    width={width}
-                    height={height}
-                    selected={Object.keys(globalTop10)}
-                />
-            </Level.Item>
-        </Level>
-
-        <hr />
-
-        <Level>
-            <Level.Item>
-                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid')}}>Compare Country Stats</Button>
-            </Level.Item>
-        </Level>
-
-        <hr />
-
-        <Level>
-            <Level.Item>
-                <Heading>Top 10 Confirmed Cases (by continent)</Heading>
-            </Level.Item>
-        </Level>
-
-        <Level>
-            <Level.Item>
-                <GraphWithLoader 
-                    graphName="continental_graph"
-                    secondaryGraph="continental_graph"
-                    graph={confirmedContinental}
-                    width={width}
-                    height={height}
-                    selected={['North America', 'Asia', 'Europe', 'South America']}
-                />
-            </Level.Item>
-        </Level>
-
-        <Level>
-            <Level.Item>
-                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Compare Continental Stats</Button>
-            </Level.Item>
-        </Level>
-
-        <hr />
-        
-
-        <Level>
-            <Level.Item>
-                <Title size={3}>Today's United States Totals</Title>
-            </Level.Item>
-        </Level>
-
-        <Level>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Total Cases</Heading>
-                <Title as="p">{numeral(usStatesStats.confirmed).format('0,0')}</Title>
-                </div>
-            </Level.Item>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Total Deaths</Heading>
-                <Title as="p">{numeral(usStatesStats.deaths).format('0,0')}</Title>
-                </div>
-            </Level.Item>
-        </Level>        
-        
-
-        <Level>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>New Cases</Heading>
-                { renderChangeDifference(usStatesStats.newConfirmed)}
-                </div>
-            </Level.Item>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>New Deaths</Heading>
-                { renderChangeDifference(usStatesStats.newDeaths)}
-                </div>
-            </Level.Item>
-        </Level>
-
-        <Level>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Recovery Rate</Heading>
-                <Title as="p">{numeral(usStatesStats.recovery).format('0.0 %')}</Title>
-                </div>
-            </Level.Item>
-            <Level.Item textAlign="centered">
-                <div>
-                <Heading>Mortality Rate</Heading>
-                <Title as="p">{numeral(usStatesStats.mortality).format('0.0 %')}</Title>
-                </div>
-            </Level.Item>
-        </Level>
-
-        <hr />
-
-        <Level>
-            <Level.Item>
-                <Heading>Top 10 Confirmed Cases (by State)</Heading>
-            </Level.Item>
-        </Level>
-
-        <Level>
-            <Level.Item>
-                <GraphWithLoader 
-                    graphName="top_10_states_graph"
-                    secondaryGraph="top_10_states_graph"
+                    graphName="Top 10 Confirmed Cases"
+                    secondaryGraph="Top 10 Confirmed Cases"
                     graph={usStatesTop10}
-                    width={width}
-                    height={height}
-                    selected={Object.keys(usStatesTop10)}
+                    selected={['New York', 'Washington', 'California', 'Massachusetts', 'New Jersey', 'Colorado', 'Florida', 'Louisiana', 'Georgia', 'Illinois']}
                 />
-            </Level.Item>
-        </Level>
+            </Column>
 
-        <Level>
-            <Level.Item>
-                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Compare U.S. Stats</Button>
-            </Level.Item>
-        </Level>
-
-        <hr />
-        
-        <Level>
-            <Level.Item>
-                <Heading>Top U.S. Regions</Heading>
-            </Level.Item>
-        </Level>
-
-        <Level>
-            <Level.Item>
+            <Column className="chart">
+                <Title size={2} align="center"><Heading>Top Coronavirus Cases</Heading>By U.S. Region</Title>
                 <GraphWithLoader 
-                    graphName="top_us_regions_graph"
-                    secondaryGraph="top_us_regions_graph"
+                    graphName="Top Regions Cases"
+                    secondaryGraph="Top Regions Cases"
                     graph={confirmedUSRegions}
-                    width={width}
-                    height={height}
                     selected={['Midwest', 'Northeast', 'South', 'West']}
                 />
-            </Level.Item>
-        </Level>
+            </Column>
+            </Column.Group>
 
-        <Level>
-            <Level.Item>
-                <Button color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>Compare U.S. Regions</Button>
-            </Level.Item>
-        </Level>
+            <Button.Group align="center">
+                <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Compare U.S. Regions</Button>
+            </Button.Group>
+        </Box>
 
         </>
     )    

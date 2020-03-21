@@ -10,7 +10,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tab, Level } from "rbx"
+import { Hero, Container, Title, Box, Tab, Button } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
@@ -78,27 +78,46 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
         handleHistory(selectedContinents, selectedGraph)
     }
     
+    const HeroElement = (props) => {
+        return (
+            <Hero size="medium">
+                <Hero.Body>
+                <Container>
+                    <Title subtitle size={2}>Global</Title>
+                    <Title size={1}>Coronavirus Cases <br/>by Continent</Title>
+                    <Button.Group>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid')}}>Cases By Country</Button>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Cases By Continent</Button>
+                    </Button.Group>
+                </Container>
+                </Hero.Body>
+            </Hero>
+        )
+    }
+
     if(!sortedConfirmed) {
         return (
-            <h1>Loading...</h1>
+        <>
+            <HeroElement />
+            <Box>
+                <h1>Loading...</h1>
+            </Box>
+        </>
         )
     }
     return (
+    <>
+        <HeroElement />
+        <Box>
         <TwoGraphLayout>
 
+            <SelectRegionComponent
+                    data={sortedConfirmed}
+                    selected={selectedContinents}
+                    handleSelected={dataList => handleSelectedRegion(dataList)} />
+                   
             <>
-                <Level>
-                    <Level.Item>
-                        <SelectRegionComponent
-                            data={sortedConfirmed}
-                            selected={selectedContinents}
-                            handleSelected={dataList => handleSelectedRegion(dataList)} />
-                    </Level.Item>                        
-                </Level>
-            </>
-
-            <>
-                <Tab.Group>
+                <Tab.Group size="large" kind="boxed">
                     <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
                     <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
                     <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
@@ -134,14 +153,11 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
                     y_type="percent"
                     y_title="Mortality Rate Percentage"
                 />
-        
-            </>
-
-            <>
-
             </>
 
         </TwoGraphLayout>
+        </Box>
+    </>
     )    
 }
 

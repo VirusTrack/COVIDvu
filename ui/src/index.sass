@@ -1,0 +1,320 @@
+$tertiary: hsla(5,87,70,1)
+$secondary: hsla(188,80,38,1)
+$primary: hsla(221,63,33,1)
+
+$offwhite: hsla(216,17,94,1)
+
+$drop-shadow-large: 0px 10px 30px rgba(11, 56, 156, 0.05), 0px 7px 20px rgba(11, 56, 156, 0.05);
+
+html 
+  font-size: 10px
+
+body 
+  margin: 0
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  --tertiary: hsla(5,87,70,1)
+  --secondary: hsla(188,80,38,1)
+  --primary: hsla(221,63,33,1)
+  --offwhite: hsla(216,17,94,1)
+  font-size: 1.6rem
+  background: url('./images/hero-tall.svg') #FAFAFA no-repeat
+  background-position: center top
+  background-size: 100%
+  @media screen and (max-width: 1024px)
+    background-size: 135vw
+  @media screen and (max-width: 901px)
+    background-size: 155vw
+  @media screen and (max-width: 700px)
+    background-size: 240vw
+  @media screen and (min-width: 900px)
+    background-size: 120vw
+  @media screen and (min-width: 1400px)
+    background-size: 100%
+
+    
+
+
+a 
+  color: #{$primary}
+  &:hover 
+    color: #{$secondary}
+
+p 
+  color: hsla(189,4,47,1)
+
+code 
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace
+
+
+.hero
+  @media screen and (min-width: 1024px)
+    .buttons .button:not(:last-child)
+        margin-right: 2rem
+  @media screen and (max-width: 1025px)
+    text-align: center
+    align-content: center
+    .buttons
+      justify-content: center
+      .button:not(:last-child)
+        margin-right: 1rem
+  .subtitle 
+    color: #{$secondary}
+  .title 
+    color: white
+    font-family: archivo
+    font-size: 3.6rem
+    @media screen and (min-width: 1024px)
+      font-size: 6.4rem
+  .tag 
+    font-size: 1.2rem
+    background-color: transparent
+    color: white
+  
+
+.navbar 
+  box-shadow: #{$drop-shadow-large}
+  background: white
+  .logomark
+    width: 3.6rem
+    height: auto
+    display: block
+    max-height: none
+    margin: -1rem 1rem -1rem 0
+  .navbar-brand
+    padding: 1rem 1rem
+  .navbar-burger.is-active
+    background: transparent
+  .navbar-dropdown
+    font-size: 1.6rem
+    @media screen and (max-width: 1025px)
+      display: block
+      padding-bottom: 1.5rem
+      .navbar-item
+        font-size: 1.8rem
+        padding: 0
+  .navbar-link:not(.is-arrowless)
+    padding-right: 2rem
+    &:after
+      right: 0
+  .navbar-menu
+    box-shadow: none
+    font-family: archivo
+    background: #{$offwhite}
+    padding: 2rem
+    font-size: 2.8rem
+    @media screen and (min-width: 1024px)
+      background: white
+      font-size: 1.6rem
+      justify-content: flex-end
+      .navbar-start
+        margin: 0 auto
+        justify-self: center
+      .navbar-end 
+        margin-left: 0
+        justify-self: flex-end
+    &.is-active
+      min-height: 100vh
+      display: flex
+      flex-direction: column
+      justify-content: center
+      text-align: right
+      .navbar-end 
+        margin-top: 3rem
+    .navbar-item 
+      margin: 0 1rem
+      border-radius: .5rem
+      
+      img 
+        @media screen and (max-width: 1025px)
+          display: none
+        @media screen and (min-width: 1024px)
+          display: block
+          width: 1em
+          height: 1em
+          margin-right: .75rem
+          opacity: .7
+    .navbar-item.is-active,
+    .navbar-dropdown .navbar-item.is-active
+      background: transparent
+      @media screen and (min-width: 1024px)
+        background-color: #{$offwhite} !important
+        img 
+          opacity: 1
+    .navbar-item:hover,
+    .navbar-link:hover 
+      color: black
+      
+      .navbar-link:hover 
+      @media screen and (max-width: 1025px)
+        background: transparent
+        
+
+#root > .content
+  padding: 0 1rem
+
+.navbar-brand 
+  .title
+    font-family: 'Archivo'
+    text-transform: uppercase
+    font-size: 1.4rem
+    color: #{$primary}
+    span 
+      color: #{$tertiary}
+    @media screen and (min-width: 1024px)
+      font-size: 1.6rem
+
+.box 
+  padding: 0
+  border: 0
+  box-shadow: #{$drop-shadow-large}
+  border-radius: 1rem
+  position: relative
+  z-index: 2
+  overflow: hidden
+  .title > img 
+    width: 1em
+    height: auto
+    margin-bottom: -.1em
+    margin-right: .5em
+  .notification 
+    border-bottom: .1rem solid #{$offwhite}
+  &:not(:last-child)
+    margin-bottom: 5rem
+  .buttons 
+    text-align: center
+    margin: auto
+    display: block
+    background: #F4F5F8
+    border-bottom-left-radius: .5rem
+    border-bottom-right-radius: .5rem
+    @media screen and (min-width: 1024px)
+      .button:not(:last-child)
+        margin-right: 1.5rem
+  > *:not(hr)
+    padding: 1.5rem 2rem
+  > .title:first-child
+      padding-bottom: 1.5rem
+      margin-bottom: 0
+      text-align: center
+      border-bottom: .1rem solid #{$offwhite}
+      @media screen and (min-width: 1024px)
+        padding-bottom: 2.5rem
+        padding-top: 2.5rem
+        & + .columns 
+          margin-top: 0
+          padding-top: 0
+          margin-bottom: 0
+          padding-bottom: 0
+          .statistics
+            margin-right: 1.5rem
+          .column 
+            > *:first-child 
+              margin-top: 1.5rem
+            > *:last-child
+              margin-bottom: 1.5rem
+
+hr 
+  height: .1rem
+  background-color: hsla(221,87,33,.1)
+
+.heading
+    margin-bottom: 0rem
+    text-transform: none
+    letter-spacing: 0
+    font-weight: 400
+
+
+.columns.separated,
+.columns.separated.is-gapless
+  @media screen and (max-width: 1024px)
+    .column 
+      margin-top: 4rem
+      margin-bottom: 4rem
+      padding-bottom: 4rem !important
+    .column:not(:last-child)
+      border-bottom: .1rem solid #{$offwhite}
+  @media screen and (min-width: 1024px)
+    margin: 0
+    padding: 0
+    .column 
+      margin: 0
+      padding: 0
+    .column:not(:last-child)
+      border-right: .1rem solid #{$offwhite}
+      padding-right: 1rem
+    
+
+.statistics
+  min-width: 30rem
+  max-width: 40rem
+  .level 
+    margin-bottom: 3rem
+    .level-item
+      width: 50%
+      margin: 0 auto
+    .heading
+      margin-bottom: 0
+    .title 
+      font-weight: 700
+      font-size: 3.2rem
+  .level:first-of-type 
+    .level-item
+      width: 100%
+    .title
+      font-size: 5.6rem
+
+.button
+  &.is-primary
+    background-color: #{$secondary}
+    &:hover
+      background-color: #{lighten($secondary, 5%)}
+  &.is-secondary
+    background-color: #{$primary}
+  &.is-large
+    padding: 0rem 4rem
+    min-height: 4rem 
+    box-shadow: #{$drop-shadow-large}
+
+.chart > .title:first-of-type 
+  margin-bottom: 3rem
+
+.footer 
+  padding: 47rem 2rem 20rem 2rem
+  margin-top: -35rem
+  background: url('./images/footer.svg') center bottom no-repeat
+  background-position: center bottom
+  min-height: 80rem
+  z-index: 1
+  position: relative
+  .tag 
+    font-size: 1.2rem
+    margin-right: 2rem
+    background-color: #{$secondary}
+    color: white
+  p
+    margin-bottom: 2rem
+
+.tabs ul 
+  margin-left: 0
+
+.select-sidebar
+  background: #{$offwhite}
+
+.is-tooltip-right.select
+  margin: 1.5rem
+  @media screen and (min-width: 1024px)
+    width: 100%
+    height: 100%
+    margin: 0
+    margin-top: 0 !important
+    margin-right: 0 !important
+
+.select select[multiple]
+  height: 100%
+  width: 100%
+  background: #{$offwhite}
+  margin: 0
+  border: 0
+  border-radius: 0

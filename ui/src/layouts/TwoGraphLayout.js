@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Column, Notification } from 'rbx'
+import { Column, Level, Title } from 'rbx'
 
 export const TwoGraphLayout = ({ children }) => {
     const nodes = React.Children.toArray(children);
@@ -8,28 +8,25 @@ export const TwoGraphLayout = ({ children }) => {
     return (
         <>
 
-            <Column.Group gapless>
-                <Column>
-                    <Notification>
-                        <p>Compare specific regions using the multi-select below. Ctrl or Cmd-click to select multiple regions.</p>
-                    </Notification>
-                </Column>
-            </Column.Group>
+        <Title as="p" style={{fontSize: '1.4rem', fontWeight: 400}}>
+            Compare specific regions using the multi-select below. Ctrl or Cmd-click to select multiple regions.
+        </Title> 
 
-            <Column.Group gapless>
-                <Column size={3}>
+            <Column.Group breakpoint="tablet" style={{margin: 0, padding: 0}} gapless>
+                <Column size={3} style={{margin: 0, padding: 0}} className="select-sidebar">
                     {nodes[0]}
                 </Column>
-                <Column>
+                <Column style={{margin: '1.5rem'}}>
+                    <Level align="right">
+                        {nodes[2]}
+                    </Level>
                     {nodes[1]}
-                </Column>
-                <Column size={2}>
-                    {nodes[2]}                                    
-                </Column>
 
+                    {children.slice(3)}
+                </Column>
             </Column.Group>
 
-            {children.slice(3)}
+            
 
         </>
     )
