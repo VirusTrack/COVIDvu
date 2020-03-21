@@ -23,8 +23,9 @@ RAW_DATA_FILE="$SITE_DATA_DIR/raw-source.html"
 RAW_DATA_SOURCE="https://docs.google.com/spreadsheets/d/e/2PACX-1vR30F8lYP3jG7YOq8es0PBpJIE5yvRVZffOyaqC0GgMBN6yt0Q-NI8pxS7hd1F9dYXnowSC6zpZmW9D/pubhtml?gid=0&amp;single=false&amp;widget=true&amp;headers=true"
 TMP_OUTPUT="/tmp/refreshdata.log"
 UPDATE_ERROR="$SITE_DATA_DIR/ERROR.txt"
-UPDATE_NOTICE="$SITE_DATA_DIR/$UPDATE_NOTICE_FILE"
+# -- order is imortant:
 UPDATE_NOTICE_FILE="last-update.txt"
+UPDATE_NOTICE="$SITE_DATA_DIR/$UPDATE_NOTICE_FILE"
 
 
 # *** functions ***
@@ -168,22 +169,24 @@ function patchJSONFiles {
         ls -Alrt "$SITE_DATA_DIR"/*html
 
         echo "vudpatch - patching stale JH CSSE data with latest, calculated updates"
-        ./vudpatch
+        python -m covidvu.pipeline.vudpatch confirmed deaths recovered
+        ls -Alrt "$SITE_DATA_DIR"/*json
     fi
 } # patchJSONFiles
 
 
 function packJSONFiles {
-    # TODO: Define the virtual environment for this whole script instead of lots
-    #       of little scripts scattered all over the disk.
     echo "jsonpack - combine individual JSON files into a single blob"
-    ./jsonpack
+    python3 -m covidvu.pipeline.jsonpack
+    ls -Alrt "$SITE_DATA_DIR"/*json
 } # packJSONFiles
 
 
 function generateRegionsJSONBundle {
     echo "vuregions - generate continental region summaries"
-    ./vuregions
+    env | awk '/VIRT/' | sort
+    python3 -m covidvu.pipeline.vuregions
+    ls -Alrt "$SITE_DATA_DIR"
 } # generateRegionsJSONBundle
 
 
@@ -198,8 +201,6 @@ function deployVirusUpdateJSON {
     local targetBucket="$1"
 
     echo "cloning $SITE_DATA_DIR to the $targetBucket website"
-    # TODO:  Decide whether to keep these or not.
-    # rm -f "$SITE_DATA_DIR"/*html "$SITE_DATA_DIR"/*tsv
     rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$targetBucket/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
 
     invalidateCloudFrontCache
