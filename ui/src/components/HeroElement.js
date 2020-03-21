@@ -6,7 +6,8 @@ import { actions } from '../ducks/services'
 
 import { Hero, Container, Button, Title } from "rbx"
 
-export const HeroElement = ({title, subtitle, buttons}) => {
+export const HeroElement = ({title, subtitle, buttons, children}) => {
+    const nodes = React.Children.toArray(children);
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -18,7 +19,7 @@ export const HeroElement = ({title, subtitle, buttons}) => {
             history.push(pageLocation)
         }
     }
- 
+
     return (
         <Hero size="medium">
             <Hero.Body>
@@ -36,6 +37,8 @@ export const HeroElement = ({title, subtitle, buttons}) => {
                     ))}
                 </Button.Group>
                 }
+
+                {nodes}
             </Container>
             </Hero.Body>
         </Hero>

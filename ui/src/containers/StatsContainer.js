@@ -6,7 +6,7 @@ import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import { Box, Table, Title, Tab, Generic } from 'rbx'
+import { Table, Title, Tab, Generic } from 'rbx'
 
 import numeral from 'numeral'
 
@@ -15,6 +15,7 @@ import store from 'store2'
 import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
 import HeroElement from '../components/HeroElement'
+import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 export const StatsContainer = ({filter='Global'}) => {
 
@@ -40,14 +41,6 @@ export const StatsContainer = ({filter='Global'}) => {
         if(REGION_URLS.hasOwnProperty(key))
             window.open(REGION_URLS[key], "_blank")
     }
-
-    const StatsHeroElement = () => (
-        <HeroElement
-            title={
-                <>Coronavirus <br />COVID-19 Statistics</>
-            }
-        />
-    )
 
     /**
      * Fetch all the data
@@ -78,96 +71,89 @@ export const StatsContainer = ({filter='Global'}) => {
         }
     }, [selectedTab, statsTotals, usStatsTotals, history])
 
-    if(!statsTotals) {
-        return (
-            <>
-            <StatsHeroElement/>
-            <Box>
-                <h1>Loading...</h1>
-            </Box>
-        </>
-        )
-    }
-
     return (
         <>
-        <StatsHeroElement/>
+        <HeroElement
+            title={
+                <>Coronavirus <br />COVID-19 Statistics</>
+            }
+        />
 
-        <Box>
-        <Tab.Group size="large">
-            <Tab active={selectedTab === 'Global'} onClick={() => { setSelectedTab('Global')}}>Global</Tab>
-            <Tab active={selectedTab === 'US'} onClick={() => { setSelectedTab('US')}}>United States</Tab>
-        </Tab.Group>
+        <BoxWithLoadingIndicator hasData={statsTotals}>
+            <Tab.Group size="large">
+                <Tab active={selectedTab === 'Global'} onClick={() => { setSelectedTab('Global')}}>Global</Tab>
+                <Tab active={selectedTab === 'US'} onClick={() => { setSelectedTab('US')}}>United States</Tab>
+            </Tab.Group>
 
-        <div className="table-container">
-        <Table fullwidth hoverable>
-            <Table.Head>
-                <Table.Row>
-                    <Table.Heading>
-                        Region
-                    </Table.Heading>
-                    <Table.Heading>
-                        Total Cases
-                    </Table.Heading>
-                    <Table.Heading>
-                        New Cases
-                    </Table.Heading>
-                    <Table.Heading>
-                        Deaths
-                    </Table.Heading>
-                    <Table.Heading>
-                        New Deaths
-                    </Table.Heading>
-                    {/* <Table.Heading>
-                        Recovered
-                    </Table.Heading> */}
-                    <Table.Heading>
-                        Mortality Rate
-                    </Table.Heading>
-                    {/* <Table.Heading>
-                        Recovery Rate
-                    </Table.Heading> */}
-                </Table.Row>
-            </Table.Head>
-            <Table.Body>
-                { statsForGraph ? statsForGraph.map((stat, idx) => (
-                <Table.Row key={idx}>
-                    <Table.Cell>                        
-                        <Generic as="a" tooltipPosition="right" onClick={()=>{ redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>{renderDisplay(stat.region)}</Generic>
-                    </Table.Cell>
-                    <Table.Cell>
-                        <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
-                    </Table.Cell>
-                    <Table.Cell>
-                        <Title size={5}>{numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')}</Title>
-                    </Table.Cell>
-                    <Table.Cell>
-                        <Title size={5}>{numeral(stat.deaths).format('0,0')}</Title>
-                    </Table.Cell>
-                    <Table.Cell>
-                        <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')}</Title>
-                    </Table.Cell>
-                    {/* <Table.Cell>
-                        <Title size={5}>{numeral(stat.recovered).format('0,0')}</Title>
-                    </Table.Cell> */}
-                    <Table.Cell>
-                        <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
-                    </Table.Cell>
-                    {/* <Table.Cell>
-                        <Title size={6}>{numeral(stat.recovery).format('0.0 %')}</Title>
-                    </Table.Cell> */}
-                </Table.Row>
-                )) : (
+            <div className="table-container">
+            <Table fullwidth hoverable>
+                <Table.Head>
                     <Table.Row>
-                        <Table.Cell>
-                            Loading...
-                        </Table.Cell>
+                        <Table.Heading>
+                            Region
+                        </Table.Heading>
+                        <Table.Heading>
+                            Total Cases
+                        </Table.Heading>
+                        <Table.Heading>
+                            New Cases
+                        </Table.Heading>
+                        <Table.Heading>
+                            Deaths
+                        </Table.Heading>
+                        <Table.Heading>
+                            New Deaths
+                        </Table.Heading>
+                        {/* <Table.Heading>
+                            Recovered
+                        </Table.Heading> */}
+                        <Table.Heading>
+                            Mortality Rate
+                        </Table.Heading>
+                        {/* <Table.Heading>
+                            Recovery Rate
+                        </Table.Heading> */}
                     </Table.Row>
-                )}
-            </Table.Body>
-        </Table>
-        </div>
-        </Box>
+                </Table.Head>
+                <Table.Body>
+                    { statsForGraph ? statsForGraph.map((stat, idx) => (
+                    <Table.Row key={idx}>
+                        <Table.Cell>                        
+                            <Generic as="a" tooltipPosition="right" onClick={()=>{ redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>{renderDisplay(stat.region)}</Generic>
+                        </Table.Cell>
+                        <Table.Cell>
+                            <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
+                        </Table.Cell>
+                        <Table.Cell>
+                            <Title size={5}>{numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')}</Title>
+                        </Table.Cell>
+                        <Table.Cell>
+                            <Title size={5}>{numeral(stat.deaths).format('0,0')}</Title>
+                        </Table.Cell>
+                        <Table.Cell>
+                            <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')}</Title>
+                        </Table.Cell>
+                        {/* <Table.Cell>
+                            <Title size={5}>{numeral(stat.recovered).format('0,0')}</Title>
+                        </Table.Cell> */}
+                        <Table.Cell>
+                            <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
+                        </Table.Cell>
+                        {/* <Table.Cell>
+                            <Title size={6}>{numeral(stat.recovery).format('0.0 %')}</Title>
+                        </Table.Cell> */}
+                    </Table.Row>
+                    )) : (
+                        <Table.Row>
+                            <Table.Cell>
+                                Loading...
+                            </Table.Cell>
+                        </Table.Row>
+                    )}
+                </Table.Body>
+            </Table>
+            </div>
+        </BoxWithLoadingIndicator>
         </>
     )    
 }

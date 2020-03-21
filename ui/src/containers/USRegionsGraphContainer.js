@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router'
+
 import queryString from 'query-string'
+import store from 'store2'
 
 import { useWindowSize, useInterval } from '../hooks/ui'
 
@@ -17,8 +19,7 @@ import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import GraphWithLoader from '../components/GraphWithLoader'
 import SelectRegionComponent from '../components/SelectRegionComponent'
 import HeroElement from '../components/HeroElement'
-
-import store from 'store2'
+import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
     const dispatch = useDispatch()
@@ -87,8 +88,8 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
         handleHistory(selectedRegions, selectedGraph)
     }    
 
-
-    const USRegionsHeroElement = () => (
+    return (
+        <>  
         <HeroElement
             subtitle="United States"
             title={
@@ -99,24 +100,8 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                 { title: 'Cases By Region', location: '/covid/us/regions' },
             ]}
         />
-    )
 
-    if(!sortedConfirmed) {
-        return (
-        <>
-            <USRegionsHeroElement />
-            <Box>
-                <h1>Loading...</h1>
-            </Box>
-        </>
-        )
-    }
-
-    return (
-        <>  
-        <USRegionsHeroElement/>
-        
-        <Box>
+        <BoxWithLoadingIndicator hasData={sortedConfirmed}>
         <TwoGraphLayout>
             <>            
             <SelectRegionComponent
@@ -190,7 +175,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
             </Notification> 
 
         </TwoGraphLayout>
-        </Box>
+        </BoxWithLoadingIndicator>
         </>
     )
 }

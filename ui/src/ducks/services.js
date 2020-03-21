@@ -169,7 +169,8 @@ export default function (state = initialState, action) {
                     recovered: action.recovered,
                     mortality: action.mortality,
                     recovery: action.recovery,
-                    // hospitalBeds: action.hospitalBeds,
+                    allCounties: action.allCounties,
+                    hospitalBeds: action.hospitalBeds,
                 }
             }
         case types.FETCH_TOTAL_GLOBAL_STATS_SUCCESS:
@@ -822,6 +823,7 @@ export function* fetchUSStates() {
         let deaths = us_states.deaths
         let recovered = us_states.recovered
         let hospitalBeds = us_states.hospitalBeds
+        let allCounties = us_states.allCounties
 
         console.timeEnd('fetchUSStates.axios')
 
@@ -838,6 +840,9 @@ export function* fetchUSStates() {
             if(hospitalBeds.hasOwnProperty(filterState)) {
                 delete hospitalBeds[filterState]
             }
+            if(allCounties.hasOwnProperty(filterState)) {
+                delete allCounties[filterState]
+            }
         }
 
         const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
@@ -849,8 +854,11 @@ export function* fetchUSStates() {
         const mortalityCounts = extractLatestCounts(mortality)
         const recoveryCounts = extractLatestCounts(recovery)
         // const hospitalBedsCounts = extractLatestCounts(hospitalBeds)
+        // const allCountiesCounts = extractLatestCounts(allCounties)
 
         const sortedConfirmed = confirmedCounts.sort((a, b) => b.stats - a.stats)
+
+        // const allCountiesSorted = allCountiesCounts.sort((a, b) => b.stats - a.stats)
 
         const deathByRegionKey = deathsCounts.reduce((obj, item) => {
             obj[item.region] = item
