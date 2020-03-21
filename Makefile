@@ -2,8 +2,8 @@
 # vim: set fileencoding=utf-8:
 
 
-DOCKER_IMAGE=pr3d4t0r/covidvu
-DOCKER_VERSION=1.0.3
+DOCKER_IMAGE=pr3d4t0r/$(shell cat dockerimagename.txt)
+DOCKER_VERSION=$(shell cat dockerimageversion.txt)
 
 include ./build.mk
 
