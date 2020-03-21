@@ -1,0 +1,12 @@
+{
+  "California": {
+    "San Francisco": {
+      "confirmed": 76,
+      "deaths": 0
+    },
+    "Orange": {
+      "confirmed": 53,
+      "deaths": 0
+    }
+  }
+}
