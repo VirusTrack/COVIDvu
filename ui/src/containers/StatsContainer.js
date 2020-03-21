@@ -23,9 +23,7 @@ export const StatsContainer = ({filter='Global'}) => {
 
     const [selectedTab, setSelectedTab] = useState(filter)
 
-    // const statsTotals = useSelector(state => state.services.global.statsTotals)
     const statsTotals = useSelector(state => state.services.globalStats)
-    // const usStatsTotals = useSelector(state => state.services.usStates.statsTotals)
     const usStatsTotals = useSelector(state => state.services.usStatesStats)
     
     const [statsForGraph, setStatsForGraph] = useState([])
@@ -55,21 +53,16 @@ export const StatsContainer = ({filter='Global'}) => {
      * Fetch all the data
      */
     useEffect(() => {
-        // dispatch(actions.fetchGlobal())
         dispatch(actions.fetchGlobalStats())
-
-        // dispatch(actions.fetchUSStates())
         dispatch(actions.fetchUSStatesStats())
 
     }, [dispatch])
 
     useInterval(() => {
         if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            // dispatch(actions.fetchGlobal())
             dispatch(actions.fetchGlobalStats())
         }
         if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
-            // dispatch(actions.fetchUSStates())
             dispatch(actions.fetchUSStatesStats())
         }
     }, ONE_MINUTE)
