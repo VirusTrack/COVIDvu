@@ -127,7 +127,12 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
             <Hero size="medium">
                 <Hero.Body>
                 <Container>
-                    <Title size={1}>Global Coronavirus<br/>COVID-19 Cases</Title>
+                    <Title subtitle size={2}>Global</Title>
+                    <Title size={1}>Coronavirus Cases <br/>by Country</Title>
+                    <Button.Group>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid')}}>Cases By Country</Button>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Cases By Continent</Button>
+                    </Button.Group>
                 </Container>
                 </Hero.Body>
             </Hero>
@@ -151,18 +156,15 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
         <TwoGraphLayout>
 
             <>
-                <Level>
-                    <Level.Item>
-                        <SelectRegionComponent
-                            data={sortedConfirmed}
-                            selected={selectedCountries}
-                            handleSelected={dataList => handleSelectedRegion(dataList)} />
-                    </Level.Item>                        
-                </Level>
+            <SelectRegionComponent
+                data={sortedConfirmed}
+                selected={selectedCountries}
+                handleSelected={dataList => handleSelectedRegion(dataList)} />
+
             </>
 
             <>
-                <Tab.Group>
+                <Tab.Group size="large" kind="boxed">
                     <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
                     <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
                     <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>

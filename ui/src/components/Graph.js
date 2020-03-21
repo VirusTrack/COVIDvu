@@ -45,19 +45,22 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
     let mergeConfig = { ...config,
         displayModeBar: false,
         showlegend: true,
+        responsive: true,
     }
 
     let layout = {
         title: title,
-        // width: width,
-        // height: height,
+        autosize: true,
+        width: undefined,
+        height: undefined,
         margin: {
-            l: 50,
+            l: 70,
             t: 0,
+            r: 10,
         },        
     }
 
-    if(detectMobile.isMobile()) {
+    if(false && detectMobile.isMobile()) {
         layout = {
             ...layout,
             xaxis: {
@@ -66,7 +69,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             yaxis: {
                 fixedrange: true
             },
-            width: width
+            //width: width
         }
     }
 
@@ -89,15 +92,17 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         xanchor: 'center',
         yanchor: 'top',
         y:-0.1,
-        x:0.5
+        x:0.5,
     }
 
     return (
-        <Generic tooltipPosition="right" tooltip="Clicking on legend items will remove them from graph">
+        <Generic tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
             <Plot
                 data={plotsAsValues}
                 layout={layout}
                 config={mergeConfig}
+                useResizeHandler={true}
+                style={{width: '100%', height: '100%', minHeight: '45rem'}}
             />
         </Generic>
     )

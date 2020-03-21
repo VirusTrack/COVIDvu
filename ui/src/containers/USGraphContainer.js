@@ -9,7 +9,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Hero, Container, Box, Tag, Tab, Notification, Generic, Title, Level } from "rbx"
+import { Hero, Container, Box, Tag, Tab, Notification, Generic, Title, Button } from "rbx"
 
 import { REGION_URLS, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
@@ -107,7 +107,12 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
             <Hero size="medium">
             <Hero.Body>
             <Container>
-                <Title size={1}>Coronavirus <br/>COVID-19 US States</Title>
+                <Title subtitle size={2}>United States</Title>
+                <Title size={1}>Coronavirus Cases <br/>by State</Title>
+                <Button.Group>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Cases By State</Button>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>Cases By Region</Button>
+                    </Button.Group>
             </Container>
             </Hero.Body>
         </Hero>
@@ -132,20 +137,15 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
         <Box>
         <TwoGraphLayout>
             <>
-                <Level>
-                    <Level.Item>
-                        <SelectRegionComponent
-                            data={sortedConfirmed}
-                            selected={selectedStates}
-                            handleSelected={dataList => handleSelectedRegion(dataList)} />
-                    </Level.Item>
-                </Level>
-
+            <SelectRegionComponent
+                data={sortedConfirmed}
+                selected={selectedStates}
+                handleSelected={dataList => handleSelectedRegion(dataList)} />
             </>
 
 
             <>
-                <Tab.Group>
+                <Tab.Group size="large" kind="boxed">
                     <Tab active={secondaryGraph === 'Confirmed'} onClick={() => { handleSelectedGraph('Confirmed')}}>Confirmed</Tab>
                     <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
                     <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
@@ -181,41 +181,24 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                     y_type='percent'
                     y_title="Mortality Rate Percentage"
                 />
-            
             </>
 
             <>
 
-                <Level>
-                    <Level.Item>
-                        <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
-                    </Level.Item>
-                </Level>
-
-
-                <Level>
-                    <Level.Item>
-                        <Notification color="info">
-                            <Title size={6}>Government Services</Title>
-                            {selectedStates.map((region, idx) => (
-                                <React.Fragment key={idx}>
-                                    <Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"} textColor="white">{renderDisplay(region)}</Generic><br />
-                                </React.Fragment>
-                            ))}
-                        </Notification>
-                    </Level.Item>
-                </Level>
-
+            <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
+            <Tag size="large" color="info">
+                Government Services: {selectedStates.map((region, idx) => (
+                    <React.Fragment key={idx}>
+                        <Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"} textColor="white">{renderDisplay(region)}</Generic><br />
+                    </React.Fragment>
+                ))}
+            </Tag>
             </>
 
             <>
-                <Level>
-                    <Level.Item>
-                        <Notification color="warning">
-                            The sum of all states and territories may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
-                        </Notification>
-                    </Level.Item>
-                </Level>
+            <Notification color="warning" size="small" style={{margin: '1.5rem'}}>
+                The sum of all states and territories may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
+            </Notification>
             </>
         </TwoGraphLayout>
         </Box>

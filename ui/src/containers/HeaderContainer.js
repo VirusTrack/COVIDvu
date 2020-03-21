@@ -26,6 +26,13 @@ import {
 
 import ReactGA from 'react-ga';
 
+import compassImg from '../images/fa-icon-compass.svg'
+import globeImg from '../images/fa-icon-globe.svg'
+import usflagImg from '../images/fa-icon-usflag.svg'
+import chartImg from '../images/fa-icon-chart.svg'
+import syncImg from '../images/fa-icon-sync.svg'
+import infoImg from '../images/fa-icon-info.svg'
+
 export const HeaderContainer = () => {
     const history = useHistory()
     const dispatch = useDispatch()
@@ -72,25 +79,42 @@ export const HeaderContainer = () => {
     return (
         <Navbar>
             <Navbar.Brand>
-                <Navbar.Item onClick={() => { changePage('/dashboard') }}>
-                    <img src={VirusTrackLogo} alt="" role="presentation" class="logomark"/>
+                <Navbar.Item onClick={() => { dispatch(actions.clearGraphs()); changePage('/dashboard') }}>
+                    <img src={VirusTrackLogo} alt="VirusTrack" role="presentation" className="logomark"/>
                     <Title size={5} title="Coronavirus COVID-19 Cases"><span>Virus</span>Track</Title>
                 </Navbar.Item>
                 <Navbar.Burger />
             </Navbar.Brand>
             <Navbar.Menu>
                 <Navbar.Segment align="start">
-                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{changePage('/dashboard')}}>Dashboard</Navbar.Item>
-                    <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid')}}>Global</Navbar.Item>
-                    <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>US States</Navbar.Item>
-                    <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>US Regions</Navbar.Item>
-                    <Navbar.Item active={selectedNav === '/covid/continental'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Continental</Navbar.Item>
-                    <Navbar.Item active={selectedNav === '/stats'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/stats')}}>Stats</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{dispatch(actions.clearGraphs());changePage('/dashboard')}}><img src={compassImg} alt=""/>Dashboard</Navbar.Item>
+                    
+                    <Navbar.Item hoverable dropdown>
+                        <Navbar.Link arrowless 
+                            onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid')}}
+                            active={selectedNav === '/covid' || selectedNav === '/covid/continental'}>
+                                <img src={globeImg} alt=""/>Global
+                        </Navbar.Link>
+                        <Navbar.Dropdown boxed>
+                            <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid')}}>Countries</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/continental'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Continental</Navbar.Item>
+                        </Navbar.Dropdown>
+                    </Navbar.Item>
+
+                    <Navbar.Item hoverable dropdown>
+                        <Navbar.Link arrowless onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}><img src={usflagImg} alt=""/>United States</Navbar.Link>
+                        <Navbar.Dropdown boxed>
+                            <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>US States</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>US Regions</Navbar.Item>
+                        </Navbar.Dropdown>
+                    </Navbar.Item>
+                    
+                    <Navbar.Item active={selectedNav === '/stats'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/stats')}}><img src={chartImg} alt=""/>Stats</Navbar.Item>
                 </Navbar.Segment>
 
                 <Navbar.Segment align="end">
-                    <Navbar.Item onClick={() => { forceRefresh() }}>Refresh</Navbar.Item>
-                    <Navbar.Item active={selectedNav === '/about'} onClick={()=>{history.push('/about')}}>About</Navbar.Item>
+                    <Navbar.Item onClick={() => { forceRefresh() }}><img src={syncImg} alt=""/>Refresh</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/about'} onClick={()=>{history.push('/about')}}><img src={infoImg} alt=""/>About</Navbar.Item>
                 </Navbar.Segment>
             </Navbar.Menu>
         </Navbar>

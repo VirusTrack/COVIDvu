@@ -16,8 +16,6 @@ export const GraphWithLoader = ({graphName, title, secondaryGraph, x_title, y_ty
                 y_type={y_type}
                 x_title={x_title}
                 y_title={y_title}
-                width={width}
-                height={height}
             />
 
             ) : (

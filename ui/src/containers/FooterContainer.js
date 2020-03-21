@@ -5,7 +5,7 @@ import { useInterval } from '../hooks/ui'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import {Content, Container, Footer, Tag, Column} from "rbx"
+import {Container, Footer, Tag, Column} from "rbx"
 
 import { CACHE_TIMER } from '../constants'
 

@@ -10,7 +10,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Hero, Container, Title, Box, Tab, Level, Column } from "rbx"
+import { Hero, Container, Title, Box, Tab, Button } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
@@ -83,7 +83,12 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
             <Hero size="medium">
                 <Hero.Body>
                 <Container>
+                    <Title subtitle size={2}>Global</Title>
                     <Title size={1}>Coronavirus Cases <br/>by Continent</Title>
+                    <Button.Group>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid')}}>Cases By Country</Button>
+                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Cases By Continent</Button>
+                    </Button.Group>
                 </Container>
                 </Hero.Body>
             </Hero>
@@ -106,55 +111,49 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
         <Box>
         <TwoGraphLayout>
 
-                <Column.Group>
-                <Column>
-                    <SelectRegionComponent
-                            data={sortedConfirmed}
-                            selected={selectedContinents}
-                            handleSelected={dataList => handleSelectedRegion(dataList)} />
-                    </Column>                      
-                </Column.Group>
+            <SelectRegionComponent
+                    data={sortedConfirmed}
+                    selected={selectedContinents}
+                    handleSelected={dataList => handleSelectedRegion(dataList)} />
+                   
+            <>
+                <Tab.Group size="large" kind="boxed">
+                    <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
+                    <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
+                    <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
+                </Tab.Group>
 
-                <>
-                    <Tab.Group>
-                        <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
-                        <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                        <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
-                    </Tab.Group>
+                <GraphWithLoader 
+                    graphName="Cases"
+                    secondaryGraph={secondaryGraph}
+                    graph={confirmed}
+                    width={width}
+                    height={height}
+                    selected={selectedContinents}
+                    y_title="Total confirmed cases"
+                />
 
-                    
+                <GraphWithLoader 
+                    graphName="Deaths"
+                    secondaryGraph={secondaryGraph}
+                    graph={deaths}
+                    width={width}
+                    height={height}
+                    selected={selectedContinents}
+                    y_title="Number of deaths"
+                />        
 
-                    <GraphWithLoader 
-                        graphName="Cases"
-                        secondaryGraph={secondaryGraph}
-                        graph={confirmed}
-                        width={width}
-                        height={height}
-                        selected={selectedContinents}
-                        y_title="Total confirmed cases"
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Deaths"
-                        secondaryGraph={secondaryGraph}
-                        graph={deaths}
-                        width={width}
-                        height={height}
-                        selected={selectedContinents}
-                        y_title="Number of deaths"
-                    />        
-
-                    <GraphWithLoader 
-                        graphName="Mortality"
-                        secondaryGraph={secondaryGraph}
-                        graph={mortality}
-                        width={width}
-                        height={height}
-                        selected={selectedContinents}
-                        y_type="percent"
-                        y_title="Mortality Rate Percentage"
-                    />
-                </>
+                <GraphWithLoader 
+                    graphName="Mortality"
+                    secondaryGraph={secondaryGraph}
+                    graph={mortality}
+                    width={width}
+                    height={height}
+                    selected={selectedContinents}
+                    y_type="percent"
+                    y_title="Mortality Rate Percentage"
+                />
+            </>
 
         </TwoGraphLayout>
         </Box>
