@@ -8,7 +8,7 @@ import { useWindowSize, useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Hero, Title, Container, Box, Button, Tag, Tab, Notification, Level } from "rbx"
+import { Box, Tag, Tab, Notification, Level } from "rbx"
 
 import { CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
@@ -16,6 +16,7 @@ import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 import SelectRegionComponent from '../components/SelectRegionComponent'
+import HeroElement from '../components/HeroElement'
 
 import store from 'store2'
 
@@ -41,13 +42,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     useEffect(() => {
         dispatch(actions.fetchUSRegions())
     }, [dispatch])
-
-    const changePage = (pageLocation) => {
-        if(location.pathname !== pageLocation) {
-            dispatch(actions.clearGraphs())
-            history.push(pageLocation)
-        }
-    }
 
     useInterval(() => {
         if(store.session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
@@ -93,27 +87,24 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
         handleHistory(selectedRegions, selectedGraph)
     }    
 
-    const HeroElement = (props) => {
-        return (
-            <Hero size="medium">
-                <Hero.Body>
-                <Container>
-                    <Title subtitle size={2}>United States</Title>
-                    <Title size={1}>Coronavirus Cases <br/>by Region</Title>
-                    <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {changePage('/covid/us')}}>Cases By State</Button>
-                        <Button size="large" color="primary" onClick={() => {changePage('/covid/us/regions')}}>Cases By Region</Button>
-                    </Button.Group>
-                </Container>
-                </Hero.Body>
-            </Hero>
-        )
-    }
+
+    const USRegionsHeroElement = () => (
+        <HeroElement
+            subtitle="United States"
+            title={
+                <>Coronavirus Cases <br />by Region</>
+            }
+            buttons={[
+                { title: 'Cases By State', location: '/covid/us' },
+                { title: 'Cases By Region', location: '/covid/us/regions' },
+            ]}
+        />
+    )
 
     if(!sortedConfirmed) {
         return (
         <>
-            <HeroElement />
+            <USRegionsHeroElement />
             <Box>
                 <h1>Loading...</h1>
             </Box>
@@ -123,7 +114,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
 
     return (
         <>  
-        <HeroElement/>
+        <USRegionsHeroElement/>
         
         <Box>
         <TwoGraphLayout>

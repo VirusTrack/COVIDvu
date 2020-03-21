@@ -93,6 +93,7 @@ export const DashboardContainer = () => {
         )
     }
 
+    // TODO need a HeroElement which can grab children somehow?
     const HeroElement = (props) => {
         return (
             <Hero size="medium">

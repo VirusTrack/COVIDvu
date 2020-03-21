@@ -10,8 +10,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import HeroElement from '../components/HeroElement'
-import { Hero, Container, Box, Tag, Tab, Level, Button, Title } from "rbx"
+import { Box, Tag, Tab, Level } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
@@ -24,13 +23,13 @@ import numeral from 'numeral'
 import store from 'store2'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
+import HeroElement from '../components/HeroElement'
 
 export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'Cases'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
-    const location = useLocation()
-    const { search } = location
+    const { search } = useLocation()
 
     const [width, height] = useWindowSize()
 
@@ -78,13 +77,6 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
             return (
                 <Tag size="large" color="danger">Selected Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
             )
-        }
-    }
-
-    const changePage = (pageLocation) => {
-        if(location.pathname !== pageLocation) {
-            dispatch(actions.clearGraphs())
-            history.push(pageLocation)
         }
     }
 

@@ -10,7 +10,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Hero, Container, Title, Box, Tab, Button } from "rbx"
+import { Box, Tab } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
@@ -21,13 +21,13 @@ import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 import store from 'store2'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
+import HeroElement from '../components/HeroElement'
 
 export const ContinentalGraphContainer = ({continent = ['North America', 'Europe', 'Asia'], graph = 'Cases'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
-    const location = useLocation()
-    const { search } = location
+    const { search } = useLocation()
 
     const [width, height] = useWindowSize()
 
@@ -52,13 +52,6 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
             dispatch(actions.fetchContinental())
         }
     }, ONE_MINUTE)
-
-    const changePage = (pageLocation) => {
-        if(location.pathname !== pageLocation) {
-            dispatch(actions.clearGraphs())
-            history.push(pageLocation)
-        }
-    }
 
     useEffect(() => {
         if(!search) {
@@ -86,27 +79,23 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
         handleHistory(selectedContinents, selectedGraph)
     }
     
-    const HeroElement = (props) => {
-        return (
-            <Hero size="medium">
-                <Hero.Body>
-                <Container>
-                    <Title subtitle size={2}>Global</Title>
-                    <Title size={1}>Coronavirus Cases <br/>by Continent</Title>
-                    <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {changePage('/covid')}}>Cases By Country</Button>
-                        <Button size="large" color="primary" onClick={() => {changePage('/covid/continental')}}>Cases By Continent</Button>
-                    </Button.Group>
-                </Container>
-                </Hero.Body>
-            </Hero>
-        )
-    }
+    const ContinentalHeroElement = () => (
+        <HeroElement
+            subtitle="Global"
+            title={
+                <>Coronavirus Cases <br />by Continent</>
+            }
+            buttons={[
+                { title: 'Cases By Country', location: '/covid' },
+                { title: 'Cases By Continent', location: '/covid/continental' },
+            ]}
+        />
+    )
 
     if(!sortedConfirmed) {
         return (
         <>
-            <HeroElement />
+            <ContinentalHeroElement />
             <Box>
                 <h1>Loading...</h1>
             </Box>
@@ -115,7 +104,7 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
     }
     return (
     <>
-        <HeroElement />
+        <ContinentalHeroElement />
         <Box>
         <TwoGraphLayout>
 

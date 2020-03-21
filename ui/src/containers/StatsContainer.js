@@ -6,7 +6,7 @@ import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import { Hero, Container, Box, Table, Title, Tab, Generic } from 'rbx'
+import { Box, Table, Title, Tab, Generic } from 'rbx'
 
 import numeral from 'numeral'
 
