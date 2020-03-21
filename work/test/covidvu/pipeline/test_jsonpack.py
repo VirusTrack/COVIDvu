@@ -24,7 +24,7 @@ TEST_GROUPINGS = {
 
 def test_packDataset():
     for grouping in TEST_GROUPINGS:
-        packedDataset = packDataset(grouping, siteDataDirectory = TEST_SITE_DATA, groupings = TEST_GROUPINGS, reports = REPORTS, scrub = False)
+        packedDataset = packDataset(grouping, siteDataDirectory = TEST_SITE_DATA, groupings = TEST_GROUPINGS, reports = REPORTS)
 
         for report in REPORTS:
             assert packedDataset[report]
@@ -32,13 +32,17 @@ def test_packDataset():
         inputFileName = os.path.join(TEST_SITE_DATA, TEST_GROUPINGS[grouping]+'.json')
         packedDataset = json.loads(open(inputFileName).read())
 
-        try:
-            os.unlink(inputFileName)
-        except:
-            pass
+#         try:
+#             os.unlink(inputFileName)
+#         except:
+#             pass
 
         testValue = packedDataset['confirmed']['!Bogus']['2020-03-15']
         assert testValue == 166684
+
+        if '-US' == grouping:
+            assert 'hospitalBeds' in packedDataset
+            assert 'Alabama' in packedDataset['hospitalBeds']
 
 
 def test_main():

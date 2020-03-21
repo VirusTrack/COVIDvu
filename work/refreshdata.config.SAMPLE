@@ -12,4 +12,5 @@ export CONTAINER_SIG_FILE="/proc/1/cgroup"
 export STAGE_BUCKET="staging.virustrack.live"
 export SITE_BUCKET="virustrack.live"
 export SITE_DATA_DIR="site-data"
+export HOSPITAL_BEDS_US_FILE="resources/hospital-beds-count-US-20200320.json"
 

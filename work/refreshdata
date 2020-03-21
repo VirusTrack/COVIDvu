@@ -62,6 +62,12 @@ function assert_rcloneConfig {
 } # assert_rcloneConfig
 
 
+function assertHospitalBedsJSONFiles {
+    [[ -n "$HOSPITAL_BEDS_US_FILE" ]] || die "HOSPITAL_BEDS_US_FILE not defined" 12
+    [[ -e "$HOSPITAL_BEDS_US_FILE" ]] || die "HOSPITAL_BEDS_US_FILE $HOSPITAL_BEDS_US_FILE does not exist" 13
+} # assertHospitalBedsJSONFiles
+
+
 function resetSiteData {
     echo "resetting $SITE_DATA_DIR"
     rm -f "$SITE_DATA_DIR"/*
@@ -97,6 +103,14 @@ function generateVirusUpdateJSONFiles {
     echo "vujson - generating virus update JSON files"
     ./vujson
 } # generateVirusUpdateJSONFiles
+
+
+function generateHospitalBedsJSONFiles {
+    local hospitalBedsTargetFile="$SITE_DATA_DIR/hospital-beds-count-US.json"
+
+    printf "fetching current US hospital beds count\n  "
+    cp -vf "$HOSPITAL_BEDS_US_FILE" "$hospitalBedsTargetFile"
+} # generateHospitalBedsJSONFiles
 
 
 function patchJSONFiles {
@@ -162,6 +176,7 @@ resetSiteData "$1"
 assertCOVID19DirExists
 updateCOVID19DataSources
 generateVirusUpdateJSONFiles
+generateHospitalBedsJSONFiles
 patchJSONFiles "$2"
 packJSONFiles
 generateRegionsJSONBundle

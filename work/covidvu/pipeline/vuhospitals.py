@@ -5,7 +5,6 @@
 
 from os.path import join
 from time import sleep
-from tqdm.auto import tqdm
 
 from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import dumpJSON
@@ -15,12 +14,14 @@ import os
 import urllib
 
 import pandas as pd
+from tqdm.auto import tqdm
 
 
 # *** constants ***
 
-STATE_CODES_PATH = join(os.getcwd(), 'stateCodesUS.csv')
-OUT_FILE_NAME    = 'hospital-beds-count-US.json'
+ENDPOINT_REQUEST_DELAY  = 0.5 # seconds
+STATE_CODES_PATH        = join(os.getcwd(), 'stateCodesUS.csv')
+HOSPITAL_BEDS_FILE_NAME = 'hospital-beds-count-US.json'
 
 
 def resolveFileName(siteDataDirectory, outFileName):
@@ -28,6 +29,7 @@ def resolveFileName(siteDataDirectory, outFileName):
 
 
 def _getTotalBedsForPostalCode(postalCode):
+    # TODO: This looks a bit meh...  not a good practice for RESTful web services, I'll 
     url = f"http://www.communitybenefitinsight.org/api/get_hospitals.php?state={postalCode}"
     response = urllib.request.urlopen(url)
     assert response
@@ -35,7 +37,8 @@ def _getTotalBedsForPostalCode(postalCode):
     totalBeds = 0
     for i in range(len(data)):
         totalBeds += int(data[i]['hospital_bed_count'])
-    sleep(0.5)
+    sleep(ENDPOINT_REQUEST_DELAY)
+
     return totalBeds
 
 
@@ -48,8 +51,15 @@ def _getTotalBedCount(postCodes, nStateLimit = None):
     return bedCount
 
 
+def loadUSHospitalBedsCount(siteDataDirectory = SITE_DATA, inputFileName = HOSPITAL_BEDS_FILE_NAME):
+    with open(resolveFileName(siteDataDirectory, inputFileName), 'r') as inputFile:
+        payload = json.load(inputFile)
+
+    return payload
+    
+
 def _main(siteDataDirectory = SITE_DATA,
-          outFileName = OUT_FILE_NAME,
+          outFileName = HOSPITAL_BEDS_FILE_NAME,
           nStateLimit = None,
           ):
     postCodes = pd.read_csv(STATE_CODES_PATH)
@@ -62,3 +72,4 @@ def _main(siteDataDirectory = SITE_DATA,
 
 if '__main__' == __name__:
     _main()
+

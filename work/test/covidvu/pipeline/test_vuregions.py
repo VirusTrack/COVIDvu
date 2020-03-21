@@ -72,7 +72,7 @@ def test_COUNTRIES_REGIONS_table():
     countriesCheck = [countries for countries in COUNTRIES_REGIONS.keys() if countries not in countriesCSSE ]
 
     assert len(countriesCheck)
-    assert 'Zimbabwe' in countriesCheck
+    assert 'Other Region' in countriesCheck
 
 
 # test_COUNTRIES_REGIONS_table()
