@@ -68,6 +68,12 @@ function assertHospitalBedsJSONFiles {
 } # assertHospitalBedsJSONFiles
 
 
+function assertCountiesUSJSONFiles {
+    [[ -n "$COUNTY_CASES_US_FILE" ]] || die "COUNTY_CASES_US_FILE not defined" 14
+    [[ -e "$COUNTY_CASES_US_FILE" ]] || die "COUNTY_CASES_US_FILE $COUNTY_CASES_US_FILE does not exist" 15
+} # assertCountiesUSJSONFiles
+
+
 function resetSiteData {
     echo "resetting $SITE_DATA_DIR"
     rm -f "$SITE_DATA_DIR"/*
@@ -111,6 +117,14 @@ function generateHospitalBedsJSONFiles {
     printf "fetching current US hospital beds count\n  "
     cp -vf "$HOSPITAL_BEDS_US_FILE" "$hospitalBedsTargetFile"
 } # generateHospitalBedsJSONFiles
+
+
+function generateCountiesUSJSONFile {
+    local countiesUSTargetFile="$SITE_DATA_DIR/counties-US-all.json"
+
+    printf "fetching current US counties report\n  "
+    cp -vf "$COUNTY_CASES_US_FILE" "$countiesUSTargetFile"
+} # generateCountiesUSJSONFile
 
 
 function patchJSONFiles {
@@ -177,6 +191,7 @@ assertCOVID19DirExists
 updateCOVID19DataSources
 generateVirusUpdateJSONFiles
 generateHospitalBedsJSONFiles
+generateCountiesUSJSONFile
 patchJSONFiles "$2"
 packJSONFiles
 generateRegionsJSONBundle

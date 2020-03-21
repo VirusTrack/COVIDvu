@@ -6,7 +6,6 @@
 from covidvu.pipeline.vudpatch import fetchJSONData
 from covidvu.pipeline.vuhospitals import loadUSHospitalBedsCount
 from covidvu.pipeline.vujson import SITE_DATA
-from covidvu.pipeline.vujson import resolveReportFileName
 
 import json
 import os
@@ -15,6 +14,7 @@ import os
 # *** constants ***
 
 # TODO: This would be better served in a config file
+COUNTIES_US_FILE_NAME='counties-US-all.json'
 GROUPINGS = { 
                 ''           : 'bundle-global',
                 # '-Boats'     : 'bundle-boats',
@@ -27,6 +27,14 @@ REPORTS   = ( 'confirmed', 'deaths', 'recovered', )
 # +++ functions +++
 
 
+def loadUSCounties(siteDataDirectory = SITE_DATA, datasetFile = COUNTIES_US_FILE_NAME):
+    countiesFileName = os.path.join(siteDataDirectory, datasetFile)
+    with open(countiesFileName, 'r') as inputFile:
+        payload = json.load(inputFile)
+
+    return payload
+
+
 def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, reports = REPORTS):
     packedDataset  = dict()
     outputFileName = os.path.join(siteDataDirectory, groupings[grouping]+'.json')
@@ -35,6 +43,7 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
 
         if '-US' == grouping and 'confirmed' == report:
             packedDataset['hospitalBeds'] = loadUSHospitalBedsCount(siteDataDirectory)
+            packedDataset['allCounties']  = loadUSCounties(siteDataDirectory)
 
         # reportFileName = resolveReportFileName(siteDataDirectory, report, grouping)
         with open(outputFileName, 'w') as outputStream:

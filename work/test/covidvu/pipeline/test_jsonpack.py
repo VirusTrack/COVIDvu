@@ -4,6 +4,7 @@
 
 
 from covidvu.pipeline.jsonpack import REPORTS
+from covidvu.pipeline.jsonpack import loadUSCounties
 from covidvu.pipeline.jsonpack import packDataset
 
 import json
@@ -20,6 +21,15 @@ TEST_GROUPINGS = {
 
 
 # *** tests ***
+
+
+def test_loadUSCounties():
+    payload = loadUSCounties(siteDataDirectory = TEST_SITE_DATA)
+
+    assert payload
+    assert 'California' in payload
+    assert 'San Francisco' in payload['California']
+    assert 'confirmed' in payload['California']['San Francisco']
 
 
 def test_packDataset():
@@ -47,4 +57,6 @@ def test_packDataset():
 
 def test_main():
     pass  # It runs, the meat is in the packDataset function
+
+test_loadUSCounties()
 

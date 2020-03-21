@@ -1,0 +1,15 @@
+#!/bin/bash
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+
+export COUNTY_CASES_US_ENDPOINT="https://coronavirus-county-api.herokuapp.com/latest"
+
+
+# *** main ***
+
+curl -s "$COUNTY_CASES_US_ENDPOINT" | jq -M '.' > "$COUNTY_CASES_US_FILE" 
+
