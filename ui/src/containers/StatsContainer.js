@@ -6,7 +6,7 @@ import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import { Table, Title, Tab, Generic } from 'rbx'
+import { Table, Title, Tab, Generic, Button, Level } from 'rbx'
 
 import numeral from 'numeral'
 
@@ -17,12 +17,14 @@ import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KE
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const StatsContainer = ({filter='Global'}) => {
+export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
 
     const [selectedTab, setSelectedTab] = useState(filter)
+
+    const [daysAgo, setDaysAgo] = useState(daysAgoParam)
 
     const statsTotals = useSelector(state => state.services.globalStats)
     const usStatsTotals = useSelector(state => state.services.usStatesStats)
@@ -44,19 +46,22 @@ export const StatsContainer = ({filter='Global'}) => {
 
     /**
      * Fetch all the data
+     * 
+     * we should limit it to what's currently being viewed
      */
     useEffect(() => {
-        dispatch(actions.fetchGlobalStats())
-        dispatch(actions.fetchUSStatesStats())
+        dispatch(actions.clearStats())
+        dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
+        dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
 
-    }, [dispatch])
+    }, [dispatch, daysAgo])
 
     useInterval(() => {
         if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchGlobalStats())
+            dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
         }
         if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
-            dispatch(actions.fetchUSStatesStats())
+            dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
         }
     }, ONE_MINUTE)
 
@@ -80,9 +85,17 @@ export const StatsContainer = ({filter='Global'}) => {
         />
 
         <BoxWithLoadingIndicator hasData={statsTotals}>
+
+            <Level align="right">
+                <Level.Item >
+                <Button size="medium" onClick={() => {if(daysAgo !== 0) { setStatsForGraph([]); setDaysAgo(0) }}} color={daysAgo === 0 ? "primary" : "default"}>Now</Button>
+                &nbsp;
+                <Button size="medium" onClick={() => {if(daysAgo !== 1) { setStatsForGraph([]); setDaysAgo(1) }}} color={daysAgo === 1 ? "primary " : "default"}>Yesterday</Button></Level.Item>
+            </Level>
+
             <Tab.Group size="large">
-                <Tab active={selectedTab === 'Global'} onClick={() => { setSelectedTab('Global')}}>Global</Tab>
-                <Tab active={selectedTab === 'US'} onClick={() => { setSelectedTab('US')}}>United States</Tab>
+                <Tab active={selectedTab === 'Global'} onClick={() => { setStatsForGraph([]); setSelectedTab('Global')}}>Global</Tab>
+                <Tab active={selectedTab === 'US'} onClick={() => { setStatsForGraph([]); setSelectedTab('US')}}>United States</Tab>
             </Tab.Group>
 
             <div className="table-container">
@@ -98,25 +111,24 @@ export const StatsContainer = ({filter='Global'}) => {
                         <Table.Heading>
                             New Cases
                         </Table.Heading>
+                        { filter === 'US' &&
+                        <Table.Heading>
+                            Hospital Beds
+                        </Table.Heading>
+                        }
                         <Table.Heading>
                             Deaths
                         </Table.Heading>
                         <Table.Heading>
                             New Deaths
                         </Table.Heading>
-                        {/* <Table.Heading>
-                            Recovered
-                        </Table.Heading> */}
                         <Table.Heading>
                             Mortality Rate
                         </Table.Heading>
-                        {/* <Table.Heading>
-                            Recovery Rate
-                        </Table.Heading> */}
                     </Table.Row>
                 </Table.Head>
                 <Table.Body>
-                    { statsForGraph ? statsForGraph.map((stat, idx) => (
+                    { (statsForGraph && statsForGraph.length > 0) ? statsForGraph.map((stat, idx) => (
                     <Table.Row key={idx}>
                         <Table.Cell>                        
                             <Generic as="a" tooltipPosition="right" onClick={()=>{ redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>{renderDisplay(stat.region)}</Generic>
@@ -127,21 +139,20 @@ export const StatsContainer = ({filter='Global'}) => {
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')}</Title>
                         </Table.Cell>
+                        { filter === 'US' &&
+                        <Table.Heading>
+                            <Title size={5}>{stat.hospitalBeds > 0 ? numeral(stat.hospitalBeds).format('0,0') : '-'}</Title>
+                        </Table.Heading>
+                        }
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.deaths).format('0,0')}</Title>
                         </Table.Cell>
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')}</Title>
                         </Table.Cell>
-                        {/* <Table.Cell>
-                            <Title size={5}>{numeral(stat.recovered).format('0,0')}</Title>
-                        </Table.Cell> */}
                         <Table.Cell>
                             <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
                         </Table.Cell>
-                        {/* <Table.Cell>
-                            <Title size={6}>{numeral(stat.recovery).format('0.0 %')}</Title>
-                        </Table.Cell> */}
                     </Table.Row>
                     )) : (
                         <Table.Row>

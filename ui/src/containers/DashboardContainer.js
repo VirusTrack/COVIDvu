@@ -25,8 +25,6 @@ import globeImg from '../images/fa-icon-globe.svg'
 import usflagImg from '../images/fa-icon-usflag.svg'
 
 export const DashboardContainer = () => {
-
-    const session = store.session
     const dispatch = useDispatch()
     const history = useHistory()
 
@@ -45,20 +43,20 @@ export const DashboardContainer = () => {
     }, [dispatch])
 
     useInterval(() => {
-        if(session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
             dispatch(actions.fetchTop10Countries({
                 excludeChina: true
             }))
             dispatch(actions.fetchTotalGlobalStats())
         }
-        if(session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
             dispatch(actions.fetchTop10USStates())
             dispatch(actions.fetchTotalUSStatesStats())
         }
-        if(session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
             dispatch(actions.fetchUSRegions())
         }
-        if(session.get(CACHE_INVALIDATE_CONTINENTAL_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_CONTINENTAL_KEY)) {
             dispatch(actions.fetchContinental())
         }
     }, ONE_MINUTE)

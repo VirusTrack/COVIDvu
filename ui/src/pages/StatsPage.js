@@ -13,7 +13,7 @@ export const StatsPage = () => {
     const { search } = useLocation()
 
     let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
-
+    
     return (
         <MainLayout>
             <ErrorBoundary>

@@ -22,7 +22,7 @@ export const AboutPage = () => {
                         to the website.
                     </p>
                     <p>
-                        Everyone, we need help to test the site, provide suggestions and post issues to GitHub.
+                        Everyone, we need help to test the site, provide suggestions and post issues to <a href="https://github.com/pr3d4t0r/covidvu/issues" target="_new" rel="noopener noreferrer">GitHub</a>.
                     </p>
 
                     <Title size={4}>Helpful Links</Title>

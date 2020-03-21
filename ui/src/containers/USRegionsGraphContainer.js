@@ -10,7 +10,7 @@ import { useWindowSize, useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Box, Tag, Tab, Notification, Level } from "rbx"
+import { Tag, Tab, Notification, Level } from "rbx"
 
 import { CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 

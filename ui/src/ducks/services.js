@@ -20,6 +20,7 @@ import moment from "moment"
 
 export const types = {
     CLEAR_GRAPHS: 'CLEAR_GRAPHS',
+    CLEAR_STATS: 'CLEAR_STATS',
 
     FETCH_GLOBAL: 'FETCH_GLOBAL',
     FETCH_GLOBAL_SUCCESS: 'FETCH_GLOBAL_SUCCESS',
@@ -72,6 +73,8 @@ export const types = {
 
 export const actions = {
     clearGraphs: createAction(types.CLEAR_GRAPHS),
+    clearStats: createAction(types.CLEAR_STATS),
+
     fetchGlobal: createAction(types.FETCH_GLOBAL),
     fetchContinental: createAction(types.FETCH_CONTINENTAL),
 
@@ -121,6 +124,12 @@ export default function (state = initialState, action) {
                 totalUSStatesStats: {},
                 usStatesTop10: {},
                 usRegions: {}
+            }
+        case types.CLEAR_STATS:
+            return {
+                ...state,
+                globalStats: undefined,
+                usStatesStats: undefined,
             }
         case types.FETCH_TOP_10_COUNTRIES_SUCCESS:
             return {
@@ -250,15 +259,15 @@ const calculateMortalityAndRecovery = (deaths, confirmed, recovered) => {
     return { mortality, recovery }
 }
 
-const extractLatestCounts = (stats) => {
+const extractLatestCounts = (stats, daysAgo = 0) => {
     const regionWithLatestCounts = []
 
     for(const region of Object.keys(stats)) {
         const dates = Object.keys(stats[region])
 
-        const lastDate = dates[dates.length - 1]
+        const lastDate = dates[dates.length - daysAgo - 1]
 
-        const yesterDate = dates[dates.length - 2]
+        const yesterDate = dates[dates.length - daysAgo - 2]
 
         const currentNumbers = stats[region][lastDate]
         const yesterdayNumbers = stats[region][yesterDate]
@@ -372,6 +381,11 @@ export function* fetchUSStatesStats({payload}) {
 
     const dataService = new DataService()
 
+    let daysAgo = 0
+    if(payload && payload.daysAgo && !isNaN(daysAgo)) {
+        daysAgo = payload.daysAgo
+    }
+
     try {
         console.time('fetchUSStatesStats.axios')
 
@@ -380,6 +394,8 @@ export function* fetchUSStatesStats({payload}) {
         let confirmed = us_states.confirmed
         let deaths = us_states.deaths
         let recovered = us_states.recovered
+        let hospitalBeds = us_states.hospitalBeds
+
         console.timeEnd('fetchUSStatesStats.axios')
 
         for(let filterState of filterStates) {
@@ -392,16 +408,24 @@ export function* fetchUSStatesStats({payload}) {
             if(recovered.hasOwnProperty(filterState)) {
                  delete recovered[filterState]
             }
+            if(hospitalBeds.hasOwnProperty(filterState)) {
+                 delete hospitalBeds[filterState]
+            }
         }
+
+        let totalBeds = Object.values(hospitalBeds).reduce((total, beds) => total + beds)
+
+        console.log(`Total Beds: ${totalBeds}`)
+        hospitalBeds['!Total US'] = totalBeds
 
         const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
 
-        const confirmedCounts = extractLatestCounts(confirmed)
+        const confirmedCounts = extractLatestCounts(confirmed, daysAgo)
 
-        const deathsCounts = extractLatestCounts(deaths)
-        const recoveredCounts = extractLatestCounts(recovered)
-        const mortalityCounts = extractLatestCounts(mortality)
-        const recoveryCounts = extractLatestCounts(recovery)
+        const deathsCounts = extractLatestCounts(deaths, daysAgo)
+        const recoveredCounts = extractLatestCounts(recovered, daysAgo)
+        const mortalityCounts = extractLatestCounts(mortality, daysAgo)
+        const recoveryCounts = extractLatestCounts(recovery, daysAgo)
         const sortedConfirmed = confirmedCounts.sort((a, b) => b.stats - a.stats)
 
         const deathByRegionKey = deathsCounts.reduce((obj, item) => {
@@ -438,7 +462,8 @@ export function* fetchUSStatesStats({payload}) {
                     deathsDayChange: deathByRegionKey[region].dayChange,
                     recovered: recoveredByRegionKey[region].stats,
                     mortality: mortalityByRegionKey[region].stats,
-                    recovery: recoveryByRegionKey[region].stats
+                    recovery: recoveryByRegionKey[region].stats,
+                    hospitalBeds: hospitalBeds[region]
                 })
             }
         }
@@ -456,6 +481,11 @@ export function* fetchUSStatesStats({payload}) {
 
 export function* fetchGlobalStats({payload}) {
     console.time('fetchGlobalStats')
+
+    let daysAgo = 0
+    if(payload && payload.daysAgo && !isNaN(daysAgo)) {
+        daysAgo = payload.daysAgo
+    }
 
     const dataService = new DataService()
 
@@ -483,11 +513,11 @@ export function* fetchGlobalStats({payload}) {
         
         const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
 
-        const confirmedCounts = extractLatestCounts(confirmed)
-        const deathsCounts = extractLatestCounts(deaths)
-        const recoveredCounts = extractLatestCounts(recovered)
-        const mortalityCounts = extractLatestCounts(mortality)
-        const recoveryCounts = extractLatestCounts(recovery)
+        const confirmedCounts = extractLatestCounts(confirmed, daysAgo)
+        const deathsCounts = extractLatestCounts(deaths, daysAgo)
+        const recoveredCounts = extractLatestCounts(recovered, daysAgo)
+        const mortalityCounts = extractLatestCounts(mortality, daysAgo)
+        const recoveryCounts = extractLatestCounts(recovery, daysAgo)
         const sortedConfirmed = confirmedCounts.sort((a, b) => b.stats - a.stats)
         
         const deathByCountryKey = deathsCounts.reduce((obj, item) => {
