@@ -16,11 +16,15 @@ source ./pyrunner
 
 CONFIG_rclone="rclone.conf"
 COVID_19_DIR="COVID-19"
+HTML_FILE_NAME="$SITE_DATA_DIR/table-%02d.html"
 JSON_DATA_BUNDLE="COVID19-cases.tar.gz"
+PYAVKA_USER_AGENT="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:74.0) Gecko/20100101 Firefox/74.0"
+RAW_DATA_FILE="$SITE_DATA_DIR/raw-source.html"
+RAW_DATA_SOURCE="https://docs.google.com/spreadsheets/d/e/2PACX-1vR30F8lYP3jG7YOq8es0PBpJIE5yvRVZffOyaqC0GgMBN6yt0Q-NI8pxS7hd1F9dYXnowSC6zpZmW9D/pubhtml?gid=0&amp;single=false&amp;widget=true&amp;headers=true"
 TMP_OUTPUT="/tmp/refreshdata.log"
-UPDATE_NOTICE_FILE="last-update.txt"
-UPDATE_NOTICE="$SITE_DATA_DIR/$UPDATE_NOTICE_FILE"
 UPDATE_ERROR="$SITE_DATA_DIR/ERROR.txt"
+UPDATE_NOTICE="$SITE_DATA_DIR/$UPDATE_NOTICE_FILE"
+UPDATE_NOTICE_FILE="last-update.txt"
 
 
 # *** functions ***
@@ -134,6 +138,18 @@ function generateCountiesUSJSONFile {
 } # generateCountiesUSJSONFile
 
 
+function fetchBNODataSource {
+    echo "-----"
+    curl -A "$PYAVKA_USER_AGENT" -vi -o "$RAW_DATA_FILE" --connect-timeout 20 "$RAW_DATA_SOURCE" | 
+    [[ "$?" == 0 ]] || exit 99
+
+    cat "$RAW_DATA_FILE" | awk '/<table/ { gsub("<table", "\n<table"); gsub("/table>", "/table>\n"); print; }' | \
+    awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
+
+    echo "+++++"
+} # fetchBNODataSource
+
+
 function patchJSONFiles {
     local subCommand="$1"
     # TODO: Document the command line arguments in the README.md page:
@@ -147,7 +163,10 @@ function patchJSONFiles {
     then
         now=$(date)
         echo "pyavka - grabbing the spreadsheet"
-        ./pyavka
+        fetchBNODataSource
+        python3 -m covidvu.pipeline.pyavka
+        ls -Alrt "$SITE_DATA_DIR"/*html
+
         echo "vudpatch - patching stale JH CSSE data with latest, calculated updates"
         ./vudpatch
     fi
