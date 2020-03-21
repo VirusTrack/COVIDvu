@@ -1,20 +1,28 @@
 #!/usr/bin/env python3
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE
 # vim: set fileencoding=utf-8:
-import os
+
+
 from os.path import join
+
+from covidvu.pipeline.vuhospitals import HOSPITAL_BEDS_FILE_NAME
+from covidvu.pipeline.vuhospitals import STATE_CODES_PATH
+from covidvu.pipeline.vuhospitals import _getTotalBedCount
+from covidvu.pipeline.vuhospitals import _getTotalBedsForPostalCode
+from covidvu.pipeline.vuhospitals import _main
+from covidvu.pipeline.vuhospitals import loadUSHospitalBedsCount
+
+import os
 import json
 import re
+
 import pandas as pd
 
-from covidvu.pipeline.vuhospitals import STATE_CODES_PATH
-from covidvu.pipeline.vuhospitals import OUT_FILE_NAME
-from covidvu.pipeline.vuhospitals import _getTotalBedsForPostalCode
-from covidvu.pipeline.vuhospitals import _getTotalBedCount
-from covidvu.pipeline.vuhospitals import _main
+
+# +++ a few constants +++
 
 TEST_STATE_CODES_PATH       = join(os.getcwd(), 'stateCodesUS.csv')
-TEST_SITE_DATA              = join(os.getcwd(), 'resources', 'test_site_data')
+TEST_SITE_DATA              = join(os.getcwd(), 'resources', 'test_pipeline')
 
 
 # *** functions ***
@@ -33,6 +41,7 @@ def assertValidJSON(fname):
     assert len(jsonObject.keys()) > 0
 
 # *** tests ***
+
 def test__getTotalBedsForPostalCode():
     totalBeds = _getTotalBedsForPostalCode('NC')
     assert totalBeds > 0
@@ -47,11 +56,17 @@ def test__getTotalBedCount():
     assert all((c > 0 for c in bedCount.values()))
 
 
+def test_loadUSHospitalBedsCount():
+    payload = loadUSHospitalBedsCount(TEST_SITE_DATA)
+
+    assert isinstance(payload, dict)
+    assert payload['Alabama'] > 0
+    
+
 def test__main():
-    try:
-        _main(TEST_SITE_DATA, nStateLimit=2)
-        assertValidJSON(OUT_FILE_NAME)
-    except Exception as e:
-        raise e
-    finally:
-        _purge(TEST_SITE_DATA, '.json')
+    _main(TEST_SITE_DATA, nStateLimit=2)
+    assertValidJSON(HOSPITAL_BEDS_FILE_NAME)
+
+
+# test_loadUSHospitalBedsCount()
+
