@@ -3,6 +3,7 @@ import {call, put, takeEvery} from "redux-saga/effects"
 import DataService from '../services'
 
 import { 
+    US_STATES_WITH_ABBREVIATION,
     LAST_UPDATE_KEY, 
     CACHE_INVALIDATE_GLOBAL_KEY,
     CACHE_INVALIDATE_US_STATES_KEY,
@@ -62,6 +63,10 @@ export const types = {
     FETCH_US_STATES_STATS_SUCCESS: 'FETCH_US_STATES_STATS_SUCCESS',
     FETCH_US_STATES_STATS_ERROR: 'FETCH_US_STATES_STATS_ERROR',
 
+    FETCH_US_COUNTIES_STATS: 'FETCH_US_COUNTIES_STATS',
+    FETCH_US_COUNTIES_STATS_SUCCESS: 'FETCH_US_COUNTIES_STATS_SUCCESS',
+    FETCH_US_COUNTIES_STATS_ERROR: 'FETCH_US_COUNTIES_STATS_ERROR',
+
     FETCH_GLOBAL_STATS: 'FETCH_GLOBAL_STATS',
     FETCH_GLOBAL_STATS_SUCCESS: 'FETCH_GLOBAL_STATS_SUCCESS',
     FETCH_GLOBAL_STATS_ERROR: 'FETCH_GLOBAL_STATS_ERROR',
@@ -86,6 +91,7 @@ export const actions = {
     fetchTop10USStates: createAction(types.FETCH_TOP_10_US_STATES),
     fetchTotalUSStatesStats: createAction(types.FETCH_TOTAL_US_STATES_STATS),
     fetchTotalGlobalStats: createAction(types.FETCH_TOTAL_GLOBAL_STATS),
+    fetchUSCountiesStats: createAction(types.FETCH_US_COUNTIES_STATS),
     fetchUSStatesStats: createAction(types.FETCH_US_STATES_STATS),
     fetchGlobalStats: createAction(types.FETCH_GLOBAL_STATS),
 }
@@ -201,6 +207,11 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 usStatesStats: action.payload
+            }
+        case types.FETCH_US_COUNTIES_STATS_SUCCESS:
+            return {
+                ...state,
+                usCountiesStats: action.payload
             }
         case types.FETCH_US_REGIONS_SUCCESS:
             return {
@@ -376,6 +387,52 @@ export function* fetchTotalUSStatesStats({payload}) {
     }
 }
 
+export function* fetchUSCountiesStats({payload}) {
+    console.time('fetchUSCountiesStats')
+
+    const dataService = new DataService()
+
+    let daysAgo = 0
+    if(payload && payload.daysAgo && !isNaN(daysAgo)) {
+        daysAgo = payload.daysAgo
+    }
+
+    try {
+        console.time('fetchUSCountiesStats.axios')
+
+        const us_states = yield call(dataService.getUSStates)
+
+        // let hospitalBeds = us_states.hospitalBeds
+        let allCounties = us_states.allCounties
+
+        console.timeEnd('fetchUSCountiesStats.axios')
+
+        let countiesWithAbbreviation = []
+
+        for(const usState of Object.keys(allCounties)) {
+            let trimmedUSState = usState.trim()
+            const countiesInState = allCounties[usState]
+
+            const abbreviation = US_STATES_WITH_ABBREVIATION[trimmedUSState]
+            
+            for(let county of Object.keys(countiesInState)) {
+                countiesWithAbbreviation.push({region: `${county}, ${abbreviation}`, confirmed: countiesInState[county].confirmed, deaths: countiesInState[county].deaths})
+            }
+        }
+
+        const sortedCounties = countiesWithAbbreviation.sort((a, b) => b.confirmed - a.confirmed)
+
+        yield put({
+            type: types.FETCH_US_COUNTIES_STATS_SUCCESS, 
+            payload: sortedCounties
+        })
+
+    } catch(error) {
+        console.error(error)
+    }
+    console.timeEnd('fetchUSCountiesStats')
+}
+
 export function* fetchUSStatesStats({payload}) {
     console.time('fetchUSStatesStats')
 
@@ -395,6 +452,7 @@ export function* fetchUSStatesStats({payload}) {
         let deaths = us_states.deaths
         let recovered = us_states.recovered
         let hospitalBeds = us_states.hospitalBeds
+        let allCounties = us_states.allCounties
 
         console.timeEnd('fetchUSStatesStats.axios')
 
@@ -415,7 +473,6 @@ export function* fetchUSStatesStats({payload}) {
 
         let totalBeds = Object.values(hospitalBeds).reduce((total, beds) => total + beds)
 
-        console.log(`Total Beds: ${totalBeds}`)
         hospitalBeds['!Total US'] = totalBeds
 
         const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
@@ -1007,5 +1064,6 @@ export const sagas = [
     takeEvery(types.FETCH_TOTAL_GLOBAL_STATS, fetchTotalGlobalStats),
 
     takeEvery(types.FETCH_US_STATES_STATS, fetchUSStatesStats),
+    takeEvery(types.FETCH_US_COUNTIES_STATS, fetchUSCountiesStats),
     takeEvery(types.FETCH_GLOBAL_STATS, fetchGlobalStats),
 ]

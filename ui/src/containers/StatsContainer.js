@@ -28,6 +28,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
 
     const statsTotals = useSelector(state => state.services.globalStats)
     const usStatsTotals = useSelector(state => state.services.usStatesStats)
+    const usCountiesStatsTotals = useSelector(state => state.services.usCountiesStats)
     
     const [statsForGraph, setStatsForGraph] = useState([])
 
@@ -51,9 +52,10 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
      */
     useEffect(() => {
         dispatch(actions.clearStats())
-        dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
-        dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
 
+        dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
+        dispatch(actions.fetchUSCountiesStats({daysAgo: daysAgo}))
+        dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
     }, [dispatch, daysAgo])
 
     useInterval(() => {
@@ -66,15 +68,18 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
     }, ONE_MINUTE)
 
     useEffect(() => {
-
         if(selectedTab === 'Global' && statsTotals) {
             setStatsForGraph(statsTotals)
             history.replace('/stats?filter=Global')
         } else if(selectedTab === 'US' && usStatsTotals) {
             setStatsForGraph(usStatsTotals)
             history.replace('/stats?filter=US')
+        } else if(selectedTab === 'US_Counties' && usCountiesStatsTotals) {
+            setStatsForGraph(usCountiesStatsTotals)
+            history.replace('/stats?filter=US_Counties')
         }
     }, [selectedTab, statsTotals, usStatsTotals, history])
+
 
     return (
         <>
@@ -96,6 +101,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
             <Tab.Group size="large">
                 <Tab active={selectedTab === 'Global'} onClick={() => { setStatsForGraph([]); setSelectedTab('Global')}}>Global</Tab>
                 <Tab active={selectedTab === 'US'} onClick={() => { setStatsForGraph([]); setSelectedTab('US')}}>United States</Tab>
+                <Tab active={selectedTab === 'US_Counties'} onClick={() => { setStatsForGraph([]); setSelectedTab('US_Counties')}}>U.S. Counties</Tab>
             </Tab.Group>
 
             <div className="table-container">
@@ -108,9 +114,11 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                         <Table.Heading>
                             Total Cases
                         </Table.Heading>
+                        { filter !== 'US_Counties' &&
                         <Table.Heading>
                             New Cases
                         </Table.Heading>
+                        }
                         { filter === 'US' &&
                         <Table.Heading>
                             Hospital Beds
@@ -119,12 +127,16 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                         <Table.Heading>
                             Deaths
                         </Table.Heading>
+                        { filter !== 'US_Counties' &&
+                        <>
                         <Table.Heading>
                             New Deaths
                         </Table.Heading>
                         <Table.Heading>
                             Mortality Rate
                         </Table.Heading>
+                        </>
+                        }
                     </Table.Row>
                 </Table.Head>
                 <Table.Body>
@@ -136,9 +148,11 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
                         </Table.Cell>
+                        { filter !== 'US_Counties' &&
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')}</Title>
                         </Table.Cell>
+                        }
                         { filter === 'US' &&
                         <Table.Heading>
                             <Title size={5}>{stat.hospitalBeds > 0 ? numeral(stat.hospitalBeds).format('0,0') : '-'}</Title>
@@ -147,12 +161,16 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.deaths).format('0,0')}</Title>
                         </Table.Cell>
+                        { filter !== 'US_Counties' &&
+                        <>
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')}</Title>
                         </Table.Cell>
                         <Table.Cell>
                             <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
                         </Table.Cell>
+                        </>
+                        }
                     </Table.Row>
                     )) : (
                         <Table.Row>
