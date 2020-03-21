@@ -70,16 +70,18 @@ export const HeaderContainer = () => {
     }
 
     const changePage = (pageLocation) => {
+        console.log(pageLocation)
+        console.log(location)
         if(location.pathname !== pageLocation) {
             dispatch(actions.clearGraphs())
-            history.push('/dashboard')
+            history.push(pageLocation)
         }
     }
 
     return (
         <Navbar>
             <Navbar.Brand>
-                <Navbar.Item onClick={() => { dispatch(actions.clearGraphs()); changePage('/dashboard') }}>
+                <Navbar.Item onClick={() => { changePage('/dashboard') }}>
                     <img src={VirusTrackLogo} alt="VirusTrack" role="presentation" className="logomark"/>
                     <Title size={5} title="Coronavirus COVID-19 Cases"><span>Virus</span>Track</Title>
                 </Navbar.Item>
@@ -87,29 +89,29 @@ export const HeaderContainer = () => {
             </Navbar.Brand>
             <Navbar.Menu>
                 <Navbar.Segment align="start">
-                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{dispatch(actions.clearGraphs());changePage('/dashboard')}}><img src={compassImg} alt=""/>Dashboard</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{changePage('/dashboard')}}><img src={compassImg} alt=""/>Dashboard</Navbar.Item>
                     
                     <Navbar.Item hoverable dropdown>
                         <Navbar.Link arrowless 
-                            onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid')}}
+                            onClick={()=>{changePage('/covid')}}
                             active={selectedNav === '/covid' || selectedNav === '/covid/continental'}>
                                 <img src={globeImg} alt=""/>Global
                         </Navbar.Link>
                         <Navbar.Dropdown boxed>
-                            <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid')}}>Countries</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/continental'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Continental</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{changePage('/covid')}}>Countries</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/continental'} onClick={()=>{changePage('/covid/continental')}}>Continental</Navbar.Item>
                         </Navbar.Dropdown>
                     </Navbar.Item>
 
                     <Navbar.Item hoverable dropdown>
-                        <Navbar.Link arrowless onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}><img src={usflagImg} alt=""/>United States</Navbar.Link>
+                        <Navbar.Link arrowless onClick={() => { changePage('/covid/us')}}><img src={usflagImg} alt=""/>United States</Navbar.Link>
                         <Navbar.Dropdown boxed>
-                            <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>US States</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>US Regions</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {changePage('/covid/us')}}>US States</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{changePage('/covid/us/regions')}}>US Regions</Navbar.Item>
                         </Navbar.Dropdown>
                     </Navbar.Item>
                     
-                    <Navbar.Item active={selectedNav === '/stats'} onClick={()=>{dispatch(actions.clearGraphs()); history.push('/stats')}}><img src={chartImg} alt=""/>Stats</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/stats'} onClick={()=>{changePage('/stats')}}><img src={chartImg} alt=""/>Stats</Navbar.Item>
                 </Navbar.Segment>
 
                 <Navbar.Segment align="end">
