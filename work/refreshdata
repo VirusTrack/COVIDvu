@@ -9,6 +9,10 @@
 REFRESHDATA_CONFIG="./refreshdata.config"
 [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
 
+source ./pyrunner
+
+
+# +++ constants +++
 
 CONFIG_rclone="rclone.conf"
 COVID_19_DIR="COVID-19"
@@ -107,7 +111,10 @@ function updateCOVID19DataSources {
 
 function generateVirusUpdateJSONFiles {
     echo "vujson - generating virus update JSON files"
-    ./vujson
+
+    env | awk '/VIRT/' | sort
+    python3 -m covidvu.pipeline.vujson confirmed deaths recovered
+    ls -Alrt "$SITE_DATA_DIR"
 } # generateVirusUpdateJSONFiles
 
 
