@@ -129,37 +129,9 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
         handleHistory(selectedCountries, selectedGraph)
-    }
+    }    
 
-    // const HeroElement = (props) => {
-    //     return (
-    //         <Hero size="medium">
-    //             <Hero.Body>
-    //             <Container>
-    //                 <Title subtitle size={2}>Global</Title>
-    //                 <Title size={1}>Coronavirus Cases <br/>by Country</Title>
-    //                 <Button.Group>
-    //                     <Button size="large" color="primary" onClick={() => {changePage('/covid')}}>Cases By Country</Button>
-    //                     <Button size="large" color="primary" onClick={() => {changePage('/covid/continental')}}>Cases By Continent</Button>
-    //                 </Button.Group>
-    //             </Container>
-    //             </Hero.Body>
-    //         </Hero>
-    //     )
-    // }
-    
-    if(!sortedConfirmed) {
-        return (
-            <>
-            <HeroElement />
-            <Box>
-            <h1>Loading...</h1>
-            </Box>
-            </>
-        )
-    }
-    return (
-        <>
+    const GlobalHeroElement = () => (
         <HeroElement
             subtitle="Global"
             title={
@@ -170,6 +142,21 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
                 { title: 'Cases By Continent', location: '/covid/continental' },
             ]}
         />
+    )
+
+    if(!sortedConfirmed) {
+        return (
+            <>
+            <GlobalHeroElement />
+            <Box>
+            <h1>Loading...</h1>
+            </Box>
+            </>
+        )
+    }
+    return (
+        <>
+        <GlobalHeroElement />
         <Box>
         <TwoGraphLayout>
 

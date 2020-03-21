@@ -14,6 +14,8 @@ import store from 'store2'
 
 import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
+import HeroElement from '../components/HeroElement'
+
 export const StatsContainer = ({filter='Global'}) => {
 
     const dispatch = useDispatch()
@@ -41,17 +43,13 @@ export const StatsContainer = ({filter='Global'}) => {
             window.open(REGION_URLS[key], "_blank")
     }
 
-    const HeroElement = (props) => {
-        return (
-        <Hero size="medium">
-            <Hero.Body>
-            <Container>
-                <Title size={1}>Coronavirus <br/>COVID-19 Statistics</Title>
-            </Container>
-            </Hero.Body>
-        </Hero>
-        )
-    }
+    const StatsHeroElement = () => (
+        <HeroElement
+            title={
+                <>Coronavirus <br />COVID-19 Statistics</>
+            }
+        />
+    )
 
     /**
      * Fetch all the data
@@ -90,7 +88,7 @@ export const StatsContainer = ({filter='Global'}) => {
     if(!statsTotals) {
         return (
             <>
-            <HeroElement/>
+            <StatsHeroElement/>
             <Box>
                 <h1>Loading...</h1>
             </Box>
@@ -100,7 +98,7 @@ export const StatsContainer = ({filter='Global'}) => {
 
     return (
         <>
-        <HeroElement/>
+        <StatsHeroElement/>
 
         <Box>
         <Tab.Group size="large">
