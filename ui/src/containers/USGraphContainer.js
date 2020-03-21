@@ -186,16 +186,19 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
             <>
 
             <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
-            <Tag size="large" color="info">
-                Government Services: {selectedStates.map((region, idx) => (
-                    <React.Fragment key={idx}>
-                        <Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"} textColor="white">{renderDisplay(region)}</Generic><br />
-                    </React.Fragment>
-                ))}
-            </Tag>
             </>
 
             <>
+            
+            <Title size={3}>Government Services: </Title>
+            <ul>
+            {selectedStates.map((region, idx) => (
+                <React.Fragment key={idx}>
+                    <li><Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"}>{renderDisplay(region)}</Generic></li>
+                </React.Fragment>
+            ))}
+            </ul>
+
             <Notification color="warning" size="small" style={{margin: '1.5rem'}}>
                 The sum of all states and territories may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
             </Notification>
