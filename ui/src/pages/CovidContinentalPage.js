@@ -16,13 +16,13 @@ export const CovidContinentalPage = () => {
 
     let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
 
-    let continent = query.continent ? Array.isArray(query.continent) ? query.continent : [query.continent] : undefined
+    let region = query.region ? Array.isArray(query.region) ? query.region : [query.region] : undefined
     let graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
 
     return (
         <MainLayout>
             <ErrorBoundary>
-                <ContinentalGraphContainer continent={continent} graph={graph} />
+                <ContinentalGraphContainer region={region} graph={graph} />
             </ErrorBoundary>
         </MainLayout>
     )

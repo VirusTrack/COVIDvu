@@ -24,7 +24,7 @@ import SelectRegionComponent from '../components/SelectRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const ContinentalGraphContainer = ({continent = ['North America', 'Europe', 'Asia'], graph = 'Cases'}) => {
+export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 'Asia'], graph = 'Cases'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -32,7 +32,7 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
 
     const [width, height] = useWindowSize()
 
-    const [selectedContinents, setSelectedContinents] = useState(continent)
+    const [selectedContinents, setSelectedContinents] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
     const confirmed = useSelector(state => state.services.continental.confirmed)

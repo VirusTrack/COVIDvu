@@ -26,7 +26,7 @@ import SelectRegionComponent from '../components/SelectRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'Cases'}) => {
+export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Cases'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -34,7 +34,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
 
     const [width, height] = useWindowSize()
 
-    const [selectedCountries, setSelectedCountries] = useState(country)
+    const [selectedCountries, setSelectedCountries] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
     const confirmed = useSelector(state => state.services.global.confirmed)
