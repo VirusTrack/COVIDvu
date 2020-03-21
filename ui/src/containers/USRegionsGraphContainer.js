@@ -22,7 +22,8 @@ import store from 'store2'
 export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
     const dispatch = useDispatch()
     const history = useHistory()
-    const { search } = useLocation()
+    const location = useLocation()
+    const { search } = location
     const [width, height] = useWindowSize()
 
     const [selectedRegions, setSelectedRegions] = useState(region)
@@ -40,6 +41,13 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     useEffect(() => {
         dispatch(actions.fetchUSRegions())
     }, [dispatch])
+
+    const changePage = (pageLocation) => {
+        if(location.pathname !== pageLocation) {
+            dispatch(actions.clearGraphs())
+            history.push(pageLocation)
+        }
+    }
 
     useInterval(() => {
         if(store.session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
@@ -93,8 +101,8 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     <Title subtitle size={2}>United States</Title>
                     <Title size={1}>Coronavirus Cases <br/>by Region</Title>
                     <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Cases By State</Button>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>Cases By Region</Button>
+                        <Button size="large" color="primary" onClick={() => {changePage('/covid/us')}}>Cases By State</Button>
+                        <Button size="large" color="primary" onClick={() => {changePage('/covid/us/regions')}}>Cases By Region</Button>
                     </Button.Group>
                 </Container>
                 </Hero.Body>

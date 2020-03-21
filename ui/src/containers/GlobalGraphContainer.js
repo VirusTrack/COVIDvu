@@ -10,6 +10,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
+import HeroElement from '../components/HeroElement'
 import { Hero, Container, Box, Tag, Tab, Level, Button, Title } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
@@ -28,7 +29,8 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
 
     const dispatch = useDispatch()
     const history = useHistory()
-    const { search } = useLocation()
+    const location = useLocation()
+    const { search } = location
 
     const [width, height] = useWindowSize()
 
@@ -79,6 +81,13 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
         }
     }
 
+    const changePage = (pageLocation) => {
+        if(location.pathname !== pageLocation) {
+            dispatch(actions.clearGraphs())
+            history.push(pageLocation)
+        }
+    }
+
     const handleHistory = (region, graph) => {
         const query = queryString.stringify({
             region,
@@ -122,22 +131,22 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
         handleHistory(selectedCountries, selectedGraph)
     }
 
-    const HeroElement = (props) => {
-        return (
-            <Hero size="medium">
-                <Hero.Body>
-                <Container>
-                    <Title subtitle size={2}>Global</Title>
-                    <Title size={1}>Coronavirus Cases <br/>by Country</Title>
-                    <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid')}}>Cases By Country</Button>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Cases By Continent</Button>
-                    </Button.Group>
-                </Container>
-                </Hero.Body>
-            </Hero>
-        )
-    }
+    // const HeroElement = (props) => {
+    //     return (
+    //         <Hero size="medium">
+    //             <Hero.Body>
+    //             <Container>
+    //                 <Title subtitle size={2}>Global</Title>
+    //                 <Title size={1}>Coronavirus Cases <br/>by Country</Title>
+    //                 <Button.Group>
+    //                     <Button size="large" color="primary" onClick={() => {changePage('/covid')}}>Cases By Country</Button>
+    //                     <Button size="large" color="primary" onClick={() => {changePage('/covid/continental')}}>Cases By Continent</Button>
+    //                 </Button.Group>
+    //             </Container>
+    //             </Hero.Body>
+    //         </Hero>
+    //     )
+    // }
     
     if(!sortedConfirmed) {
         return (
@@ -151,7 +160,16 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
     }
     return (
         <>
-        <HeroElement/>
+        <HeroElement
+            subtitle="Global"
+            title={
+                <>Coronavirus Cases <br />by Country</>
+            }
+            buttons={[
+                { title: 'Cases By Country', location: '/covid' },
+                { title: 'Cases By Continent', location: '/covid/continental' },
+            ]}
+        />
         <Box>
         <TwoGraphLayout>
 

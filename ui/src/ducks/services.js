@@ -168,7 +168,8 @@ export default function (state = initialState, action) {
                     deaths: action.deaths,
                     recovered: action.recovered,
                     mortality: action.mortality,
-                    recovery: action.recovery
+                    recovery: action.recovery,
+                    // hospitalBeds: action.hospitalBeds,
                 }
             }
         case types.FETCH_TOTAL_GLOBAL_STATS_SUCCESS:
@@ -816,10 +817,12 @@ export function* fetchUSStates() {
         console.time('fetchUSStates.axios')
 
         const us_states = yield call(dataService.getUSStates)
-
+        
         let confirmed = us_states.confirmed
         let deaths = us_states.deaths
         let recovered = us_states.recovered
+        let hospitalBeds = us_states.hospitalBeds
+
         console.timeEnd('fetchUSStates.axios')
 
         for(let filterState of filterStates) {
@@ -832,6 +835,9 @@ export function* fetchUSStates() {
             if(recovered.hasOwnProperty(filterState)) {
                  delete recovered[filterState]
             }
+            if(hospitalBeds.hasOwnProperty(filterState)) {
+                delete hospitalBeds[filterState]
+            }
         }
 
         const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
@@ -842,6 +848,8 @@ export function* fetchUSStates() {
         const recoveredCounts = extractLatestCounts(recovered)
         const mortalityCounts = extractLatestCounts(mortality)
         const recoveryCounts = extractLatestCounts(recovery)
+        // const hospitalBedsCounts = extractLatestCounts(hospitalBeds)
+
         const sortedConfirmed = confirmedCounts.sort((a, b) => b.stats - a.stats)
 
         const deathByRegionKey = deathsCounts.reduce((obj, item) => {
@@ -864,6 +872,11 @@ export function* fetchUSStates() {
             return obj
         }, {})
 
+        // const hospitalBedsByRegionKey = recoveryCounts.reduce((obj, item) => {
+        //     obj[item.region] = item
+        //     return obj
+        // }, {})
+
         let statsTotals = []
         
         for(const confirmData of sortedConfirmed) {
@@ -878,7 +891,8 @@ export function* fetchUSStates() {
                     deathsDayChange: deathByRegionKey[region].dayChange,
                     recovered: recoveredByRegionKey[region].stats,
                     mortality: mortalityByRegionKey[region].stats,
-                    recovery: recoveryByRegionKey[region].stats
+                    recovery: recoveryByRegionKey[region].stats,
+                    // hospitalBeds: hospitalBedsByRegionKey[region].stats,
                 })
             }
         }
@@ -892,7 +906,8 @@ export function* fetchUSStates() {
                 deaths: deaths, 
                 recovered: recovered,
                 mortality: mortality,
-                recovery: recovery
+                recovery: recovery,
+                // hospitalBeds: hospitalBeds,
             }
         )    
     } catch(error) {

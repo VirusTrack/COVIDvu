@@ -127,15 +127,15 @@ export const StatsContainer = ({filter='Global'}) => {
                     <Table.Heading>
                         New Deaths
                     </Table.Heading>
-                    <Table.Heading>
+                    {/* <Table.Heading>
                         Recovered
-                    </Table.Heading>
+                    </Table.Heading> */}
                     <Table.Heading>
                         Mortality Rate
                     </Table.Heading>
-                    <Table.Heading>
+                    {/* <Table.Heading>
                         Recovery Rate
-                    </Table.Heading>
+                    </Table.Heading> */}
                 </Table.Row>
             </Table.Head>
             <Table.Body>
@@ -156,15 +156,15 @@ export const StatsContainer = ({filter='Global'}) => {
                     <Table.Cell>
                         <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')}</Title>
                     </Table.Cell>
-                    <Table.Cell>
+                    {/* <Table.Cell>
                         <Title size={5}>{numeral(stat.recovered).format('0,0')}</Title>
-                    </Table.Cell>
+                    </Table.Cell> */}
                     <Table.Cell>
                         <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
                     </Table.Cell>
-                    <Table.Cell>
+                    {/* <Table.Cell>
                         <Title size={6}>{numeral(stat.recovery).format('0.0 %')}</Title>
-                    </Table.Cell>
+                    </Table.Cell> */}
                 </Table.Row>
                 )) : (
                     <Table.Row>

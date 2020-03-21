@@ -27,7 +27,9 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
 
     const dispatch = useDispatch()
     const history = useHistory()
-    const { search } = useLocation()
+    const location = useLocation()
+
+    const { search } = location
 
     const [width, height] = useWindowSize()
 
@@ -49,6 +51,13 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
 
     const isExternalLinkAvailable = (key) => {
         return REGION_URLS.hasOwnProperty(key)
+    }
+
+    const changePage = (pageLocation) => {
+        if(location.pathname !== pageLocation) {
+            dispatch(actions.clearGraphs())
+            history.push(pageLocation)
+        }
     }
 
     const redirectToExternalLink = (key) => {
@@ -110,15 +119,14 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                 <Title subtitle size={2}>United States</Title>
                 <Title size={1}>Coronavirus Cases <br/>by State</Title>
                 <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Cases By State</Button>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>Cases By Region</Button>
+                        <Button size="large" color="primary" onClick={() => {changePage('/covid/us')}}>Cases By State</Button>
+                        <Button size="large" color="primary" onClick={() => {changePage('/covid/us/regions')}}>Cases By Region</Button>
                     </Button.Group>
             </Container>
             </Hero.Body>
         </Hero>
         )
     }
-
 
     if(!sortedConfirmed) {
         return (

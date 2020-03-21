@@ -26,7 +26,8 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
 
     const dispatch = useDispatch()
     const history = useHistory()
-    const { search } = useLocation()
+    const location = useLocation()
+    const { search } = location
 
     const [width, height] = useWindowSize()
 
@@ -51,6 +52,13 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
             dispatch(actions.fetchContinental())
         }
     }, ONE_MINUTE)
+
+    const changePage = (pageLocation) => {
+        if(location.pathname !== pageLocation) {
+            dispatch(actions.clearGraphs())
+            history.push(pageLocation)
+        }
+    }
 
     useEffect(() => {
         if(!search) {
@@ -86,8 +94,8 @@ export const ContinentalGraphContainer = ({continent = ['North America', 'Europe
                     <Title subtitle size={2}>Global</Title>
                     <Title size={1}>Coronavirus Cases <br/>by Continent</Title>
                     <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid')}}>Cases By Country</Button>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Cases By Continent</Button>
+                        <Button size="large" color="primary" onClick={() => {changePage('/covid')}}>Cases By Country</Button>
+                        <Button size="large" color="primary" onClick={() => {changePage('/covid/continental')}}>Cases By Continent</Button>
                     </Button.Group>
                 </Container>
                 </Hero.Body>
