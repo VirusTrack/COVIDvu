@@ -70,8 +70,6 @@ export const HeaderContainer = () => {
     }
 
     const changePage = (pageLocation) => {
-        console.log(pageLocation)
-        console.log(location)
         if(location.pathname !== pageLocation) {
             dispatch(actions.clearGraphs())
             history.push(pageLocation)
@@ -94,7 +92,7 @@ export const HeaderContainer = () => {
                     <Navbar.Item hoverable dropdown>
                         <Navbar.Link arrowless 
                             onClick={()=>{changePage('/covid')}}
-                            active={selectedNav === '/covid' || selectedNav === '/covid/continental'}>
+                            active={(selectedNav === '/covid' || selectedNav === '/covid/continental').toString()}>
                                 <img src={globeImg} alt=""/>Global
                         </Navbar.Link>
                         <Navbar.Dropdown boxed>

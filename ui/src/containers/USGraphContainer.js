@@ -6,10 +6,12 @@ import { useHistory, useLocation } from 'react-router'
 import { useWindowSize, useInterval } from '../hooks/ui'
 
 import queryString from 'query-string'
+import numeral from 'numeral'
+import store from 'store2'
 
 import { actions } from '../ducks/services'
 
-import { Hero, Container, Box, Tag, Tab, Notification, Generic, Title, Button } from "rbx"
+import { Tag, Tab, Notification, Generic, Title } from "rbx"
 
 import { REGION_URLS, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
@@ -18,10 +20,8 @@ import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import GraphWithLoader from '../components/GraphWithLoader'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
-
-import numeral from 'numeral'
-
-import store from 'store2'
+import HeroElement from '../components/HeroElement'
+import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
 
@@ -102,109 +102,90 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
         handleHistory(selectedStates, graph)
     }
 
-    const HeroElement = (props) => {
-        return (
-            <Hero size="medium">
-            <Hero.Body>
-            <Container>
-                <Title subtitle size={2}>United States</Title>
-                <Title size={1}>Coronavirus Cases <br/>by State</Title>
-                <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Cases By State</Button>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>Cases By Region</Button>
-                    </Button.Group>
-            </Container>
-            </Hero.Body>
-        </Hero>
-        )
-    }
-
-
-    if(!sortedConfirmed) {
-        return (
-            <>
-            <HeroElement />
-            <Box>
-                <h1>Loading...</h1>
-            </Box>
-            </>
-        )
-    }
-
     return (
         <>
-        <HeroElement />
-        <Box>
-        <TwoGraphLayout>
-            <>
-            <SelectRegionComponent
-                data={sortedConfirmed}
-                selected={selectedStates}
-                handleSelected={dataList => handleSelectedRegion(dataList)} />
-            </>
 
+        <HeroElement
+            subtitle="United States"
+            title={
+                <>Coronavirus Cases <br />by State</>
+            }
+            buttons={[
+                { title: 'Cases By State', location: '/covid/us' },
+                { title: 'Cases By Region', location: '/covid/us/regions' },
+            ]}
+        />   
 
-            <>
-                <Tab.Group size="large" kind="boxed">
-                    <Tab active={secondaryGraph === 'Confirmed'} onClick={() => { handleSelectedGraph('Confirmed')}}>Confirmed</Tab>
-                    <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                    <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
-                </Tab.Group>
+        <BoxWithLoadingIndicator hasData={sortedConfirmed}>
+            <TwoGraphLayout>
+                <>
+                    <SelectRegionComponent
+                        data={sortedConfirmed}
+                        selected={selectedStates}
+                        handleSelected={dataList => handleSelectedRegion(dataList)} />
+                </>
 
-                <GraphWithLoader 
-                    graphName="Confirmed"
-                    secondaryGraph={secondaryGraph}
-                    graph={confirmed}
-                    width={width}
-                    height={height}
-                    selected={selectedStates}
-                    y_title="Total confirmed cases"
-                />
+                <>
+                    <Tab.Group size="large" kind="boxed">
+                        <Tab active={secondaryGraph === 'Confirmed'} onClick={() => { handleSelectedGraph('Confirmed')}}>Confirmed</Tab>
+                        <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
+                        <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
+                    </Tab.Group>
 
-                <GraphWithLoader 
-                    graphName="Deaths"
-                    secondaryGraph={secondaryGraph}
-                    graph={deaths}
-                    width={width}
-                    height={height}
-                    selected={selectedStates}
-                    y_title="Number of deaths"
-                />
-            
-                <GraphWithLoader 
-                    graphName="Mortality"
-                    secondaryGraph={secondaryGraph}
-                    graph={mortality}
-                    width={width}
-                    height={height}
-                    selected={selectedStates}
-                    y_type='percent'
-                    y_title="Mortality Rate Percentage"
-                />
-            </>
+                    <GraphWithLoader 
+                        graphName="Confirmed"
+                        secondaryGraph={secondaryGraph}
+                        graph={confirmed}
+                        width={width}
+                        height={height}
+                        selected={selectedStates}
+                        y_title="Total confirmed cases"
+                    />
 
-            <>
+                    <GraphWithLoader 
+                        graphName="Deaths"
+                        secondaryGraph={secondaryGraph}
+                        graph={deaths}
+                        width={width}
+                        height={height}
+                        selected={selectedStates}
+                        y_title="Number of deaths"
+                    />
+                
+                    <GraphWithLoader 
+                        graphName="Mortality"
+                        secondaryGraph={secondaryGraph}
+                        graph={mortality}
+                        width={width}
+                        height={height}
+                        selected={selectedStates}
+                        y_type='percent'
+                        y_title="Mortality Rate Percentage"
+                    />
+                </>
 
-            <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
-            </>
+                <>
 
-            <>
-            
-            <Title size={3}>Government Services: </Title>
-            <ul>
-            {selectedStates.map((region, idx) => (
-                <React.Fragment key={idx}>
-                    <li><Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"}>{renderDisplay(region)}</Generic></li>
-                </React.Fragment>
-            ))}
-            </ul>
+                <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
+                </>
 
-            <Notification color="warning" size="small" style={{margin: '1.5rem'}}>
-                The sum of all states and territories may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
-            </Notification>
-            </>
-        </TwoGraphLayout>
-        </Box>
+                <>
+                
+                <Title size={3}>Government Services: </Title>
+                <ul>
+                {selectedStates.map((region, idx) => (
+                    <React.Fragment key={idx}>
+                        <li><Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"}>{renderDisplay(region)}</Generic></li>
+                    </React.Fragment>
+                ))}
+                </ul>
+
+                <Notification color="warning" size="small" style={{margin: '1.5rem'}}>
+                    The sum of all states and territories may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
+                </Notification>
+                </>
+            </TwoGraphLayout>
+        </BoxWithLoadingIndicator>
         </>
     )
 }

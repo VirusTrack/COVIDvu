@@ -10,7 +10,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Hero, Container, Box, Tag, Tab, Level, Button, Title } from "rbx"
+import { Tag, Tab, Level } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
@@ -23,8 +23,10 @@ import numeral from 'numeral'
 import store from 'store2'
 
 import SelectRegionComponent from '../components/SelectRegionComponent'
+import HeroElement from '../components/HeroElement'
+import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'Cases'}) => {
+export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Cases'}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -32,7 +34,7 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
 
     const [width, height] = useWindowSize()
 
-    const [selectedCountries, setSelectedCountries] = useState(country)
+    const [selectedCountries, setSelectedCountries] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
     const confirmed = useSelector(state => state.services.global.confirmed)
@@ -120,105 +122,88 @@ export const GlobalGraphContainer = ({country = ['!Global', 'China'], graph = 'C
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
         handleHistory(selectedCountries, selectedGraph)
-    }
+    }    
 
-    const HeroElement = (props) => {
-        return (
-            <Hero size="medium">
-                <Hero.Body>
-                <Container>
-                    <Title subtitle size={2}>Global</Title>
-                    <Title size={1}>Coronavirus Cases <br/>by Country</Title>
-                    <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid')}}>Cases By Country</Button>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/continental')}}>Cases By Continent</Button>
-                    </Button.Group>
-                </Container>
-                </Hero.Body>
-            </Hero>
-        )
-    }
-    
-    if(!sortedConfirmed) {
-        return (
-            <>
-            <HeroElement />
-            <Box>
-            <h1>Loading...</h1>
-            </Box>
-            </>
-        )
-    }
     return (
         <>
-        <HeroElement/>
-        <Box>
-        <TwoGraphLayout>
+        <HeroElement
+            subtitle="Global"
+            title={
+                <>Coronavirus Cases <br />by Country</>
+            }
+            buttons={[
+                { title: 'Cases By Country', location: '/covid' },
+                { title: 'Cases By Continent', location: '/covid/continental' },
+            ]}
+        />
 
-            <>
-            <SelectRegionComponent
-                data={sortedConfirmed}
-                selected={selectedCountries}
-                handleSelected={dataList => handleSelectedRegion(dataList)} />
+        <BoxWithLoadingIndicator hasData={sortedConfirmed}>
+            <TwoGraphLayout>
 
-            </>
-
-            <>
-                <Tab.Group size="large" kind="boxed">
-                    <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
-                    <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                    <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
-                </Tab.Group>
-
-                <GraphWithLoader 
-                    graphName="Cases"
-                    secondaryGraph={secondaryGraph}
-                    graph={confirmed}
-                    width={width}
-                    height={height}
+                <>
+                <SelectRegionComponent
+                    data={sortedConfirmed}
                     selected={selectedCountries}
-                    y_title="Total confirmed cases"
-                />
+                    handleSelected={dataList => handleSelectedRegion(dataList)} />
+                </>
 
-                <GraphWithLoader 
-                    graphName="Deaths"
-                    secondaryGraph={secondaryGraph}
-                    graph={deaths}
-                    width={width}
-                    height={height}
-                    selected={selectedCountries}
-                    y_title="Number of deaths"
-                />        
+                <>
+                    <Tab.Group size="large" kind="boxed">
+                        <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
+                        <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
+                        <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
+                    </Tab.Group>
 
-                <GraphWithLoader 
-                    graphName="Mortality"
-                    secondaryGraph={secondaryGraph}
-                    graph={mortality}
-                    width={width}
-                    height={height}
-                    selected={selectedCountries}
-                    y_type="percent"
-                    y_title="Mortality Rate Percentage"
-                />
-        
-            </>
+                    <GraphWithLoader 
+                        graphName="Cases"
+                        secondaryGraph={secondaryGraph}
+                        graph={confirmed}
+                        width={width}
+                        height={height}
+                        selected={selectedCountries}
+                        y_title="Total confirmed cases"
+                    />
 
-            <>
-                <Level>
-                    <Level.Item>
-                        {renderCaseTags()}
-                    </Level.Item>
-                </Level>
+                    <GraphWithLoader 
+                        graphName="Deaths"
+                        secondaryGraph={secondaryGraph}
+                        graph={deaths}
+                        width={width}
+                        height={height}
+                        selected={selectedCountries}
+                        y_title="Number of deaths"
+                    />        
 
-                <Level>
-                    <Level.Item>
-                        <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br /><br />
-                    </Level.Item>
-                </Level>
-            </>
+                    <GraphWithLoader 
+                        graphName="Mortality"
+                        secondaryGraph={secondaryGraph}
+                        graph={mortality}
+                        width={width}
+                        height={height}
+                        selected={selectedCountries}
+                        y_type="percent"
+                        y_title="Mortality Rate Percentage"
+                    />
+            
+                </>
 
-        </TwoGraphLayout>
-        </Box>
+                <>
+                    <Level>
+                        <Level.Item>
+                            {renderCaseTags()}
+                        </Level.Item>
+                    </Level>
+
+                    <Level>
+                        <Level.Item>
+                            <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br /><br />
+                        </Level.Item>
+                    </Level>
+                </>
+
+            </TwoGraphLayout>
+        </BoxWithLoadingIndicator>
+
         </>
     )    
 }

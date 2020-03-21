@@ -8,9 +8,10 @@ import { useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Hero, Tag, Title, Level, Heading, Container, Button, Box, Column } from "rbx"
+import { Tag, Title, Level, Heading, Container, Button, Box, Column } from "rbx"
 
 import GraphWithLoader from '../components/GraphWithLoader'
+import HeroElement from '../components/HeroElement'
 
 import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_CONTINENTAL_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
@@ -24,14 +25,8 @@ import globeImg from '../images/fa-icon-globe.svg'
 import usflagImg from '../images/fa-icon-usflag.svg'
 
 export const DashboardContainer = () => {
-
-    const session = store.session
     const dispatch = useDispatch()
     const history = useHistory()
-
-    useEffect(() => {
-        console.log("Same ")
-    }, [])
 
     useEffect(() => {
         dispatch(actions.fetchTop10Countries({
@@ -48,20 +43,20 @@ export const DashboardContainer = () => {
     }, [dispatch])
 
     useInterval(() => {
-        if(session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
             dispatch(actions.fetchTop10Countries({
                 excludeChina: true
             }))
             dispatch(actions.fetchTotalGlobalStats())
         }
-        if(session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
             dispatch(actions.fetchTop10USStates())
             dispatch(actions.fetchTotalUSStatesStats())
         }
-        if(session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
             dispatch(actions.fetchUSRegions())
         }
-        if(session.get(CACHE_INVALIDATE_CONTINENTAL_KEY)) {
+        if(store.session.get(CACHE_INVALIDATE_CONTINENTAL_KEY)) {
             dispatch(actions.fetchContinental())
         }
     }, ONE_MINUTE)
@@ -93,28 +88,22 @@ export const DashboardContainer = () => {
         )
     }
 
-    const HeroElement = (props) => {
-        return (
-            <Hero size="medium">
-                <Hero.Body>
-                <Container>
-                    <Title size={1}>Coronavirus <br/>COVID-19 Cases</Title>
-                    <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid')}}>Global</Button>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>United States</Button>
-                    </Button.Group>
-                    { lastUpdate && 
-                            <Tag as="p">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
-                        }
-                </Container>
-                </Hero.Body>
-            </Hero>
-        )
-    }
-
     return (
         <>
-        <HeroElement />
+        <HeroElement
+            title={
+                <>Coronavirus Cases <br />COVID-19 Cases</>
+            }
+            buttons={[
+                { title: 'Global', location: '/covid' },
+                { title: 'United States', location: '/covid/us' },
+            ]}
+        >
+            { lastUpdate && 
+                <Tag as="p">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
+            }
+        </HeroElement>
+
         <Box>
             <Title size={2}><img src={globeImg} alt=""/>Global Coronavirus Totals</Title>
             <Column.Group breakpoint="desktop" gapless className="separated">

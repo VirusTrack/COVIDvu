@@ -60,7 +60,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         },        
     }
 
-    if(false && detectMobile.isMobile()) {
+    if(detectMobile.isMobile()) {
         layout = {
             ...layout,
             xaxis: {

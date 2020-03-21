@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router'
+
 import queryString from 'query-string'
+import store from 'store2'
 
 import { useWindowSize, useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Hero, Title, Container, Box, Button, Tag, Tab, Notification, Level } from "rbx"
+import { Tag, Tab, Notification, Level } from "rbx"
 
 import { CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
@@ -16,13 +18,14 @@ import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 import SelectRegionComponent from '../components/SelectRegionComponent'
-
-import store from 'store2'
+import HeroElement from '../components/HeroElement'
+import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
     const dispatch = useDispatch()
     const history = useHistory()
-    const { search } = useLocation()
+    const location = useLocation()
+    const { search } = location
     const [width, height] = useWindowSize()
 
     const [selectedRegions, setSelectedRegions] = useState(region)
@@ -85,39 +88,20 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
         handleHistory(selectedRegions, selectedGraph)
     }    
 
-    const HeroElement = (props) => {
-        return (
-            <Hero size="medium">
-                <Hero.Body>
-                <Container>
-                    <Title subtitle size={2}>United States</Title>
-                    <Title size={1}>Coronavirus Cases <br/>by Region</Title>
-                    <Button.Group>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Cases By State</Button>
-                        <Button size="large" color="primary" onClick={() => {dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>Cases By Region</Button>
-                    </Button.Group>
-                </Container>
-                </Hero.Body>
-            </Hero>
-        )
-    }
-
-    if(!sortedConfirmed) {
-        return (
-        <>
-            <HeroElement />
-            <Box>
-                <h1>Loading...</h1>
-            </Box>
-        </>
-        )
-    }
-
     return (
         <>  
-        <HeroElement/>
-        
-        <Box>
+        <HeroElement
+            subtitle="United States"
+            title={
+                <>Coronavirus Cases <br />by Region</>
+            }
+            buttons={[
+                { title: 'Cases By State', location: '/covid/us' },
+                { title: 'Cases By Region', location: '/covid/us/regions' },
+            ]}
+        />
+
+        <BoxWithLoadingIndicator hasData={sortedConfirmed}>
         <TwoGraphLayout>
             <>            
             <SelectRegionComponent
@@ -191,7 +175,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
             </Notification> 
 
         </TwoGraphLayout>
-        </Box>
+        </BoxWithLoadingIndicator>
         </>
     )
 }
