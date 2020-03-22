@@ -28,7 +28,7 @@ if '__main__' == __name__:
         install_requires     = requirements,
         license              = open('../LICENSE.txt').read(),
         long_description     = open('../README.md').read(),
-        name                 = open('../modulename.txt').read().replace('\n', ''),
+        name                 = open('modulename.txt').read().replace('\n', ''),
         namespace_packages   = [ ],
         packages             = find_packages(),
         url                  = 'http://virustrack.live/covid',
