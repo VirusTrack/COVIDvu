@@ -393,8 +393,13 @@ export function* fetchUSCountiesStats({payload}) {
     const dataService = new DataService()
 
     let daysAgo = 0
-    if(payload && payload.daysAgo && !isNaN(daysAgo)) {
-        daysAgo = payload.daysAgo
+    let filterRegion = undefined
+    if(payload) {
+        if(payload.daysAgo && !isNaN(daysAgo)) {
+            daysAgo = payload.daysAgo
+        }
+
+        filterRegion = payload.filterRegion ? payload.filterRegion : undefined      
     }
 
     try {
@@ -415,6 +420,10 @@ export function* fetchUSCountiesStats({payload}) {
 
             const abbreviation = US_STATES_WITH_ABBREVIATION[trimmedUSState]
             
+            if(filterRegion && filterRegion !== abbreviation) {
+                continue
+            }
+                        
             for(let county of Object.keys(countiesInState)) {
                 countiesWithAbbreviation.push({region: `${county}, ${abbreviation}`, confirmed: countiesInState[county].confirmed, deaths: countiesInState[county].deaths})
             }
@@ -452,7 +461,6 @@ export function* fetchUSStatesStats({payload}) {
         let deaths = us_states.deaths
         let recovered = us_states.recovered
         let hospitalBeds = us_states.hospitalBeds
-        let allCounties = us_states.allCounties
 
         console.timeEnd('fetchUSStatesStats.axios')
 
@@ -536,6 +544,40 @@ export function* fetchUSStatesStats({payload}) {
     console.timeEnd('fetchUSStatesStats')
 }
 
+function roughSizeOfObject( object ) {
+
+    var objectList = [];
+    var stack = [ object ];
+    var bytes = 0;
+
+    while ( stack.length ) {
+        var value = stack.pop();
+
+        if ( typeof value === 'boolean' ) {
+            bytes += 4;
+        }
+        else if ( typeof value === 'string' ) {
+            bytes += value.length * 2;
+        }
+        else if ( typeof value === 'number' ) {
+            bytes += 8;
+        }
+        else if
+        (
+            typeof value === 'object'
+            && objectList.indexOf( value ) === -1
+        )
+        {
+            objectList.push( value );
+
+            for( var i in value ) {
+                stack.push( value[ i ] );
+            }
+        }
+    }
+    return bytes;
+}
+
 export function* fetchGlobalStats({payload}) {
     console.time('fetchGlobalStats')
 
@@ -556,6 +598,9 @@ export function* fetchGlobalStats({payload}) {
         let recovered = global.recovered
         console.timeEnd('fetchGlobalStats.axios')
         
+        console.time('fetchGlobalStats.filtering')
+
+        console.time('fetchGlobalStats.filterCountries')
         for(let filterCountry of filterCountries) {
             if(confirmed.hasOwnProperty(filterCountry)) {
                  delete confirmed[filterCountry]
@@ -567,16 +612,22 @@ export function* fetchGlobalStats({payload}) {
                  delete recovered[filterCountry]
             }
         }
-        
-        const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
+        console.timeEnd('fetchGlobalStats.filterCountries')
 
+        console.time('fetchGlobalStats.calculateMortality')
+        const { mortality, recovery } = calculateMortalityAndRecovery(deaths, confirmed, recovered)
+        console.timeEnd('fetchGlobalStats.calculateMortality')
+
+        console.time('fetchGlobalStats.extractLatestCounts')
         const confirmedCounts = extractLatestCounts(confirmed, daysAgo)
         const deathsCounts = extractLatestCounts(deaths, daysAgo)
         const recoveredCounts = extractLatestCounts(recovered, daysAgo)
         const mortalityCounts = extractLatestCounts(mortality, daysAgo)
         const recoveryCounts = extractLatestCounts(recovery, daysAgo)
         const sortedConfirmed = confirmedCounts.sort((a, b) => b.stats - a.stats)
+        console.timeEnd('fetchGlobalStats.extractLatestCounts')
         
+        console.time('fetchGlobalStats.countsReducers')
         const deathByCountryKey = deathsCounts.reduce((obj, item) => {
             obj[item.region] = item
             return obj
@@ -596,9 +647,11 @@ export function* fetchGlobalStats({payload}) {
             obj[item.region] = item
             return obj
         }, {})
+        console.timeEnd('fetchGlobalStats.countsReducers')
 
         let statsTotals = []
         
+        console.time('fetchGlobalStats.statsTotals.loop')
         for(const confirmData of sortedConfirmed) {
             const region = confirmData.region
             if(deathByCountryKey.hasOwnProperty(region)) {
@@ -614,13 +667,24 @@ export function* fetchGlobalStats({payload}) {
                 })
             }
         }
+        console.timeEnd('fetchGlobalStats.statsTotals.loop')
 
+        console.time('fetchGlobalStats.putGlobalStats')
+
+        console.log(roughSizeOfObject(statsTotals))
+
+        console.dir(statsTotals)
         yield put(
             { 
                 type: types.FETCH_GLOBAL_STATS_SUCCESS, 
                 payload: statsTotals,
             }
-        )    
+        )  
+
+        console.timeEnd('fetchGlobalStats.putGlobalStats')
+
+        console.timeEnd('fetchGlobalStats.filtering')
+
     } catch(error) {
         console.error(error)
     }
