@@ -35,7 +35,12 @@ export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExter
                     { statsForGraph ? statsForGraph.map((stat, idx) => (
                     <Table.Row key={idx}>
                         <Table.Cell>                        
-                            <Generic as="a" tooltipPosition="right" onClick={()=>{ redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>{renderDisplay(stat.region)}</Generic>
+                            <Generic as="a" tooltipPosition="right" 
+                                onClick={()=>{ redirectToExternalLink(stat.region) }} 
+                                tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} 
+                                textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>
+                                    {renderDisplay(stat.region)}
+                            </Generic>
                         </Table.Cell>
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>

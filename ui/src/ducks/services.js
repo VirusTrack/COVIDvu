@@ -427,6 +427,7 @@ export function* fetchUSCountiesStats({payload}) {
             for(let county of Object.keys(countiesInState)) {
                 countiesWithAbbreviation.push({region: `${county}, ${abbreviation}`, confirmed: countiesInState[county].confirmed, deaths: countiesInState[county].deaths})
             }
+            
         }
 
         const sortedCounties = countiesWithAbbreviation.sort((a, b) => b.confirmed - a.confirmed)
@@ -673,7 +674,6 @@ export function* fetchGlobalStats({payload}) {
 
         console.log(roughSizeOfObject(statsTotals))
 
-        console.dir(statsTotals)
         yield put(
             { 
                 type: types.FETCH_GLOBAL_STATS_SUCCESS, 

@@ -16,9 +16,8 @@ export const USCountiesStatsTable = ({filterRegion = '', statsForGraph, redirect
         setSelectedState(newRegion)
         onSelectedFilter(newRegion)
     }
-    
-    return (
 
+    return (
         <>
         <Level>
             <Level.Item>
@@ -33,7 +32,6 @@ export const USCountiesStatsTable = ({filterRegion = '', statsForGraph, redirect
                 </Select.Container>
             </Level.Item>
         </Level>
-
         <div className="table-container">
         <Table fullwidth hoverable>
             <Table.Head>
@@ -71,8 +69,8 @@ export const USCountiesStatsTable = ({filterRegion = '', statsForGraph, redirect
                 )}
             </Table.Body>
         </Table>
-        </div>
-        </>
+        </div>  
+        </>      
     )
 }
 

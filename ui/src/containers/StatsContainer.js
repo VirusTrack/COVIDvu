@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { useInterval } from '../hooks/ui'
+// import { useInterval } from '../hooks/ui'
 
 import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,9 +9,10 @@ import { actions } from '../ducks/services'
 import { Tab, Button, Level, Notification } from 'rbx'
 import LogoElement from '../components/LogoElement'
 
-import store from 'store2'
+// import store from 'store2'
 
-import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
+import { REGION_URLS } from '../constants'
+// import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
@@ -68,7 +69,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
         } else if(selectedTab === 'US_Counties') {
             dispatch(actions.fetchUSCountiesStats({daysAgo: daysAgo, filterRegion: filterRegion}))
         }
-    }, [dispatch, daysAgo, filterRegion])
+    }, [dispatch, daysAgo, selectedTab, filterRegion])
 
     // useInterval(() => {
     //     if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
@@ -151,7 +152,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                     isExternalLinkAvailable={isExternalLinkAvailable}
                     renderDisplay={renderDisplay}
                     filterRegion={filterRegion}
-                    onSelectedFilter={handleSelectedFilter}                    
+                    onSelectedFilter={handleSelectedFilter}
                 />
             
             }
