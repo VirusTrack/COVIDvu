@@ -1,20 +1,38 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import numeral from 'numeral'
 
-import { Select, Title, Generic, Table } from 'rbx'
+import { Select, Level, Title, Generic, Table } from 'rbx'
 
-export const USCountiesStatsTable = ({statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay}) => {
+import { US_STATES_WITH_ABBREVIATION } from '../constants'
+
+export const USCountiesStatsTable = ({filterRegion = '', statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, onSelectedFilter}) => {
+
+    const [selectedState, setSelectedState] = useState(filterRegion)
+
+    const handleChange = (event) => {
+        const newRegion = event.target.value
+
+        setSelectedState(newRegion)
+        onSelectedFilter(newRegion)
+    }
+
     return (
+        <>
 
-        // <Select.Container>
-        // <Select value={selectedState} onChange={onChange}>
-        //     {data.map(element => (
-        //         <Select.Option key={element.region} value={element.region}>{renderDisplay(`${element.region} ${element.stats}`)}</Select.Option>
-        //     ))}
-        //     </Select>
-        // </Select.Container>
+        <Level>
+            <Level.Item>
+                <Select.Container>
+                <Select value={selectedState} onChange={handleChange}>
+                    <Select.Option key='' value=''>Select a State</Select.Option>
 
+                    {Object.keys(US_STATES_WITH_ABBREVIATION).map(stateName => (
+                        <Select.Option key={stateName} value={US_STATES_WITH_ABBREVIATION[stateName]}>{stateName}</Select.Option>
+                    ))}
+                    </Select>
+                </Select.Container>
+            </Level.Item>
+        </Level>
         <div className="table-container">
         <Table fullwidth hoverable>
             <Table.Head>
@@ -52,7 +70,8 @@ export const USCountiesStatsTable = ({statsForGraph, redirectToExternalLink, isE
                 )}
             </Table.Body>
         </Table>
-        </div>        
+        </div>  
+        </>      
     )
 }
 

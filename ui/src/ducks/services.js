@@ -393,8 +393,13 @@ export function* fetchUSCountiesStats({payload}) {
     const dataService = new DataService()
 
     let daysAgo = 0
-    if(payload && payload.daysAgo && !isNaN(daysAgo)) {
-        daysAgo = payload.daysAgo
+    let filterRegion = undefined
+    if(payload) {
+        if(payload.daysAgo && !isNaN(daysAgo)) {
+            daysAgo = payload.daysAgo
+        }
+
+        filterRegion = payload.filterRegion ? payload.filterRegion : undefined
     }
 
     try {
@@ -414,10 +419,15 @@ export function* fetchUSCountiesStats({payload}) {
             const countiesInState = allCounties[usState]
 
             const abbreviation = US_STATES_WITH_ABBREVIATION[trimmedUSState]
-            
+
+            if(filterRegion && filterRegion !== abbreviation) {
+                continue
+            }
+
             for(let county of Object.keys(countiesInState)) {
                 countiesWithAbbreviation.push({region: `${county}, ${abbreviation}`, confirmed: countiesInState[county].confirmed, deaths: countiesInState[county].deaths})
             }
+            
         }
 
         const sortedCounties = countiesWithAbbreviation.sort((a, b) => b.confirmed - a.confirmed)
@@ -665,7 +675,6 @@ export function* fetchGlobalStats({payload}) {
 
         console.log(roughSizeOfObject(statsTotals))
 
-        console.dir(statsTotals)
         yield put(
             { 
                 type: types.FETCH_GLOBAL_STATS_SUCCESS, 

@@ -25,13 +25,15 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
 
     const [selectedTab, setSelectedTab] = useState(filter)
 
+    const [filterRegion, setFilterRegion] = useState('')
+
     const [daysAgo, setDaysAgo] = useState(daysAgoParam)
 
     const statsTotals = useSelector(state => state.services.globalStats)
     const usStatsTotals = useSelector(state => state.services.usStatesStats)
     const usCountiesStatsTotals = useSelector(state => state.services.usCountiesStats)
     
-    const [statsForGraph, setStatsForGraph] = useState([])
+    const [statsForGraph, setStatsForGraph] = useState(undefined)
 
     const renderDisplay = (value) => {
         return value.startsWith('!') ? value.substring(1) : value            
@@ -46,6 +48,10 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
             window.open(REGION_URLS[key], "_blank")
     }
 
+    const handleSelectedFilter = (selectedFilter) => {
+        setFilterRegion(selectedFilter)
+    }
+
     /**
      * Fetch all the data
      * 
@@ -54,19 +60,23 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
     useEffect(() => {
         dispatch(actions.clearStats())
 
-        dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
-        dispatch(actions.fetchUSCountiesStats({daysAgo: daysAgo}))
-        dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
-    }, [dispatch, daysAgo])
-
-    useInterval(() => {
-        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+        if(selectedTab === 'Global') {
             dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
-        }
-        if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+        } else if(selectedTab === 'US') {
             dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
+        } else if(selectedTab === 'US_Counties') {
+            dispatch(actions.fetchUSCountiesStats({daysAgo: daysAgo, filterRegion: filterRegion}))
         }
-    }, ONE_MINUTE)
+    }, [dispatch, daysAgo, selectedTab, filterRegion])
+
+    // useInterval(() => {
+    //     if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+    //         dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
+    //     }
+    //     if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+    //         dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
+    //     }
+    // }, ONE_MINUTE)
 
     useEffect(() => {
         if(selectedTab === 'Global' && statsTotals) {
@@ -79,9 +89,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
             setStatsForGraph(usCountiesStatsTotals)
             history.replace('/stats?filter=US_Counties')
         }
-    }, [selectedTab, statsTotals, usStatsTotals, history])
-
-//US_STATES_WITH_ABBREVIATION
+    }, [selectedTab, statsTotals, usStatsTotals, usCountiesStatsTotals, history])
 
     return (
         <>
@@ -91,7 +99,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
             }
         />
 
-        <BoxWithLoadingIndicator hasData={statsTotals}>
+        <BoxWithLoadingIndicator hasData={statsForGraph}>
 
             <Level align="right">
                 <Level.Item >
@@ -134,6 +142,8 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                     redirectToExternalLink={redirectToExternalLink}    
                     isExternalLinkAvailable={isExternalLinkAvailable}
                     renderDisplay={renderDisplay}
+                    filterRegion={filterRegion}
+                    onSelectedFilter={handleSelectedFilter}
                 />
             
             }

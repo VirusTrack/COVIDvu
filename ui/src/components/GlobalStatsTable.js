@@ -35,7 +35,12 @@ export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExter
                     { (statsForGraph && statsForGraph.length > 0) ? statsForGraph.map((stat, idx) => (
                     <Table.Row key={idx}>
                         <Table.Cell>                        
-                            <Generic as="a" tooltipPosition="right" onClick={()=>{ redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>{renderDisplay(stat.region)}</Generic>
+                            <Generic as="a" tooltipPosition="right" 
+                                onClick={()=>{ redirectToExternalLink(stat.region) }} 
+                                tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} 
+                                textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>
+                                    {renderDisplay(stat.region)}
+                            </Generic>
                         </Table.Cell>
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
@@ -52,7 +57,6 @@ export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExter
                         <Table.Cell>
                             <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
                         </Table.Cell>
-                        }
                     </Table.Row>
                     )) : (
                         <Table.Row>
