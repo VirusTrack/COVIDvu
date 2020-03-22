@@ -20,8 +20,8 @@ export const USStatsTable = ({statsForGraph, redirectToExternalLink, isExternalL
                     <Table.Heading>
                         New Cases
                     </Table.Heading>
-                    <Table.Heading>
-                        Hospital Beds
+                    <Table.Heading tooltipPosition="bottom" tooltip="Total not-for-profit beds available in each state">
+                        Total Hospital Beds
                     </Table.Heading>
                     <Table.Heading>
                         Deaths
