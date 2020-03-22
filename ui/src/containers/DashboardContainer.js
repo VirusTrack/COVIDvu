@@ -264,7 +264,8 @@ export const DashboardContainer = () => {
             </Column.Group>
 
             <Button.Group align="center">
-                <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Compare U.S. Regions</Button>
+                <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us')}}>Compare U.S. States</Button>
+                <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us/regions')}}>Compare U.S. Regions</Button>
             </Button.Group>
         </Box>
 
