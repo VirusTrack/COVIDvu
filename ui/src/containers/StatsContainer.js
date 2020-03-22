@@ -6,7 +6,8 @@ import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import { Table, Title, Tab, Generic, Button, Level } from 'rbx'
+import { Table, Title, Tab, Generic, Button, Level, Notification } from 'rbx'
+import LogoElement from '../components/LogoElement'
 
 import numeral from 'numeral'
 
@@ -91,12 +92,19 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
 
         <BoxWithLoadingIndicator hasData={statsTotals}>
 
-            <Level align="right">
-                <Level.Item >
-                <Button size="medium" onClick={() => {if(daysAgo !== 0) { setStatsForGraph([]); setDaysAgo(0) }}} color={daysAgo === 0 ? "primary" : "default"}>Now</Button>
-                &nbsp;
-                <Button size="medium" onClick={() => {if(daysAgo !== 1) { setStatsForGraph([]); setDaysAgo(1) }}} color={daysAgo === 1 ? "primary " : "default"}>Yesterday</Button></Level.Item>
-            </Level>
+            <Notification>
+                <Level breakpoint="mobile">
+                    <Level.Item align="left">
+                        <LogoElement size="small" />
+                    </Level.Item>
+                    <Level.Item align="right">
+                        <Button.Group >
+                            <Button size="medium" onClick={() => {if(daysAgo !== 0) { setStatsForGraph([]); setDaysAgo(0) }}} color={daysAgo === 0 ? "primary" : "default"}>Now</Button>
+                            <Button size="medium" onClick={() => {if(daysAgo !== 1) { setStatsForGraph([]); setDaysAgo(1) }}} color={daysAgo === 1 ? "primary " : "default"}>Yesterday</Button>
+                        </Button.Group>
+                    </Level.Item>
+                </Level>
+            </Notification>
 
             <Tab.Group size="large">
                 <Tab active={selectedTab === 'Global'} onClick={() => { setStatsForGraph([]); setSelectedTab('Global')}}>Global</Tab>

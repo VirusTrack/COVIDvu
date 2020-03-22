@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Column, Level, Title } from 'rbx'
+import LogoElement from '../components/LogoElement'
 
 export const TwoGraphLayout = ({ children }) => {
     const nodes = React.Children.toArray(children);
@@ -9,6 +10,7 @@ export const TwoGraphLayout = ({ children }) => {
         <>
 
         <Title as="p" style={{fontSize: '1.4rem', fontWeight: 400}}>
+            <LogoElement size="small" />
             Compare specific regions using the multi-select below. Ctrl or Cmd-click to select multiple regions.
         </Title> 
 

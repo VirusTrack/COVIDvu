@@ -6,9 +6,10 @@ import { useDispatch } from 'react-redux'
 
 import { actions } from '../ducks/services'
 
-import { Navbar, Title } from "rbx"
+import { Navbar } from "rbx"
+import LogoElement from '../components/LogoElement'
 
-import VirusTrackLogo from '../images/virus-pngrepo-icon.png'
+
 
 import store from 'store2'
 
@@ -80,8 +81,7 @@ export const HeaderContainer = () => {
         <Navbar>
             <Navbar.Brand>
                 <Navbar.Item onClick={() => { changePage('/dashboard') }}>
-                    <img src={VirusTrackLogo} alt="VirusTrack" role="presentation" className="logomark"/>
-                    <Title size={5} title="Coronavirus COVID-19 Cases"><span>Virus</span>Track</Title>
+                    <LogoElement size="small" />
                 </Navbar.Item>
                 <Navbar.Burger />
             </Navbar.Brand>
