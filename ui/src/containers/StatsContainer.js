@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react'
 
-import { useInterval } from '../hooks/ui'
+// import { useInterval } from '../hooks/ui'
 
 import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
-import { Table, Title, Tab, Generic, Button, Level, Notification } from 'rbx'
+import { Tab, Button, Level, Notification } from 'rbx'
 import LogoElement from '../components/LogoElement'
 
-import numeral from 'numeral'
+// import store from 'store2'
 
-import store from 'store2'
-
-import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
+import { REGION_URLS } from '../constants'
+// import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
+import GlobalStatsTable from '../components/GlobalStatsTable'
+import USCountiesStatsTable from '../components/USCountiesStatsTable'
+import USStatsTable from '../components/USStatsTable'
 
 export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
 
@@ -24,6 +26,8 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
     const history = useHistory()
 
     const [selectedTab, setSelectedTab] = useState(filter)
+    
+    const [filterRegion, setFilterRegion] = useState('')
 
     const [daysAgo, setDaysAgo] = useState(daysAgoParam)
 
@@ -31,7 +35,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
     const usStatsTotals = useSelector(state => state.services.usStatesStats)
     const usCountiesStatsTotals = useSelector(state => state.services.usCountiesStats)
     
-    const [statsForGraph, setStatsForGraph] = useState([])
+    const [statsForGraph, setStatsForGraph] = useState(undefined)
 
     const renderDisplay = (value) => {
         return value.startsWith('!') ? value.substring(1) : value            
@@ -46,6 +50,10 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
             window.open(REGION_URLS[key], "_blank")
     }
 
+    const handleSelectedFilter = (selectedFilter) => {
+        setFilterRegion(selectedFilter)
+    }
+   
     /**
      * Fetch all the data
      * 
@@ -54,19 +62,23 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
     useEffect(() => {
         dispatch(actions.clearStats())
 
-        dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
-        dispatch(actions.fetchUSCountiesStats({daysAgo: daysAgo}))
-        dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
-    }, [dispatch, daysAgo])
-
-    useInterval(() => {
-        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+        if(selectedTab === 'Global') {
             dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
-        }
-        if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+        } else if(selectedTab === 'US') {
             dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
+        } else if(selectedTab === 'US_Counties') {
+            dispatch(actions.fetchUSCountiesStats({daysAgo: daysAgo, filterRegion: filterRegion}))
         }
-    }, ONE_MINUTE)
+    }, [dispatch, daysAgo, selectedTab, filterRegion])
+
+    // useInterval(() => {
+    //     if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
+    //         dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
+    //     }
+    //     if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
+    //         dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
+    //     }
+    // }, ONE_MINUTE)
 
     useEffect(() => {
         if(selectedTab === 'Global' && statsTotals) {
@@ -79,8 +91,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
             setStatsForGraph(usCountiesStatsTotals)
             history.replace('/stats?filter=US_Counties')
         }
-    }, [selectedTab, statsTotals, usStatsTotals, history])
-
+    }, [selectedTab, statsTotals, usStatsTotals, usCountiesStatsTotals, history])
 
     return (
         <>
@@ -90,19 +101,21 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
             }
         />
 
-        <BoxWithLoadingIndicator hasData={statsTotals}>
+        <BoxWithLoadingIndicator hasData={statsForGraph}>
 
             <Notification>
                 <Level breakpoint="mobile">
                     <Level.Item align="left">
                         <LogoElement size="small" />
                     </Level.Item>
-                    <Level.Item align="right">
-                        <Button.Group >
-                            <Button size="medium" onClick={() => {if(daysAgo !== 0) { setStatsForGraph([]); setDaysAgo(0) }}} color={daysAgo === 0 ? "primary" : "default"}>Now</Button>
-                            <Button size="medium" onClick={() => {if(daysAgo !== 1) { setStatsForGraph([]); setDaysAgo(1) }}} color={daysAgo === 1 ? "primary " : "default"}>Yesterday</Button>
-                        </Button.Group>
-                    </Level.Item>
+                    { selectedTab !== 'US_Counties' &&
+                        <Level.Item align="right">
+                            <Button.Group >
+                                <Button size="medium" onClick={() => {if(daysAgo !== 0) { setStatsForGraph([]); setDaysAgo(0) }}} color={daysAgo === 0 ? "primary" : "default"}>Now</Button>
+                                <Button size="medium" onClick={() => {if(daysAgo !== 1) { setStatsForGraph([]); setDaysAgo(1) }}} color={daysAgo === 1 ? "primary " : "default"}>Yesterday</Button>
+                            </Button.Group>
+                        </Level.Item>
+                    }
                 </Level>
             </Notification>
 
@@ -112,84 +125,39 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                 <Tab active={selectedTab === 'US_Counties'} onClick={() => { setStatsForGraph([]); setSelectedTab('US_Counties')}}>U.S. Counties</Tab>
             </Tab.Group>
 
-            <div className="table-container">
-            <Table fullwidth hoverable>
-                <Table.Head>
-                    <Table.Row>
-                        <Table.Heading>
-                            Region
-                        </Table.Heading>
-                        <Table.Heading>
-                            Total Cases
-                        </Table.Heading>
-                        { filter !== 'US_Counties' &&
-                        <Table.Heading>
-                            New Cases
-                        </Table.Heading>
-                        }
-                        { filter === 'US' &&
-                        <Table.Heading>
-                            Hospital Beds
-                        </Table.Heading>
-                        }
-                        <Table.Heading>
-                            Deaths
-                        </Table.Heading>
-                        { filter !== 'US_Counties' &&
-                        <>
-                        <Table.Heading>
-                            New Deaths
-                        </Table.Heading>
-                        <Table.Heading>
-                            Mortality Rate
-                        </Table.Heading>
-                        </>
-                        }
-                    </Table.Row>
-                </Table.Head>
-                <Table.Body>
-                    { (statsForGraph && statsForGraph.length > 0) ? statsForGraph.map((stat, idx) => (
-                    <Table.Row key={idx}>
-                        <Table.Cell>                        
-                            <Generic as="a" tooltipPosition="right" onClick={()=>{ redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>{renderDisplay(stat.region)}</Generic>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
-                        </Table.Cell>
-                        { filter !== 'US_Counties' &&
-                        <Table.Cell>
-                            <Title size={5}>{numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')}</Title>
-                        </Table.Cell>
-                        }
-                        { filter === 'US' &&
-                        <Table.Heading>
-                            <Title size={5}>{stat.hospitalBeds > 0 ? numeral(stat.hospitalBeds).format('0,0') : '-'}</Title>
-                        </Table.Heading>
-                        }
-                        <Table.Cell>
-                            <Title size={5}>{numeral(stat.deaths).format('0,0')}</Title>
-                        </Table.Cell>
-                        { filter !== 'US_Counties' &&
-                        <>
-                        <Table.Cell>
-                            <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')}</Title>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
-                        </Table.Cell>
-                        </>
-                        }
-                    </Table.Row>
-                    )) : (
-                        <Table.Row>
-                            <Table.Cell>
-                                Loading...
-                            </Table.Cell>
-                        </Table.Row>
-                    )}
-                </Table.Body>
-            </Table>
-            </div>
+
+            { selectedTab === 'Global' &&
+            
+                <GlobalStatsTable 
+                    statsForGraph={statsForGraph} 
+                    redirectToExternalLink={redirectToExternalLink}    
+                    isExternalLinkAvailable={isExternalLinkAvailable}
+                    renderDisplay={renderDisplay}
+                />
+            
+            }
+            { selectedTab === 'US' &&
+            
+                <USStatsTable 
+                    statsForGraph={statsForGraph} 
+                    redirectToExternalLink={redirectToExternalLink}    
+                    isExternalLinkAvailable={isExternalLinkAvailable}
+                    renderDisplay={renderDisplay}
+                />
+
+            }
+            { selectedTab === 'US_Counties' &&
+            
+                <USCountiesStatsTable 
+                    statsForGraph={statsForGraph} 
+                    redirectToExternalLink={redirectToExternalLink}    
+                    isExternalLinkAvailable={isExternalLinkAvailable}
+                    renderDisplay={renderDisplay}
+                    filterRegion={filterRegion}
+                    onSelectedFilter={handleSelectedFilter}
+                />
+            
+            }
         </BoxWithLoadingIndicator>
         </>
     )    

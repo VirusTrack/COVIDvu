@@ -43,7 +43,7 @@ export const FooterContainer = () =>{
                     <Column.Group>
                         <Column>
                             <p>
-                                <strong><a href="https://github.com/pr3d4t0r/covidvu" target="_new" rel="noopener noreferrer">COVIDvu GitHub</a></strong> Support by: <br/>
+                                <strong><a href="https://github.com/VirusTrack/covidvu" target="_new" rel="noopener noreferrer">COVIDvu GitHub</a></strong> Support by: <br/>
                                 <a href="https://cime.net" target="_new" rel="noopener noreferrer">CIME</a>, <a href="https://mysticcoders.com" target="_new" rel="noopener noreferrer">Mystic Coders</a> and <a href="https://farad.ai" target="_new" rel="noopener noreferrer">Farad.ai</a>
                             </p>
                         </Column>
