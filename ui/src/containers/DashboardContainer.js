@@ -12,6 +12,7 @@ import { Tag, Title, Level, Heading, Container, Button, Box, Column } from "rbx"
 
 import GraphWithLoader from '../components/GraphWithLoader'
 import HeroElement from '../components/HeroElement'
+import LogoElement from '../components/LogoElement'
 
 import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_CONTINENTAL_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
@@ -92,7 +93,7 @@ export const DashboardContainer = () => {
         <>
         <HeroElement
             title={
-                <>Coronavirus Cases <br />COVID-19 Cases</>
+                <>Coronavirus <br />COVID-19 Cases</>
             }
             buttons={[
                 { title: 'Global', location: '/covid' },
@@ -105,7 +106,9 @@ export const DashboardContainer = () => {
         </HeroElement>
 
         <Box>
-            <Title size={2}><img src={globeImg} alt=""/>Global Coronavirus Totals</Title>
+            <Title size={2}>
+                <LogoElement size="small" />
+                <img src={globeImg} alt=""/>Global Coronavirus Totals</Title>
             <Column.Group breakpoint="desktop" gapless className="separated">
             <Column narrow>
 
@@ -195,7 +198,10 @@ export const DashboardContainer = () => {
 
         <Box>
 
-            <Title size={2}><img src={usflagImg} alt=""/>United States Coronavirus Totals</Title>
+            <Title size={2}>
+                <LogoElement size="small" />
+                <img src={usflagImg} alt=""/>United States Coronavirus Totals
+            </Title>
             <Column.Group gapless breakpoint="desktop" className="separated">
             <Column size="narrow"> 
             <Container className="statistics">

@@ -47,6 +47,24 @@ p
 code 
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace
 
+.LogoElement
+  display: flex
+  align-items: center
+  color: #{$primary}
+  text-transform: uppercase
+  font-family: archivo
+  font-weight: 700
+  span 
+    color: #{$tertiary}
+  &.small 
+    font-size: 1.4rem
+    line-height: 1.4rem
+    img 
+      width: 2.4rem
+      height: 2.4rem
+      margin: -1rem 1rem -1rem 0
+      max-height: none
+
 
 .hero
   @media screen and (min-width: 1024px)
@@ -76,12 +94,8 @@ code
 .navbar 
   box-shadow: #{$drop-shadow-large}
   background: white
-  .logomark
-    width: 3.6rem
-    height: auto
-    display: block
-    max-height: none
-    margin: -1rem 1rem -1rem 0
+  .LogoElement.small
+    margin: 0
   .navbar-brand
     padding: 1rem 1rem
   .navbar-burger.is-active
@@ -199,6 +213,18 @@ code
       margin-bottom: 0
       text-align: center
       border-bottom: .1rem solid #{$offwhite}
+      .LogoElement
+        align-self: center
+        margin: 0 auto 1rem auto
+        justify-content: center
+      @media screen and (min-width: 1024px)
+        display: flex
+        align-items: center
+        justify-content: flex-start
+        .LogoElement
+          margin: 0 1rem 0 auto
+          order: 2
+          justify-self: flex-end
       @media screen and (min-width: 1024px)
         padding-bottom: 2.5rem
         padding-top: 2.5rem
