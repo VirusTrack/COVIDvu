@@ -32,7 +32,8 @@ from covidvu.predict import PRIOR_LOG_CARRYING_CAPACITY
 from covidvu.predict import PRIOR_MID_POINT
 from covidvu.predict import PRIOR_SIGMA
 from covidvu.predict import load
-
+from covidvu.predict import getSavedShortCountryNames
+from pandas.core.frame import DataFrame
 
 # *** constants ***
 TEST_JH_CSSE_DATA_HOME           = join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
@@ -240,8 +241,43 @@ def test__dumpCountryPrediction():
 
 
 def test_load():
-    raise NotImplementedError
+    try:
+        _main('all',
+              siteData=TEST_SITE_DATA,
+              nSamples=10,
+              nTune=10,
+              nChains=1,
+              nBurn=0,
+              nDaysPredict=10,
+              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              )
+
+        meanPredictionTS, percentilesTS, countryName = load(0, siteData=TEST_SITE_DATA)
+        assert isinstance(meanPredictionTS, Series)
+        assert isinstance(percentilesTS, DataFrame)
+        assert isinstance(countryName, str)
+        assert (percentilesTS.columns.isin(['97.5', '2.5', '25', '75'])).all()
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')
 
 
 def test_getSavedShortCountryNames():
-    raise NotImplementedError
+    try:
+        _main('all',
+              siteData=TEST_SITE_DATA,
+              nSamples=10,
+              nTune=10,
+              nChains=1,
+              nBurn=0,
+              nDaysPredict=10,
+              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              )
+        countryNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
+        assert isinstance(countryNameShortAll, list)
+        assert len(countryNameShortAll) == 2
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')

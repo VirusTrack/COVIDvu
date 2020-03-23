@@ -4,6 +4,7 @@
 
 from covidvu.visualize import plotTimeSeries
 from covidvu.visualize import plotTimeSeriesInteractive
+from covidvu.visualize import plotPrediction
 import pandas as pd
 import numpy as np
 
@@ -59,5 +60,9 @@ def test_plotTimeSeriesInteractive():
                               yLabel='test'
                               )
 
+
 def test_plotPrediction():
-    raise NotImplementedError
+    data = meanPredictionTS = pd.Series(data=np.arange(0,10), index=np.arange(0,10))
+    percentilesTS = pd.DataFrame(data=np.ones((10,4)), index = np.arange(0,10),  columns=['2.5', '97.5', '25', '75'])
+    countryName = 'US'
+    _, _ = plotPrediction(data, meanPredictionTS, percentilesTS, countryName, log=False)
