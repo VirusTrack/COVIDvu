@@ -29,6 +29,7 @@ RUN             pip install -U \
                     devpi-client \
                     jupyter_contrib_nbextensions \
                     jupyter_nbextensions_configurator \
+                    pre-commit \
                     pudb \
                     pyflakes \
                     pytest 
