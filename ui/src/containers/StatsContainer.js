@@ -82,14 +82,6 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
 
     useEffect(() => {
 
-        console.log("Global")
-        console.dir(statsTotals)
-
-        console.log("US States")
-        console.dir(usStatsTotals)
-
-        console.log("US Counties")
-        console.dir(usCountiesStatsTotals)
         if(selectedTab === 'Global' && statsTotals) {
             setStatsForGraph(statsTotals)
             history.replace('/stats?filter=Global')

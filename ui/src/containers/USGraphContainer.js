@@ -11,7 +11,7 @@ import store from 'store2'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Level, Button, Tab, Notification, Generic, Title } from "rbx"
+import { Tag, Tab, Notification, Generic, Title } from "rbx"
 
 import { REGION_URLS, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 

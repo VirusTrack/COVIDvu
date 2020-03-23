@@ -6,7 +6,7 @@ import { useHistory, useLocation } from 'react-router'
 import queryString from 'query-string'
 import store from 'store2'
 
-import { useWindowSize, useInterval } from '../hooks/ui'
+import { useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 

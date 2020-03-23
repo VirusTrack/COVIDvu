@@ -104,12 +104,14 @@ export const initialState = {
     global: {},
     continental: {},
     globalTop10: {},
+    globalNamesTop10: {},
     globalStats: undefined, 
     totalGlobalStats: {}, 
     usStates: {},
     usStatesStats: undefined,
     totalUSStatesStats: {},
     usStatesTop10: {},
+    usStateNamesTop10: [],
     usRegions: {},
     lastUpdate: undefined
 }
@@ -123,12 +125,14 @@ export default function (state = initialState, action) {
                 global: {},
                 continental: {},
                 globalTop10: {},
+                globalNamesTop10: {},
                 globalStats: undefined,
                 totalGlobalStats: {},
                 usStates: {},
                 usStatesStats: undefined,
                 totalUSStatesStats: {},
                 usStatesTop10: {},
+                usStateNamesTop10: [],
                 usRegions: {}
             }
         case types.CLEAR_STATS:
@@ -140,12 +144,14 @@ export default function (state = initialState, action) {
         case types.FETCH_TOP_10_COUNTRIES_SUCCESS:
             return {
                 ...state,
-                globalTop10: action.payload
+                globalTop10: action.payload,
+                globalNamesTop10: action.top10CountryNames,
             }
         case types.FETCH_TOP_10_US_STATES_SUCCESS:
             return {
                 ...state,
-                usStatesTop10: action.payload
+                usStatesTop10: action.payload,
+                usStateNamesTop10: action.top10StateNames
             }
         case types.FETCH_GLOBAL_SUCCESS:
             return {
@@ -336,7 +342,7 @@ export function* fetchTop10USStates({payload}) {
             top10[region] = us_states.confirmed[region]
         }
 
-        yield put({ type: types.FETCH_TOP_10_US_STATES_SUCCESS, payload: top10 })
+        yield put({ type: types.FETCH_TOP_10_US_STATES_SUCCESS, payload: top10, top10StateNames: top10States})
     } catch(error) {
         console.error(error)
     }
@@ -769,7 +775,7 @@ export function* fetchTop10Countries({payload}) {
             top10[country] = global.confirmed[country]
         }
 
-        yield put({ type: types.FETCH_TOP_10_COUNTRIES_SUCCESS, payload: top10 })
+        yield put({ type: types.FETCH_TOP_10_COUNTRIES_SUCCESS, payload: top10, top10CountryNames: top10Countries })
     } catch(error) {
         console.error(error)
     }
