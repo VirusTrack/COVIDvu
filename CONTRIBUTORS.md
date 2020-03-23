@@ -8,6 +8,7 @@ Listed in the order in which they joined this development effort.
 |[jaryaman](https://www.linkedin.com/in/juvid-aryaman/)| Dr. Juvid Aryaman|
 |[kinabalu](https://www.linkedin.com/in/andrewlombardi/)| Andrew Lombardi|
 |[goodwolf](https://www.linkedin.com/in/connorgoodwolf/)| Connor Goodwolf |
+|n/a/d|[Evon Onusic](https://www.linkedin.com/in/onusic/)|
 |[StriderWilson](https://www.linkedin.com/in/strider-wilson/)|Strider Wilson|
 |n/a/d*|[Alice Bonasio](https://www.linkedin.com/in/alicebonasio/)|
 |[dermidgen](https://www.linkedin.com/in/dermidgen/)|Danny Graham|
@@ -15,6 +16,7 @@ Listed in the order in which they joined this development effort.
 |[lukemarohn](https://www.linkedin.com/in/lucasmarohn/)|Lucas Marohn|
 |[kotiek14](https://github.com/kotek14/)|Stepan Sgibnev|
 |n/a/d|[Jim Key](https://www.linkedin.com/in/jimkey/)|
+|n/a/d|[Jessica Powell](https://www.linkedin.com/in/jessica-powell-28b8b7a/)/
 
 &#42; _Not a developer_
 
