@@ -22,6 +22,7 @@ import numeral from 'numeral'
 
 import store from 'store2'
 
+import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import SelectRegionComponent from '../components/SelectRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
@@ -141,10 +142,13 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
             <TwoGraphLayout>
 
                 <>
-                <SelectRegionComponent
-                    data={sortedConfirmed}
-                    selected={selectedCountries}
-                    handleSelected={dataList => handleSelectedRegion(dataList)} />
+`                    <CheckboxRegionComponent
+                        data={sortedConfirmed}
+                        selected={selectedCountries}
+                        handleSelected={dataList => handleSelectedRegion(dataList)} 
+                        defaultSelected={region}
+                    />
+
                 </>
 
                 <>
