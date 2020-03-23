@@ -9,9 +9,9 @@ export const TwoGraphLayout = ({ children }) => {
     return (
         <>
 
-        <Title as="p" style={{fontSize: '1.4rem', fontWeight: 400}}>
+        <Title as="div" style={{fontSize: '1.4rem', fontWeight: 400}}>
             <LogoElement size="small" />
-            Compare specific regions using the multi-select below. Ctrl or Cmd-click to select multiple regions.
+            Select from the options below to compare regions
         </Title> 
 
             <Column.Group breakpoint="tablet" style={{margin: 0, padding: 0}} gapless>

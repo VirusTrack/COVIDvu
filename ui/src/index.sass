@@ -1,3 +1,5 @@
+@import 'rbx/index'
+
 $tertiary: hsla(5,87,70,1)
 $secondary: hsla(188,80,38,1)
 $primary: hsla(221,63,33,1)
@@ -5,6 +7,7 @@ $primary: hsla(221,63,33,1)
 $offwhite: hsla(216,17,94,1)
 
 $drop-shadow-large: 0px 10px 30px rgba(11, 56, 156, 0.05), 0px 7px 20px rgba(11, 56, 156, 0.05);
+$drop-shadow-small: 0px 5px 15px rgba(11, 56, 156, 0.05), 0px 3px 10px rgba(11, 56, 156, 0.05);
 
 html 
   font-size: 10px
@@ -326,21 +329,94 @@ hr
   margin-left: 0
 
 .select-sidebar
-  background: #{$offwhite}
+  min-width: 24rem
+  display: flex !important
+  flex-direction: column 
+  align-content: stretch
+  justify-content: stretch
+  @media (min-width: #{$tablet})
+    background: #{$offwhite}
 
-.is-tooltip-right.select
-  margin: 1.5rem
-  @media screen and (min-width: 1024px)
-    width: 100%
-    height: 100%
+.CheckboxRegionComponent
+  background: #{$offwhite}
+  max-width: 28rem
+  margin: 1.5rem auto
+  border-radius: 1rem
+  overflow: hidden
+  text-align: center
+  width: 100%
+  @media (min-width: #{$tablet})
+    max-width: none
     margin: 0
     margin-top: 0 !important
-    margin-right: 0 !important
+    border-radius: 0
+    width: 100% !important
 
-.select select[multiple]
+
+.CheckboxRegionForm
+  margin: 0 0 0 0
+  margin-top: 0 !important
+  padding: 0 
   height: 100%
-  width: 100%
-  background: #{$offwhite}
-  margin: 0
-  border: 0
-  border-radius: 0
+  overflow-y: scroll
+  max-width: 28rem
+  max-height: 80vh
+  min-height: 100%
+  flex-basis: 100%
+  position: relative
+  &:before 
+    content: ''
+    display: block 
+    position: sticky 
+    top: 0
+    left: 0
+    right: 0
+    height: 2rem
+    background: linear-gradient(rgba($offwhite, 1), rgba($offwhite, 0))
+    z-index: +1
+    pointer-events: none
+  @media screen and (min-width: #{$tablet})
+    max-height: 110vh
+    max-width: none
+    
+
+.CheckboxRegionOptions
+  padding: 1rem .5rem .5rem 1rem
+  margin-top: 0 !important
+  @media screen and (min-width: #{$tablet})
+    padding: 2rem 1.5rem .5rem 1.5rem
+    &.buttons
+      text-align: left
+  .button 
+    background: white
+    box-shadow: #{$drop-shadow-small}
+    min-height: 4rem
+    &:not(:last-child)
+      margin-right: 1rem !important
+
+.CheckboxRegionCheckbox
+  display: none
+
+.CheckboxRegionCheckbox:checked
+  + label 
+    background: white
+    color: #{$primary}
+    box-shadow: #{$drop-shadow-small}
+    border-radius: .5rem
+
+.CheckboxRegionCheckbox:checked + .CheckboxRegionCheckbox:checked
+  label  
+    border-top-left-radius: 0
+    border: 1px solid red
+    border-top-right-radius: 0
+label 
+  display: flex
+  justify-content: space-between
+  padding: .75rem 1.5rem
+  min-height: 4rem
+  margin-top: .1rem
+  margin: .1rem 1rem .5rem 1rem
+  text-align: left
+  .label-stats
+    color: #{$primary}
+    
