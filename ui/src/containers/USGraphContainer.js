@@ -122,7 +122,9 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                     <CheckboxRegionComponent
                         data={sortedConfirmed}
                         selected={selectedStates}
-                        handleSelected={dataList => handleSelectedRegion(dataList)} />
+                        handleSelected={dataList => handleSelectedRegion(dataList)} 
+                        defaultSelected={region}
+                    />
                 </>
 
                 <>
