@@ -71,9 +71,11 @@ export const DashboardContainer = ({showLogParam = false}) => {
     }, [dispatch])
 
     const globalTop10 = useSelector(state => state.services.globalTop10)
+    const globalNamesTop10 = useSelector(state => state.services.globalNamesTop10)
     const globalStats = useSelector(state => state.services.totalGlobalStats)
     
     const usStatesTop10 = useSelector(state => state.services.usStatesTop10)
+    const usStateNamesTop10 = useSelector(state => state.services.usStateNamesTop10)
     const usStatesStats = useSelector(state => state.services.totalUSStatesStats)
     
     const confirmedUSRegions = useSelector(state => state.services.usRegions.confirmed)
@@ -168,7 +170,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         secondaryGraph="Top 10 Confirmed Cases"
                         graph={globalTop10}
                         showLog={showLog}
-                        selected={['Italy', 'Iran', 'Korea, South', 'Spain', 'Germany', 'France', 'US', 'Switzerland', 'United Kingdom', 'Netherlands']}
+                        selected={globalNamesTop10}
                     />
                 </Container>
             </Column>
@@ -259,7 +261,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                     secondaryGraph="Top 10 Confirmed Cases"
                     graph={usStatesTop10}
                     showLog={showLog}
-                    selected={['New York', 'Washington', 'California', 'Massachusetts', 'New Jersey', 'Colorado', 'Florida', 'Louisiana', 'Georgia', 'Illinois']}
+                    selected={usStateNamesTop10}
                 />
             </Column>
 

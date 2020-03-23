@@ -10,7 +10,7 @@ import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Level, Button } from "rbx"
+import { Tag, Tab, Level } from "rbx"
 
 import { COUNTRIES, CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 import numeral from 'numeral'

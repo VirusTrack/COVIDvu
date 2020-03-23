@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useHistory, useLocation } from 'react-router'
 
-import { useWindowSize, useInterval } from '../hooks/ui'
+import { useInterval } from '../hooks/ui'
 
 import queryString from 'query-string'
 
