@@ -203,7 +203,7 @@ export const DashboardContainer = () => {
                 <img src={usflagImg} alt=""/>United States Coronavirus Totals
             </Title>
             <Column.Group gapless breakpoint="desktop" className="separated">
-            <Column size="narrow"> 
+            <Column narrow> 
             <Container className="statistics">
                 <Level>
                     <Level.Item textAlign="centered">
