@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import "rbx/index.css"
 import './index.sass';
 
 import { Provider } from 'react-redux'

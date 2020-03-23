@@ -19,7 +19,7 @@ import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
-import SelectRegionComponent from '../components/SelectRegionComponent'
+import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
@@ -119,7 +119,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
         <BoxWithLoadingIndicator hasData={sortedConfirmed}>
             <TwoGraphLayout>
                 <>
-                    <SelectRegionComponent
+                    <CheckboxRegionComponent
                         data={sortedConfirmed}
                         selected={selectedStates}
                         handleSelected={dataList => handleSelectedRegion(dataList)} />
