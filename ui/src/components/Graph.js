@@ -72,10 +72,16 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             ...layout,
             xaxis: {
                 fixedrange: true
-            },
-            yaxis: {
-                fixedrange: true
-            },
+            }
+        }
+
+        if(!showLog) {
+            layout = {
+                ...layout,
+                yaxis: {
+                    fixedrange: true
+                }
+            }
         }
     }
 

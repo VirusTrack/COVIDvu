@@ -3,6 +3,7 @@ import axios from "axios"
 import { 
     DATA_URL, 
     STAGING_DATA_URL, 
+    LOCAL_DATA_URL, 
     GLOBAL_KEY, 
     CONTINENTAL_KEY, 
     US_STATES_KEY, 
@@ -28,6 +29,8 @@ function dataUrl() {
             return STAGING_DATA_URL
         case "prod":
             return DATA_URL
+        case "local":
+            return LOCAL_DATA_URL
         default:
             return DATA_URL
     }
