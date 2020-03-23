@@ -18,6 +18,7 @@ from pymc3.backends.base import MultiTrace
 from pymc3.model import Model
 
 from covidvu.predict import _castPredictionsAsTS
+from covidvu.predict import _dumpCountryPrediction
 from covidvu.predict import _dumpPredictionCollectionAsJSON
 from covidvu.predict import _dumpTimeSeriesAsJSON
 from covidvu.predict import _getPredictionsFromPosteriorSamples
@@ -78,6 +79,7 @@ def test_predictLogisticGrowth():
     assert (prediction['predictionsPercentilesTS'][0][0].isnull().values).sum() == 0
     assert isinstance(prediction['trace'], MultiTrace)
     assert (prediction['countryTSClean'] > MIN_CASES_FILTER).all()
+    return prediction
 
 
 def test__initializeLogisticModel():
@@ -201,7 +203,24 @@ def test__main():
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
 
+        # TODO test all
+
     except Exception as e:
         raise e
     finally:
         _purge(TEST_SITE_DATA, '.json')
+
+
+def test__dumpCountryPrediction():
+    prediction = test_predictLogisticGrowth()
+    try:
+        _dumpCountryPrediction(prediction, TEST_SITE_DATA, PREDICTIONS_PERCENTILES)
+        _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA,'prediction-conf-int-US.json'))
+
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')
+
+

@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from pandas.core.indexes.datetimes import DatetimeIndex
 import pymc3 as pm
+import re
 
 from os.path import join
 
@@ -17,6 +18,7 @@ N_BURN           = 100
 N_CHAINS         = 2
 N_DAYS_PREDICT   = 14
 MIN_CASES_FILTER = 10
+MIN_NUMBER_CASES = 10
 
 PRIOR_LOG_CARRYING_CAPACITY = (3, 10)
 PRIOR_MID_POINT             = (0, 1e3)
@@ -145,6 +147,7 @@ def _castPredictionsAsTS(countryTSClean,
 
 def predictLogisticGrowth(countryTrainIndex: int        = None,
                           countryName: str              = None,
+                          confirmedCases                = None,
                           target                        = 'confirmed',
                           subGroup                      = 'casesGlobal',
                           nSamples                      = N_SAMPLES,
@@ -153,6 +156,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                           nBurn                         = N_BURN,
                           nDaysPredict                  = N_DAYS_PREDICT,
                           minCasesFilter                = MIN_CASES_FILTER,
+                          minNumberCases                = MIN_NUMBER_CASES,
                           priorLogCarryingCapacity      = PRIOR_LOG_CARRYING_CAPACITY,
                           priorMidPoint                 = PRIOR_MID_POINT,
                           priorGrowthRate               = PRIOR_GROWTH_RATE,
@@ -168,6 +172,8 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     ----------
     countryTrainIndex: Order countries from highest to lowest, and train the ith country
     countryName: Overwrites countryTrainIndex as the country to train
+    confirmedCases: A dataframe of countries as columns, and total number of cases as a time series
+        (see covidvu.vujson.parseCSSE)
     target: string in ['confirmed', 'deaths', 'recovered']
     subGroup: A key in the output of covidvu.pipeline.vujson.parseCSSE
     nSamples: Number of samples per chain of MCMC
@@ -194,7 +200,8 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     countryTSClean: Data used for training
     """
 
-    confirmedCases = parseCSSE(target, **kwargs)[subGroup]
+    if confirmedCases is None:
+        confirmedCases = parseCSSE(target, **kwargs)[subGroup]
 
     if countryName is None:
         countryName = _getCountryToTrain(int(countryTrainIndex), confirmedCases)
@@ -203,6 +210,9 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
 
     countryTS = confirmedCases[countryName]
     countryTSClean = countryTS[countryTS > minCasesFilter]
+    if countryTSClean.shape[0] < minNumberCases:
+        return None
+
     countryTSClean.index = pd.to_datetime(countryTSClean.index)
 
     t = np.arange(countryTSClean.shape[0])
@@ -290,31 +300,75 @@ def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
     return result
 
 
-def _main(countryTrainIndex,
-          target = 'confirmed',
-          predictionsPercentiles = PREDICTIONS_PERCENTILES,
-          siteData               = SITE_DATA,
-          **kwargs
-          ):
+def _dumpCountryPrediction(prediction, siteData, predictionsPercentiles):
+    countryNameSimple = ''.join(e for e in prediction['countryName'] if e.isalnum())
+    prediction['predictionsMeanTS'].name = prediction['countryName']
 
-    prediction = predictLogisticGrowth(
-        countryTrainIndex = countryTrainIndex,
-        predictionsPercentiles = predictionsPercentiles,
-        target=target,
-        siteData = siteData,
-        **kwargs
-    )
-
-    prediction['predictionsMeanTS'].name = prediction['countryName'].replace(' ', '')
     _dumpTimeSeriesAsJSON(prediction['predictionsMeanTS'],
-                          join(siteData, 'prediction-mean-%s.json' % prediction['predictionsMeanTS'].name),
-                         )
+                          join(siteData, 'prediction-mean-%s.json' % countryNameSimple),
+                          )
 
     _dumpPredictionCollectionAsJSON(prediction['predictionsPercentilesTS'],
                                     prediction['predictionsMeanTS'].name,
                                     predictionsPercentiles,
-                                    join(siteData, 'prediction-conf-int-%s.json' % prediction['predictionsMeanTS'].name),
-                                   )
+                                    join(siteData,
+                                         'prediction-conf-int-%s.json' % countryNameSimple),
+                                    )
+
+def _main(countryTrainIndex,
+          target = 'confirmed',
+          predictionsPercentiles = PREDICTIONS_PERCENTILES,
+          siteData               = SITE_DATA,
+          subGroup               = 'casesGlobal',
+          **kwargs
+          ):
+    """
+
+    Parameters
+    ----------
+    countryTrainIndex: If an integer, trains the country ranked i+1 in order of total number of cases. If 'all',
+        predicts all countries
+    target: A string in ['confirmed', 'deaths', 'recovered']
+    predictionsPercentiles: The posterior percentiles to compute
+    siteData: The directory for output data
+    kwargs: Optional named arguments for covidvu.predictLogisticGrowth
+
+    Returns
+    -------
+
+    """
+    if re.search(r'^\d$', countryTrainIndex):
+        prediction = predictLogisticGrowth(
+            countryTrainIndex = countryTrainIndex,
+            predictionsPercentiles = predictionsPercentiles,
+            target=target,
+            siteData = siteData,
+            **kwargs
+        )
+
+        _dumpCountryPrediction(prediction, siteData, predictionsPercentiles)
+
+
+    elif countryTrainIndex == 'all':
+        confirmedCases = parseCSSE(target, **kwargs)[subGroup]
+        countriesAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
+        for countryName in countriesAll:
+            print(f'Training {countryName}...')
+
+            prediction = predictLogisticGrowth(countryName            = countryName,
+                                               confirmedCases         = confirmedCases,
+                                               predictionsPercentiles = predictionsPercentiles,
+                                               target                 = target,
+                                               siteData               = siteData,
+                                               **kwargs,
+                                               )
+            if prediction:
+                _dumpCountryPrediction(prediction, siteData, predictionsPercentiles)
+                print('Saved.')
+            else:
+                print('Skipped.')
+    else:
+        raise NotImplementedError
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
