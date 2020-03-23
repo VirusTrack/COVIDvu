@@ -6,6 +6,8 @@ from covidvu.visualize import plotTimeSeries
 from covidvu.visualize import plotTimeSeriesInteractive
 from covidvu.visualize import plotPrediction
 from covidvu.visualize import plotDataAndPredictionsWithCI
+from covidvu.visualize import castHexToRGBA_string
+from covidvu.visualize import hexToRGB
 from covidvu.predict import _main
 from covidvu.predict import loadAll
 import pandas as pd
@@ -106,3 +108,20 @@ def test_plotDataAndPredictionsWithCI():
         raise e
     finally:
         _purge(TEST_SITE_DATA, '.json')
+
+
+def test_castHexToRGBA_string():
+    rgba = castHexToRGBA_string('#f28500', 0.5)
+    assert isinstance(rgba, str)
+    r, g, b, a = re.search(r'^rgba\((\d+), (\d+), (\d+), ([0-9].[0-9])\)$',
+                           castHexToRGBA_string('#f28500', 0.5)).groups()
+    assert isinstance(r, str)
+    assert isinstance(g, str)
+    assert isinstance(b, str)
+    assert isinstance(a, str)
+
+
+def test_hexToRGB():
+    rgb = hexToRGB('#f28500')
+    assert isinstance(rgb, tuple)
+    assert len(rgb) == 3
