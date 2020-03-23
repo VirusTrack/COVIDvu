@@ -107,7 +107,7 @@ export const initialState = {
     globalStats: undefined, 
     totalGlobalStats: {}, 
     usStates: {},
-    usStatesStats: {},
+    usStatesStats: undefined,
     totalUSStatesStats: {},
     usStatesTop10: {},
     usRegions: {},
@@ -780,7 +780,7 @@ const filterCountries = [
     '!Outside China', 
 ]
 
-export function* fetchGlobal() {
+export function* fetchGlobal({payload}) {
     console.time('fetchGlobal')
 
     const dataService = new DataService()
@@ -793,6 +793,7 @@ export function* fetchGlobal() {
         let confirmed = global.confirmed
         let deaths = global.deaths
         let recovered = global.recovered
+
         console.timeEnd('fetchGlobal.axios')
         
         for(let filterCountry of filterCountries) {

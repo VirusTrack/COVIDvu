@@ -17,11 +17,12 @@ export const CovidUSPage = () => {
 
     let region = query.region ? Array.isArray(query.region) ? query.region : [query.region] : undefined
     let graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
+    let showLog = query.showLog === 'true' ? true : false
 
     return (
         <MainLayout>
             <ErrorBoundary>
-                <USGraphContainer region={region} graph={graph} />
+                <USGraphContainer region={region} graph={graph} showLogParam={showLog} />
             </ErrorBoundary>
         </MainLayout>
     )

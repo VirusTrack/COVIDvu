@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from 'rbx'
 
-export const CheckboxRegionComponent = ({data, selected, handleSelected, defaultSelected = []}) => {
+export const CheckboxRegionComponent = ({data, selected, handleSelected, defaultSelected = [], showLog = false}) => {
 
   const renderDisplay = (value) => {
     return value.startsWith('!') ? value.substring(1) : value            
