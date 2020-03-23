@@ -34,10 +34,11 @@ from covidvu.predict import PRIOR_SIGMA
 
 
 # *** constants ***
-TEST_JH_CSSE_DATA_HOME      = join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
+TEST_JH_CSSE_DATA_HOME           = join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
                                            'csse_covid_19_time_series')
-TEST_SITE_DATA              = join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_FILE_CONFIRMED = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed.csv')
+TEST_SITE_DATA                   = join(os.getcwd(), 'resources', 'test_site_data')
+TEST_JH_CSSE_FILE_CONFIRMED      = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed.csv')
+TEST_JH_CSSEFILE_CONFIRMED_SMALL = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed-small.csv')
 
 # *** functions ***
 def _purge(purgeDirectory, pattern):
@@ -203,7 +204,20 @@ def test__main():
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
 
-        # TODO test all
+        _main('all',
+              siteData=TEST_SITE_DATA,
+              nSamples=10,
+              nTune=10,
+              nChains=1,
+              nBurn=0,
+              nDaysPredict=10,
+              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              )
+
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-Italy.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-Italy.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-US.json'))
 
     except Exception as e:
         raise e

@@ -7,10 +7,12 @@ import re
 
 from os.path import join
 
-from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import dumpJSON
+from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
+from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
+from covidvu.pipeline.vujson import JH_CSSE_FILE_RECOVERED
+from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import SITE_DATA
-
 
 N_SAMPLES        = 500
 N_TUNE           = 200
@@ -164,6 +166,9 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                           predictionsPercentiles        = PREDICTIONS_PERCENTILES,
                           init                          = None,
                           randomSeed                    = 2020,
+                          jhCSSEFileConfirmed           = JH_CSSE_FILE_CONFIRMED,
+                          jhCSSEFileDeaths              = JH_CSSE_FILE_DEATHS,
+                          jhCSSEFileRecovered           = JH_CSSE_FILE_RECOVERED,
                           **kwargs
                           ):
     """Predict the country with the nth highest number of cases
@@ -201,7 +206,12 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     """
 
     if confirmedCases is None:
-        confirmedCases = parseCSSE(target, **kwargs)[subGroup]
+        confirmedCases = parseCSSE(target,
+                                   siteData            = kwargs.get('siteData', SITE_DATA),
+                                   jhCSSEFileConfirmed = kwargs.get('jhCSSEFileConfirmed', JH_CSSE_FILE_CONFIRMED),
+                                   jhCSSEFileDeaths    = kwargs.get('jhCSSEFileDeaths', JH_CSSE_FILE_DEATHS),
+                                   jhCSSEFileRecovered = kwargs.get('jhCSSEFileRecovered', JH_CSSE_FILE_RECOVERED),
+                                   )[subGroup]
 
     if countryName is None:
         countryName = _getCountryToTrain(int(countryTrainIndex), confirmedCases)
@@ -320,6 +330,9 @@ def _main(countryTrainIndex,
           predictionsPercentiles = PREDICTIONS_PERCENTILES,
           siteData               = SITE_DATA,
           subGroup               = 'casesGlobal',
+          jhCSSEFileConfirmed = JH_CSSE_FILE_CONFIRMED,
+          jhCSSEFileDeaths    = JH_CSSE_FILE_DEATHS,
+          jhCSSEFileRecovered = JH_CSSE_FILE_RECOVERED,
           **kwargs
           ):
     """
@@ -337,12 +350,15 @@ def _main(countryTrainIndex,
     -------
 
     """
-    if re.search(r'^\d$', countryTrainIndex):
+    if re.search(r'^\d$', str(countryTrainIndex)):
         prediction = predictLogisticGrowth(
-            countryTrainIndex = countryTrainIndex,
+            countryTrainIndex      = countryTrainIndex,
             predictionsPercentiles = predictionsPercentiles,
-            target=target,
-            siteData = siteData,
+            target                 = target,
+            siteData               = siteData,
+            jhCSSEFileConfirmed    = jhCSSEFileConfirmed,
+            jhCSSEFileDeaths       = jhCSSEFileDeaths,
+            jhCSSEFileRecovered    = jhCSSEFileRecovered,
             **kwargs
         )
 
@@ -350,7 +366,12 @@ def _main(countryTrainIndex,
 
 
     elif countryTrainIndex == 'all':
-        confirmedCases = parseCSSE(target, **kwargs)[subGroup]
+        confirmedCases = parseCSSE(target,
+                                   siteData            = siteData,
+                                   jhCSSEFileConfirmed = jhCSSEFileConfirmed,
+                                   jhCSSEFileDeaths    = jhCSSEFileConfirmed,
+                                   jhCSSEFileRecovered = jhCSSEFileDeaths,
+                                   )[subGroup]
         countriesAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
         for countryName in countriesAll:
             print(f'Training {countryName}...')
