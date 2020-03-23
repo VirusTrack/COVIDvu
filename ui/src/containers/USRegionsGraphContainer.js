@@ -17,7 +17,7 @@ import { CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
-import SelectRegionComponent from '../components/SelectRegionComponent'
+import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
@@ -103,11 +103,13 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
 
         <BoxWithLoadingIndicator hasData={sortedConfirmed}>
         <TwoGraphLayout>
-            <>            
-            <SelectRegionComponent
-                data={sortedConfirmed}
-                selected={selectedRegions}
-                handleSelected={dataList => handleSelectedRegion(dataList)} />
+            <>           
+                <CheckboxRegionComponent
+                    data={sortedConfirmed}
+                    selected={selectedRegions}
+                    handleSelected={dataList => handleSelectedRegion(dataList)} 
+                    defaultSelected={region}
+                />
             </>
             <>
                 <Tab.Group size="large" kind="boxed">

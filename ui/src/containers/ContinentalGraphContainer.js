@@ -20,7 +20,7 @@ import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 
 import store from 'store2'
 
-import SelectRegionComponent from '../components/SelectRegionComponent'
+import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
@@ -95,10 +95,12 @@ export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 
         <BoxWithLoadingIndicator hasData={sortedConfirmed}>
             <TwoGraphLayout>
 
-                <SelectRegionComponent
+                <CheckboxRegionComponent
                     data={sortedConfirmed}
                     selected={selectedContinents}
-                    handleSelected={dataList => handleSelectedRegion(dataList)} />
+                    handleSelected={dataList => handleSelectedRegion(dataList)} 
+                    defaultSelected={region}
+                />
                     
                 <>
                     <Tab.Group size="large" kind="boxed">
