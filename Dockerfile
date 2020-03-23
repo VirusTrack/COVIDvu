@@ -35,7 +35,6 @@ RUN             pip install -U \
                     pytest 
 
 RUN             jupyter contrib nbextension install --user
-RUN             pre-commit install
 
 COPY            resources/_bash_profile /home/jovyan/.bash_profile
 
