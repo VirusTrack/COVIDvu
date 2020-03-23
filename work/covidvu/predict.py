@@ -407,10 +407,10 @@ def load(countryIndex: int, siteData=SITE_DATA):
 
     assert abs(countryIndex) < len(countryNameShortAll)
 
-    with open(join(SITE_DATA, 'prediction-conf-int-%s.json' % countryNameShortAll[countryIndex])) as jsonFile:
+    with open(join(siteData, 'prediction-conf-int-%s.json' % countryNameShortAll[countryIndex])) as jsonFile:
         confidenceIntervals = json.load(jsonFile)
 
-    with open(join(SITE_DATA, 'prediction-mean-%s.json' % countryNameShortAll[countryIndex])) as jsonFile:
+    with open(join(siteData, 'prediction-mean-%s.json' % countryNameShortAll[countryIndex])) as jsonFile:
         meanPrediction = json.load(jsonFile)
 
     meanPredictionTS = pd.Series(list(meanPrediction.values())[0])
