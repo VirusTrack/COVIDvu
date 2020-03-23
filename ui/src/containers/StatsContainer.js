@@ -111,7 +111,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                     { selectedTab !== 'US_Counties' &&
                         <Level.Item align="right">
                             <Button.Group >
-                                <Button size="medium" onClick={() => {if(daysAgo !== 0) { setStatsForGraph([]); setDaysAgo(0) }}} color={daysAgo === 0 ? "primary" : "default"}>Now</Button>
+                                <Button size="medium" onClick={() => {if(daysAgo !== 0) { setStatsForGraph([]); setDaysAgo(0) }}} color={daysAgo === 0 ? "primary" : "default"}>Today</Button>
                                 <Button size="medium" onClick={() => {if(daysAgo !== 1) { setStatsForGraph([]); setDaysAgo(1) }}} color={daysAgo === 1 ? "primary " : "default"}>Yesterday</Button>
                             </Button.Group>
                         </Level.Item>
