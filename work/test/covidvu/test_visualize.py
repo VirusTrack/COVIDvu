@@ -58,3 +58,6 @@ def test_plotTimeSeriesInteractive():
                               log=False,
                               yLabel='test'
                               )
+
+def test_plotPrediction():
+    raise NotImplementedError

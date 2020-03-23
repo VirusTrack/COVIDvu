@@ -6,6 +6,8 @@ import pymc3 as pm
 import re
 
 from os.path import join
+import os
+import json
 
 from covidvu.pipeline.vujson import dumpJSON
 from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
@@ -19,8 +21,8 @@ N_TUNE           = 200
 N_BURN           = 100
 N_CHAINS         = 2
 N_DAYS_PREDICT   = 14
-MIN_CASES_FILTER = 10
-MIN_NUMBER_CASES = 10
+MIN_CASES_FILTER = 50
+MIN_NUMBER_DAYS_WITH_CASES = 10
 
 PRIOR_LOG_CARRYING_CAPACITY = (3, 10)
 PRIOR_MID_POINT             = (0, 1e3)
@@ -158,7 +160,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                           nBurn                         = N_BURN,
                           nDaysPredict                  = N_DAYS_PREDICT,
                           minCasesFilter                = MIN_CASES_FILTER,
-                          minNumberCases                = MIN_NUMBER_CASES,
+                          minNumberDaysWithCases        = MIN_NUMBER_DAYS_WITH_CASES,
                           priorLogCarryingCapacity      = PRIOR_LOG_CARRYING_CAPACITY,
                           priorMidPoint                 = PRIOR_MID_POINT,
                           priorGrowthRate               = PRIOR_GROWTH_RATE,
@@ -166,9 +168,6 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                           predictionsPercentiles        = PREDICTIONS_PERCENTILES,
                           init                          = None,
                           randomSeed                    = 2020,
-                          jhCSSEFileConfirmed           = JH_CSSE_FILE_CONFIRMED,
-                          jhCSSEFileDeaths              = JH_CSSE_FILE_DEATHS,
-                          jhCSSEFileRecovered           = JH_CSSE_FILE_RECOVERED,
                           **kwargs
                           ):
     """Predict the country with the nth highest number of cases
@@ -220,7 +219,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
 
     countryTS = confirmedCases[countryName]
     countryTSClean = countryTS[countryTS > minCasesFilter]
-    if countryTSClean.shape[0] < minNumberCases:
+    if countryTSClean.shape[0] < minNumberDaysWithCases:
         return None
 
     countryTSClean.index = pd.to_datetime(countryTSClean.index)
@@ -390,6 +389,40 @@ def _main(countryTrainIndex,
                 print('Skipped.')
     else:
         raise NotImplementedError
+
+
+def getSavedShortCountryNames(siteData = SITE_DATA):
+    countryNameShortAll = []
+    for filename in os.listdir(siteData):
+        match = re.search(r'^prediction-conf-int-(.*\w).json', filename)
+        if match:
+            countryNameShort = match.groups()[0]
+            countryNameShortAll.append(countryNameShort)
+    return countryNameShortAll
+
+def load(countryIndex: int, siteData=SITE_DATA):
+    assert isinstance(countryIndex, int)
+
+    countryNameShortAll = getSavedShortCountryNames(siteData=siteData)
+
+    assert abs(countryIndex) < len(countryNameShortAll)
+
+    with open(join(SITE_DATA, 'prediction-conf-int-%s.json' % countryNameShortAll[countryIndex])) as jsonFile:
+        confidenceIntervals = json.load(jsonFile)
+
+    with open(join(SITE_DATA, 'prediction-mean-%s.json' % countryNameShortAll[countryIndex])) as jsonFile:
+        meanPrediction = json.load(jsonFile)
+
+    meanPredictionTS = pd.Series(list(meanPrediction.values())[0])
+    meanPredictionTS.index = pd.to_datetime(meanPredictionTS.index)
+
+    percentilesTS = pd.DataFrame(list(confidenceIntervals.values())[0])
+    percentilesTS.index = pd.to_datetime(percentilesTS.index)
+
+    countryName = list(meanPrediction.keys())[0]
+
+    return meanPredictionTS, percentilesTS, countryName
+
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:

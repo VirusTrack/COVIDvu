@@ -31,6 +31,7 @@ from covidvu.predict import PRIOR_GROWTH_RATE
 from covidvu.predict import PRIOR_LOG_CARRYING_CAPACITY
 from covidvu.predict import PRIOR_MID_POINT
 from covidvu.predict import PRIOR_SIGMA
+from covidvu.predict import load
 
 
 # *** constants ***
@@ -238,3 +239,9 @@ def test__dumpCountryPrediction():
         _purge(TEST_SITE_DATA, '.json')
 
 
+def test_load():
+    raise NotImplementedError
+
+
+def test_getSavedShortCountryNames():
+    raise NotImplementedError
