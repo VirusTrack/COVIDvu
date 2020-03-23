@@ -29,11 +29,13 @@ RUN             pip install -U \
                     devpi-client \
                     jupyter_contrib_nbextensions \
                     jupyter_nbextensions_configurator \
+                    pre-commit \
                     pudb \
                     pyflakes \
                     pytest 
 
 RUN             jupyter contrib nbextension install --user
+RUN             pre-commit install
 
 COPY            resources/_bash_profile /home/jovyan/.bash_profile
 
