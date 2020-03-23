@@ -183,3 +183,36 @@ def plot(nRows=1, nCols=1, figSize=5):
     if nRows * nCols > 1:
         axs = axs.ravel()
     return fig, axs
+
+
+def plotPrediction(data, meanPredictionTS, percentilesTS, countryName, log=False):
+    fig, ax = plot()
+    if log:
+        data             = np.log10(data)
+        meanPredictionTS = np.log10(meanPredictionTS + 1)
+        percentilesTS    = np.log10(percentilesTS + 1)
+    meanPredictionTS.plot(ax=ax, linestyle='-.', color='black', label='Mean Prediction')
+    data.plot(ax=ax, marker='o', color='green', label='Data')
+    ax.fill_between(meanPredictionTS.index,
+                    percentilesTS['97.5'],
+                    percentilesTS['2.5'],
+                    color='red',
+                    alpha=0.1,
+                    label=r"95% CI",
+                    )
+
+    ax.fill_between(meanPredictionTS.index,
+                    percentilesTS['75'],
+                    percentilesTS['25'],
+                    color='red',
+                    alpha=0.5,
+                    label=r"50% CI",
+                    )
+
+    if log:
+        ax.set_ylabel('Log10 Total confirmed cases')
+    else:
+        ax.set_ylabel('Total confirmed cases')
+    ax.set_title(countryName)
+    ax.legend(loc='upper left')
+    return fig, ax

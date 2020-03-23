@@ -18,6 +18,7 @@ from pymc3.backends.base import MultiTrace
 from pymc3.model import Model
 
 from covidvu.predict import _castPredictionsAsTS
+from covidvu.predict import _dumpCountryPrediction
 from covidvu.predict import _dumpPredictionCollectionAsJSON
 from covidvu.predict import _dumpTimeSeriesAsJSON
 from covidvu.predict import _getPredictionsFromPosteriorSamples
@@ -30,13 +31,16 @@ from covidvu.predict import PRIOR_GROWTH_RATE
 from covidvu.predict import PRIOR_LOG_CARRYING_CAPACITY
 from covidvu.predict import PRIOR_MID_POINT
 from covidvu.predict import PRIOR_SIGMA
-
+from covidvu.predict import load
+from covidvu.predict import getSavedShortCountryNames
+from pandas.core.frame import DataFrame
 
 # *** constants ***
-TEST_JH_CSSE_DATA_HOME      = join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
+TEST_JH_CSSE_DATA_HOME           = join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
                                            'csse_covid_19_time_series')
-TEST_SITE_DATA              = join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_FILE_CONFIRMED = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed.csv')
+TEST_SITE_DATA                   = join(os.getcwd(), 'resources', 'test_site_data')
+TEST_JH_CSSE_FILE_CONFIRMED      = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed.csv')
+TEST_JH_CSSEFILE_CONFIRMED_SMALL = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed-small.csv')
 
 # *** functions ***
 def _purge(purgeDirectory, pattern):
@@ -78,6 +82,7 @@ def test_predictLogisticGrowth():
     assert (prediction['predictionsPercentilesTS'][0][0].isnull().values).sum() == 0
     assert isinstance(prediction['trace'], MultiTrace)
     assert (prediction['countryTSClean'] > MIN_CASES_FILTER).all()
+    return prediction
 
 
 def test__initializeLogisticModel():
@@ -201,6 +206,77 @@ def test__main():
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
 
+        _main('all',
+              siteData=TEST_SITE_DATA,
+              nSamples=10,
+              nTune=10,
+              nChains=1,
+              nBurn=0,
+              nDaysPredict=10,
+              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              )
+
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-Italy.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-Italy.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-US.json'))
+
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')
+
+
+def test__dumpCountryPrediction():
+    prediction = test_predictLogisticGrowth()
+    try:
+        _dumpCountryPrediction(prediction, TEST_SITE_DATA, PREDICTIONS_PERCENTILES)
+        _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA,'prediction-conf-int-US.json'))
+
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')
+
+
+def test_load():
+    try:
+        _main('all',
+              siteData=TEST_SITE_DATA,
+              nSamples=10,
+              nTune=10,
+              nChains=1,
+              nBurn=0,
+              nDaysPredict=10,
+              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              )
+
+        meanPredictionTS, percentilesTS, countryName = load(0, siteData=TEST_SITE_DATA)
+        assert isinstance(meanPredictionTS, Series)
+        assert isinstance(percentilesTS, DataFrame)
+        assert isinstance(countryName, str)
+        assert (percentilesTS.columns.isin(['97.5', '2.5', '25', '75'])).all()
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')
+
+
+def test_getSavedShortCountryNames():
+    try:
+        _main('all',
+              siteData=TEST_SITE_DATA,
+              nSamples=10,
+              nTune=10,
+              nChains=1,
+              nBurn=0,
+              nDaysPredict=10,
+              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              )
+        countryNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
+        assert isinstance(countryNameShortAll, list)
+        assert len(countryNameShortAll) == 2
     except Exception as e:
         raise e
     finally:
