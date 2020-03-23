@@ -216,3 +216,170 @@ def plotPrediction(data, meanPredictionTS, percentilesTS, countryName, log=False
     ax.set_title(countryName)
     ax.legend(loc='upper left')
     return fig, ax
+
+
+def hexToRGB(h):
+    return tuple(int(h.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def castHexToRGBA_string(h, alpha):
+    assert isinstance(h, str)
+    if not h[0] == '#':
+        raise ValueError(f'{h} not hexadecimal')
+    color = list(hexToRGB(h))
+    color.append(alpha)
+    return f'rgba{str(tuple(color))}'
+
+
+def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, color_conf, fig = None):
+    if fig is None:
+        fig = go.Figure(layout={"yaxis_title": 'Total confirmed cases',
+                                "legend": {"itemsizing": "constant"},
+                                "hovermode": "x",
+                                })
+    fig.add_trace(
+        go.Scatter(x=data.index,
+                   y=data,
+                   name=countryName,
+                   line=dict(color=color_data),
+                   showlegend=True,
+                   mode="lines+markers",
+                   marker={"size": 5},
+                   )
+    )
+
+    fig.add_trace(
+        go.Scatter(x=percentilesTS.index,
+                   y=percentilesTS['2.5'],
+                   line_color=color_conf[0],
+                   mode="lines",
+                   name="2.5%",
+                   fill=None,
+                   showlegend=False,
+                   hoverinfo='skip',
+                   )
+    )
+    fig.add_trace(
+        go.Scatter(x=percentilesTS.index,
+                   y=percentilesTS['97.5'],
+                   line_color=color_conf[0],
+                   mode="lines",
+                   fill='tonexty',
+                   name="97.5%",
+                   showlegend=False,
+                   hoverinfo='skip',
+                   )
+    )
+
+    fig.add_trace(
+        go.Scatter(x=percentilesTS.index,
+                   y=percentilesTS['25'],
+                   line_color=color_conf[1],
+                   mode="lines",
+                   name="25%",
+                   fill=None,
+                   showlegend=False,
+                   hoverinfo='skip',
+                   )
+    )
+    fig.add_trace(
+        go.Scatter(x=percentilesTS.index,
+                   y=percentilesTS['75'],
+                   line_color=color_conf[1],
+                   mode="lines",
+                   fill='tonexty',
+                   name="75%",
+                   showlegend=False,
+                   hoverinfo='skip',
+                   )
+    )
+    fig.add_trace(
+        go.Scatter(x=meanPredictionTS.index,
+                   y=meanPredictionTS,
+                   name="Mean prediction",
+                   line=dict(color=color_data,
+                             dash='dash',
+                             ),
+                   showlegend=False,
+                   mode="lines",
+                   marker={"size": 5},
+                   )
+    )
+
+    fig.update_layout(showlegend=True)
+
+    return fig
+
+
+def plotDataAndPredictionsWithCI(meanPredictionTSAll,
+                                 confirmedCasesAll,
+                                 percentilesTSAll,
+                                 selectedColumns,
+                                 log=False,
+                                 **kwargs,
+                                 ):
+    yLabel = kwargs.get("yLabel", 'Total confirmed cases')
+    cmapName = kwargs.get("cmapName")
+    title    = kwargs.get('title', 'COVID-19 predictions for total confirmed cases')
+
+    if cmapName is None:
+        cm = plt.get_cmap("nipy_spectral")
+    else:
+        cm = plt.get_cmap(cmapName)
+    if isinstance(selectedColumns, str):
+        selectedColumns = [selectedColumns]
+        nvalues = 1
+    elif isinstance(selectedColumns, tuple):
+        selectedColumns = list(selectedColumns)
+        nvalues = len(list(selectedColumns))
+    elif isinstance(selectedColumns, list):
+        nvalues = len(selectedColumns)
+    else:
+        print('No columns selected')
+
+    if nvalues > 1:
+        cols = cm(np.arange(0, nvalues + 1, nvalues / (nvalues - 1)) / nvalues)
+    else:
+        cols = cm(0.5)
+
+    meanPredictionTSSelected = meanPredictionTSAll[selectedColumns]
+    confirmedCasesAllSelected = confirmedCasesAll[selectedColumns]
+    percentilesTSAllSelected = percentilesTSAll.loc[:, (slice(None), selectedColumns)]
+
+    if log:
+        meanPredictionTSSelected  = np.log10(meanPredictionTSSelected + 1)
+        confirmedCasesAllSelected = np.log10(confirmedCasesAllSelected + 1)
+        percentilesTSAllSelected  = np.log10(percentilesTSAllSelected + 1)
+        yLabel =  "Log10 " + yLabel
+
+
+    fig = go.Figure(layout={"yaxis_title": yLabel,
+                            "legend": {"itemsizing": "constant"},
+                            "hovermode": "x",
+                            # "template": "plotly_dark"
+                            })
+
+    for ii, countryName in enumerate(selectedColumns):
+        meanPredictionTSThisCountry = meanPredictionTSSelected[countryName]
+        percentilesTSThisCountry = percentilesTSAllSelected.xs(countryName, level=1, axis=1)
+        confirmedCasesThisCountry = confirmedCasesAllSelected[countryName]
+
+        if nvalues > 1:
+            colorData = f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{cols[ii][3]})'
+            colorCI = (f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{0.1})',
+                       f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{0.5})',
+                       )
+        else:
+            colorData = f'rgba({cols[0]},{cols[1]},{cols[2]},{cols[3]})'
+            colorCI = (f'rgba({cols[0]},{cols[1]},{cols[2]},{0.1})',
+                       f'rgba({cols[0]},{cols[1]},{cols[2]},{0.5})',
+                       )
+
+        fig = plotWithCI(confirmedCasesThisCountry,
+                         percentilesTSThisCountry,
+                         meanPredictionTSThisCountry,
+                         countryName, colorData, colorCI,
+                         fig=fig,
+                         )
+    fig.update_layout(title_text=title)
+    return fig
