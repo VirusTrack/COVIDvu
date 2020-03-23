@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router'
 
-import { useWindowSize, useInterval } from '../hooks/ui'
+import { useInterval } from '../hooks/ui'
 
 import queryString from 'query-string'
 import numeral from 'numeral'
@@ -11,7 +11,7 @@ import store from 'store2'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Notification, Generic, Title } from "rbx"
+import { Tag, Level, Button, Tab, Notification, Generic, Title } from "rbx"
 
 import { REGION_URLS, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
@@ -19,20 +19,19 @@ import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 
+import GraphScaleControl from '../components/GraphScaleControl'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
+export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed', showLogParam = false}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
     const { search } = useLocation()
 
-    const [width, height] = useWindowSize()
-
+    const [showLog, setShowLog] = useState(showLogParam)
     const [selectedStates, setSelectedStates] = useState(region)
-
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
     const confirmed = useSelector(state => state.services.usStates.confirmed)
@@ -73,10 +72,11 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const handleHistory = (region, graph) => {        
+    const handleHistory = (region, graph, showLog) => {        
         const query = queryString.stringify({
             region,
-            graph
+            graph,
+            showLog
         })
 
         history.replace(`/covid/us?${query}`)
@@ -94,13 +94,19 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
     
     const handleSelectedRegion = (regionList) => {
         setSelectedStates(regionList)
-        handleHistory(regionList, graph)
+        handleHistory(regionList, graph, showLog)
     }
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
-        handleHistory(selectedStates, graph)
+        handleHistory(selectedStates, graph, showLog)
     }
+
+    const handleGraphScale = (logScale) => {
+        setShowLog(logScale)
+        handleHistory(selectedStates, secondaryGraph, logScale)
+    }
+
 
     return (
         <>
@@ -124,6 +130,7 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                         selected={selectedStates}
                         handleSelected={dataList => handleSelectedRegion(dataList)} 
                         defaultSelected={region}
+                        showLog={showLog}
                     />
                 </>
 
@@ -134,13 +141,18 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                         <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
                     </Tab.Group>
 
+                    <GraphScaleControl
+                        showLog={showLog}
+                        handleGraphScale={handleGraphScale}
+                        secondaryGraph={secondaryGraph}
+                    />
+
                     <GraphWithLoader 
                         graphName="Confirmed"
                         secondaryGraph={secondaryGraph}
                         graph={confirmed}
-                        width={width}
-                        height={height}
                         selected={selectedStates}
+                        showLog={showLog}
                         y_title="Total confirmed cases"
                     />
 
@@ -148,9 +160,8 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                         graphName="Deaths"
                         secondaryGraph={secondaryGraph}
                         graph={deaths}
-                        width={width}
-                        height={height}
                         selected={selectedStates}
+                        showLog={showLog}
                         y_title="Number of deaths"
                     />
                 
@@ -158,17 +169,19 @@ export const USGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) 
                         graphName="Mortality"
                         secondaryGraph={secondaryGraph}
                         graph={mortality}
-                        width={width}
-                        height={height}
                         selected={selectedStates}
+                        showLog={showLog}
                         y_type='percent'
                         y_title="Mortality Rate Percentage"
                     />
                 </>
 
                 <>
-
-                <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
+                { !showLog &&
+                    <>
+                    <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag><br />
+                    </>
+                }
                 </>
 
                 <>

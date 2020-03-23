@@ -4,37 +4,33 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useHistory, useLocation } from 'react-router'
 
-import { useWindowSize, useInterval } from '../hooks/ui'
+import { useInterval } from '../hooks/ui'
 
 import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Level } from "rbx"
-
-import TwoGraphLayout from '../layouts/TwoGraphLayout'
-
-import GraphWithLoader from '../components/GraphWithLoader'
+import { Tag, Tab, Level, Button } from "rbx"
 
 import { COUNTRIES, CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
-
 import numeral from 'numeral'
-
 import store from 'store2'
 
+import TwoGraphLayout from '../layouts/TwoGraphLayout'
+import GraphWithLoader from '../components/GraphWithLoader'
+
+import GraphScaleControl from '../components/GraphScaleControl'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
-import SelectRegionComponent from '../components/SelectRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Cases'}) => {
+export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
     const { search } = useLocation()
 
-    const [width, height] = useWindowSize()
-
+    const [showLog, setShowLog] = useState(showLogParam)
     const [selectedCountries, setSelectedCountries] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
@@ -53,12 +49,12 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
      */
     useEffect(() => {
         dispatch(actions.fetchGlobal())
-    }, [dispatch])
+    }, [dispatch, showLog])
 
 
     useInterval(() => {
         if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchGlobal())
+            dispatch(actions.fetchGlobal({showLog}))
         }
     }, ONE_MINUTE)
 
@@ -82,10 +78,11 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
         }
     }
 
-    const handleHistory = (region, graph) => {
+    const handleHistory = (region, graph, showLog) => {
         const query = queryString.stringify({
             region,
-            graph
+            graph,
+            showLog
         })
 
         history.replace(`/covid?${query}`)
@@ -117,13 +114,18 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
 
     const handleSelectedRegion = (regionList) => {
         setSelectedCountries(regionList)
-        handleHistory(regionList, secondaryGraph)
+        handleHistory(regionList, secondaryGraph, showLog)
     }
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
-        handleHistory(selectedCountries, selectedGraph)
+        handleHistory(selectedCountries, selectedGraph, showLog)
     }    
+
+    const handleGraphScale = (logScale) => {
+        setShowLog(logScale)
+        handleHistory(selectedCountries, secondaryGraph, logScale)
+    }
 
     return (
         <>
@@ -147,6 +149,7 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
                         selected={selectedCountries}
                         handleSelected={dataList => handleSelectedRegion(dataList)} 
                         defaultSelected={region}
+                        showLog={showLog}
                     />
 
                 </>
@@ -158,13 +161,18 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
                         <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
                     </Tab.Group>
 
+                    <GraphScaleControl
+                        showLog={showLog}
+                        handleGraphScale={handleGraphScale}
+                        secondaryGraph={secondaryGraph}
+                    />
+
                     <GraphWithLoader 
                         graphName="Cases"
                         secondaryGraph={secondaryGraph}
                         graph={confirmed}
-                        width={width}
-                        height={height}
                         selected={selectedCountries}
+                        showLog={showLog}
                         y_title="Total confirmed cases"
                     />
 
@@ -172,9 +180,8 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
                         graphName="Deaths"
                         secondaryGraph={secondaryGraph}
                         graph={deaths}
-                        width={width}
-                        height={height}
                         selected={selectedCountries}
+                        showLog={showLog}
                         y_title="Number of deaths"
                     />        
 
@@ -182,8 +189,6 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
                         graphName="Mortality"
                         secondaryGraph={secondaryGraph}
                         graph={mortality}
-                        width={width}
-                        height={height}
                         selected={selectedCountries}
                         y_type="percent"
                         y_title="Mortality Rate Percentage"
@@ -194,7 +199,7 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
                 <>
                     <Level>
                         <Level.Item>
-                            {renderCaseTags()}
+                            {!showLog && renderCaseTags()}
                         </Level.Item>
                     </Level>
 

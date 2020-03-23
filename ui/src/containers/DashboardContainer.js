@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -25,9 +25,11 @@ import moment from 'moment'
 import globeImg from '../images/fa-icon-globe.svg'
 import usflagImg from '../images/fa-icon-usflag.svg'
 
-export const DashboardContainer = () => {
+export const DashboardContainer = ({showLogParam = false}) => {
     const dispatch = useDispatch()
     const history = useHistory()
+
+    const [showLog, setShowLog] = useState(showLogParam)
 
     useEffect(() => {
         dispatch(actions.fetchTop10Countries({
@@ -165,6 +167,7 @@ export const DashboardContainer = () => {
                         graphName="Top 10 Confirmed Cases"
                         secondaryGraph="Top 10 Confirmed Cases"
                         graph={globalTop10}
+                        showLog={showLog}
                         selected={['Italy', 'Iran', 'Korea, South', 'Spain', 'Germany', 'France', 'US', 'Switzerland', 'United Kingdom', 'Netherlands']}
                     />
                 </Container>
@@ -180,6 +183,7 @@ export const DashboardContainer = () => {
                         graphName="continental_graph"
                         secondaryGraph="continental_graph"
                         graph={confirmedContinental}
+                        showLog={showLog}
                         selected={['North America', 'Asia', 'Europe', 'South America']}
                         style={{width: '100%', height: '100%'}}
                     />
@@ -254,6 +258,7 @@ export const DashboardContainer = () => {
                     graphName="Top 10 Confirmed Cases"
                     secondaryGraph="Top 10 Confirmed Cases"
                     graph={usStatesTop10}
+                    showLog={showLog}
                     selected={['New York', 'Washington', 'California', 'Massachusetts', 'New Jersey', 'Colorado', 'Florida', 'Louisiana', 'Georgia', 'Illinois']}
                 />
             </Column>
@@ -264,6 +269,7 @@ export const DashboardContainer = () => {
                     graphName="Top Regions Cases"
                     secondaryGraph="Top Regions Cases"
                     graph={confirmedUSRegions}
+                    showLog={showLog}
                     selected={['Midwest', 'Northeast', 'South', 'West']}
                 />
             </Column>

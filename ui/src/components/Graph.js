@@ -6,7 +6,7 @@ import { useMobileDetect } from '../hooks/ui'
 
 import { Generic } from 'rbx'
 
-export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, width, height}) => {
+export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, showLog = false}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
 
@@ -55,9 +55,16 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         height: undefined,
         margin: {
             l: 70,
-            t: 0,
+            t: 5,
             r: 10,
-        },        
+        }
+    }
+    
+    if(showLog) {
+        layout['yaxis'] = {
+            type: 'log',
+            autorange: true
+        }
     }
 
     if(detectMobile.isMobile()) {
@@ -69,7 +76,6 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             yaxis: {
                 fixedrange: true
             },
-            //width: width
         }
     }
 

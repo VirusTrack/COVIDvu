@@ -20,18 +20,18 @@ import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 
 import store from 'store2'
 
+import GraphScaleControl from '../components/GraphScaleControl'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 'Asia'], graph = 'Cases'}) => {
+export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 'Asia'], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
     const { search } = useLocation()
 
-    const [width, height] = useWindowSize()
-
+    const [showLog, setShowLog] = useState(showLogParam)
     const [selectedContinents, setSelectedContinents] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
@@ -61,10 +61,11 @@ export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const handleHistory = (region, graph) => {
+    const handleHistory = (region, graph, showLog) => {
         const query = queryString.stringify({
             region,
-            graph
+            graph,
+            showLog
         })
 
         history.replace(`/covid/continental?${query}`)
@@ -72,14 +73,19 @@ export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 
 
     const handleSelectedRegion = (regionList) => {
         setSelectedContinents(regionList)
-        handleHistory(regionList, secondaryGraph)
+        handleHistory(regionList, secondaryGraph, showLog)
     }
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
-        handleHistory(selectedContinents, selectedGraph)
+        handleHistory(selectedContinents, selectedGraph, showLog)
     }
     
+    const handleGraphScale = (logScale) => {
+        setShowLog(logScale)
+        handleHistory(selectedContinents, secondaryGraph, logScale)
+    }
+
     return (
     <>
         <HeroElement
@@ -100,6 +106,7 @@ export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 
                     selected={selectedContinents}
                     handleSelected={dataList => handleSelectedRegion(dataList)} 
                     defaultSelected={region}
+                    showLog={showLog}
                 />
                     
                 <>
@@ -109,13 +116,18 @@ export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 
                         <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
                     </Tab.Group>
 
+                    <GraphScaleControl
+                        showLog={showLog}
+                        handleGraphScale={handleGraphScale}
+                        secondaryGraph={secondaryGraph}
+                    />
+
                     <GraphWithLoader 
                         graphName="Cases"
                         secondaryGraph={secondaryGraph}
                         graph={confirmed}
-                        width={width}
-                        height={height}
                         selected={selectedContinents}
+                        showLog={showLog}
                         y_title="Total confirmed cases"
                     />
 
@@ -123,9 +135,8 @@ export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 
                         graphName="Deaths"
                         secondaryGraph={secondaryGraph}
                         graph={deaths}
-                        width={width}
-                        height={height}
                         selected={selectedContinents}
+                        showLog={showLog}
                         y_title="Number of deaths"
                     />        
 
@@ -133,8 +144,6 @@ export const ContinentalGraphContainer = ({region = ['North America', 'Europe', 
                         graphName="Mortality"
                         secondaryGraph={secondaryGraph}
                         graph={mortality}
-                        width={width}
-                        height={height}
                         selected={selectedContinents}
                         y_type="percent"
                         y_title="Mortality Rate Percentage"

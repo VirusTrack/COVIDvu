@@ -2,7 +2,18 @@ import React from 'react'
 
 import Graph from './Graph'
 
-export const GraphWithLoader = ({graphName, title, secondaryGraph, x_title, y_type, y_title, graph, selected, config, width, height}) => {
+export const GraphWithLoader = ({
+        graphName, 
+        title, 
+        secondaryGraph, 
+        x_title, 
+        y_type, 
+        y_title, 
+        graph, 
+        selected, 
+        config, 
+        showLog
+    }) => {
     
     return (
         <>
@@ -16,6 +27,7 @@ export const GraphWithLoader = ({graphName, title, secondaryGraph, x_title, y_ty
                 y_type={y_type}
                 x_title={x_title}
                 y_title={y_title}
+                showLog={showLog}
             />
 
             ) : (

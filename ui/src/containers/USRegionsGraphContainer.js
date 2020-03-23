@@ -16,20 +16,20 @@ import { CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
+import GraphScaleControl from '../components/GraphScaleControl'
 import GraphWithLoader from '../components/GraphWithLoader'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confirmed'}) => {
+export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confirmed', showLogParam = false}) => {
     const dispatch = useDispatch()
     const history = useHistory()
     const location = useLocation()
     const { search } = location
-    const [width, height] = useWindowSize()
 
+    const [showLog, setShowLog] = useState(showLogParam)
     const [selectedRegions, setSelectedRegions] = useState(region)
-
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
     const confirmed = useSelector(state => state.services.usRegions.confirmed)
@@ -57,10 +57,11 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const handleHistory = (region, graph) => {
+    const handleHistory = (region, graph, showLog) => {
         const query = queryString.stringify({
             region,
-            graph
+            graph,
+            showLog
         })
 
         history.replace(`/covid/us/regions?${query}`)
@@ -88,6 +89,11 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
         handleHistory(selectedRegions, selectedGraph)
     }    
 
+    const handleGraphScale = (logScale) => {
+        setShowLog(logScale)
+        handleHistory(selectedRegions, secondaryGraph, logScale)
+    }
+
     return (
         <>  
         <HeroElement
@@ -109,6 +115,7 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     selected={selectedRegions}
                     handleSelected={dataList => handleSelectedRegion(dataList)} 
                     defaultSelected={region}
+                    showLog={showLog}
                 />
             </>
             <>
@@ -118,14 +125,19 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
                 </Tab.Group>
 
+                <GraphScaleControl
+                    showLog={showLog}
+                    handleGraphScale={handleGraphScale}
+                    secondaryGraph={secondaryGraph}
+                />
+
                 <GraphWithLoader 
                     graphName="Confirmed"
                     secondaryGraph={secondaryGraph}
                     title="Cases US Regions"
                     graph={confirmed}
-                    width={width}
-                    height={height}
                     selected={selectedRegions}
+                    showLog={showLog}
                     y_title="Total confirmed cases"
                 />
                 
@@ -133,9 +145,8 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     graphName="Deaths"
                     secondaryGraph={secondaryGraph}
                     graph={deaths}
-                    width={width}
-                    height={height}
                     selected={selectedRegions}
+                    showLog={showLog}
                     y_title="Number of deaths"
                 />
 
@@ -143,8 +154,6 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
                     graphName="Mortality"
                     secondaryGraph={secondaryGraph}
                     graph={mortality}
-                    width={width}
-                    height={height}
                     selected={selectedRegions}
                     y_type='percent'
                     y_title='Mortality Rate Percentage'
@@ -153,7 +162,12 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
 
             <Level>
                 <Level.Item>
-                    <Tag size="large" color="danger">Total Cases: {confirmedTotal}</Tag><br />
+                    {!showLog &&
+                        <>
+                            <Tag size="large" color="danger">Total Cases: {confirmedTotal}</Tag>
+                            <br />
+                        </>
+                    }
                 </Level.Item>
             </Level>
 
