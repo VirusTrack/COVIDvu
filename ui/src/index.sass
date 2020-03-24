@@ -347,16 +347,17 @@ hr
   margin: 1.5rem auto
   border-radius: 1rem
   overflow: hidden
-  text-align: center
-  width: 100%
+  &:after 
+    clear: both
+    display: table 
   @media (min-width: #{$tablet})
     max-width: none
     margin: 0
     margin-top: 0 !important
+    margin-bottom: 0 !important
     border-radius: 0
     width: 100% !important
-
-
+  
 .CheckboxRegionForm
   margin: 0 0 0 0
   margin-top: 0 !important
@@ -368,6 +369,7 @@ hr
   min-height: 100%
   flex-basis: 100%
   position: relative
+  padding-bottom: 2rem
   &:before 
     content: ''
     display: block 
@@ -406,13 +408,8 @@ hr
     background: white
     color: #{$primary}
     box-shadow: #{$drop-shadow-small}
-    border-radius: .5rem
+    border: .1rem solid #DDDDDD
 
-.CheckboxRegionCheckbox:checked + .CheckboxRegionCheckbox:checked
-  label  
-    border-top-left-radius: 0
-    border: 1px solid red
-    border-top-right-radius: 0
 label 
   display: flex
   justify-content: space-between
@@ -421,6 +418,9 @@ label
   margin-top: .1rem
   margin: .1rem 1rem .5rem 1rem
   text-align: left
+  border: .1rem solid transparent
+  transition: border .1s ease-out, background .1s ease-out, box-shadow .1s ease-out
+  border-radius: .5rem
   .label-stats
     color: #{$primary}
     
