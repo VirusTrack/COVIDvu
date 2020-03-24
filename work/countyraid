@@ -11,6 +11,6 @@ export COUNTY_CASES_US_ENDPOINT="https://coronavirus-tracker-api.herokuapp.com/v
 
 # *** main ***
 
-curl -s "$COUNTY_CASES_US_ENDPOINT" | jq -M '.locations' > "$COUNTY_CASES_US_FILE" 
+curl -s "$COUNTY_CASES_US_ENDPOINT" | jq -M '.locations' > "$COUNTY_CASES_CSBS_FILE" 
 python -m covidvu.pipeline.vucounty
 
