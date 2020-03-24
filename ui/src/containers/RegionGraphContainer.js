@@ -4,117 +4,120 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useHistory, useLocation } from 'react-router'
 
-import { useInterval } from '../hooks/ui'
-
 import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tab } from "rbx"
+import { Tab, Message } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
-
 import GraphWithLoader from '../components/GraphWithLoader'
-
-import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
-
-import store from 'store2'
 
 import GraphScaleControl from '../components/GraphScaleControl'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
+const countriesRegions = require('../constants/countries_regions.json');
+
+export const RegionGraphContainer = ({region, uniqueRegion = [], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
     const { search } = useLocation()
 
     const [showLog, setShowLog] = useState(showLogParam)
-    const [selectedContinents, setSelectedContinents] = useState(region)
+    const [selectedRegions, setSelectedRegions] = useState(uniqueRegion)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
-    const confirmed = useSelector(state => state.services.continental.confirmed)
-    const sortedConfirmed = useSelector(state => state.services.continental.sortedConfirmed)
-    const deaths = useSelector(state => state.services.continental.deaths)
-    const mortality = useSelector(state => state.services.continental.mortality)
+    const confirmed = useSelector(state => state.services.region.hasOwnProperty(region) ? state.services.region[region].confirmed : undefined)
+    const sortedConfirmed = useSelector(state => state.services.region.hasOwnProperty(region) ? state.services.region[region].sortedConfirmed : undefined)
+    const deaths = useSelector(state => state.services.region.hasOwnProperty(region) ? state.services.region[region].deaths : undefined)
+    const mortality = useSelector(state => state.services.region.hasOwnProperty(region) ? state.services.region[region].mortality : undefined)
+
+    const [regionNotFound, setRegionNotFound] = useState(undefined)
 
     /**
      * Fetch all the data
      */
     useEffect(() => {
-        dispatch(actions.fetchContinental())
-    }, [dispatch])
+        const uniqueRegionSet = Object.values(countriesRegions).filter((value, index, self) => self.indexOf(value) === index)
 
-    // Select the Top 3 confirmed from list if nothing is selected
-    useEffect(() => {
-        if(sortedConfirmed && region.length === 0) {
-            setSelectedContinents(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
+        if(uniqueRegionSet.indexOf(region) !== -1) {
+            dispatch(actions.fetchRegion({region}))
+        } else {
+            setRegionNotFound(true)
         }
-    }, [sortedConfirmed])
+    }, [dispatch, region, showLog])
 
-    useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchContinental())
-        }
-    }, ONE_MINUTE)
-
-    useEffect(() => {
-        if(!search) {
-            handleHistory(selectedContinents, secondaryGraph)
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-    const handleHistory = (region, graph, showLog) => {
+    const handleHistory = (regions, graph, showLog) => {
         const query = queryString.stringify({
-            region,
+            region: regions,
             graph,
             showLog
         })
 
-        history.replace(`/covid/continental?${query}`)
+        history.replace(`/covid/region/${region}?${query}`)
     }
 
+    // Select the Top 3 confirmed from list if nothing is selected
+    useEffect(() => {
+        if(sortedConfirmed && uniqueRegion.length === 0) {
+            setSelectedRegions(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
+        }
+    }, [sortedConfirmed])
+
     const handleSelectedRegion = (regionList) => {
-        setSelectedContinents(regionList)
+        setSelectedRegions(regionList)
         handleHistory(regionList, secondaryGraph, showLog)
     }
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
-        handleHistory(selectedContinents, selectedGraph, showLog)
-    }
-    
+        handleHistory(selectedRegions, selectedGraph, showLog)
+    }    
+
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
-        handleHistory(selectedContinents, secondaryGraph, logScale)
+        handleHistory(selectedRegions, secondaryGraph, logScale)
+    }
+
+    if(regionNotFound) {
+        return (
+            <Message color="danger">
+                <Message.Header>
+                    Region not found
+                </Message.Header>
+                <Message.Body>
+                    The region entered in the location bar was not found
+                </Message.Body>
+            </Message>
+        )
     }
 
     return (
-    <>
+        <>
         <HeroElement
-            subtitle="Global"
+            subtitle={region}
             title={
-                <>Coronavirus Cases <br />by Continent</>
+                <>Coronavirus Cases <br />by Country</>
             }
-            buttons={[
-                { title: 'Cases By Country', location: '/covid' },
-                { title: 'Cases By Continent', location: '/covid/continental' },
-            ]}
         />
+
         <BoxWithLoadingIndicator hasData={sortedConfirmed}>
             <TwoGraphLayout>
 
-                <CheckboxRegionComponent
-                    data={sortedConfirmed}
-                    selected={selectedContinents}
-                    handleSelected={dataList => handleSelectedRegion(dataList)} 
-                    defaultSelected={region}
-                    showLog={showLog}
-                />
-                    
+                <>
+                    <CheckboxRegionComponent
+                        data={sortedConfirmed}
+                        selected={selectedRegions}
+                        handleSelected={dataList => handleSelectedRegion(dataList)} 
+                        defaultSelected={uniqueRegion}
+                        showLog={showLog}
+                    />
+
+                </>
+
                 <>
                     <Tab.Group size="large" kind="boxed">
                         <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
@@ -132,7 +135,7 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
                         graphName="Cases"
                         secondaryGraph={secondaryGraph}
                         graph={confirmed}
-                        selected={selectedContinents}
+                        selected={selectedRegions}
                         showLog={showLog}
                         y_title="Total confirmed cases"
                     />
@@ -141,7 +144,7 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
                         graphName="Deaths"
                         secondaryGraph={secondaryGraph}
                         graph={deaths}
-                        selected={selectedContinents}
+                        selected={selectedRegions}
                         showLog={showLog}
                         y_title="Number of deaths"
                     />        
@@ -150,16 +153,18 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
                         graphName="Mortality"
                         secondaryGraph={secondaryGraph}
                         graph={mortality}
-                        selected={selectedContinents}
+                        selected={selectedRegions}
                         y_type="percent"
                         y_title="Mortality Rate Percentage"
                     />
+            
                 </>
 
             </TwoGraphLayout>
         </BoxWithLoadingIndicator>
-    </>
+
+        </>
     )    
 }
 
-export default ContinentalGraphContainer
+export default RegionGraphContainer

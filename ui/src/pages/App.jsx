@@ -6,6 +6,7 @@ import { CovidGlobalPage } from './CovidGlobalPage'
 import { CovidContinentalPage } from './CovidContinentalPage'
 import { CovidUSPage } from './CovidUSPage'
 import { CovidUSRegionsPage } from './CovidUSRegionsPage'
+import { CovidRegionPage } from './CovidRegionPage'
 import { StatsPage } from './StatsPage'
 import { AboutPage } from './AboutPage'
 
@@ -22,6 +23,9 @@ const App = () => (
 
         <Route path="/dashboard">
             <DashboardPage />
+        </Route>
+        <Route path="/covid/region/:region">
+            <CovidRegionPage />
         </Route>
         <Route path="/covid/us/regions">
             <CovidUSRegionsPage />

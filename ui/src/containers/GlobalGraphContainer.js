@@ -24,7 +24,7 @@ import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Cases', showLogParam = false}) => {
+export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
@@ -57,6 +57,13 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
             dispatch(actions.fetchGlobal({showLog}))
         }
     }, ONE_MINUTE)
+
+    // Select the Top 3 confirmed from list if nothing is selected
+    useEffect(() => {
+        if(sortedConfirmed && region.length === 0) {
+            setSelectedCountries(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
+        }
+    }, [sortedConfirmed])
 
     useEffect(() => {
         if(!search) {
