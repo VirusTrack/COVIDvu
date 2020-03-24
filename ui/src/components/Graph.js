@@ -24,6 +24,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
                 type: 'scatter',
                 mode: 'lines+markers',
                 name: region,
+                showlegend: true,
                 marker: {
                     size: 3
                 }
@@ -44,7 +45,6 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
 
     let mergeConfig = { ...config,
         displayModeBar: false,
-        showlegend: true,
         responsive: true,
     }
 

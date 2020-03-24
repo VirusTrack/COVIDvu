@@ -22,7 +22,7 @@ import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confirmed', showLogParam = false}) => {
+export const USRegionsGraphContainer = ({region = [], graph = 'Confirmed', showLogParam = false}) => {
     const dispatch = useDispatch()
     const history = useHistory()
     const location = useLocation()
@@ -43,6 +43,13 @@ export const USRegionsGraphContainer = ({region = ['!Total US'], graph = 'Confir
     useEffect(() => {
         dispatch(actions.fetchUSRegions())
     }, [dispatch])
+
+    // Select the Top 3 confirmed from list if nothing is selected
+    useEffect(() => {
+        if(sortedConfirmed && region.length === 0) {
+            setSelectedRegions(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
+        }
+    }, [sortedConfirmed])
 
     useInterval(() => {
         if(store.session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
