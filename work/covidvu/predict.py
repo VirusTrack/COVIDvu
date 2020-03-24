@@ -424,6 +424,25 @@ def load(countryIndex: int, siteData=SITE_DATA):
     return meanPredictionTS, percentilesTS, countryName
 
 
+def loadAll(target='confirmed', subGroup='casesGlobal', **kwargs):
+    confirmedCasesAll = parseCSSE(target, **kwargs)[subGroup]
+    nTrainedCountries = len(getSavedShortCountryNames())
+    meanPredictionTSAll = pd.DataFrame()
+    percentilesTSAll = pd.DataFrame()
+    for i in range(nTrainedCountries):
+        meanPredictionTS, percentilesTS, countryName = load(i)
+        meanPredictionTS.name = 'meanPrediction'
+        meanPredictionTS = meanPredictionTS.to_frame()
+        meanPredictionTS['countryName'] = countryName
+        percentilesTS['countryName'] = countryName
+        percentilesTSAll = percentilesTSAll.append(percentilesTS)
+        meanPredictionTSAll = meanPredictionTSAll.append(meanPredictionTS)
+    percentilesTSAll = percentilesTSAll.pivot(columns='countryName')
+    meanPredictionTSAll = meanPredictionTSAll.pivot(columns='countryName')
+    meanPredictionTSAll.columns = meanPredictionTSAll.columns.droplevel(level=0)
+    return confirmedCasesAll, meanPredictionTSAll, percentilesTSAll
+
+
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
         _main(argument)

@@ -32,6 +32,7 @@ from covidvu.predict import PRIOR_LOG_CARRYING_CAPACITY
 from covidvu.predict import PRIOR_MID_POINT
 from covidvu.predict import PRIOR_SIGMA
 from covidvu.predict import load
+from covidvu.predict import loadAll
 from covidvu.predict import getSavedShortCountryNames
 from pandas.core.frame import DataFrame
 
@@ -277,6 +278,28 @@ def test_getSavedShortCountryNames():
         countryNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
         assert isinstance(countryNameShortAll, list)
         assert len(countryNameShortAll) == 2
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')
+
+
+def test_loadAll():
+    try:
+        _main('all',
+              siteData=TEST_SITE_DATA,
+              nSamples=10,
+              nTune=10,
+              nChains=1,
+              nBurn=0,
+              nDaysPredict=10,
+              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              )
+
+        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA)
+        assert isinstance(confirmedCasesAll, DataFrame)
+        assert isinstance(meanPredictionTSAll, DataFrame)
+        assert isinstance(percentilesTSAll, DataFrame)
     except Exception as e:
         raise e
     finally:

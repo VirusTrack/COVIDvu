@@ -144,7 +144,7 @@ export const GlobalGraphContainer = ({region = ['!Global', 'China'], graph = 'Ca
             <TwoGraphLayout>
 
                 <>
-`                    <CheckboxRegionComponent
+                    <CheckboxRegionComponent
                         data={sortedConfirmed}
                         selected={selectedCountries}
                         handleSelected={dataList => handleSelectedRegion(dataList)} 
