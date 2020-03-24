@@ -1,4 +1,4 @@
-const DATA_URL = `https://virustrack.live/site-data`
+const DATA_URL = `/site-data`
 const STAGING_DATA_URL = `http://staging.virustrack.live/site-data`
 const LOCAL_DATA_URL = `http://localhost:3100/site-data`
 
@@ -217,15 +217,69 @@ const COUNTRIES = [
   "Zimbabwe"
 ]
 
-  const US_REGIONS = [
-    "!Total US",
-    "Diamond Princess",
-    "Midwest",
-    "Northeast",
-    "South",
-    "Unassigned",
-    "West"
-  ]
+const EUROPEAN_COUNTRIES = [
+  "Albania",
+  "Andorra",
+  "Armenia",
+  "Austria",
+  "Azerbaijan",
+  "Belarus",
+  "Belgium",
+  "Bosnia and Herzegovina",
+  "Bulgaria",
+  "Croatia",
+  "Cyprus",
+  "Czech Republic",
+  "Denmark",
+  "Estonia",
+  "Finland",
+  "France",
+  "Georgia",
+  "Germany",
+  "Greece",
+  "Holy See",
+  "Hungary",
+  "Iceland",
+  "Ireland",
+  "Italy",
+  "Kazakhstan",
+  "Latvia",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Malta",
+  "Moldova",
+  "Monaco",
+  "Montenegro",
+  "Netherlands",
+  "North Macedonia",
+  "Norway",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "Russia",
+  "San Marino",
+  "Serbia",
+  "Slovakia",
+  "Slovenia",
+  "Spain",
+  "Sweden",
+  "Switzerland",
+  "Turkey",
+  "Ukraine",
+  "UK"
+]
+
+
+const US_REGIONS = [
+  "!Total US",
+  "Diamond Princess",
+  "Midwest",
+  "Northeast",
+  "South",
+  "Unassigned",
+  "West"
+]
 
   const US_STATES = [
   "!Total US",  
