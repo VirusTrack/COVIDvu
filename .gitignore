@@ -140,7 +140,9 @@ dmypy.json
 **.ssh/
 **/*psd
 **/.cufflinks*
+**/.theano
 **/.vim/*
+**/resources/counties-US-all*json
 **/work/*.tar.gz
 **/work/COVID-19
 **/work/last-update.txt
@@ -150,7 +152,6 @@ dmypy.json
 *swp
 .viminfo
 work/*.json
-**/.theano
 
 # Python virtual environment
 

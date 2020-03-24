@@ -2,31 +2,43 @@
 # See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE
 # vim: set fileencoding=utf-8:
 
-from covidvu.pipeline.vucounty import _isCounty
-from covidvu.pipeline.vucounty import allUSCounties
 
-from pandas.core.frame import DataFrame
-from pandas.core.indexes.datetimes import DatetimeIndex
+from covidvu.pipeline.vucounty import processCounties
+
+import json
 import os
-import pandas as pd
-
-# *** constants ***
-TEST_JH_CSSE_DATA_HOME      = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
-                                           'csse_covid_19_time_series')
-TEST_JH_CSSE_FILE_CONFIRMED = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed.csv')
 
 
-# *** functions ***
+# +++ constants +++
 
-def test__isCounty():
-    assert _isCounty("King County, WA")
-    assert not _isCounty("New Jersey")
-    assert not _isCounty("Washington, D.C.")
-    assert _isCounty("King County, WA ")
+TEST_SITE_RESOURCES            = 'resources/test_pipeline'
+TEST_COUNTY_CASES_CSBS_US_FILE = 'counties-US-CSBS.json'
+TEST_COUNTY_CASES_US_FILE      = 'bogus.json'
+TEST_SITE_DATA                 = 'resources/test_pipeline'
 
 
-def test_allUSCases():
-    casesUSCounty = allUSCounties(fileName = TEST_JH_CSSE_FILE_CONFIRMED)
+# --- tests ---
 
-    assert isinstance(casesUSCounty, DataFrame)
-    assert isinstance(casesUSCounty.index, DatetimeIndex)
+def test_processCounties():
+    dataset = processCounties(
+                TEST_SITE_RESOURCES,
+                TEST_COUNTY_CASES_CSBS_US_FILE,
+                TEST_SITE_DATA,
+                TEST_COUNTY_CASES_US_FILE)
+
+    assert 'California' in dataset
+    assert 'San Francisco' in dataset['California']
+    assert dataset['California']['San Francisco']['confirmed'] > 0
+
+
+def test_processCounties_JSON():
+    # It must follow test_processCounties()
+    testFileName = os.path.join(TEST_SITE_DATA, TEST_COUNTY_CASES_US_FILE)
+
+    dataset = json.loads(open(testFileName, 'r').read())
+    os.unlink(testFileName)
+
+    assert 'California' in dataset
+    assert 'San Francisco' in dataset['California']
+    assert dataset['California']['San Francisco']['confirmed'] > 0
+

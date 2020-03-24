@@ -1,0 +1,38 @@
+[
+  {
+    "coordinates": {
+      "latitude": "37.77712",
+      "longitude": "-122.41964"
+    },
+    "country": "US",
+    "country_code": "US",
+    "county": "San Francisco",
+    "id": 104,
+    "last_updated": "2020-03-23T20:59:00Z",
+    "latest": {
+      "confirmed": 131,
+      "deaths": 0,
+      "recovered": 0
+    },
+    "province": "California",
+    "state": "California"
+  },
+  {
+    "coordinates": {
+      "latitude": "33.78787",
+      "longitude": "-117.85071"
+    },
+    "country": "US",
+    "country_code": "US",
+    "county": "Orange",
+    "id": 105,
+    "last_updated": "2020-03-23T20:59:00Z",
+    "latest": {
+      "confirmed": 125,
+      "deaths": 0,
+      "recovered": 0
+    },
+    "province": "California",
+    "state": "California"
+  }
+]

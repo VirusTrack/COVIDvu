@@ -24,6 +24,7 @@ Listed in the order in which they joined this development effort.
 ---
 ## 3rd-party
 
+- [ExpDev07 / coronavirus-tracker-api](https://github.com/ExpDev07/coronavirus-tracker-api)
 - [Virus icon](https://www.pngrepo.com/svg/25229/virus) CC 4.0 via PNG Repo, author unknown, see link
 
 
