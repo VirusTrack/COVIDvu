@@ -6,10 +6,11 @@
 REFRESHDATA_CONFIG="./refreshdata.config"
 [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
 
-export COUNTY_CASES_US_ENDPOINT="https://coronavirus-county-api.herokuapp.com/latest"
+export COUNTY_CASES_US_ENDPOINT="https://coronavirus-tracker-api.herokuapp.com/v2/locations?source=csbs"
 
 
 # *** main ***
 
-curl -s "$COUNTY_CASES_US_ENDPOINT" | jq -M '.' > "$COUNTY_CASES_US_FILE" 
+curl -s "$COUNTY_CASES_US_ENDPOINT" | jq -M '.locations' > "$COUNTY_CASES_CSBS_FILE" 
+python -m covidvu.pipeline.vucounty
 
