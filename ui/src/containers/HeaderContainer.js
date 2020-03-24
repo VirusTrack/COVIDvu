@@ -98,6 +98,13 @@ export const HeaderContainer = () => {
                         <Navbar.Dropdown boxed>
                             <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{changePage('/covid')}}>Countries</Navbar.Item>
                             <Navbar.Item active={selectedNav === '/covid/continental'} onClick={()=>{changePage('/covid/continental')}}>Continental</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/region/Europe'} onClick={()=>{changePage('/covid/region/Europe')}}>Europe</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/region/Asia'} onClick={()=>{changePage('/covid/region/Asia')}}>Asia</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/region/Africa'} onClick={()=>{changePage('/covid/region/Africa')}}>Africa</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/region/South America'} onClick={()=>{changePage('/covid/region/South America')}}>South America</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/region/North America'} onClick={()=>{changePage('/covid/region/North America')}}>North America</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/region/Central America'} onClick={()=>{changePage('/covid/region/Central America')}}>Central America</Navbar.Item>
+                            <Navbar.Item active={selectedNav === '/covid/region/Oceania'} onClick={()=>{changePage('/covid/region/Oceania')}}>Oceania</Navbar.Item>
                         </Navbar.Dropdown>
                     </Navbar.Item>
 
