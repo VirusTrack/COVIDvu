@@ -203,7 +203,12 @@ function deployVirusUpdateJSON {
     echo "cloning $SITE_DATA_DIR to the $targetBucket website"
     rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$targetBucket/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
 
-    invalidateCloudFrontCache
+    case "$targetBucket" in
+        "publish")
+            # Staging doesn't use CloudFront
+            invalidateCloudFrontCache
+            ;;
+    esac
 } # deployVirusUpdateJSON
 
 

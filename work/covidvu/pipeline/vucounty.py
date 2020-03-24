@@ -21,7 +21,7 @@ SITE_RESOURCES         = 'resources'
 
 def processCounties( siteResources  = SITE_RESOURCES,
                      countiesFile   = COUNTY_CASES_CSBS_FILE,
-                     siteData       = SITE_DATA,
+                     siteData       = SITE_RESOURCES,
                      outputFileName = COUNTIES_US_FILE):
 
     inputFileName = os.path.join(siteResources, countiesFile)
