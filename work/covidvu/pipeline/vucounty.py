@@ -24,6 +24,8 @@ def processCounties( siteResources  = SITE_RESOURCES,
                      siteData       = SITE_RESOURCES,
                      outputFileName = COUNTIES_US_FILE):
 
+    print('vucounty - processing US counties for the good of humanity')
+
     inputFileName = os.path.join(siteResources, countiesFile)
     with open(inputFileName, 'r') as inputFile:
         regions = json.load(inputFile)
@@ -32,11 +34,16 @@ def processCounties( siteResources  = SITE_RESOURCES,
     for region in regions:
         state = region[STATE_OR_PROVINCE_KEY]
         if state not in dataset:
+            print('updating %s' % state)
             dataset[state] = dict()
 
         county = region['county']
         latest = region['latest']
-        del(latest['recovered'])
+
+        print('  updating %s, %s' % (county, state))
+
+        if 'recovered' in latest:
+            del(latest['recovered'])
         
         dataset[state][county] = latest
 
