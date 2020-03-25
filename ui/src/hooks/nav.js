@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { useLocation, useHistory } from 'react-router'
+import { useHistory } from 'react-router'
 
 import queryString from 'query-string'
 
@@ -13,9 +13,10 @@ import queryString from 'query-string'
 //     }
 // }
 
+
 export function useHandleHistory(urlFragment) {
     const history = useHistory()
-        
+
     return (region, graph, showLog) => {
 
         const query = queryString.stringify({

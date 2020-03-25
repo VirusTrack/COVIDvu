@@ -12,7 +12,7 @@ import { actions } from '../ducks/services'
 
 import { Tag, Level } from "rbx"
 
-import { COUNTRIES, CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
+import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 import numeral from 'numeral'
 import store from 'store2'
 
@@ -37,15 +37,12 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("global")
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
-    const [totalCountries, setTotalCountries] = useState(0)
-
-    const COUNTRY_COUNT = Object.keys(COUNTRIES).length - 2
 
     /**
      * Fetch all the data
      */
     useEffect(() => {
-        dispatch(actions.fetchGlobal())
+        dispatch(actions.fetchGlobal({showLog}))
     }, [dispatch, showLog])
 
 
@@ -81,15 +78,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
             }
             setConfirmedTotal(theConfirmedTotal)
 
-            let confirmedCountries = 0
-            for(const country of Object.keys(confirmed)) {
-                const total = Object.values(confirmed[country]).reduce((total, value) => total + value)
-                
-                if(total > 0 && country !== '!Global' && country !== '!Outside Mainland China') {
-                    ++confirmedCountries
-                }
-            }
-            setTotalCountries(confirmedCountries)
         }
     }, [confirmed, selectedCountries, sortedConfirmed])
 
@@ -157,11 +145,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                         </Level.Item>
                     </Level>
 
-                    <Level>
-                        <Level.Item>
-                            <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br /><br />
-                        </Level.Item>
-                    </Level>
                 </>
 
             </TwoGraphLayout>
