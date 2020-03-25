@@ -14,7 +14,7 @@ export const CovidRegionPage = () => {
 
     let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
 
-    const validGraphs = ['Confirmed', 'Deaths', 'Recovered', 'Mortality', 'Recovery']
+    const validGraphs = ['Cases', 'Deaths', 'Recovered', 'Mortality', 'Recovery']
 
     let uniqueRegion = query.region ? Array.isArray(query.region) ? query.region : [query.region] : undefined
     let graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
