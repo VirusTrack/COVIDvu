@@ -13,6 +13,7 @@ RUN             apt-get update && \
                 apt-get -y install \
                     awscli \
                     colordiff \
+                    dnsutils \
                     git \
                     jq \
                     rclone \
