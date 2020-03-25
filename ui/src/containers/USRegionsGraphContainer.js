@@ -1,41 +1,38 @@
 import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router'
+import { useDispatch } from 'react-redux'
+import { useLocation } from 'react-router'
 
-import queryString from 'query-string'
 import store from 'store2'
 
 import { useInterval } from '../hooks/ui'
+import { useHandleHistory } from '../hooks/nav'
+import { useGraphData } from '../hooks/graphData'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Notification, Level } from "rbx"
+import { Tag, Notification, Level } from "rbx"
 
 import { CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
+import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
-import GraphScaleControl from '../components/GraphScaleControl'
-import GraphWithLoader from '../components/GraphWithLoader'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const USRegionsGraphContainer = ({region = [], graph = 'Confirmed', showLogParam = false}) => {
+export const USRegionsGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
     const dispatch = useDispatch()
-    const history = useHistory()
     const location = useLocation()
     const { search } = location
+    const handleHistory = useHandleHistory('/covid/us/regions')
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [selectedRegions, setSelectedRegions] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
-    const confirmed = useSelector(state => state.services.usRegions.confirmed)
-    const sortedConfirmed = useSelector(state => state.services.usRegions.sortedConfirmed)
-    const deaths = useSelector(state => state.services.usRegions.deaths)
-    const mortality = useSelector(state => state.services.usRegions.mortality)
+    const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("usRegions")
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
     const [unassignedCases, setUnassignedCases] = useState(0)
@@ -63,16 +60,6 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Confirmed', showL
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-    const handleHistory = (region, graph, showLog) => {
-        const query = queryString.stringify({
-            region,
-            graph,
-            showLog
-        })
-
-        history.replace(`/covid/us/regions?${query}`)
-    }
 
     useEffect(() => {
         if(confirmed) {
@@ -125,47 +112,17 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Confirmed', showL
                     showLog={showLog}
                 />
             </>
-            <>
-                <Tab.Group size="large" kind="boxed">
-                    <Tab active={secondaryGraph === 'Confirmed'} onClick={() => { handleSelectedGraph('Confirmed')}}>Confirmed</Tab>
-                    <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                    <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
-                </Tab.Group>
 
-                <GraphScaleControl
-                    showLog={showLog}
+            <TabbedCompareGraphs
+                    secondaryGraph={secondaryGraph}
+                    confirmed={confirmed}
+                    deaths={deaths}
+                    mortality={mortality}
+                    selected={selectedRegions}
+                    handleSelectedGraph={handleSelectedGraph}
                     handleGraphScale={handleGraphScale}
-                    secondaryGraph={secondaryGraph}
-                />
-
-                <GraphWithLoader 
-                    graphName="Confirmed"
-                    secondaryGraph={secondaryGraph}
-                    title="Cases US Regions"
-                    graph={confirmed}
-                    selected={selectedRegions}
                     showLog={showLog}
-                    y_title="Total confirmed cases"
                 />
-                
-                <GraphWithLoader 
-                    graphName="Deaths"
-                    secondaryGraph={secondaryGraph}
-                    graph={deaths}
-                    selected={selectedRegions}
-                    showLog={showLog}
-                    y_title="Number of deaths"
-                />
-
-                <GraphWithLoader 
-                    graphName="Mortality"
-                    secondaryGraph={secondaryGraph}
-                    graph={mortality}
-                    selected={selectedRegions}
-                    y_type='percent'
-                    y_title='Mortality Rate Percentage'
-                />
-            </>
 
             <Level>
                 <Level.Item>

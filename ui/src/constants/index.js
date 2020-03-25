@@ -17,6 +17,8 @@ const CONTINENTAL_KEY = 'covid-continental'
 const US_STATES_KEY = 'covid-us-states'
 const US_REGIONS_KEY = 'covid-us-regions'
 
+const GOOGLE_ANALYTICS_KEY = 'UA-574325-5'
+
 const COUNTRIES = [
   "!Global",
   "!Outside Mainland China",
@@ -314,7 +316,7 @@ const COUNTRIES = [
       "Massachusetts": 'MA',
       "Michigan": 'MI',
       "Minnesota": 'MN',
-      "Mississippi": 'MI',
+      "Mississippi": 'MS',
       "Missouri": 'MO',
       "Montana": 'MT',
       "Nebraska": 'NB',
@@ -406,6 +408,7 @@ const COUNTRIES = [
     }
 
   export { 
+    GOOGLE_ANALYTICS_KEY,
     COUNTRIES,
     US_REGIONS,
     US_STATES,

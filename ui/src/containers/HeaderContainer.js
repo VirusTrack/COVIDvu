@@ -1,19 +1,17 @@
 import React from 'react'
 
 import { useHistory, useLocation } from "react-router-dom"
-
 import { useDispatch } from 'react-redux'
 
 import { actions } from '../ducks/services'
 
-import { Navbar } from "rbx"
+import { Navbar, Notification } from "rbx"
 import LogoElement from '../components/LogoElement'
-
-
 
 import store from 'store2'
 
 import { 
+    GOOGLE_ANALYTICS_KEY,
     LAST_UPDATE_KEY, 
     GLOBAL_KEY, 
     CONTINENTAL_KEY,
@@ -41,8 +39,8 @@ export const HeaderContainer = () => {
 
     const selectedNav = location.pathname
 
-    ReactGA.initialize('UA-574325-5');
-    ReactGA.pageview(window.location.pathname + window.location.search);
+    ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
+    ReactGA.pageview(window.location.pathname + window.location.search)
 
     const forceRefresh = () => {
         store.session.remove(LAST_UPDATE_KEY)
@@ -78,6 +76,12 @@ export const HeaderContainer = () => {
     }
 
     return (
+        <>
+        <Notification color="warning" style={{marginBottom: '0'}}>
+            Unfortunately data coming in from one of our data sources has changed format this morning. Our volunteer team is in the middle of fixing this linkage and
+            it will be resolved shortly. Thank you for your patience!
+        </Notification>
+
         <Navbar>
             <Navbar.Brand>
                 <Navbar.Item onClick={() => { changePage('/dashboard') }}>
@@ -125,6 +129,7 @@ export const HeaderContainer = () => {
                 </Navbar.Segment>
             </Navbar.Menu>
         </Navbar>
+        </>
     )
 
 }

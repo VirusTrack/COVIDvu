@@ -1,25 +1,24 @@
 import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
-import { useHistory, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 
 import { useInterval } from '../hooks/ui'
-
-import queryString from 'query-string'
+import { useHandleHistory } from '../hooks/nav'
+import { useGraphData } from '../hooks/graphData'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Level } from "rbx"
+import { Tag, Level } from "rbx"
 
-import { COUNTRIES, CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
+import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 import numeral from 'numeral'
 import store from 'store2'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
-import GraphWithLoader from '../components/GraphWithLoader'
+import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
-import GraphScaleControl from '../components/GraphScaleControl'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
@@ -27,28 +26,23 @@ import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
-    const history = useHistory()
     const { search } = useLocation()
+
+    const handleHistory = useHandleHistory('/covid')
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [selectedCountries, setSelectedCountries] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
-    const confirmed = useSelector(state => state.services.global.confirmed)
-    const sortedConfirmed = useSelector(state => state.services.global.sortedConfirmed)
-    const deaths = useSelector(state => state.services.global.deaths)
-    const mortality = useSelector(state => state.services.global.mortality)
+    const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("global")
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
-    const [totalCountries, setTotalCountries] = useState(0)
-
-    const COUNTRY_COUNT = Object.keys(COUNTRIES).length - 2
 
     /**
      * Fetch all the data
      */
     useEffect(() => {
-        dispatch(actions.fetchGlobal())
+        dispatch(actions.fetchGlobal({showLog}))
     }, [dispatch, showLog])
 
 
@@ -72,29 +66,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-
-    const renderCaseTags = () => {        
-        if(selectedCountries.indexOf('!Global') !== -1) {
-            return (
-                <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
-            )
-        } else {
-            return (
-                <Tag size="large" color="danger">Selected Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
-            )
-        }
-    }
-
-    const handleHistory = (region, graph, showLog) => {
-        const query = queryString.stringify({
-            region,
-            graph,
-            showLog
-        })
-
-        history.replace(`/covid?${query}`)
-    }
-
     useEffect(() => {
         if(confirmed) {
 
@@ -107,15 +78,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
             }
             setConfirmedTotal(theConfirmedTotal)
 
-            let confirmedCountries = 0
-            for(const country of Object.keys(confirmed)) {
-                const total = Object.values(confirmed[country]).reduce((total, value) => total + value)
-                
-                if(total > 0 && country !== '!Global' && country !== '!Outside Mainland China') {
-                    ++confirmedCountries
-                }
-            }
-            setTotalCountries(confirmedCountries)
         }
     }, [confirmed, selectedCountries, sortedConfirmed])
 
@@ -161,60 +123,28 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
                 </>
 
-                <>
-                    <Tab.Group size="large" kind="boxed">
-                        <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
-                        <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                        <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
-                    </Tab.Group>
-
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={secondaryGraph}
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Cases"
-                        secondaryGraph={secondaryGraph}
-                        graph={confirmed}
-                        selected={selectedCountries}
-                        showLog={showLog}
-                        y_title="Total confirmed cases"
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Deaths"
-                        secondaryGraph={secondaryGraph}
-                        graph={deaths}
-                        selected={selectedCountries}
-                        showLog={showLog}
-                        y_title="Number of deaths"
-                    />        
-
-                    <GraphWithLoader 
-                        graphName="Mortality"
-                        secondaryGraph={secondaryGraph}
-                        graph={mortality}
-                        selected={selectedCountries}
-                        y_type="percent"
-                        y_title="Mortality Rate Percentage"
-                    />
-            
-                </>
+                <TabbedCompareGraphs
+                    secondaryGraph={secondaryGraph}
+                    confirmed={confirmed}
+                    deaths={deaths}
+                    mortality={mortality}
+                    selected={selectedCountries}
+                    handleSelectedGraph={handleSelectedGraph}
+                    handleGraphScale={handleGraphScale}
+                    showLog={showLog}
+                />
 
                 <>
                     <Level>
                         <Level.Item>
-                            {!showLog && renderCaseTags()}
+                            {!showLog && 
+                            
+                                <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
+
+                            }
                         </Level.Item>
                     </Level>
 
-                    <Level>
-                        <Level.Item>
-                            <Tag size="large" color="info">Countries: {totalCountries} / { COUNTRY_COUNT }</Tag><br /><br />
-                        </Level.Item>
-                    </Level>
                 </>
 
             </TwoGraphLayout>
