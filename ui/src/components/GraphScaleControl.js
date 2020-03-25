@@ -1,21 +1,20 @@
 import React from 'react'
 
-import { Level, Button } from 'rbx'
+import { Generic, Button } from 'rbx'
 
-export const GraphScaleControl = ({showLog, handleGraphScale, secondaryGraph}) => {
+export const GraphScaleControl = ({showLog, handleGraphScale, secondaryGraph, align = 'flex-start'}) => {
 
     if(secondaryGraph === 'Mortality') {
         return null
     }
 
     return (
-        <Level>                        
-            <Level.Item align="left">
-                Graph Scale:&nbsp;<Button color={!showLog?"primary":"default"} onClick={() => { if(showLog) { handleGraphScale(false) } }}>Linear</Button>
-                &nbsp;
-                <Button tooltip="Steeper slope on log scale means faster disease spread" color={showLog?"primary":"default"} onClick={() => { if(!showLog) { handleGraphScale(true) } }}>Logarithmic</Button>
-            </Level.Item>
-        </Level>
+        <Generic as="div" align={align} style={{marginBottom: '1rem', fontSize: '1.4rem', display: 'flex', alignItems:'baseline', justifyContent: align}}>
+            Graph Scale: &nbsp;
+            <Button size="medium" outlined color={!showLog?"secondary":"default"} onClick={() => { if(showLog) { handleGraphScale(false) } }}>Linear</Button>
+            &nbsp;
+            <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" color={showLog?"secondary":"default"} outlined onClick={() => { if(!showLog) { handleGraphScale(true) } }}>Logarithmic</Button>
+        </Generic>
     )
 }
 

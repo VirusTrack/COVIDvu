@@ -7,6 +7,7 @@ $primary: hsla(221,63,33,1)
 $offwhite: hsla(216,17,94,1)
 
 $drop-shadow-large: 0px 10px 30px rgba(11, 56, 156, 0.05), 0px 7px 20px rgba(11, 56, 156, 0.05);
+$drop-shadow-large-reverse: 0px -10px 30px rgba(11, 56, 156, 0.05), 0px -7px 20px rgba(11, 56, 156, 0.05);
 $drop-shadow-small: 0px 5px 15px rgba(11, 56, 156, 0.05), 0px 3px 10px rgba(11, 56, 156, 0.05);
 
 html 
@@ -297,10 +298,18 @@ hr
 .button
   &.is-primary
     background-color: #{$secondary}
+    &.is-outlined,&.is-outlined:focus
+      background: transparent
+      color: #{$secondary}
+      border-color: #{$secondary}
     &:hover
       background-color: #{lighten($secondary, 5%)}
   &.is-secondary
     background-color: #{$primary}
+    &.is-outlined,&.is-outlined:focus
+      background: transparent
+      color: #{$primary}
+      border-color: #{$primary}
   &.is-large
     padding: 0rem 4rem
     min-height: 4rem 
@@ -335,6 +344,8 @@ hr
   flex-direction: column 
   align-content: stretch
   justify-content: stretch
+  .buttons
+    background: #{$offwhite}
   @media (min-width: #{$tablet})
     background: #{$offwhite}
 
@@ -344,16 +355,17 @@ hr
   margin: 1.5rem auto
   border-radius: 1rem
   overflow: hidden
-  text-align: center
-  width: 100%
+  &:after 
+    clear: both
+    display: table 
   @media (min-width: #{$tablet})
     max-width: none
     margin: 0
     margin-top: 0 !important
+    margin-bottom: 0 !important
     border-radius: 0
     width: 100% !important
-
-
+  
 .CheckboxRegionForm
   margin: 0 0 0 0
   margin-top: 0 !important
@@ -365,6 +377,7 @@ hr
   min-height: 100%
   flex-basis: 100%
   position: relative
+  padding-bottom: 2rem
   &:before 
     content: ''
     display: block 
@@ -403,13 +416,8 @@ hr
     background: white
     color: #{$primary}
     box-shadow: #{$drop-shadow-small}
-    border-radius: .5rem
+    border: .1rem solid #DDDDDD
 
-.CheckboxRegionCheckbox:checked + .CheckboxRegionCheckbox:checked
-  label  
-    border-top-left-radius: 0
-    border: 1px solid red
-    border-top-right-radius: 0
 label 
   display: flex
   justify-content: space-between
@@ -418,9 +426,41 @@ label
   margin-top: .1rem
   margin: .1rem 1rem .5rem 1rem
   text-align: left
+  border: .1rem solid transparent
+  transition: border .1s ease-out, background .1s ease-out, box-shadow .1s ease-out
+  border-radius: .5rem
   .label-stats
     color: #{$primary}
     
 .tooltip:hover::before
   max-width: 32rem
   font-size: 1rem
+
+
+.cookieConsent
+  display: flex
+  justify-content: space-between
+  align-items: center !important
+
+  background: white !important
+  border-top: .3rem solid #{$tertiary}
+  color: rgba(0,0,0,.83) !important
+  box-shadow: #{$drop-shadow-large-reverse}
+  transform: translateY(100%)
+
+  animation: cookieConsent .3s ease-out forwards
+  animation-delay: 1s
+  button 
+    font-size: 1.6rem
+    background: #{$secondary} !important
+    color: white !important
+    border-radius: .5rem !important
+    padding: 1rem 2rem !important
+    box-shadow: #{$drop-shadow-small} !important
+
+
+@keyframes cookieConsent
+  0% 
+    transform: translateY(100%)
+  100% 
+    transform: translateY(0)
