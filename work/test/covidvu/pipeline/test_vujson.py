@@ -53,7 +53,7 @@ def test_US_REGIONS():
 
 
 def test_splitCSSEDataByParsingBoundary():
-    cases = pd.read_csv(TEST_JH_CSSE_FILE_CONFIRMED)
+    cases = pd.read_csv(TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED)
     casesSplit = splitCSSEDataByParsingBoundary(cases)
     assert isinstance(casesSplit[0], DataFrame)
     assert isinstance(casesSplit[1], DataFrame)
@@ -132,7 +132,7 @@ def test__parseBoundary2():
 
 
 def test__readSource():
-    cases = _readSourceDeprecated(TEST_JH_CSSE_FILE_CONFIRMED)
+    cases = _readSourceDeprecated(TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED)
     assert not (cases['Province/State'].isin(STATE_NAMES.keys())).any()
 
 
