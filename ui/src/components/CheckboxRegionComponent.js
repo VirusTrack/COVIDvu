@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Button } from 'rbx'
 
+import numeral from 'numeral'
+
 export const CheckboxRegionComponent = ({data, selected, handleSelected, defaultSelected = [], showLog = false}) => {
 
   const [regionList, setRegionList] = useState(data)
@@ -44,21 +46,23 @@ export const CheckboxRegionComponent = ({data, selected, handleSelected, default
   return (
     <div className="CheckboxRegionComponent">
       <Button.Group className="CheckboxRegionOptions">
-        {/* <Button size="medium" onClick={() => { handleSelected(defaultSelected)}}>Select Default</Button> */}
-        <AlphaOrByConfirmedButton />
-        <Button size="medium" onClick={() => { handleSelected([]) }}>Deselect All</Button>
-      </Button.Group>
-      <form className="CheckboxRegionForm">
-              {regionList.map((element, idx) => (
-                <React.Fragment key={idx}>
-                  <input className="CheckboxRegionCheckbox" checked={selected.indexOf(element.region) !== -1} type="checkbox" onChange={() => { onChange(element.region) }} id={element.region} key={element.region} value={element.region} />
-                    <label htmlFor={element.region}>
-                      <span className="label-name">{renderDisplay(`${element.region}`)} </span>
-                      <span className="label-stats">{renderDisplay(`${element.stats}`)}</span>
-                    </label>
-                  </React.Fragment>
-              ))}
-      </form>
+          {/* <Button size="medium" onClick={() => { handleSelected(defaultSelected)}}>Select Default</Button> */}
+          <AlphaOrByConfirmedButton />
+          <Button size="medium" onClick={() => { handleSelected([]) }}>Deselect All</Button>
+        </Button.Group>
+      <div>{/* fixes form overflow bug in firefox */}
+        <form className="CheckboxRegionForm">
+                {regionList.map((element, idx) => (
+                  <React.Fragment key={idx}>
+                    <input className="CheckboxRegionCheckbox" checked={selected.indexOf(element.region) !== -1} type="checkbox" onChange={() => { onChange(element.region) }} id={element.region} key={element.region} value={element.region} />
+                      <label htmlFor={element.region}>
+                        <span className="label-name">{renderDisplay(`${element.region}`)} </span>
+                        <span className="label-stats">{renderDisplay(`${numeral(element.stats).format('0,0')}`)}</span>
+                      </label>
+                    </React.Fragment>
+                ))}
+        </form>
+      </div>
     </div>
   )
 }
