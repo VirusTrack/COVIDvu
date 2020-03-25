@@ -12,7 +12,6 @@ import json
 from covidvu.pipeline.vujson import dumpJSON
 from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
 from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
-from covidvu.pipeline.vujson import JH_CSSE_FILE_RECOVERED
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import SITE_DATA
 
@@ -209,7 +208,6 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                                    siteData            = kwargs.get('siteData', SITE_DATA),
                                    jhCSSEFileConfirmed = kwargs.get('jhCSSEFileConfirmed', JH_CSSE_FILE_CONFIRMED),
                                    jhCSSEFileDeaths    = kwargs.get('jhCSSEFileDeaths', JH_CSSE_FILE_DEATHS),
-                                   jhCSSEFileRecovered = kwargs.get('jhCSSEFileRecovered', JH_CSSE_FILE_RECOVERED),
                                    )[subGroup]
 
     if countryName is None:
@@ -331,7 +329,6 @@ def _main(countryTrainIndex,
           subGroup               = 'casesGlobal',
           jhCSSEFileConfirmed = JH_CSSE_FILE_CONFIRMED,
           jhCSSEFileDeaths    = JH_CSSE_FILE_DEATHS,
-          jhCSSEFileRecovered = JH_CSSE_FILE_RECOVERED,
           **kwargs
           ):
     """
@@ -357,7 +354,6 @@ def _main(countryTrainIndex,
             siteData               = siteData,
             jhCSSEFileConfirmed    = jhCSSEFileConfirmed,
             jhCSSEFileDeaths       = jhCSSEFileDeaths,
-            jhCSSEFileRecovered    = jhCSSEFileRecovered,
             **kwargs
         )
 

@@ -20,14 +20,20 @@ pd.options.mode.chained_assignment = None
 
 # *** constants ***
 
-JH_CSSE_DATA_HOME       = 'COVID-19'
-JH_CSSE_PATH            = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOME), 'csse_covid_19_data/csse_covid_19_time_series')
-JH_CSSE_FILE_CONFIRMED  = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
-JH_CSSE_FILE_DEATHS     = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
-JH_CSSE_FILE_RECOVERED  = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
-SITE_DATA               = './site-data'
-STATE_CODES_PATH        = os.path.join(os.getcwd(), 'stateCodesUS.csv')
-PARSING_MODE_BOUNDARY_1 = '2020-03-10'  # From this date (inclusive), new parsing rules
+JH_CSSE_DATA_HOME                  = 'COVID-19'
+JH_CSSE_PATH                       = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOME), 'csse_covid_19_data/csse_covid_19_time_series')
+JH_CSSE_FILE_CONFIRMED             = os.path.join(JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
+JH_CSSE_FILE_DEATHS                = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
+JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
+JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
+JH_CSSE_FILE_RECOVERED_DEPRECATED  = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
+JH_CSSE_REPORT_PATH                = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOME), 'csse_covid_19_data/csse_covid_19_daily_reports')
+SITE_DATA                          = './site-data'
+STATE_CODES_PATH                   = os.path.join(os.getcwd(), 'stateCodesUS.csv')
+
+PARSING_MODE_BOUNDARY_1            = '2020-03-10'  # From this date (inclusive), new parsing rules
+PARSING_MODE_BOUNDARY_2            = '2020-03-24'  # From this date (inclusive), new parsing rules
+
 
 
 US_REGIONS = {
@@ -151,8 +157,8 @@ def splitCSSEDataByParsingBoundary(cases):
 
     cases.index = pd.to_datetime(cases.index)
 
-    cases = (cases.loc[cases.index  < PARSING_MODE_BOUNDARY_1],
-             cases.loc[cases.index >= PARSING_MODE_BOUNDARY_1])
+    cases = [cases.loc[cases.index  < PARSING_MODE_BOUNDARY_1],
+             cases.loc[cases.index >= PARSING_MODE_BOUNDARY_1]]
 
     return cases
 
@@ -160,7 +166,7 @@ def _parseBoundary2(cases):
     cases               = cases.T.reset_index()
     casesBoats          = cases[cases['Province/State'].apply(lambda p: any((b in str(p) for b in BOATS)))]
 
-    cases               = cases[~cases['Province/State'].isin(BOATS)]
+    cases               = cases[~(cases['Province/State'].isin(BOATS) | (cases['Country/Region'].isin(BOATS)))]
     casesUS             = cases[cases['Country/Region'] == 'US'].drop('Country/Region', axis=1)
 
     casesUSCounties     = casesUS[casesUS['Province/State'].apply(lambda c: _isCounty(c))]
@@ -200,6 +206,34 @@ def _parseBoundary2(cases):
                 # 'casesUSCounties': casesUSCounties  # Not implemented
              }
     return output
+
+def _parseBoundary3Global(sourceFileName):
+    cases = pd.read_csv(sourceFileName)
+    cases.drop(labels=['Lat', 'Long'], axis=1, inplace=True)
+    cases = cases.set_index(['Province/State', 'Country/Region']).T
+    cases.index = pd.to_datetime(cases.index)
+    cases.index = cases.index.map(lambda t: t.date())
+
+    cases = cases[cases.index >= pd.to_datetime(PARSING_MODE_BOUNDARY_2)]
+
+    cases = cases.T.reset_index()
+
+    casesBoats = cases[cases['Province/State'].apply(lambda p: any((b in str(p) for b in BOATS)))]
+    casesBoats.rename(BOAT_NAMES, axis=1, inplace=True)
+    casesBoats = casesBoats.groupby(casesBoats.columns, axis=1).sum()
+    casesBoats.drop('Country/Region', axis=1, inplace=True)
+    casesBoats = casesBoats.set_index('Province/State').T
+
+    casesGlobal = cases[~(cases['Province/State'].isin(BOATS)|(cases['Country/Region'].isin(BOATS)))]
+
+    casesGlobal.drop('Province/State', axis=1, inplace=True)
+    casesGlobal = casesGlobal.groupby('Country/Region').sum().T
+
+    casesGlobal = utils.computeGlobal(casesGlobal)
+    casesGlobal = utils.computeCasesOutside(casesGlobal,
+                                      ['China', '!Global'],
+                                      '!Outside China')
+    return casesGlobal, casesBoats
 
 
 def allCases(cases, includeGeoLocation = False):
@@ -276,6 +310,7 @@ def _resampleByRegionUS_mode1(casesUS):
     casesUS.index        = pd.to_datetime(casesUS.index)
     return casesUS
 
+
 def _resampleByRegionUS_mode2(casesUS):
     stateCodes = pd.read_csv(STATE_CODES_PATH)
     regionsUSVerbose = makeUSRegionsVerbose(stateCodes)
@@ -290,7 +325,6 @@ def _resampleByRegionUS_mode2(casesUS):
         if not regionFound:
             regions.append('Unassigned')
 
-
     casesUS.columns      = regions
     casesUS              = casesUS.groupby(casesUS.columns, axis=1).sum()
     casesUS['!Total US'] = casesUS.loc[:, casesUS.columns != 'Unassigned'].sum(axis=1)
@@ -298,15 +332,17 @@ def _resampleByRegionUS_mode2(casesUS):
     casesUS.index        = pd.to_datetime(casesUS.index)
     return casesUS
 
+
 def _getBoats_mode1(cases):
     casesNotBoats = cases.T.reset_index()
-    casesNotBoats = casesNotBoats[~casesNotBoats['Province/State'].isin(BOATS)]
+    casesNotBoats = casesNotBoats[~(casesNotBoats['Province/State'].isin(BOATS) | (casesNotBoats['Country/Region'].isin(BOATS)))]
     casesNotBoats = casesNotBoats.set_index(['Province/State', 'Country/Region']).T
 
     casesBoats = cases.loc[:, (BOATS, slice(None))]
     casesBoats.columns = casesBoats.columns.droplevel(level=1)
     casesBoats = casesBoats.groupby(casesBoats.columns, axis=1).sum()
     return casesBoats, casesNotBoats
+
 
 def _getCounties_mode1(cases):
     casesUS = cases.loc[:, (slice(None), 'US')]
@@ -317,6 +353,7 @@ def _getCounties_mode1(cases):
     casesUS = casesUS.T
     casesUS.index = casesUS.index.map(lambda s: s.date())
     return casesUS
+
 
 def allUSCases(cases):
     casesUS = cases.loc[:, (slice(None), 'US')]
@@ -366,7 +403,7 @@ def resolveReportFileName(siteDataDirectory, report, region):
     return os.path.join(siteDataDirectory, report+('%s.json' % region))
 
 
-def _readSource(sourceFileName):
+def _readSourceDeprecated(sourceFileName):
     cases = pd.read_csv(sourceFileName)
     for oldName in STATE_NAMES:
         cases['Province/State'] = cases['Province/State'].replace(oldName, STATE_NAMES[oldName])
@@ -393,43 +430,101 @@ def _combineCollection(collection):
     return cases
 
 
+def _getReportsToLoadBoundary3(jsCSSEReportPath=JH_CSSE_REPORT_PATH):
+    reportsToLoad = []
+    for fileName in os.listdir(jsCSSEReportPath):
+        if '.csv' in fileName:
+            date = pd.to_datetime(fileName.split('.csv')[0], format='%m-%d-%Y').date()
+            if date >= pd.to_datetime(PARSING_MODE_BOUNDARY_2, format='%Y-%m-%d').date():
+                reportsToLoad.append([fileName, date])
+    return reportsToLoad
+
+
+def _transformReport(report, date):
+    report['date'] = date
+    report.reset_index(inplace=True)
+    report = report.pivot(index='date', columns='Province_State')
+    report.columns = report.columns.droplevel(level=0)
+    return report
+
+
+def _parseBoundary3(jsCSSEReportPath=JH_CSSE_REPORT_PATH, targetReportName='Confirmed'):
+    reportsToLoad = _getReportsToLoadBoundary3(jsCSSEReportPath=jsCSSEReportPath)
+
+    casesUSStates = []
+    for fileName, date in reportsToLoad:
+        report = pd.read_csv(os.path.join(jsCSSEReportPath, fileName))
+        reportUS = report[report['Country_Region'] == 'US']
+        reportUS = reportUS.loc[~(reportUS['Province_State'].isin(BOATS)|reportUS['Country_Region'].isin(BOATS)), :]
+        reportUSConfirmed = reportUS[['Province_State', targetReportName]].groupby('Province_State').sum()
+        reportUSConfirmed = _transformReport(reportUSConfirmed, date)
+        casesUSStates.append(reportUSConfirmed)
+
+    casesUSStates = pd.concat(casesUSStates)
+    return casesUSStates
+
+
+def _getCleanCountryNames(casesWithTrueCountries):
+    """JH CSSE couldn't decide whether certain territories were countries or not. The function defines the Law."""
+    return casesWithTrueCountries.columns
+
+
 def parseCSSE(target,
-              siteData            = SITE_DATA,
-              jhCSSEFileConfirmed = JH_CSSE_FILE_CONFIRMED,
-              jhCSSEFileDeaths    = JH_CSSE_FILE_DEATHS,
-              jhCSSEFileRecovered = JH_CSSE_FILE_RECOVERED,
+              siteData=SITE_DATA,
+              jhCSSEFileConfirmed           = JH_CSSE_FILE_CONFIRMED,
+              jhCSSEFileDeaths              = JH_CSSE_FILE_DEATHS,
+              jhCSSEFileConfirmedDeprecated = JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+              jhCSSEFileDeathsDeprecated    = JH_CSSE_FILE_DEATHS_DEPRECATED,
+              jhCSSEFileRecoveredDeprecated = JH_CSSE_FILE_RECOVERED_DEPRECATED,
+              jsCSSEReportPath              = JH_CSSE_REPORT_PATH,
               ):
     if 'confirmed' == target:
-        sourceFileName = jhCSSEFileConfirmed
+        sourceFileNameDeprecated = jhCSSEFileConfirmedDeprecated
+        sourceFileName           = jhCSSEFileConfirmed
+        targetReportName         = 'Confirmed'
     elif 'deaths' == target:
-        sourceFileName = jhCSSEFileDeaths
+        sourceFileNameDeprecated = jhCSSEFileDeathsDeprecated
+        sourceFileName           = jhCSSEFileDeaths
+        targetReportName         = 'Deaths'
     elif 'recovered' == target:
-        sourceFileName = jhCSSEFileRecovered
+        sourceFileNameDeprecated = jhCSSEFileRecoveredDeprecated  # Recovered deprecated after 2020-03-24
+        targetReportName         = 'Recovered'
     else:
         raise NotImplementedError
 
-    casesGlobalCollection = [0, 0]
-    casesUSStatesCollection = [0, 0]
-    casesUSRegionsCollection = [0, 0]
-    casesBoatsCollection = [0, 0]
+    casesGlobalCollection    = [0, 0, 0]
+    casesUSStatesCollection  = [0, 0, 0]
+    casesUSRegionsCollection = [0, 0, 0]
+    casesBoatsCollection     = [0, 0, 0]
 
-    cases = _readSource(sourceFileName)
+    casesDeprecated = _readSourceDeprecated(sourceFileNameDeprecated)
 
-    cases = splitCSSEDataByParsingBoundary(cases)
+    casesDeprecated = splitCSSEDataByParsingBoundary(casesDeprecated)
 
     # Parsing type 1 -- before 2020-03-10
-    outputBoundary1             = _parseBoundary1(cases[0])
+    outputBoundary1             = _parseBoundary1(casesDeprecated[0])
     casesGlobalCollection[0]    = outputBoundary1['casesGlobal']
     casesUSStatesCollection[0]  = outputBoundary1['casesUSStates']
     casesUSRegionsCollection[0] = outputBoundary1['casesUSRegions']
     casesBoatsCollection[0]     = outputBoundary1['casesBoats']
 
     # Parsing type 2 -- after 2020-03-10
-    outputBoundary2             = _parseBoundary2(cases[1])
+    outputBoundary2             = _parseBoundary2(casesDeprecated[1])
     casesGlobalCollection[1]    = outputBoundary2['casesGlobal']
     casesUSRegionsCollection[1] = outputBoundary2['casesUSRegions']
     casesUSStatesCollection[1]  = outputBoundary2['casesUSStates']
     casesBoatsCollection[1]     = outputBoundary2['casesBoats']
+
+
+    # Parsing type 3 -- on/after 2020-03-24
+    casesGlobal3, casesBoats3     = _parseBoundary3Global(sourceFileName)
+    casesUSStates3               = _parseBoundary3(jsCSSEReportPath=jsCSSEReportPath, targetReportName=targetReportName)
+    casesUSRegions3              = _resampleByRegionUS_mode2(casesUSStates3.copy())
+    casesGlobalCollection[2]    = casesGlobal3
+    casesUSRegionsCollection[2] = casesUSRegions3
+    casesUSStatesCollection[2]  = casesUSStates3
+    casesBoatsCollection[2]     = casesBoats3
+
 
     # Concatenate
     casesGlobal     = _combineCollection(casesGlobalCollection)
@@ -437,10 +532,18 @@ def parseCSSE(target,
     casesUSStates   = _combineCollection(casesUSStatesCollection)
     casesBoats      = _combineCollection(casesBoatsCollection)
 
-    casesGlobal     = casesGlobal.fillna(method='ffill', axis=0).fillna(0)
-    casesUSStates   = casesUSStates.fillna(method='ffill', axis=0).fillna(0)
-    casesUSRegions  = casesUSRegions.fillna(method='ffill', axis=0).fillna(0)
-    casesBoats      = casesBoats.fillna(method='ffill', axis=0).fillna(0)
+    # Kludges: JA20200325
+    countryNamesClean = _getCleanCountryNames(casesGlobal3)
+    casesGlobal['!Global'] = casesGlobal['!Global'] - casesGlobal.loc[:, ~casesGlobal.columns.isin(countryNamesClean)].sum(axis=1)
+    casesGlobal['!Outside China'] = casesGlobal['!Outside China'] - casesGlobal.loc[:, ~casesGlobal.columns.isin(countryNamesClean)].sum(
+        axis=1)
+    casesGlobal = casesGlobal[countryNamesClean]
+
+
+    casesGlobal     = casesGlobal.fillna(value=0, axis=0).fillna(0)
+    casesUSStates   = casesUSStates.fillna(value=0, axis=0).fillna(0)
+    casesUSRegions  = casesUSRegions.fillna(value=0, axis=0).fillna(0)
+    casesBoats      = casesBoats.fillna(value=0, axis=0).fillna(0)
 
     output = {
         'casesGlobal': casesGlobal,
@@ -456,9 +559,6 @@ def parseCSSE(target,
     dumpUSCasesAsJSONFor(casesUSStates.copy(), outputFileName)
     dumpUSCasesAsJSONFor(casesBoats.copy(), outputFileName, 'boats')
     #dumpUSCasesAsJSONFor(casesUSCounties.copy(), outputFileName, 'US-Counties')
-
-
-
     return output
 
 # *** main ***

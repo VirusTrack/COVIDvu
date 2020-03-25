@@ -12,7 +12,7 @@ from covidvu.pipeline.vujson import _getBoats_mode1
 from covidvu.pipeline.vujson import allUSCases
 from covidvu.pipeline.vujson import _parseBoundary1
 from covidvu.pipeline.vujson import _parseBoundary2
-from covidvu.pipeline.vujson import _readSource
+from covidvu.pipeline.vujson import _readSourceDeprecated
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import resolveReportFileName
 
@@ -26,13 +26,15 @@ import json
 
 
 # *** constants ***
-TEST_JH_CSSE_DATA_HOME      = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
-                                           'csse_covid_19_time_series')
-TEST_JH_CSSE_FILE_CONFIRMED = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed.csv')
-TEST_JH_CSSE_FILE_DEATHS    = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Deaths.csv')
-TEST_JH_CSSE_FILE_RECOVERED = os.path.join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Recovered.csv')
+TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_time_series')
+TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
+TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
+TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
+TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
+TEST_JH_CSSE_FILE_RECOVERED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
 TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test_site_data')
+TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_daily_reports')
 
 # *** functions ***
 def _purge(purgeDirectory, pattern):
@@ -130,7 +132,7 @@ def test__parseBoundary2():
 
 
 def test__readSource():
-    cases = _readSource(TEST_JH_CSSE_FILE_CONFIRMED)
+    cases = _readSourceDeprecated(TEST_JH_CSSE_FILE_CONFIRMED)
     assert not (cases['Province/State'].isin(STATE_NAMES.keys())).any()
 
 
@@ -142,11 +144,14 @@ def assertValidJSON(fname):
     assert isinstance(jsonObject, dict)
     assert len(jsonObject.keys()) > 0
 
+
 def test_parseCSSE():
     try:
         output = parseCSSE('confirmed',
-                            siteData=TEST_SITE_DATA,
-                            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+                           siteData=TEST_SITE_DATA,
+                           jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+                           jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+                           jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
                            )
         casesGlobal = output['casesGlobal']
         casesUSStates = output['casesUSStates']
@@ -157,11 +162,27 @@ def test_parseCSSE():
         assertValidJSON('confirmed-US.json')
         assertValidJSON('confirmed-boats.json')
         assertValidJSON('confirmed.json')
-
     except Exception as e:
         raise e
     finally:
         _purge(TEST_SITE_DATA, '.json')
+
+def test__combineCollection():
+    # TODO: JA 20200325
+    pass
+
+def test__getReportsToLoadBoundary3():
+    # TODO: JA 20200325
+    pass
+
+def test__parseBoundary3():
+    # TODO: JA 20200325
+    pass
+
+
+def test__transformReport():
+    # TODO: JA 20200325
+    pass
 
 
 def test_resolveReportFileName():
