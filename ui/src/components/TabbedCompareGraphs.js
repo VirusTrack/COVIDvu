@@ -27,7 +27,8 @@ export const TabbedCompareGraphs = (
 
             for(const country of Object.keys(confirmed)) {
                 if(selected.indexOf(country) !== -1) {
-                    newData.push([country, ...Object.values(confirmed[country])])
+                    let values = showLog ? Object.values(confirmed[country]).map(val => Math.log10(1+val)) : Object.values(confirmed[country])
+                    newData.push([country, ...values])
                 }
             }
 
@@ -43,7 +44,8 @@ export const TabbedCompareGraphs = (
 
             for(const country of Object.keys(deaths)) {
                 if(selected.indexOf(country) !== -1) {
-                    newData.push([country, ...Object.values(deaths[country])])
+                    let values = showLog ? Object.values(deaths[country]).map(val => Math.log10(1+val)) : Object.values(deaths[country])
+                    newData.push([country, ...values])
                 }
             }
 
@@ -60,7 +62,8 @@ export const TabbedCompareGraphs = (
 
             for(const country of Object.keys(mortality)) {
                 if(selected.indexOf(country) !== -1) {
-                    newData.push([country, ...Object.values(mortality[country])])
+                    let values = Object.values(mortality[country])
+                    newData.push([country, ...values])
                 }
             }
 
