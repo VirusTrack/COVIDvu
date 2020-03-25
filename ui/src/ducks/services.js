@@ -437,12 +437,17 @@ export function* fetchUSCountiesStats({payload}) {
 
     let daysAgo = 0
     let filterRegion = undefined
+    let sort = "confirmed"
     if(payload) {
         if(payload.daysAgo && !isNaN(daysAgo)) {
             daysAgo = payload.daysAgo
         }
 
         filterRegion = payload.filterRegion ? payload.filterRegion : undefined      
+    }
+
+    if(payload && payload.sort) {
+        sort = payload.sort
     }
 
     try {
@@ -473,7 +478,13 @@ export function* fetchUSCountiesStats({payload}) {
             
         }
 
-        const sortedCounties = countiesWithAbbreviation.sort((a, b) => b.confirmed - a.confirmed)
+        let sortedCounties = []
+
+        if(sort === 'confirmed') {
+            sortedCounties = countiesWithAbbreviation.sort((a, b) => b.confirmed - a.confirmed)
+        } else if(sort === 'deaths') {
+            sortedCounties = countiesWithAbbreviation.sort((a, b) => b.deaths - a.deaths)
+        }
 
         yield put({
             type: types.FETCH_US_COUNTIES_STATS_SUCCESS, 
@@ -492,7 +503,7 @@ export function* fetchUSStatesStats({payload}) {
     const dataService = new DataService()
 
     let daysAgo = 0
-    let sort = "mortality"
+    let sort = "confirmed"
     if(payload && payload.daysAgo && !isNaN(daysAgo)) {
         daysAgo = payload.daysAgo
     }
@@ -580,6 +591,7 @@ export function* fetchGlobalStats({payload}) {
     console.time('fetchGlobalStats')
 
     let daysAgo = 0
+    const sort = (payload && payload.sort) ? payload.sort : "confirmed"
     if(payload && payload.daysAgo && !isNaN(daysAgo)) {
         daysAgo = payload.daysAgo
     }
@@ -605,20 +617,29 @@ export function* fetchGlobalStats({payload}) {
         const confirmedCounts = extractLatestCounts(confirmed, daysAgo)
         const deathsCounts = extractLatestCounts(deaths, daysAgo)
         const mortalityCounts = extractLatestCounts(mortality, daysAgo)
-        const sortedConfirmed = confirmedCounts.sort((a, b) => b.stats - a.stats)
+
+        let sorted = []
+
+        if(sort === 'confirmed') {
+            sorted = confirmedCounts.sort((a, b) => b.stats - a.stats)
+        } else if(sort === 'deaths') {
+            sorted = deathsCounts.sort((a, b) => b.stats - a.stats)
+        } else if(sort === 'mortality') {
+            sorted = mortalityCounts.sort((a, b) => b.stats - a.stats)
+        }
         
         const deathByCountryKey = groupByKey("region", deathsCounts)
         const mortalityByCountryKey = groupByKey("region", mortalityCounts)
 
         let statsTotals = []
         
-        for(const confirmData of sortedConfirmed) {
-            const region = confirmData.region
+        for(const data of sorted) {
+            const region = data.region
             if(deathByCountryKey.hasOwnProperty(region)) {
                 statsTotals.push({
                     region: region,
-                    confirmed: confirmData.stats,
-                    confirmedDayChange: confirmData.dayChange,
+                    confirmed: data.stats,
+                    confirmedDayChange: data.dayChange,
                     deaths: deathByCountryKey[region].stats,
                     deathsDayChange: deathByCountryKey[region].dayChange,
                     mortality: mortalityByCountryKey[region].stats,

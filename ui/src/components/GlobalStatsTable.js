@@ -4,7 +4,9 @@ import numeral from 'numeral'
 
 import { Title, Generic, Table } from 'rbx'
 
-export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay}) => {
+import { ColumnSortIcon } from './ColumnSortIcon'
+
+export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, sort, onSort}) => {
     return (
 
         <div className="table-container">
@@ -14,20 +16,29 @@ export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExter
                         <Table.Heading>
                             Region
                         </Table.Heading>
-                        <Table.Heading>
+                        <Table.Heading onClick={() => { onSort('confirmed') }} style={{ cursor: 'pointer'}}>
                             Total Cases
+                            {sort === 'confirmed' &&
+                                <ColumnSortIcon direction='desc' />
+                            }
                         </Table.Heading>
                         <Table.Heading>
                             New Cases
                         </Table.Heading>
-                        <Table.Heading>
+                        <Table.Heading onClick={() => { onSort('deaths')}} style={{ cursor: 'pointer'}}>
                             Deaths
+                            {sort === 'deaths' &&
+                                <ColumnSortIcon direction='desc' />
+                            }
                         </Table.Heading>
                         <Table.Heading>
                             New Deaths
                         </Table.Heading>
-                        <Table.Heading>
+                        <Table.Heading onClick={() => { console.log("hi"); onSort('mortality')}} style={{ cursor: 'pointer'}}>
                             Mortality Rate
+                            {sort === 'mortality' &&
+                                <ColumnSortIcon direction='desc' />
+                            }
                         </Table.Heading>
                     </Table.Row>
                 </Table.Head>
