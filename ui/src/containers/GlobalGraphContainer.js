@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import { useHistory, useLocation } from 'react-router'
 
 import { useInterval } from '../hooks/ui'
+import { useGraphData } from '../hooks/graphData'
 
 import queryString from 'query-string'
 
@@ -34,10 +35,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     const [selectedCountries, setSelectedCountries] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
-    const confirmed = useSelector(state => state.services.global.confirmed)
-    const sortedConfirmed = useSelector(state => state.services.global.sortedConfirmed)
-    const deaths = useSelector(state => state.services.global.deaths)
-    const mortality = useSelector(state => state.services.global.mortality)
+    const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("global")
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
     const [totalCountries, setTotalCountries] = useState(0)
@@ -71,19 +69,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-
-    const renderCaseTags = () => {        
-        if(selectedCountries.indexOf('!Global') !== -1) {
-            return (
-                <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
-            )
-        } else {
-            return (
-                <Tag size="large" color="danger">Selected Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
-            )
-        }
-    }
 
     const handleHistory = (region, graph, showLog) => {
         const query = queryString.stringify({
@@ -206,7 +191,11 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                 <>
                     <Level>
                         <Level.Item>
-                            {!showLog && renderCaseTags()}
+                            {!showLog && 
+                            
+                                <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
+
+                            }
                         </Level.Item>
                     </Level>
 

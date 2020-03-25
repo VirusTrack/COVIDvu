@@ -314,7 +314,7 @@ const COUNTRIES = [
       "Massachusetts": 'MA',
       "Michigan": 'MI',
       "Minnesota": 'MN',
-      "Mississippi": 'MI',
+      "Mississippi": 'MS',
       "Missouri": 'MO',
       "Montana": 'MT',
       "Nebraska": 'NB',

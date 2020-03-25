@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import { useHistory, useLocation } from 'react-router'
 
 import { useInterval } from '../hooks/ui'
+import { useGraphData } from '../hooks/graphData'
 
 import queryString from 'query-string'
 
@@ -35,10 +36,7 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
     const [selectedContinents, setSelectedContinents] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
-    const confirmed = useSelector(state => state.services.continental.confirmed)
-    const sortedConfirmed = useSelector(state => state.services.continental.sortedConfirmed)
-    const deaths = useSelector(state => state.services.continental.deaths)
-    const mortality = useSelector(state => state.services.continental.mortality)
+    const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("continental")
 
     /**
      * Fetch all the data

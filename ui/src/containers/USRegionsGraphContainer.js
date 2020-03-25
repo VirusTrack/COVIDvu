@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useHistory, useLocation } from 'react-router'
 
 import queryString from 'query-string'
 import store from 'store2'
 
 import { useInterval } from '../hooks/ui'
+import { useGraphData } from '../hooks/graphData'
 
 import { actions } from '../ducks/services'
 
@@ -32,10 +33,7 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Confirmed', showL
     const [selectedRegions, setSelectedRegions] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
-    const confirmed = useSelector(state => state.services.usRegions.confirmed)
-    const sortedConfirmed = useSelector(state => state.services.usRegions.sortedConfirmed)
-    const deaths = useSelector(state => state.services.usRegions.deaths)
-    const mortality = useSelector(state => state.services.usRegions.mortality)
+    const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("usRegions")
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
     const [unassignedCases, setUnassignedCases] = useState(0)

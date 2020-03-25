@@ -30,6 +30,7 @@ export const RegionGraphContainer = ({region, uniqueRegion = [], graph = 'Cases'
     const [selectedRegions, setSelectedRegions] = useState(uniqueRegion)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
+    // TODO look into using the hook for this as well, somehow
     const confirmed = useSelector(state => state.services.region.hasOwnProperty(region) ? state.services.region[region].confirmed : undefined)
     const sortedConfirmed = useSelector(state => state.services.region.hasOwnProperty(region) ? state.services.region[region].sortedConfirmed : undefined)
     const deaths = useSelector(state => state.services.region.hasOwnProperty(region) ? state.services.region[region].deaths : undefined)

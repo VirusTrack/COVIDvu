@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useHistory, useLocation } from 'react-router'
 
 import { useInterval } from '../hooks/ui'
+import { useGraphData } from '../hooks/graphData'
 
 import queryString from 'query-string'
 import numeral from 'numeral'
@@ -34,10 +35,7 @@ export const USGraphContainer = ({region = [], graph = 'Confirmed', showLogParam
     const [selectedStates, setSelectedStates] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
-    const confirmed = useSelector(state => state.services.usStates.confirmed)
-    const sortedConfirmed = useSelector(state => state.services.usStates.sortedConfirmed)
-    const deaths = useSelector(state => state.services.usStates.deaths)
-    const mortality = useSelector(state => state.services.usStates.mortality)
+    const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("usStates")
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
     const [unassignedCases, setUnassignedCases] = useState(0)
