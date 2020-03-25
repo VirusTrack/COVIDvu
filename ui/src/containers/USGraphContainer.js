@@ -54,13 +54,9 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
         if(sortedConfirmed && region.length === 0) {
-            console.dir(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
             setSelectedStates(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
         }
     }, [sortedConfirmed])
-
-    console.dir(region)
-    // console.dir(sortedConfirmed)
 
     useEffect(() => {
         dispatch(actions.fetchUSStates())
