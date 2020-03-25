@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Button } from 'rbx'
 
+import numeral from 'numeral'
+
 export const CheckboxRegionComponent = ({data, selected, handleSelected, defaultSelected = [], showLog = false}) => {
 
   const [regionList, setRegionList] = useState(data)
@@ -55,7 +57,7 @@ export const CheckboxRegionComponent = ({data, selected, handleSelected, default
                     <input className="CheckboxRegionCheckbox" checked={selected.indexOf(element.region) !== -1} type="checkbox" onChange={() => { onChange(element.region) }} id={element.region} key={element.region} value={element.region} />
                       <label htmlFor={element.region}>
                         <span className="label-name">{renderDisplay(`${element.region}`)} </span>
-                        <span className="label-stats">{renderDisplay(`${element.stats}`)}</span>
+                        <span className="label-stats">{renderDisplay(`${numeral(element.stats).format('0,0')}`)}</span>
                       </label>
                     </React.Fragment>
                 ))}

@@ -26,10 +26,9 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
     const history = useHistory()
 
     const [selectedTab, setSelectedTab] = useState(filter)
-    
     const [filterRegion, setFilterRegion] = useState('')
-
     const [daysAgo, setDaysAgo] = useState(daysAgoParam)
+    const [sort, setSort] = useState('confirmed')
 
     const statsTotals = useSelector(state => state.services.globalStats)
     const usStatsTotals = useSelector(state => state.services.usStatesStats)
@@ -54,6 +53,10 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
         setFilterRegion(selectedFilter)
     }
    
+    const handleSort = (column) => {
+        setSort(column)
+    }
+
     /**
      * Fetch all the data
      * 
@@ -63,13 +66,13 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
         dispatch(actions.clearStats())
 
         if(selectedTab === 'Global') {
-            dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
+            dispatch(actions.fetchGlobalStats({daysAgo: daysAgo, sort}))
         } else if(selectedTab === 'US') {
-            dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
+            dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo, sort}))
         } else if(selectedTab === 'US_Counties') {
-            dispatch(actions.fetchUSCountiesStats({daysAgo: daysAgo, filterRegion: filterRegion}))
+            dispatch(actions.fetchUSCountiesStats({daysAgo: daysAgo, filterRegion: filterRegion, sort}))
         }
-    }, [dispatch, daysAgo, selectedTab, filterRegion])
+    }, [dispatch, daysAgo, selectedTab, filterRegion, sort])
 
     // useInterval(() => {
     //     if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
@@ -121,9 +124,9 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
             </Notification>
 
             <Tab.Group size="large">
-                <Tab active={selectedTab === 'Global'} onClick={() => { setStatsForGraph([]); setSelectedTab('Global')}}>Global</Tab>
-                <Tab active={selectedTab === 'US'} onClick={() => { setStatsForGraph([]); setSelectedTab('US')}}>United States</Tab>
-                <Tab active={selectedTab === 'US_Counties'} onClick={() => { setStatsForGraph([]); setSelectedTab('US_Counties')}}>U.S. Counties</Tab>
+                <Tab active={selectedTab === 'Global'} onClick={() => { setStatsForGraph([]); setSelectedTab('Global'); setSort('confirmed')}}>Global</Tab>
+                <Tab active={selectedTab === 'US'} onClick={() => { setStatsForGraph([]); setSelectedTab('US'); setSort('confirmed')}}>United States</Tab>
+                <Tab active={selectedTab === 'US_Counties'} onClick={() => { setStatsForGraph([]); setSelectedTab('US_Counties'); setSort('confirmed')}}>U.S. Counties</Tab>
             </Tab.Group>
 
 
@@ -134,6 +137,8 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                     redirectToExternalLink={redirectToExternalLink}    
                     isExternalLinkAvailable={isExternalLinkAvailable}
                     renderDisplay={renderDisplay}
+                    sort={sort}
+                    onSort={handleSort}
                 />
             
             }
@@ -144,6 +149,8 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                     redirectToExternalLink={redirectToExternalLink}    
                     isExternalLinkAvailable={isExternalLinkAvailable}
                     renderDisplay={renderDisplay}
+                    sort={sort}
+                    onSort={handleSort}
                 />
 
             }
@@ -156,6 +163,8 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                     renderDisplay={renderDisplay}
                     filterRegion={filterRegion}
                     onSelectedFilter={handleSelectedFilter}
+                    sort={sort}
+                    onSort={handleSort}
                 />
             
             }

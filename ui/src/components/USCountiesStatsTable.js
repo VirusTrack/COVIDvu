@@ -4,9 +4,11 @@ import numeral from 'numeral'
 
 import { Select, Level, Title, Generic, Table } from 'rbx'
 
+import { ColumnSortIcon } from './ColumnSortIcon'
+
 import { US_STATES_WITH_ABBREVIATION } from '../constants'
 
-export const USCountiesStatsTable = ({filterRegion = '', statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, onSelectedFilter}) => {
+export const USCountiesStatsTable = ({filterRegion = '', statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, onSelectedFilter, sort, onSort}) => {
 
     const [selectedState, setSelectedState] = useState(filterRegion)
 
@@ -39,11 +41,17 @@ export const USCountiesStatsTable = ({filterRegion = '', statsForGraph, redirect
                     <Table.Heading>
                         Region
                     </Table.Heading>
-                    <Table.Heading>
+                    <Table.Heading onClick={() => { onSort('confirmed') }} style={{ cursor: 'pointer'}}>
                         Total Cases
+                        {sort === 'confirmed' &&
+                            <ColumnSortIcon direction='desc' />
+                        }
                     </Table.Heading>
-                    <Table.Heading>
+                    <Table.Heading onClick={() => { onSort('deaths')}} style={{ cursor: 'pointer'}}>
                         Deaths
+                        {sort === 'deaths' &&
+                            <ColumnSortIcon direction='desc' />
+                        }
                     </Table.Heading>
                 </Table.Row>
             </Table.Head>

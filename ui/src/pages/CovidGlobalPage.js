@@ -12,7 +12,7 @@ export const CovidGlobalPage = () => {
     
     const { search } = useLocation()
 
-    const validGraphs = ['Confirmed', 'Deaths', 'Recovered', 'Mortality', 'Recovery']
+    const validGraphs = ['Cases', 'Deaths', 'Recovered', 'Mortality', 'Recovery']
 
     let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
 
