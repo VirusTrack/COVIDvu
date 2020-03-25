@@ -459,8 +459,8 @@ def _parseBoundary3(jsCSSEReportPath=JH_CSSE_REPORT_PATH, targetReportName='Conf
         reportUSConfirmed = reportUS[['Province_State', targetReportName]].groupby('Province_State').sum()
         reportUSConfirmed = _transformReport(reportUSConfirmed, date)
         casesUSStates.append(reportUSConfirmed)
-
     casesUSStates = pd.concat(casesUSStates)
+    casesUSStates['!Total US'] = casesUSStates.loc[:, casesUSStates.columns != 'Unassigned'].sum(axis=1)
     return casesUSStates
 
 
