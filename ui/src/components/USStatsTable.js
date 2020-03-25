@@ -1,10 +1,19 @@
 import React from 'react'
+import { Icon } from 'rbx'
 
 import numeral from 'numeral'
 
 import { Title, Generic, Table } from 'rbx'
 
+import imgAngleDown from '../images/fa-icon-angle-down.svg'
+import imgAngleUp from '../images/fa-icon-angle-up.svg'
+
 export const USStatsTable = ({statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay}) => {
+
+    const toggleSorting = () => {
+        return false
+    }
+
     return (
 
         <div className="table-container">
@@ -14,11 +23,13 @@ export const USStatsTable = ({statsForGraph, redirectToExternalLink, isExternalL
                     <Table.Heading>
                         Region
                     </Table.Heading>
-                    <Table.Heading>
+                    <Table.Heading onClick={toggleSorting}>
                         Total Cases
+                        <Icon size="small" style={{marginLeft: '.5rem', opacity: '.83'}}><img src={imgAngleDown} /></Icon>
                     </Table.Heading>
                     <Table.Heading>
                         New Cases
+                        <Icon size="small" style={{marginLeft: '.5rem', opacity: '.83'}}><img src={imgAngleUp} /></Icon>
                     </Table.Heading>
                     <Table.Heading tooltipPosition="bottom" tooltip="Total not-for-profit beds available in each state">
                         Total Hospital Beds
