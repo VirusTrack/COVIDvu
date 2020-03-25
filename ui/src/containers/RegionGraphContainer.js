@@ -2,18 +2,17 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useHistory, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 
-import queryString from 'query-string'
+import { useHandleHistory } from '../hooks/nav'
 
 import { actions } from '../ducks/services'
 
-import { Tab, Message } from "rbx"
+import { Message } from "rbx"
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
-import GraphWithLoader from '../components/GraphWithLoader'
+import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
-import GraphScaleControl from '../components/GraphScaleControl'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
@@ -23,8 +22,8 @@ const countriesRegions = require('../constants/countries_regions.json');
 export const RegionGraphContainer = ({region, uniqueRegion = [], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
-    const history = useHistory()
     const { search } = useLocation()
+    const handleHistory = useHandleHistory(`/covid/region/${region}`)
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [selectedRegions, setSelectedRegions] = useState(uniqueRegion)
@@ -50,16 +49,6 @@ export const RegionGraphContainer = ({region, uniqueRegion = [], graph = 'Cases'
             setRegionNotFound(true)
         }
     }, [dispatch, region, showLog])
-
-    const handleHistory = (regions, graph, showLog) => {
-        const query = queryString.stringify({
-            region: regions,
-            graph,
-            showLog
-        })
-
-        history.replace(`/covid/region/${region}?${query}`)
-    }
 
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
@@ -119,47 +108,16 @@ export const RegionGraphContainer = ({region, uniqueRegion = [], graph = 'Cases'
 
                 </>
 
-                <>
-                    <Tab.Group size="large" kind="boxed">
-                        <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
-                        <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                        <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
-                    </Tab.Group>
-
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={secondaryGraph}
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Cases"
-                        secondaryGraph={secondaryGraph}
-                        graph={confirmed}
-                        selected={selectedRegions}
-                        showLog={showLog}
-                        y_title="Total confirmed cases"
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Deaths"
-                        secondaryGraph={secondaryGraph}
-                        graph={deaths}
-                        selected={selectedRegions}
-                        showLog={showLog}
-                        y_title="Number of deaths"
-                    />        
-
-                    <GraphWithLoader 
-                        graphName="Mortality"
-                        secondaryGraph={secondaryGraph}
-                        graph={mortality}
-                        selected={selectedRegions}
-                        y_type="percent"
-                        y_title="Mortality Rate Percentage"
-                    />
-            
-                </>
+                <TabbedCompareGraphs
+                    secondaryGraph={secondaryGraph}
+                    confirmed={confirmed}
+                    deaths={deaths}
+                    mortality={mortality}
+                    selected={selectedRegions}
+                    handleSelectedGraph={handleSelectedGraph}
+                    handleGraphScale={handleGraphScale}
+                    showLog={showLog}
+                />
 
             </TwoGraphLayout>
         </BoxWithLoadingIndicator>

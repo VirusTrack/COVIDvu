@@ -3,7 +3,6 @@
 # vim: set fileencoding=utf-8:
 
 
-from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import dumpJSON
 
 import json
@@ -15,6 +14,7 @@ import os
 COUNTIES_US_FILE       = 'counties-US-all.json'
 COUNTY_CASES_CSBS_FILE = 'counties-US-all-20200324.json'
 SITE_RESOURCES         = 'resources'
+STATE_OR_PROVINCE_KEY  = 'province'
 
 
 # --- main ---
@@ -30,7 +30,7 @@ def processCounties( siteResources  = SITE_RESOURCES,
 
     dataset = dict()
     for region in regions:
-        state = region['state']
+        state = region[STATE_OR_PROVINCE_KEY]
         if state not in dataset:
             dataset[state] = dict()
 

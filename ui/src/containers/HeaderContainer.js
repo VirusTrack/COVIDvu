@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { useHistory, useLocation } from "react-router-dom"
-
 import { useDispatch } from 'react-redux'
 
 import { actions } from '../ducks/services'
@@ -12,6 +11,7 @@ import LogoElement from '../components/LogoElement'
 import store from 'store2'
 
 import { 
+    GOOGLE_ANALYTICS_KEY,
     LAST_UPDATE_KEY, 
     GLOBAL_KEY, 
     CONTINENTAL_KEY,
@@ -39,8 +39,8 @@ export const HeaderContainer = () => {
 
     const selectedNav = location.pathname
 
-    ReactGA.initialize('UA-574325-5');
-    ReactGA.pageview(window.location.pathname + window.location.search);
+    ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
+    ReactGA.pageview(window.location.pathname + window.location.search)
 
     const forceRefresh = () => {
         store.session.remove(LAST_UPDATE_KEY)
