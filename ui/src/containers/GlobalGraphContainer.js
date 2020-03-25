@@ -2,25 +2,23 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch } from 'react-redux'
 
-import { useHistory, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 
 import { useInterval } from '../hooks/ui'
+import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
-
-import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Level } from "rbx"
+import { Tag, Level } from "rbx"
 
 import { COUNTRIES, CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 import numeral from 'numeral'
 import store from 'store2'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
-import GraphWithLoader from '../components/GraphWithLoader'
+import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
-import GraphScaleControl from '../components/GraphScaleControl'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
@@ -28,8 +26,9 @@ import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
-    const history = useHistory()
     const { search } = useLocation()
+
+    const handleHistory = useHandleHistory('/covid')
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [selectedCountries, setSelectedCountries] = useState(region)
@@ -69,16 +68,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-    const handleHistory = (region, graph, showLog) => {
-        const query = queryString.stringify({
-            region,
-            graph,
-            showLog
-        })
-
-        history.replace(`/covid?${query}`)
-    }
 
     useEffect(() => {
         if(confirmed) {
@@ -146,47 +135,16 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
                 </>
 
-                <>
-                    <Tab.Group size="large" kind="boxed">
-                        <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
-                        <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                        <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
-                    </Tab.Group>
-
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={secondaryGraph}
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Cases"
-                        secondaryGraph={secondaryGraph}
-                        graph={confirmed}
-                        selected={selectedCountries}
-                        showLog={showLog}
-                        y_title="Total confirmed cases"
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Deaths"
-                        secondaryGraph={secondaryGraph}
-                        graph={deaths}
-                        selected={selectedCountries}
-                        showLog={showLog}
-                        y_title="Number of deaths"
-                    />        
-
-                    <GraphWithLoader 
-                        graphName="Mortality"
-                        secondaryGraph={secondaryGraph}
-                        graph={mortality}
-                        selected={selectedCountries}
-                        y_type="percent"
-                        y_title="Mortality Rate Percentage"
-                    />
-            
-                </>
+                <TabbedCompareGraphs
+                    secondaryGraph={secondaryGraph}
+                    confirmed={confirmed}
+                    deaths={deaths}
+                    mortality={mortality}
+                    selected={selectedCountries}
+                    handleSelectedGraph={handleSelectedGraph}
+                    handleGraphScale={handleGraphScale}
+                    showLog={showLog}
+                />
 
                 <>
                     <Level>

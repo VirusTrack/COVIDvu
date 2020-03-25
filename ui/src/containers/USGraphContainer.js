@@ -1,35 +1,33 @@
 import React, { useEffect, useState } from 'react'
 
 import { useDispatch } from 'react-redux'
-import { useHistory, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 
 import { useInterval } from '../hooks/ui'
+import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
 
-import queryString from 'query-string'
 import numeral from 'numeral'
 import store from 'store2'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Tab, Notification, Generic, Title } from "rbx"
+import { Tag, Notification, Generic, Title } from "rbx"
 
 import { REGION_URLS, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
+import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
-import GraphWithLoader from '../components/GraphWithLoader'
-
-import GraphScaleControl from '../components/GraphScaleControl'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-export const USGraphContainer = ({region = [], graph = 'Confirmed', showLogParam = false}) => {
+export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
-    const history = useHistory()
     const { search } = useLocation()
+    const handleHistory = useHandleHistory('/covid/us')
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [selectedStates, setSelectedStates] = useState(region)
@@ -56,9 +54,13 @@ export const USGraphContainer = ({region = [], graph = 'Confirmed', showLogParam
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
         if(sortedConfirmed && region.length === 0) {
+            console.dir(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
             setSelectedStates(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
         }
     }, [sortedConfirmed])
+
+    console.dir(region)
+    // console.dir(sortedConfirmed)
 
     useEffect(() => {
         dispatch(actions.fetchUSStates())
@@ -76,16 +78,6 @@ export const USGraphContainer = ({region = [], graph = 'Confirmed', showLogParam
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-    const handleHistory = (region, graph, showLog) => {        
-        const query = queryString.stringify({
-            region,
-            graph,
-            showLog
-        })
-
-        history.replace(`/covid/us?${query}`)
-    }
 
     useEffect(() => {
         if(confirmed) {
@@ -139,47 +131,16 @@ export const USGraphContainer = ({region = [], graph = 'Confirmed', showLogParam
                     />
                 </>
 
-                <>
-                    <Tab.Group size="large" kind="boxed">
-                        <Tab active={secondaryGraph === 'Confirmed'} onClick={() => { handleSelectedGraph('Confirmed')}}>Confirmed</Tab>
-                        <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                        <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
-                    </Tab.Group>
-
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={secondaryGraph}
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Confirmed"
-                        secondaryGraph={secondaryGraph}
-                        graph={confirmed}
-                        selected={selectedStates}
-                        showLog={showLog}
-                        y_title="Total confirmed cases"
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Deaths"
-                        secondaryGraph={secondaryGraph}
-                        graph={deaths}
-                        selected={selectedStates}
-                        showLog={showLog}
-                        y_title="Number of deaths"
-                    />
-                
-                    <GraphWithLoader 
-                        graphName="Mortality"
-                        secondaryGraph={secondaryGraph}
-                        graph={mortality}
-                        selected={selectedStates}
-                        showLog={showLog}
-                        y_type='percent'
-                        y_title="Mortality Rate Percentage"
-                    />
-                </>
+                <TabbedCompareGraphs
+                    secondaryGraph={secondaryGraph}
+                    confirmed={confirmed}
+                    deaths={deaths}
+                    mortality={mortality}
+                    selected={selectedStates}
+                    handleSelectedGraph={handleSelectedGraph}
+                    handleGraphScale={handleGraphScale}
+                    showLog={showLog}
+                />
 
                 <>
                 { !showLog &&

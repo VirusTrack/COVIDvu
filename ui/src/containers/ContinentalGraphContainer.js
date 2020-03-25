@@ -2,26 +2,22 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch } from 'react-redux'
 
-import { useHistory, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 
 import { useInterval } from '../hooks/ui'
+import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
-
-import queryString from 'query-string'
 
 import { actions } from '../ducks/services'
 
-import { Tab } from "rbx"
-
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
-import GraphWithLoader from '../components/GraphWithLoader'
+import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
 import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 
 import store from 'store2'
 
-import GraphScaleControl from '../components/GraphScaleControl'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
@@ -29,8 +25,8 @@ import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
-    const history = useHistory()
     const { search } = useLocation()
+    const handleHistory = useHandleHistory('/covid/continental')
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [selectedContinents, setSelectedContinents] = useState(region)
@@ -64,16 +60,6 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-    const handleHistory = (region, graph, showLog) => {
-        const query = queryString.stringify({
-            region,
-            graph,
-            showLog
-        })
-
-        history.replace(`/covid/continental?${query}`)
-    }
 
     const handleSelectedRegion = (regionList) => {
         setSelectedContinents(regionList)
@@ -112,47 +98,17 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
                     defaultSelected={region}
                     showLog={showLog}
                 />
-                    
-                <>
-                    <Tab.Group size="large" kind="boxed">
-                        <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
-                        <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                        <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
-                    </Tab.Group>
 
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={secondaryGraph}
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Cases"
-                        secondaryGraph={secondaryGraph}
-                        graph={confirmed}
-                        selected={selectedContinents}
-                        showLog={showLog}
-                        y_title="Total confirmed cases"
-                    />
-
-                    <GraphWithLoader 
-                        graphName="Deaths"
-                        secondaryGraph={secondaryGraph}
-                        graph={deaths}
-                        selected={selectedContinents}
-                        showLog={showLog}
-                        y_title="Number of deaths"
-                    />        
-
-                    <GraphWithLoader 
-                        graphName="Mortality"
-                        secondaryGraph={secondaryGraph}
-                        graph={mortality}
-                        selected={selectedContinents}
-                        y_type="percent"
-                        y_title="Mortality Rate Percentage"
-                    />
-                </>
+                <TabbedCompareGraphs
+                    secondaryGraph={secondaryGraph}
+                    confirmed={confirmed}
+                    deaths={deaths}
+                    mortality={mortality}
+                    selected={selectedContinents}
+                    handleSelectedGraph={handleSelectedGraph}
+                    handleGraphScale={handleGraphScale}
+                    showLog={showLog}
+                />
 
             </TwoGraphLayout>
         </BoxWithLoadingIndicator>
