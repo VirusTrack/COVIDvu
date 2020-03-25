@@ -479,6 +479,7 @@ export function* fetchUSStatesStats({payload}) {
     const dataService = new DataService()
 
     let daysAgo = 0
+    let sort = "confirmed"
     if(payload && payload.daysAgo && !isNaN(daysAgo)) {
         daysAgo = payload.daysAgo
     }
@@ -522,13 +523,16 @@ export function* fetchUSStatesStats({payload}) {
         const recoveredCounts = extractLatestCounts(recovered, daysAgo)
         const mortalityCounts = extractLatestCounts(mortality, daysAgo)
         const recoveryCounts = extractLatestCounts(recovery, daysAgo)
+
         const sortedConfirmed = confirmedCounts.sort((a, b) => b.stats - a.stats)
 
+        console.dir(deathsCounts)
         const deathByRegionKey = deathsCounts.reduce((obj, item) => {
             obj[item.region] = item
             return obj
         }, {})
 
+        console.dir(deathByRegionKey)
         const recoveredByRegionKey = recoveredCounts.reduce((obj, item) => {
             obj[item.region] = item
             return obj
