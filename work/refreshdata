@@ -169,7 +169,7 @@ function patchJSONFiles {
         ls -Alrt "$SITE_DATA_DIR"/*html
 
         echo "vudpatch - patching stale JH CSSE data with latest, calculated updates"
-        python -m covidvu.pipeline.vudpatch confirmed deaths recovered
+        python -m covidvu.pipeline.vudpatch confirmed deaths
         ls -Alrt "$SITE_DATA_DIR"/*json
     fi
 } # patchJSONFiles
@@ -222,7 +222,7 @@ resetSiteData "$1"
 assertCOVID19DirExists
 updateCOVID19DataSources
 generateVirusUpdateJSONFiles
-generateHospitalBedsJSONFiles
+# generateHospitalBedsJSONFiles
 generateCountiesUSJSONFile
 patchJSONFiles "$2"
 packJSONFiles
