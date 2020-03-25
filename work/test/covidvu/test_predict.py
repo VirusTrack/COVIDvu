@@ -37,11 +37,17 @@ from covidvu.predict import getSavedShortCountryNames
 from pandas.core.frame import DataFrame
 
 # *** constants ***
-TEST_JH_CSSE_DATA_HOME           = join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
-                                           'csse_covid_19_time_series')
-TEST_SITE_DATA                   = join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_FILE_CONFIRMED      = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed.csv')
-TEST_JH_CSSEFILE_CONFIRMED_SMALL = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed-small.csv')
+TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_time_series')
+TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
+TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
+TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
+TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
+TEST_JH_CSSE_FILE_RECOVERED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
+TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
+TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test_site_data')
+TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_daily_reports')
+
+TEST_JH_CSSEFILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Confirmed-small.csv')
 
 # *** functions ***
 def _purge(purgeDirectory, pattern):
@@ -69,7 +75,9 @@ def test_predictLogisticGrowth():
                                        nBurn               = 0,
                                        nDaysPredict        = 10,
                                        siteData            = TEST_SITE_DATA,
-                                       jhCSSEFileConfirmed = TEST_JH_CSSE_FILE_CONFIRMED,
+                                       jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+                                       jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+                                       jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
                                        )
     predictionIndex = pd.date_range(start = prediction['countryTSClean'].index[0],
                                     end   = prediction['countryTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D'),
@@ -203,6 +211,9 @@ def test__main():
               nChains             = 1,
               nBurn               = 0,
               nDaysPredict        = 10,
+              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
               )
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))

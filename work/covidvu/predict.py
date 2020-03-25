@@ -12,6 +12,10 @@ import json
 from covidvu.pipeline.vujson import dumpJSON
 from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
 from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
+from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED_DEPRECATED
+from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS_DEPRECATED
+from covidvu.pipeline.vujson import JH_CSSE_FILE_RECOVERED_DEPRECATED
+from covidvu.pipeline.vujson import JH_CSSE_REPORT_PATH
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import SITE_DATA
 
@@ -206,8 +210,12 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     if confirmedCases is None:
         confirmedCases = parseCSSE(target,
                                    siteData            = kwargs.get('siteData', SITE_DATA),
-                                   jhCSSEFileConfirmed = kwargs.get('jhCSSEFileConfirmed', JH_CSSE_FILE_CONFIRMED),
-                                   jhCSSEFileDeaths    = kwargs.get('jhCSSEFileDeaths', JH_CSSE_FILE_DEATHS),
+                                   jhCSSEFileConfirmed=kwargs.get('jhCSSEFileConfirmed',JH_CSSE_FILE_CONFIRMED),
+                                   jhCSSEFileDeaths=kwargs.get('jhCSSEFileDeaths',JH_CSSE_FILE_DEATHS),
+                                   jhCSSEFileConfirmedDeprecated=kwargs.get('jhCSSEFileConfirmedDeprecated',JH_CSSE_FILE_CONFIRMED_DEPRECATED),
+                                   jhCSSEFileDeathsDeprecated=kwargs.get('jhCSSEFileDeathsDeprecated',JH_CSSE_FILE_DEATHS_DEPRECATED),
+                                   jhCSSEFileRecoveredDeprecated=kwargs.get('jhCSSEFileRecoveredDeprecated',JH_CSSE_FILE_RECOVERED_DEPRECATED),
+                                   jsCSSEReportPath=kwargs.get('jsCSSEReportPath',JH_CSSE_REPORT_PATH),
                                    )[subGroup]
 
     if countryName is None:
