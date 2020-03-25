@@ -17,6 +17,60 @@ export const TabbedCompareGraphs = (
         handleGraphScale,
         showLog,
     }) => {
+    
+    const activeData = () => {
+        if(secondaryGraph === 'Cases') {
+            let newData = []
+
+            const firstHeader = Object.keys(confirmed)[0]
+            let headers = ['Country', ...Object.keys(confirmed[firstHeader])]
+
+            for(const country of Object.keys(confirmed)) {
+                if(selected.indexOf(country) !== -1) {
+                    newData.push([country, ...Object.values(confirmed[country])])
+                }
+            }
+
+            return {
+                headers: headers,
+                data: newData
+            }
+        } else if(secondaryGraph === 'Deaths') {
+            let newData = []
+
+            const firstHeader = Object.keys(deaths)[0]
+            let headers = ['Country', ...Object.keys(deaths[firstHeader])]
+
+            for(const country of Object.keys(deaths)) {
+                if(selected.indexOf(country) !== -1) {
+                    newData.push([country, ...Object.values(deaths[country])])
+                }
+            }
+
+            return {
+                headers: headers,
+                data: newData
+            }
+
+        } else if(secondaryGraph === 'Mortality') {
+            let newData = []
+
+            const firstHeader = Object.keys(mortality)[0]
+            let headers = ['Country', ...Object.keys(mortality[firstHeader])]
+
+            for(const country of Object.keys(mortality)) {
+                if(selected.indexOf(country) !== -1) {
+                    newData.push([country, ...Object.values(mortality[country])])
+                }
+            }
+
+            return {
+                headers: headers,
+                data: newData
+            }
+
+        }
+    }
 
     return (
         <>
@@ -35,7 +89,7 @@ export const TabbedCompareGraphs = (
                     />
                 </Level.Item>
                 <Level.Item align="right">
-                    <GraphDownloadButton />
+                    <GraphDownloadButton data={activeData()} />
                 </Level.Item>
             </Level>
 
