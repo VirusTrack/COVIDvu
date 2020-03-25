@@ -8,7 +8,7 @@ import { useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Title, Level, Heading, Container, Button, Box, Column } from "rbx"
+import { Generic, Tag, Title, Level, Heading, Container, Button, Box, Column } from "rbx"
 
 import GraphWithLoader from '../components/GraphWithLoader'
 import HeroElement from '../components/HeroElement'
@@ -172,13 +172,15 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         <Heading align="center">Top 10 Confirmed</Heading>
                         Cases by Country
                     </Title>
- 
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={globalTop10}
-                        align={graphControlsAlign}
-                    />
+
+                    <Generic style={{paddingBottom: '1rem'}}>
+                        <GraphScaleControl
+                            showLog={showLog}
+                            handleGraphScale={handleGraphScale}
+                            secondaryGraph={globalTop10}
+                            align={graphControlsAlign}
+                        />
+                    </Generic>
                     <GraphWithLoader 
                         graphName="Top 10 Confirmed Cases"
                         secondaryGraph="Top 10 Confirmed Cases"
@@ -197,12 +199,14 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         Cases by Continent
                     </Title>
                     
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={confirmedContinental}
-                        align={graphControlsAlign}
-                    />
+                    <Generic style={{marginBottom: '1rem'}}>
+                        <GraphScaleControl
+                            showLog={showLog}
+                            handleGraphScale={handleGraphScale}
+                            secondaryGraph={confirmedContinental}
+                            align={graphControlsAlign}
+                        />
+                    </Generic>
                     <GraphWithLoader 
                         graphName="continental_graph"
                         secondaryGraph="continental_graph"
@@ -281,12 +285,14 @@ export const DashboardContainer = ({showLogParam = false}) => {
             <Column className="chart">
                 <Title size={2} align="center"><Heading>Top 10 Confirmed</Heading>Cases by State</Title>
                 
-                <GraphScaleControl
+                <Generic style={{marginBottom: '1rem'}}>
+                    <GraphScaleControl
                         showLog={showLog}
                         handleGraphScale={handleGraphScale}
                         secondaryGraph={usStateNamesTop10}
                         align={graphControlsAlign}
                     />
+                </Generic>
                 <GraphWithLoader 
                     graphName="Top 10 Confirmed Cases"
                     secondaryGraph="Top 10 Confirmed Cases"
@@ -299,13 +305,14 @@ export const DashboardContainer = ({showLogParam = false}) => {
             <Column className="chart">
                 <Title size={2} align="center"><Heading>Top Coronavirus Cases</Heading>By U.S. Region</Title>
                 
-                
-                <GraphScaleControl
-                    showLog={showLog}
-                    handleGraphScale={handleGraphScale}
-                    secondaryGraph={confirmedUSRegions}
-                    align={graphControlsAlign}
-                />
+                <Generic style={{marginBottom: '1rem'}}>
+                    <GraphScaleControl
+                        showLog={showLog}
+                        handleGraphScale={handleGraphScale}
+                        secondaryGraph={confirmedUSRegions}
+                        align={graphControlsAlign}
+                    />
+                </Generic>
                 <GraphWithLoader 
                     graphName="Top Regions Cases"
                     secondaryGraph="Top Regions Cases"

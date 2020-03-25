@@ -9,10 +9,9 @@ export const GraphScaleControl = ({showLog, handleGraphScale, secondaryGraph, al
     }
 
     return (
-        <Generic as="div" align={align} style={{marginBottom: '1rem', fontSize: '1.4rem', display: 'flex', alignItems:'baseline', justifyContent: align}}>
-            Graph Scale: &nbsp;
-            <Button size="medium" outlined color={!showLog?"secondary":"default"} onClick={() => { if(showLog) { handleGraphScale(false) } }}>Linear</Button>
-            &nbsp;
+        <Generic as="div" align={align} >
+            <span style={{fontSize: '1.4rem'}}>Graph Scale:&nbsp;</span>
+            <Button size="medium" outlined color={!showLog?"secondary":"default"} onClick={() => { if(showLog) { handleGraphScale(false) } }}>Linear</Button>&nbsp; 
             <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" color={showLog?"secondary":"default"} outlined onClick={() => { if(!showLog) { handleGraphScale(true) } }}>Logarithmic</Button>
         </Generic>
     )
