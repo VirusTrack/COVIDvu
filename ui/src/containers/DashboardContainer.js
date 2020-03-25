@@ -16,6 +16,8 @@ import LogoElement from '../components/LogoElement'
 
 import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_CONTINENTAL_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
+import GraphScaleControl from '../components/GraphScaleControl'
+
 import numeral from 'numeral'
 
 import store from 'store2'
@@ -30,6 +32,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
     const history = useHistory()
 
     const [showLog, setShowLog] = useState(showLogParam)
+    const graphControlsAlign = 'center'
 
     useEffect(() => {
         dispatch(actions.fetchTop10Countries({
@@ -91,6 +94,10 @@ export const DashboardContainer = ({showLogParam = false}) => {
         return (
             <Title as="p" style={colorBasedOnChange}>{numeral(value).format('+0,0')}</Title>
         )
+    }
+
+    const handleGraphScale = (logScale) => {
+        setShowLog(logScale)
     }
 
     return (
@@ -165,6 +172,13 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         <Heading align="center">Top 10 Confirmed</Heading>
                         Cases by Country
                     </Title>
+ 
+                    <GraphScaleControl
+                        showLog={showLog}
+                        handleGraphScale={handleGraphScale}
+                        secondaryGraph={globalTop10}
+                        align={graphControlsAlign}
+                    />
                     <GraphWithLoader 
                         graphName="Top 10 Confirmed Cases"
                         secondaryGraph="Top 10 Confirmed Cases"
@@ -172,6 +186,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         showLog={showLog}
                         selected={globalNamesTop10}
                     />
+                    
                 </Container>
             </Column>
 
@@ -181,6 +196,13 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         <Heading align="center">Top 10 Confirmed</Heading>
                         Cases by Continent
                     </Title>
+                    
+                    <GraphScaleControl
+                        showLog={showLog}
+                        handleGraphScale={handleGraphScale}
+                        secondaryGraph={confirmedContinental}
+                        align={graphControlsAlign}
+                    />
                     <GraphWithLoader 
                         graphName="continental_graph"
                         secondaryGraph="continental_graph"
@@ -189,6 +211,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         selected={['North America', 'Asia', 'Europe', 'South America']}
                         style={{width: '100%', height: '100%'}}
                     />
+                    
                 </Container>
             </Column>
 
@@ -251,11 +274,19 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         </div>
                     </Level.Item>               
                 </Level>
+                
             </Container>
             </Column>
 
             <Column className="chart">
                 <Title size={2} align="center"><Heading>Top 10 Confirmed</Heading>Cases by State</Title>
+                
+                <GraphScaleControl
+                        showLog={showLog}
+                        handleGraphScale={handleGraphScale}
+                        secondaryGraph={usStateNamesTop10}
+                        align={graphControlsAlign}
+                    />
                 <GraphWithLoader 
                     graphName="Top 10 Confirmed Cases"
                     secondaryGraph="Top 10 Confirmed Cases"
@@ -267,6 +298,14 @@ export const DashboardContainer = ({showLogParam = false}) => {
 
             <Column className="chart">
                 <Title size={2} align="center"><Heading>Top Coronavirus Cases</Heading>By U.S. Region</Title>
+                
+                
+                <GraphScaleControl
+                    showLog={showLog}
+                    handleGraphScale={handleGraphScale}
+                    secondaryGraph={confirmedUSRegions}
+                    align={graphControlsAlign}
+                />
                 <GraphWithLoader 
                     graphName="Top Regions Cases"
                     secondaryGraph="Top Regions Cases"
@@ -274,6 +313,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                     showLog={showLog}
                     selected={['Midwest', 'Northeast', 'South', 'West']}
                 />
+                
             </Column>
             </Column.Group>
 
