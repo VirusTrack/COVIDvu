@@ -125,7 +125,6 @@ export const initialState = {
 }
 
 export default function (state = initialState, action) {
-    // const message = action && action.error ? action.error.message : null
     switch (action.type) {
         case types.CLEAR_GRAPHS:
             return {

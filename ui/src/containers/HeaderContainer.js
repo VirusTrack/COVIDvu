@@ -77,11 +77,12 @@ export const HeaderContainer = () => {
 
     return (
         <>
-        <Notification color="warning" style={{marginBottom: '0'}}>
-            Unfortunately data coming in from one of our data sources has changed format this morning. Our volunteer team is in the middle of fixing this linkage and
-            it will be resolved shortly. Thank you for your patience!
-        </Notification>
-
+        { false &&
+            <Notification color="warning" style={{marginBottom: '0'}}>
+                Unfortunately data coming in from one of our data sources has changed format this morning. Our volunteer team is in the middle of fixing this linkage and
+                it will be resolved shortly. Thank you for your patience!
+            </Notification>
+        }
         <Navbar>
             <Navbar.Brand>
                 <Navbar.Item onClick={() => { changePage('/dashboard') }}>
