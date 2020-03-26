@@ -21,13 +21,19 @@ pd.options.mode.chained_assignment = None
 # *** constants ***
 
 JH_CSSE_DATA_HOME                  = 'COVID-19'
+
+# -- 20200325 - CSSE broke this again:
+JH_CSSE_ARCHIVED_PATH              = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOME), 'archived_data/archived_time_series')
+JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(JH_CSSE_ARCHIVED_PATH, 'time_series_19-covid-Confirmed_archived_0325.csv')
+JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(JH_CSSE_ARCHIVED_PATH, 'time_series_19-covid-Deaths_archived_0325.csv')
+JH_CSSE_FILE_RECOVERED_DEPRECATED  = os.path.join(JH_CSSE_ARCHIVED_PATH, 'time_series_19-covid-Recovered_archived_0325.csv')
+
 JH_CSSE_PATH                       = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOME), 'csse_covid_19_data/csse_covid_19_time_series')
 JH_CSSE_FILE_CONFIRMED             = os.path.join(JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
 JH_CSSE_FILE_DEATHS                = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
-JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
-JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
-JH_CSSE_FILE_RECOVERED_DEPRECATED  = os.path.join(JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
+
 JH_CSSE_REPORT_PATH                = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOME), 'csse_covid_19_data/csse_covid_19_daily_reports')
+
 SITE_DATA                          = './site-data'
 STATE_CODES_PATH                   = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 
