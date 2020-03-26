@@ -7,6 +7,7 @@ from covidvu.pipeline.vudpatch import fetchJSONData
 from covidvu.pipeline.vuhospitals import loadUSHospitalBedsCount
 from covidvu.pipeline.vujson import SITE_DATA
 
+import collections
 import json
 import os
 
@@ -35,11 +36,21 @@ def loadUSCounties(siteDataDirectory = SITE_DATA, datasetFile = COUNTIES_US_FILE
     return payload
 
 
+def sortByDate(dataset):
+    result = dict()
+    for cases in dataset.keys():
+        ordered = collections.OrderedDict(sorted(dataset[cases].items()))
+        result[cases] = ordered
+
+    return result
+
+
 def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, reports = REPORTS):
     packedDataset  = dict()
     outputFileName = os.path.join(siteDataDirectory, groupings[grouping]+'.json')
     for report in reports:
-        packedDataset[report] = fetchJSONData(report, grouping, siteDataDirectory)
+        dataset = sortByDate(fetchJSONData(report, grouping, siteDataDirectory))
+        packedDataset[report] = dataset
 
         if '-US' == grouping and 'confirmed' == report:
             packedDataset['hospitalBeds'] = loadUSHospitalBedsCount(siteDataDirectory)
