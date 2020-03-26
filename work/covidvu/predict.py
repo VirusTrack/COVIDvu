@@ -214,7 +214,6 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                                    jhCSSEFileDeaths=kwargs.get('jhCSSEFileDeaths',JH_CSSE_FILE_DEATHS),
                                    jhCSSEFileConfirmedDeprecated=kwargs.get('jhCSSEFileConfirmedDeprecated',JH_CSSE_FILE_CONFIRMED_DEPRECATED),
                                    jhCSSEFileDeathsDeprecated=kwargs.get('jhCSSEFileDeathsDeprecated',JH_CSSE_FILE_DEATHS_DEPRECATED),
-                                   jhCSSEFileRecoveredDeprecated=kwargs.get('jhCSSEFileRecoveredDeprecated',JH_CSSE_FILE_RECOVERED_DEPRECATED),
                                    jsCSSEReportPath=kwargs.get('jsCSSEReportPath',JH_CSSE_REPORT_PATH),
                                    )[subGroup]
 
@@ -335,8 +334,11 @@ def _main(countryTrainIndex,
           predictionsPercentiles = PREDICTIONS_PERCENTILES,
           siteData               = SITE_DATA,
           subGroup               = 'casesGlobal',
-          jhCSSEFileConfirmed = JH_CSSE_FILE_CONFIRMED,
-          jhCSSEFileDeaths    = JH_CSSE_FILE_DEATHS,
+          jhCSSEFileConfirmed=JH_CSSE_FILE_CONFIRMED,
+          jhCSSEFileDeaths=JH_CSSE_FILE_DEATHS,
+          jhCSSEFileConfirmedDeprecated=JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+          jhCSSEFileDeathsDeprecated=JH_CSSE_FILE_DEATHS_DEPRECATED,
+          jsCSSEReportPath=JH_CSSE_REPORT_PATH,
           **kwargs
           ):
     """
@@ -370,10 +372,12 @@ def _main(countryTrainIndex,
 
     elif countryTrainIndex == 'all':
         confirmedCases = parseCSSE(target,
-                                   siteData            = siteData,
-                                   jhCSSEFileConfirmed = jhCSSEFileConfirmed,
-                                   jhCSSEFileDeaths    = jhCSSEFileConfirmed,
-                                   jhCSSEFileRecovered = jhCSSEFileDeaths,
+                                   siteData                      = siteData,
+                                   jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
+                                   jhCSSEFileDeaths              = jhCSSEFileDeaths,
+                                   jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
+                                   jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
+                                   jsCSSEReportPath=jsCSSEReportPath,
                                    )[subGroup]
         countriesAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
         for countryName in countriesAll:

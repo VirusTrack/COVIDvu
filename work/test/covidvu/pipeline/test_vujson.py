@@ -16,6 +16,8 @@ from covidvu.pipeline.vujson import _parseBoundary2
 from covidvu.pipeline.vujson import _readSourceDeprecated
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import resolveReportFileName
+from covidvu.pipeline.vujson import _getReportsToLoadBoundary3
+from covidvu.pipeline.vujson import _parseGlobal
 
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.datetimes import DatetimeIndex
@@ -188,11 +190,28 @@ def test__combineCollection():
     pass
 
 def test__getReportsToLoadBoundary3():
-    # TODO: JA 20200325
-    pass
+    reportsToLoad = _getReportsToLoadBoundary3(jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH)
+    assert len(reportsToLoad) == 2
+
 
 def test__parseGlobal():
-    # TODO: JA 20200325
+    casesGlobal, casesBoats = _parseGlobal(TEST_JH_CSSE_FILE_CONFIRMED)
+    assert "!Global" in casesGlobal.columns
+    assert "!Outside China" in casesGlobal.columns
+    assert isinstance(casesGlobal, DataFrame)
+    assert isinstance(casesGlobal.index[0], date)
+    assert (casesGlobal.loc[:, casesGlobal.columns.map(lambda c: c[0] != '!')].sum(axis=1) == casesGlobal[
+        "!Global"]).all()
+    assert (casesGlobal.loc[:, casesGlobal.columns.map(lambda c: c[0] != '!' and c != 'China')].sum(axis=1) ==
+            casesGlobal[
+                "!Outside China"]).all()
+    assert isinstance(casesBoats, DataFrame)
+    assert isinstance(casesBoats.index[0], date)
+    assert (casesBoats.columns.isin(BOATS)).all()
+
+
+def test__parseBoundary3():
+    # TODO: JA 20200326
     pass
 
 
