@@ -21,7 +21,7 @@ GROUPINGS = {
                 '-US'        : 'bundle-US',
                 '-US-Regions': 'bundle-US-Regions',
             }
-REPORTS   = ( 'confirmed', 'deaths', 'recovered', )
+REPORTS   = ( 'confirmed', 'deaths', )
 
 
 # +++ functions +++
@@ -42,7 +42,7 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
         packedDataset[report] = fetchJSONData(report, grouping, siteDataDirectory)
 
         if '-US' == grouping and 'confirmed' == report:
-            packedDataset['hospitalBeds'] = loadUSHospitalBedsCount(siteDataDirectory)
+            # TODO: packedDataset['hospitalBeds'] = loadUSHospitalBedsCount(siteDataDirectory)
             packedDataset['allCounties']  = loadUSCounties(siteDataDirectory)
 
         # reportFileName = resolveReportFileName(siteDataDirectory, report, grouping)

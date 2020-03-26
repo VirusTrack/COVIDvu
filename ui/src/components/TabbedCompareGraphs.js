@@ -1,9 +1,10 @@
 import React from 'react'
 
-import { Tab } from 'rbx'
+import { Tab, Level, Notification } from 'rbx'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 import GraphScaleControl from '../components/GraphScaleControl'
+import GraphDownloadButton from '../components/GraphDownloadButton'
 
 export const TabbedCompareGraphs = (
     {
@@ -16,6 +17,63 @@ export const TabbedCompareGraphs = (
         handleGraphScale,
         showLog,
     }) => {
+    
+    const activeData = () => {
+        if(secondaryGraph === 'Cases') {
+            let newData = []
+
+            const firstHeader = Object.keys(confirmed)[0]
+            let headers = ['Country', ...Object.keys(confirmed[firstHeader])]
+
+            for(const country of Object.keys(confirmed)) {
+                if(selected.indexOf(country) !== -1) {
+                    let values = showLog ? Object.values(confirmed[country]).map(val => Math.log10(1+val)) : Object.values(confirmed[country])
+                    newData.push([country, ...values])
+                }
+            }
+
+            return {
+                headers: headers,
+                data: newData
+            }
+        } else if(secondaryGraph === 'Deaths') {
+            let newData = []
+
+            const firstHeader = Object.keys(deaths)[0]
+            let headers = ['Country', ...Object.keys(deaths[firstHeader])]
+
+            for(const country of Object.keys(deaths)) {
+                if(selected.indexOf(country) !== -1) {
+                    let values = showLog ? Object.values(deaths[country]).map(val => Math.log10(1+val)) : Object.values(deaths[country])
+                    newData.push([country, ...values])
+                }
+            }
+
+            return {
+                headers: headers,
+                data: newData
+            }
+
+        } else if(secondaryGraph === 'Mortality') {
+            let newData = []
+
+            const firstHeader = Object.keys(mortality)[0]
+            let headers = ['Country', ...Object.keys(mortality[firstHeader])]
+
+            for(const country of Object.keys(mortality)) {
+                if(selected.indexOf(country) !== -1) {
+                    let values = Object.values(mortality[country])
+                    newData.push([country, ...values])
+                }
+            }
+
+            return {
+                headers: headers,
+                data: newData
+            }
+
+        }
+    }
 
     return (
         <>
@@ -25,11 +83,18 @@ export const TabbedCompareGraphs = (
                 <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
             </Tab.Group>
 
-            <GraphScaleControl
-                showLog={showLog}
-                handleGraphScale={handleGraphScale}
-                secondaryGraph={secondaryGraph}
-            />
+            <Level className="TabbedCompareGraphs__controls">
+                <Level.Item align="left">
+                    <GraphScaleControl
+                        showLog={showLog}
+                        handleGraphScale={handleGraphScale}
+                        secondaryGraph={secondaryGraph}
+                    />
+                </Level.Item>
+                <Level.Item align="right">
+                    <GraphDownloadButton data={activeData()} />
+                </Level.Item>
+            </Level>
 
             <GraphWithLoader 
                 graphName="Cases"
@@ -39,6 +104,7 @@ export const TabbedCompareGraphs = (
                 showLog={showLog}
                 y_title="Total confirmed cases"
             />
+            
 
             <GraphWithLoader 
                 graphName="Deaths"
