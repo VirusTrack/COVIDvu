@@ -4,6 +4,7 @@
 
 from covidvu.pipeline.vujson import STATE_CODES_PATH
 from covidvu.pipeline.vujson import STATE_NAMES
+from covidvu.pipeline.vujson import STATE_NAMES_TO_DROP
 from covidvu.pipeline.vujson import PARSING_MODE_BOUNDARY_1
 from covidvu.pipeline.vujson import BOATS
 from covidvu.pipeline.vujson import US_REGIONS
@@ -26,15 +27,27 @@ import json
 
 
 # *** constants ***
-TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_time_series')
-TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
-TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
-TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
-TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
-TEST_JH_CSSE_FILE_RECOVERED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
+TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19',)
+
+TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_confirmed_global.csv')
+
+TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_deaths_global.csv')
+
+TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
+                                                       'time_series_19-covid-Confirmed_archived_0325.csv')
+
+TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
+                                                       'time_series_19-covid-Deaths_archived_0325.csv')
+
+
 TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_daily_reports')
+TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
+                                           'csse_covid_19_daily_reports')
 
 # *** functions ***
 def _purge(purgeDirectory, pattern):
@@ -96,6 +109,7 @@ def assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoa
     assert isinstance(casesUSStates, DataFrame)
     assert isinstance(casesUSStates.index[0], date)
     assert stateCodes.state.isin(casesUSStates.columns).all()
+    assert ~(casesUSStates.columns.isin(STATE_NAMES_TO_DROP)).any()
     assert (casesUSStates.loc[:, casesUSStates.columns.map(lambda c: c[0] != '!' and c != 'Unassigned')].sum(axis=1) ==
             casesUSStates[
                 "!Total US"]).all()
@@ -175,7 +189,7 @@ def test__getReportsToLoadBoundary3():
     # TODO: JA 20200325
     pass
 
-def test__parseBoundary3():
+def test__parseGlobal():
     # TODO: JA 20200325
     pass
 
