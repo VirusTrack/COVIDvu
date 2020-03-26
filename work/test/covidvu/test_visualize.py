@@ -121,7 +121,12 @@ def test_plotDataAndPredictionsWithCI():
               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
               )
 
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA)
+        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA,
+                                                                            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+                                                                            jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+                                                                            jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+                                                                            jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+                                                                            )
         _ = plotDataAndPredictionsWithCI(meanPredictionTSAll,
                                      confirmedCasesAll,
                                      percentilesTSAll,
