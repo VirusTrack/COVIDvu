@@ -59,7 +59,7 @@ resetpy: ALWAYS
 	rm -Rfv ./.Python ./bin ./build ./dist ./include ./lib
 
 
-# TODO:  Juvid - https://github.com/VirusTrack/COVIDvu/issues/318
+# TODO:  Juvid - https://github.com/VirusTrack/COVIDvu/issues/342
 #        There is #\t at the beginning of the line!
 #	pytest -v ./test/covidvu/test_predict.py
 #	pytest -v ./test/covidvu/test_visualize.py
@@ -70,9 +70,7 @@ test: ALWAYS
 	pytest -v ./test/covidvu/pipeline/test_vuhospitals.py
 	pytest -v ./test/covidvu/pipeline/test_vujson.py
 	pytest -v ./test/covidvu/pipeline/test_vuregions.py
-	pytest -v ./test/covidvu/test_predict.py
 	pytest -v ./test/covidvu/test_utils.py
-	pytest -v ./test/covidvu/test_visualize.py
 	pip uninstall -y $(MODULE)==$(VERSION) || true
 	rm -Rfv $$(find covidvu | awk '/__pycache__$$/')
 	rm -Rfv $$(find test | awk '/__pycache__$$/')

@@ -6,6 +6,7 @@
 from covidvu.pipeline.jsonpack import REPORTS
 from covidvu.pipeline.jsonpack import loadUSCounties
 from covidvu.pipeline.jsonpack import packDataset
+from covidvu.pipeline.jsonpack import sortByDate
 
 import json
 import os
@@ -55,8 +56,19 @@ def test_packDataset():
             assert 'Alabama' in packedDataset['hospitalBeds']
 
 
+def test_sortByDate():
+    dataset = {
+        'bogus': {
+            '2020-03-26': 42,
+            '2020-03-15': 69,
+        }
+    }
+    result = sortByDate(dataset)
+
+    x = tuple(result['bogus'].keys())[0]
+    assert tuple(result['bogus'].keys())[0] == '2020-03-15'
+
+
 def test_main():
     pass  # It runs, the meat is in the packDataset function
-
-test_loadUSCounties()
 
