@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { useLocation } from 'react-router'
 import queryString from 'query-string'
@@ -8,6 +8,8 @@ import MainLayout from '../layouts/MainLayout'
 
 import DashboardContainer from '../containers/DashboardContainer'
 
+import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+
 export const DashboardPage = () => {
  
     const { search } = useLocation()
@@ -16,6 +18,10 @@ export const DashboardPage = () => {
 
     let showLog = query.showLog === 'true' ? true : false
 
+    useEffect(() => {
+        document.title = `Dashboard | ${DEFAULT_DOCUMENT_TITLE}`        
+    }, [])
+    
     return (
         <MainLayout>
             <ErrorBoundary>

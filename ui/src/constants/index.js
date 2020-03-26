@@ -19,6 +19,8 @@ const US_REGIONS_KEY = 'covid-us-regions'
 
 const GOOGLE_ANALYTICS_KEY = 'UA-574325-5'
 
+const DEFAULT_DOCUMENT_TITLE = "COVID-19 Novel Coronavirus Data Visualization and Statistics"
+
 const COUNTRIES = [
   "!Global",
   "!Outside Mainland China",
@@ -409,6 +411,7 @@ const COUNTRIES = [
 
   export { 
     GOOGLE_ANALYTICS_KEY,
+    DEFAULT_DOCUMENT_TITLE,
     COUNTRIES,
     US_REGIONS,
     US_STATES,

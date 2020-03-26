@@ -22,10 +22,12 @@ import numeral from 'numeral'
 
 import store from 'store2'
 
-import moment from 'moment'
+import moment from 'moment-timezone'
 
 import globeImg from '../images/fa-icon-globe.svg'
 import usflagImg from '../images/fa-icon-usflag.svg'
+
+import ReactGA from 'react-ga';
 
 export const DashboardContainer = ({showLogParam = false}) => {
     const dispatch = useDispatch()
@@ -33,6 +35,8 @@ export const DashboardContainer = ({showLogParam = false}) => {
 
     const [showLog, setShowLog] = useState(showLogParam)
     const graphControlsAlign = 'center'
+
+    const [tzGuess, setTzGuess] = useState(moment.tz.guess())
 
     useEffect(() => {
         dispatch(actions.fetchTop10Countries({
@@ -91,13 +95,20 @@ export const DashboardContainer = ({showLogParam = false}) => {
 
         const colorBasedOnChange = value >= 0 ? redColor : greenColor
 
+        let renderedValue = value >= 0 ? numeral(value).format('+0,0') : "-"
+
         return (
-            <Title as="p" style={colorBasedOnChange}>{numeral(value).format('+0,0')}</Title>
+            <Title as="p" style={colorBasedOnChange}>{renderedValue}</Title>
         )
     }
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
+        ReactGA.event({
+            category: 'Dashboard',
+            action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`
+        })
+
     }
 
     return (
@@ -128,7 +139,8 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         <Level.Item textAlign="centered">
                             <div>
                             <Heading>Total Cases</Heading>
-                            <Title as="p">{numeral(globalStats.confirmed).format('0,0')}</Title>
+                            <Title as="p" style={{marginBottom: 0}}>{numeral(globalStats.confirmed).format('0,0')}</Title>
+                            <Heading>As of {moment(lastUpdate).format('YYYY-MM-DD')}</Heading>
                             </div>
                         </Level.Item>
                         
@@ -143,7 +155,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         </Level.Item>
                         <Level.Item textAlign="centered">
                             <div>
-                            <Heading>New Cases (as of today)</Heading>
+                            <Heading tooltip="Calculated from beginning of day GMT+0">New Cases (as of today)</Heading>
                             { renderChangeDifference(globalStats.newConfirmed)}
                             </div>
                         </Level.Item>
@@ -158,7 +170,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         </Level.Item>
                         <Level.Item textAlign="centered">
                             <div>
-                            <Heading>New Deaths (as of today)</Heading>
+                            <Heading tooltip="Calculated from beginning of day GMT+0">New Deaths (as of today)</Heading>
                             { renderChangeDifference(globalStats.newDeaths)}
                             </div>
                         </Level.Item>
@@ -242,7 +254,8 @@ export const DashboardContainer = ({showLogParam = false}) => {
                     <Level.Item textAlign="centered">
                         <div>
                         <Heading>Total Cases</Heading>
-                        <Title as="p">{numeral(usStatesStats.confirmed).format('0,0')}</Title>
+                        <Title as="p" style={{marginBottom: 5}}>{numeral(usStatesStats.confirmed).format('0,0')}</Title>
+                        <Heading>As of {moment(lastUpdate).format('YYYY-MM-DD')}</Heading>
                         </div>
                     </Level.Item>
                     
@@ -257,7 +270,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                     </Level.Item>
                     <Level.Item textAlign="centered">
                         <div>
-                        <Heading>New Cases (as of today)</Heading>
+                        <Heading tooltip="Calculated from beginning of day GMT+0">New Cases (as of today)</Heading>
                         { renderChangeDifference(usStatesStats.newConfirmed)}
                         </div>
                     </Level.Item>
@@ -273,7 +286,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
 
                     <Level.Item textAlign="centered">
                         <div>
-                        <Heading>New Deaths (as of today)</Heading>
+                        <Heading tooltip="Calculated from beginning of day GMT+0">New Deaths (as of today)</Heading>
                         { renderChangeDifference(usStatesStats.newDeaths)}
                         </div>
                     </Level.Item>               

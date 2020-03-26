@@ -79,7 +79,7 @@ export const HeaderContainer = () => {
         <>
         { false &&
             <Notification color="warning" style={{marginBottom: '0'}}>
-                Unfortunately data coming in from one of our data sources has changed format this morning. Our volunteer team is in the middle of fixing this linkage and
+                Due to problems with one of our data sources, all data on the site at the moment is for yesterday 03/25. Our amazing volunteer team is in the middle of fixing this linkage and
                 it will be resolved shortly. Thank you for your patience!
             </Notification>
         }

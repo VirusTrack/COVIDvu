@@ -280,10 +280,14 @@ const calculateMortality = (deaths, confirmed) => {
 }
 
 const extractLatestCounts = (stats, daysAgo = 0) => {
+
+    // const today = moment().subtract(0 + daysAgo, 'days').format("YYYY-MM-DD")
+    // const yesterday = moment().subtract(1 + daysAgo, 'days').format("YYYY-MM-DD")
+
     const regionWithLatestCounts = []
 
     for(const region of Object.keys(stats)) {
-        const dates = Object.keys(stats[region])
+        const dates = Object.keys(stats[region]).sort()
 
         const lastDate = dates[dates.length - daysAgo - 1]
 

@@ -3,7 +3,9 @@ import { Button } from 'rbx'
 
 import numeral from 'numeral'
 
-export const CheckboxRegionComponent = ({data, selected, handleSelected, defaultSelected = [], showLog = false}) => {
+import ReactGA from 'react-ga';
+
+export const CheckboxRegionComponent = ({data, selected, handleSelected, defaultSelected = [], showLog = false, parentRegion}) => {
 
   const [regionList, setRegionList] = useState(data)
   const [alphaSort, setAlphaSort] = useState(false)
@@ -23,6 +25,15 @@ export const CheckboxRegionComponent = ({data, selected, handleSelected, default
 
   const mounted = useRef()
 
+
+  const changeAlphaSort = (selectedAlphaSort) => {
+    ReactGA.event({
+      category: `Region:${parentRegion}`,
+      action: `Changed sorting of regions to ${selectedAlphaSort ? 'alphabetical' : 'confirmed'}`
+    })
+
+  }
+
   useEffect(() => {
     if(!mounted.current) {
       mounted.current = true
@@ -38,8 +49,8 @@ export const CheckboxRegionComponent = ({data, selected, handleSelected, default
 
   const AlphaOrByConfirmedButton = () => (
     <>
-    { alphaSort && <Button size="medium" onClick={() => { setAlphaSort(false) }}>Sort By Confirmed</Button> }
-    { !alphaSort && <Button size="medium" onClick={() => { setAlphaSort(true) }}>Sort Alphabetical</Button> }
+    { alphaSort && <Button size="medium" onClick={() => { changeAlphaSort(false) }}>Sort By Confirmed</Button> }
+    { !alphaSort && <Button size="medium" onClick={() => { changeAlphaSort(true) }}>Sort Alphabetical</Button> }
     </>
   )
 

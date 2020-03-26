@@ -1,11 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { Title, Box, Content } from 'rbx'
 
 import ContentLayout from '../layouts/ContentLayout'
 
+import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+
 export const PrivacyPolicyPage = () => {
 
+    useEffect(() => {
+        document.title = `Privacy Policy | ${DEFAULT_DOCUMENT_TITLE}`        
+    }, [])
+    
     return (
         <ContentLayout>
             <Box>

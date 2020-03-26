@@ -23,6 +23,8 @@ import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
+import ReactGA from 'react-ga';
+
 export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
@@ -88,16 +90,32 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
     const handleSelectedRegion = (regionList) => {
         setSelectedStates(regionList)
         handleHistory(regionList, graph, showLog)
+
+        ReactGA.event({
+            category: 'Region:United States',
+            action: `Changed selected regions to ${regionList.join(', ')}`
+        })
+
     }
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
         handleHistory(selectedStates, graph, showLog)
+
+        ReactGA.event({
+            category: 'Region:United States',
+            action: `Changed selected graph to ${selectedGraph}`
+        })
     }
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
         handleHistory(selectedStates, secondaryGraph, logScale)
+
+        ReactGA.event({
+            category: 'Region:United States',
+            action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`
+        })
     }
 
 
@@ -124,6 +142,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
                         handleSelected={dataList => handleSelectedRegion(dataList)} 
                         defaultSelected={region}
                         showLog={showLog}
+                        parentRegion="Continental"                        
                     />
                 </>
 

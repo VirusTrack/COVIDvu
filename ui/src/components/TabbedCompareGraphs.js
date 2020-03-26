@@ -16,6 +16,7 @@ export const TabbedCompareGraphs = (
         handleSelectedGraph,
         handleGraphScale,
         showLog,
+        parentRegion,
     }) => {
     
     const activeData = () => {
@@ -89,6 +90,7 @@ export const TabbedCompareGraphs = (
                         showLog={showLog}
                         handleGraphScale={handleGraphScale}
                         secondaryGraph={secondaryGraph}
+                        parentRegion={parentRegion}
                     />
                 </Level.Item>
                 <Level.Item align="right">
