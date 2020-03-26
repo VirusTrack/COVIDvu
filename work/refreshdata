@@ -221,7 +221,7 @@ resetSiteData "$1"
 assertCOVID19DirExists
 updateCOVID19DataSources
 generateVirusUpdateJSONFiles
-# generateHospitalBedsJSONFiles
+generateHospitalBedsJSONFiles
 generateCountiesUSJSONFile
 patchJSONFiles "$2"
 packJSONFiles

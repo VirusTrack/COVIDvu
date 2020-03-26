@@ -143,6 +143,7 @@ dmypy.json
 **/.theano
 **/.vim/*
 **/resources/counties-US-all*json
+**/resources/hospital-beds-*US.json
 **/work/*.tar.gz
 **/work/COVID-19
 **/work/last-update.txt
