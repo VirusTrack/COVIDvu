@@ -200,7 +200,7 @@ code
     border-bottom: .1rem solid #{$offwhite}
   &:not(:last-child)
     margin-bottom: 5rem
-  .buttons 
+  > .buttons
     text-align: center
     margin: auto
     display: block
@@ -464,3 +464,10 @@ label
     transform: translateY(100%)
   100% 
     transform: translateY(0)
+
+
+.TabbedCompareGraphs__controls
+  @media screen and (min-width: 450px)
+    display: flex
+    .level-left + .level-right
+      margin-top: 0
