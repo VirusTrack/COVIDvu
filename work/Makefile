@@ -59,7 +59,7 @@ resetpy: ALWAYS
 	rm -Rfv ./.Python ./bin ./build ./dist ./include ./lib
 
 
-# TODO:  Juvid - https://github.com/VirusTrack/COVIDvu/issues/318
+# TODO:  Juvid - https://github.com/VirusTrack/COVIDvu/issues/342
 #        There is #\t at the beginning of the line!
 #	pytest -v ./test/covidvu/test_predict.py
 #	pytest -v ./test/covidvu/test_visualize.py
