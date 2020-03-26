@@ -37,17 +37,31 @@ from covidvu.predict import getSavedShortCountryNames
 from pandas.core.frame import DataFrame
 
 # *** constants ***
-TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_time_series')
-TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
-TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
-TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
-TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
-TEST_JH_CSSE_FILE_RECOVERED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
+TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19',)
+
+TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_confirmed_global.csv')
+
+TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_deaths_global.csv')
+
+TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
+                                                       'time_series_19-covid-Confirmed_archived_0325.csv')
+
+TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
+                                                       'time_series_19-covid-Deaths_archived_0325.csv')
+
+
 TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_daily_reports')
+TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
+                                           'csse_covid_19_daily_reports')
 
-TEST_JH_CSSEFILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Confirmed-small.csv')
+TEST_JH_CSSE_FILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_confirmed_global_small.csv')
 
 # *** functions ***
 def _purge(purgeDirectory, pattern):
@@ -74,10 +88,11 @@ def test_predictLogisticGrowth():
                                        nChains             = 1,
                                        nBurn               = 0,
                                        nDaysPredict        = 10,
-                                       siteData            = TEST_SITE_DATA,
-                                       jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-                                       jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
-                                       jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+                                       siteData                      = TEST_SITE_DATA,
+                                       jhCSSEFileConfirmed           = TEST_JH_CSSE_FILE_CONFIRMED,
+                                       jhCSSEFileDeaths              = TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+                                       jhCSSEFileConfirmedDeprecated = TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+                                       jsCSSEReportPath              = TEST_JH_CSSE_REPORT_PATH,
                                        )
     predictionIndex = pd.date_range(start = prediction['countryTSClean'].index[0],
                                     end   = prediction['countryTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D'),
@@ -205,27 +220,32 @@ def test__dumpPredictionCollectionAsJSON():
 
 def test__main():
     try:
-        _main(0, siteData=TEST_SITE_DATA,
+        _main(0,
               nSamples            = 10,
               nTune               = 10,
               nChains             = 1,
               nBurn               = 0,
               nDaysPredict        = 10,
-              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+              siteData=TEST_SITE_DATA,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
               )
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
 
         _main('all',
-              siteData=TEST_SITE_DATA,
               nSamples=10,
               nTune=10,
               nChains=1,
               nBurn=0,
               nDaysPredict=10,
-              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              siteData=TEST_SITE_DATA,
+              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
               )
 
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-Italy.json'))
@@ -261,7 +281,10 @@ def test_load():
               nChains=1,
               nBurn=0,
               nDaysPredict=10,
-              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
               )
 
         meanPredictionTS, percentilesTS, countryName = load(0, siteData=TEST_SITE_DATA)
@@ -284,11 +307,14 @@ def test_getSavedShortCountryNames():
               nChains=1,
               nBurn=0,
               nDaysPredict=10,
-              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
               )
         countryNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
         assert isinstance(countryNameShortAll, list)
-        assert len(countryNameShortAll) == 2
+        assert len(countryNameShortAll) == 3
     except Exception as e:
         raise e
     finally:
@@ -304,10 +330,18 @@ def test_loadAll():
               nChains=1,
               nBurn=0,
               nDaysPredict=10,
-              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
+              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
               )
 
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA)
+        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA,
+                                                                            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+                                                                            jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+                                                                            jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+                                                                            jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+                                                                            )
         assert isinstance(confirmedCasesAll, DataFrame)
         assert isinstance(meanPredictionTSAll, DataFrame)
         assert isinstance(percentilesTSAll, DataFrame)

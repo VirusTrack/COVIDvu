@@ -4,6 +4,7 @@
 
 from covidvu.pipeline.vujson import STATE_CODES_PATH
 from covidvu.pipeline.vujson import STATE_NAMES
+from covidvu.pipeline.vujson import STATE_NAMES_TO_DROP
 from covidvu.pipeline.vujson import PARSING_MODE_BOUNDARY_1
 from covidvu.pipeline.vujson import BOATS
 from covidvu.pipeline.vujson import US_REGIONS
@@ -15,6 +16,8 @@ from covidvu.pipeline.vujson import _parseBoundary2
 from covidvu.pipeline.vujson import _readSourceDeprecated
 from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import resolveReportFileName
+from covidvu.pipeline.vujson import _getReportsToLoadBoundary3
+from covidvu.pipeline.vujson import _parseGlobal
 
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.datetimes import DatetimeIndex
@@ -26,15 +29,27 @@ import json
 
 
 # *** constants ***
-TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_time_series')
-TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
-TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
-TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Confirmed.csv')
-TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Deaths.csv')
-TEST_JH_CSSE_FILE_RECOVERED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'time_series_19-covid-Recovered.csv')
+TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19',)
+
+TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_confirmed_global.csv')
+
+TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_deaths_global.csv')
+
+TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
+                                                       'time_series_19-covid-Confirmed_archived_0325.csv')
+
+TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
+                                                       'time_series_19-covid-Deaths_archived_0325.csv')
+
+
 TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
 TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_daily_reports')
+TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
+                                           'csse_covid_19_daily_reports')
 
 # *** functions ***
 def _purge(purgeDirectory, pattern):
@@ -53,7 +68,7 @@ def test_US_REGIONS():
 
 
 def test_splitCSSEDataByParsingBoundary():
-    cases = pd.read_csv(TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED)
+    cases = test__readSourceDeprecated()
     casesSplit = splitCSSEDataByParsingBoundary(cases)
     assert isinstance(casesSplit[0], DataFrame)
     assert isinstance(casesSplit[1], DataFrame)
@@ -96,6 +111,7 @@ def assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoa
     assert isinstance(casesUSStates, DataFrame)
     assert isinstance(casesUSStates.index[0], date)
     assert stateCodes.state.isin(casesUSStates.columns).all()
+    assert ~(casesUSStates.columns.isin(STATE_NAMES_TO_DROP)).any()
     assert (casesUSStates.loc[:, casesUSStates.columns.map(lambda c: c[0] != '!' and c != 'Unassigned')].sum(axis=1) ==
             casesUSStates[
                 "!Total US"]).all()
@@ -131,9 +147,11 @@ def test__parseBoundary2():
     assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoats)
 
 
-def test__readSource():
+def test__readSourceDeprecated():
     cases = _readSourceDeprecated(TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED)
-    assert not (cases['Province/State'].isin(STATE_NAMES.keys())).any()
+    assert not (cases.columns.droplevel(1).isin(STATE_NAMES.keys())).any()
+    assert not (cases.columns.droplevel(1).isin(STATE_NAMES_TO_DROP)).any()
+    return cases
 
 
 def assertValidJSON(fname):
@@ -172,11 +190,28 @@ def test__combineCollection():
     pass
 
 def test__getReportsToLoadBoundary3():
-    # TODO: JA 20200325
-    pass
+    reportsToLoad = _getReportsToLoadBoundary3(jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH)
+    assert len(reportsToLoad) == 2
+
+
+def test__parseGlobal():
+    casesGlobal, casesBoats = _parseGlobal(TEST_JH_CSSE_FILE_CONFIRMED)
+    assert "!Global" in casesGlobal.columns
+    assert "!Outside China" in casesGlobal.columns
+    assert isinstance(casesGlobal, DataFrame)
+    assert isinstance(casesGlobal.index[0], date)
+    assert (casesGlobal.loc[:, casesGlobal.columns.map(lambda c: c[0] != '!')].sum(axis=1) == casesGlobal[
+        "!Global"]).all()
+    assert (casesGlobal.loc[:, casesGlobal.columns.map(lambda c: c[0] != '!' and c != 'China')].sum(axis=1) ==
+            casesGlobal[
+                "!Outside China"]).all()
+    assert isinstance(casesBoats, DataFrame)
+    assert isinstance(casesBoats.index[0], date)
+    assert (casesBoats.columns.isin(BOATS)).all()
+
 
 def test__parseBoundary3():
-    # TODO: JA 20200325
+    # TODO: JA 20200326
     pass
 
 
