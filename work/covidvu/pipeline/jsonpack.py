@@ -42,7 +42,7 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
         packedDataset[report] = fetchJSONData(report, grouping, siteDataDirectory)
 
         if '-US' == grouping and 'confirmed' == report:
-            # TODO: packedDataset['hospitalBeds'] = loadUSHospitalBedsCount(siteDataDirectory)
+            packedDataset['hospitalBeds'] = loadUSHospitalBedsCount(siteDataDirectory)
             packedDataset['allCounties']  = loadUSCounties(siteDataDirectory)
 
         # reportFileName = resolveReportFileName(siteDataDirectory, report, grouping)

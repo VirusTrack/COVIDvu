@@ -6,6 +6,7 @@
 from os.path import join
 from time import sleep
 
+from covidvu.pipeline.vucounty import SITE_RESOURCES
 from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import dumpJSON
 
@@ -58,11 +59,13 @@ def loadUSHospitalBedsCount(siteDataDirectory = SITE_DATA, inputFileName = HOSPI
     return payload
     
 
-def _main(siteDataDirectory = SITE_DATA,
+def _main(siteDataDirectory = SITE_RESOURCES,
           outFileName = HOSPITAL_BEDS_FILE_NAME,
           nStateLimit = None,
           ):
     postCodes = pd.read_csv(STATE_CODES_PATH)
+
+    print('vuhospitals - getting the total hospital beds count per state')
     bedCount = _getTotalBedCount(postCodes, nStateLimit=nStateLimit)
 
     dumpJSON(bedCount, resolveFileName(siteDataDirectory, outFileName))
