@@ -66,7 +66,7 @@ def test_US_REGIONS():
 
 
 def test_splitCSSEDataByParsingBoundary():
-    cases = pd.read_csv(TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED)
+    cases = test__readSourceDeprecated()
     casesSplit = splitCSSEDataByParsingBoundary(cases)
     assert isinstance(casesSplit[0], DataFrame)
     assert isinstance(casesSplit[1], DataFrame)
@@ -145,9 +145,11 @@ def test__parseBoundary2():
     assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoats)
 
 
-def test__readSource():
+def test__readSourceDeprecated():
     cases = _readSourceDeprecated(TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED)
-    assert not (cases['Province/State'].isin(STATE_NAMES.keys())).any()
+    assert not (cases.columns.droplevel(1).isin(STATE_NAMES.keys())).any()
+    assert not (cases.columns.droplevel(1).isin(STATE_NAMES_TO_DROP)).any()
+    return cases
 
 
 def assertValidJSON(fname):
