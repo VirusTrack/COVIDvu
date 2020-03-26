@@ -120,7 +120,7 @@ US_REGIONS_LONG = {
     'Guam': 'Other',
     'Marshall Islands': 'Other',
     'Micronesia': 'Other',
-    'Northern Marianas': 'Other',
+    'Northern Mariana Islands': 'Other',
     'Palau': 'Other',
     'Puerto Rico': 'Other',
     'Virgin Islands': 'Other',
