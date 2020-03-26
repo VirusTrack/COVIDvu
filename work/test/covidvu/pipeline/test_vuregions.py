@@ -5,6 +5,7 @@
 
 from covidvu.pipeline.vudpatch import resolveReportFileName
 from covidvu.pipeline.vujson import SITE_DATA
+from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vuregions import DEFAULT_OUTPUT_JSON_FILE_NAME
 from covidvu.pipeline.vuregions import COUNTRIES_REGIONS
 from covidvu.pipeline.vuregions import RegionsAggregator
@@ -67,6 +68,10 @@ def test_RegionsAggregator_JSON():
 def test_COUNTRIES_REGIONS_table():
     # :o - this uses the actual current list!
     officialCountriesFileName = resolveReportFileName(SITE_DATA, 'confirmed', '')
+
+    if not os.path.exists(officialCountriesFileName):
+        parseCSSE('confirmed')
+
     countriesCSSE = json.load(open(officialCountriesFileName, 'r')).keys()
 
     countriesCheck = [countries for countries in COUNTRIES_REGIONS.keys() if countries not in countriesCSSE ]
