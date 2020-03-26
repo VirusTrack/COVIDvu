@@ -364,6 +364,9 @@ def _main(countryTrainIndex,
             siteData               = siteData,
             jhCSSEFileConfirmed    = jhCSSEFileConfirmed,
             jhCSSEFileDeaths       = jhCSSEFileDeaths,
+            jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
+            jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
+            jsCSSEReportPath              = jsCSSEReportPath,
             **kwargs
         )
 
@@ -373,11 +376,11 @@ def _main(countryTrainIndex,
     elif countryTrainIndex == 'all':
         confirmedCases = parseCSSE(target,
                                    siteData                      = siteData,
-                                   jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
+                                   jhCSSEFileConfirmed            = jhCSSEFileConfirmed,
                                    jhCSSEFileDeaths              = jhCSSEFileDeaths,
                                    jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
                                    jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
-                                   jsCSSEReportPath=jsCSSEReportPath,
+                                   jsCSSEReportPath              = jsCSSEReportPath,
                                    )[subGroup]
         countriesAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
         for countryName in countriesAll:
@@ -388,6 +391,11 @@ def _main(countryTrainIndex,
                                                predictionsPercentiles = predictionsPercentiles,
                                                target                 = target,
                                                siteData               = siteData,
+                                               jhCSSEFileConfirmed    = jhCSSEFileConfirmed,
+                                               jhCSSEFileDeaths       = jhCSSEFileDeaths,
+                                               jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
+                                               jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
+                                               jsCSSEReportPath              = jsCSSEReportPath,
                                                **kwargs,
                                                )
             if prediction:
