@@ -33,7 +33,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
 
             const regionData = data[region]
             
-            for(const key of Object.keys(regionData)) {
+            for(const key of Object.keys(regionData).sort()) {
                 plots[normalizedRegion].x.push(key)
                 plots[normalizedRegion].y.push(regionData[key])
             }
