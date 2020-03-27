@@ -450,11 +450,11 @@ def load(countryIndex: int, siteData=SITE_DATA):
 
 def loadAll(target='confirmed', subGroup='casesGlobal', **kwargs):
     confirmedCasesAll = parseCSSE(target, **kwargs)[subGroup]
-    nTrainedCountries = len(getSavedShortCountryNames(siteData = kwargs.get('siteData')))
+    nTrainedCountries = len(getSavedShortCountryNames(siteData = kwargs.get('siteData', SITE_DATA)))
     meanPredictionTSAll = pd.DataFrame()
     percentilesTSAll = pd.DataFrame()
     for i in range(nTrainedCountries):
-        meanPredictionTS, percentilesTS, countryName = load(i, siteData=kwargs.get('siteData'))
+        meanPredictionTS, percentilesTS, countryName = load(i, siteData=kwargs.get('siteData', SITE_DATA))
         meanPredictionTS.name = 'meanPrediction'
         meanPredictionTS = meanPredictionTS.to_frame()
         meanPredictionTS['countryName'] = countryName
