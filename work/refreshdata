@@ -84,7 +84,10 @@ function assertCountiesUSJSONFiles {
 
 function resetSiteData {
     echo "resetting $SITE_DATA_DIR"
-    rm -f "$SITE_DATA_DIR"/*
+    for fileNamePrefix in bundle confirmed counties deaths hospital last raw scraped table
+    do
+        rm -f "$SITE_DATA_DIR/$fileNamePrefix"*
+    done
 } # resetSiteData
 
 
