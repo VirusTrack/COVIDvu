@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-// import { useInterval } from '../hooks/ui'
-
 import { useHistory } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
@@ -9,16 +7,15 @@ import { actions } from '../ducks/services'
 import { Tab, Button, Level, Notification } from 'rbx'
 import LogoElement from '../components/LogoElement'
 
-// import store from 'store2'
-
 import { REGION_URLS } from '../constants'
-// import { REGION_URLS, CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
 
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 import GlobalStatsTable from '../components/GlobalStatsTable'
 import USCountiesStatsTable from '../components/USCountiesStatsTable'
 import USStatsTable from '../components/USStatsTable'
+
+import ReactGA from 'react-ga';
 
 export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
 
@@ -45,16 +42,31 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
     }
 
     const redirectToExternalLink = (key) => {
-        if(REGION_URLS.hasOwnProperty(key))
+        if(REGION_URLS.hasOwnProperty(key)) {
             window.open(REGION_URLS[key], "_blank")
+            ReactGA.event({
+                category: 'Stats',
+                action: `Redirecting to external link to ${REGION_URLS[key]}`
+            })    
+        }
     }
 
     const handleSelectedFilter = (selectedFilter) => {
         setFilterRegion(selectedFilter)
+        ReactGA.event({
+            category: 'Stats',
+            action: `Changing filter on US_Counties to ${selectedFilter}`,
+            label: 'Changing Filter'
+        })
     }
    
     const handleSort = (column) => {
         setSort(column)
+        ReactGA.event({
+            category: 'Stats',
+            action: `Changed sort to ${sort}`,
+            label: 'Sorting'
+        })
     }
 
     /**
@@ -97,6 +109,26 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
         }
     }, [selectedTab, statsTotals, usStatsTotals, usCountiesStatsTotals, history])
 
+    const changeDayView = (daysAgo) => {
+        setStatsForGraph([])
+        setDaysAgo(daysAgo)
+        ReactGA.event({
+            category: 'Stats',
+            action: `Changed stats to ${daysAgo === 0 ? 'today' : 'yesterday'}`
+        })
+    }
+
+    const changeStatsTab = (newSelectedTab) => {
+        setStatsForGraph([])
+        setSelectedTab(newSelectedTab)
+        setSort('confirmed')
+
+        ReactGA.event({
+            category: 'Stats',
+            action: `Changed stats tab to ${newSelectedTab}`
+        })
+    }
+
     return (
         <>
         <HeroElement
@@ -115,8 +147,8 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                     { selectedTab !== 'US_Counties' &&
                         <Level.Item align="right">
                             <Button.Group >
-                                <Button size="medium" onClick={() => {if(daysAgo !== 0) { setStatsForGraph([]); setDaysAgo(0) }}} color={daysAgo === 0 ? "primary" : "default"}>Today</Button>
-                                <Button size="medium" onClick={() => {if(daysAgo !== 1) { setStatsForGraph([]); setDaysAgo(1) }}} color={daysAgo === 1 ? "primary " : "default"}>Yesterday</Button>
+                                <Button size="medium" onClick={() => {if(daysAgo !== 0) { changeDayView(0) }}} color={daysAgo === 0 ? "primary" : "default"}>Today</Button>
+                                <Button size="medium" onClick={() => {if(daysAgo !== 1) { changeDayView(1) }}} color={daysAgo === 1 ? "primary " : "default"}>Yesterday</Button>
                             </Button.Group>
                         </Level.Item>
                     }
@@ -124,9 +156,9 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
             </Notification>
 
             <Tab.Group size="large">
-                <Tab active={selectedTab === 'Global'} onClick={() => { setStatsForGraph([]); setSelectedTab('Global'); setSort('confirmed')}}>Global</Tab>
-                <Tab active={selectedTab === 'US'} onClick={() => { setStatsForGraph([]); setSelectedTab('US'); setSort('confirmed')}}>United States</Tab>
-                <Tab active={selectedTab === 'US_Counties'} onClick={() => { setStatsForGraph([]); setSelectedTab('US_Counties'); setSort('confirmed')}}>U.S. Counties</Tab>
+                <Tab active={selectedTab === 'Global'} onClick={() => { changeStatsTab('Global') }}>Global</Tab>
+                <Tab active={selectedTab === 'US'} onClick={() => { changeStatsTab('US') }}>United States</Tab>
+                <Tab active={selectedTab === 'US_Counties'} onClick={() => { changeStatsTab('US_Counties') }}>U.S. Counties</Tab>
             </Tab.Group>
 
 

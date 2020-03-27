@@ -13,14 +13,6 @@ import store from 'store2'
 import { 
     GOOGLE_ANALYTICS_KEY,
     LAST_UPDATE_KEY, 
-    GLOBAL_KEY, 
-    CONTINENTAL_KEY,
-    US_STATES_KEY, 
-    US_REGIONS_KEY, 
-    CACHE_INVALIDATE_GLOBAL_KEY, 
-    CACHE_INVALIDATE_CONTINENTAL_KEY,
-    CACHE_INVALIDATE_US_STATES_KEY, 
-    CACHE_INVALIDATE_US_REGIONS_KEY 
 } from '../constants'
 
 import ReactGA from 'react-ga';
@@ -44,14 +36,6 @@ export const HeaderContainer = () => {
 
     const forceRefresh = () => {
         store.session.remove(LAST_UPDATE_KEY)
-        store.session.remove(GLOBAL_KEY)
-        store.session.remove(CONTINENTAL_KEY)
-        store.session.remove(US_STATES_KEY)
-        store.session.remove(US_REGIONS_KEY)
-        store.session.remove(CACHE_INVALIDATE_GLOBAL_KEY)
-        store.session.remove(CACHE_INVALIDATE_CONTINENTAL_KEY)
-        store.session.remove(CACHE_INVALIDATE_US_STATES_KEY)
-        store.session.remove(CACHE_INVALIDATE_US_REGIONS_KEY)
     
         dispatch(actions.clearGraphs())
         dispatch(actions.fetchGlobal())
@@ -79,7 +63,7 @@ export const HeaderContainer = () => {
         <>
         { false &&
             <Notification color="warning" style={{marginBottom: '0'}}>
-                Unfortunately data coming in from one of our data sources has changed format this morning. Our volunteer team is in the middle of fixing this linkage and
+                Due to problems with one of our data sources, all data on the site at the moment is for yesterday 03/25. Our amazing volunteer team is in the middle of fixing this linkage and
                 it will be resolved shortly. Thank you for your patience!
             </Notification>
         }

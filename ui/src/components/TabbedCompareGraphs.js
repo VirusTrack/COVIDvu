@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Tab, Level, Notification } from 'rbx'
+import { Tab, Level } from 'rbx'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 import GraphScaleControl from '../components/GraphScaleControl'
@@ -16,6 +16,7 @@ export const TabbedCompareGraphs = (
         handleSelectedGraph,
         handleGraphScale,
         showLog,
+        parentRegion,
     }) => {
     
     const activeData = () => {
@@ -89,6 +90,7 @@ export const TabbedCompareGraphs = (
                         showLog={showLog}
                         handleGraphScale={handleGraphScale}
                         secondaryGraph={secondaryGraph}
+                        parentRegion={parentRegion}
                     />
                 </Level.Item>
                 <Level.Item align="right">

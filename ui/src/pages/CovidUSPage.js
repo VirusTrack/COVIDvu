@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { useLocation } from 'react-router'
 import queryString from 'query-string'
@@ -6,6 +6,8 @@ import queryString from 'query-string'
 import ErrorBoundary from '../components/ErrorBoundary'
 import USGraphContainer from '../containers/USGraphContainer'
 import MainLayout from '../layouts/MainLayout'
+
+import { DEFAULT_DOCUMENT_TITLE } from '../constants'
 
 export const CovidUSPage = () => {
 
@@ -18,6 +20,11 @@ export const CovidUSPage = () => {
     let region = query.region ? Array.isArray(query.region) ? query.region : [query.region] : undefined
     let graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
     let showLog = query.showLog === 'true' ? true : false
+
+    useEffect(() => {
+        document.title = `United States Graphs | ${DEFAULT_DOCUMENT_TITLE}`        
+    }, [])
+    
 
     return (
         <MainLayout>
