@@ -27,8 +27,8 @@ import pandas as pd
 import pymc3 as pm
 
 
-N_SAMPLES        = 500
-N_TUNE           = 200
+N_SAMPLES        = 2000
+N_TUNE           = 500
 N_BURN           = 100
 N_CHAINS         = 2
 N_DAYS_PREDICT   = 14
@@ -364,7 +364,7 @@ def _main(countryTrainIndex,
     -------
 
     """
-    if re.search(r'^\d$', str(countryTrainIndex)):
+    if re.search(r'^\d+$', str(countryTrainIndex)):
         prediction = predictLogisticGrowth(
             countryTrainIndex      = countryTrainIndex,
             predictionsPercentiles = predictionsPercentiles,
