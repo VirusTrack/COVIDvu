@@ -1,23 +1,32 @@
-import sys
-import numpy as np
-import pandas as pd
-from pandas.core.indexes.datetimes import DatetimeIndex
-import pymc3 as pm
-import re
+#!/bin/bash
+
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
 
 from os.path import join
-import os
-import json
 
-from covidvu.pipeline.vujson import dumpJSON
+from pandas.core.indexes.datetimes import DatetimeIndex
+
 from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
-from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
 from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED_DEPRECATED
+from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
 from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS_DEPRECATED
 from covidvu.pipeline.vujson import JH_CSSE_FILE_RECOVERED_DEPRECATED
 from covidvu.pipeline.vujson import JH_CSSE_REPORT_PATH
-from covidvu.pipeline.vujson import parseCSSE
 from covidvu.pipeline.vujson import SITE_DATA
+from covidvu.pipeline.vujson import dumpJSON
+from covidvu.pipeline.vujson import parseCSSE
+
+import sys
+import re
+import os
+import json
+
+import numpy as np
+import pandas as pd
+import pymc3 as pm
+
 
 N_SAMPLES        = 500
 N_TUNE           = 200
@@ -462,3 +471,4 @@ def loadAll(target='confirmed', subGroup='casesGlobal', **kwargs):
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
         _main(argument)
+

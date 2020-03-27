@@ -43,14 +43,19 @@ module:
 	python setup.py bdist_wheel
 
 
-publish:
-	@echo "publishing NOOP"
-
-
 nuke: ALWAYS
 	make clean
 	rm -Rf $(shell find covidvu | awk '/__pycache__$$/')
 	rm -Rf $(shell find test/ | awk '/__pycache__$$/')
+
+
+publish:
+	@echo "publishing NOOP"
+
+
+refresh: ALWAYS
+	conda install mkl-service
+	pip install -U -r requirements.txt
 
 
 # Delete the Python virtual environment - necessary when updating the
