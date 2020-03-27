@@ -15,8 +15,8 @@ import os
 
 # --- constants ---
 
-US_TABLE_HTML    = os.path.join(SITE_DATA, 'table-01.html')
-WORLD_TABLE_HTML = os.path.join(SITE_DATA, 'table-00.html')
+US_TABLE_HTML    = os.path.join(SITE_DATA, 'table-00.html')
+WORLD_TABLE_HTML = os.path.join(SITE_DATA, 'table-01.html')
 
 
 # +++ functions +++
