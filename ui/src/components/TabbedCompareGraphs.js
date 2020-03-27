@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Tab, Level, Notification } from 'rbx'
+import { Tab, Level } from 'rbx'
 
 import GraphWithLoader from '../components/GraphWithLoader'
 import GraphScaleControl from '../components/GraphScaleControl'

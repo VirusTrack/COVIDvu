@@ -18,25 +18,24 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         const selectedData = Object.keys(data).filter(entry => selected.indexOf(entry) !== -1)
 
         for(const region of selectedData) {
-            plots[region] = {
+            const normalizedRegion = region.startsWith('!') ? region.substring(1) : region
+            plots[normalizedRegion] = {
                 x: [],
                 y: [],
                 type: 'scatter',
                 mode: 'lines+markers',
-                name: region,
+                name: normalizedRegion,
                 showlegend: true,
                 marker: {
                     size: 3
                 }
-            }            
-        }
+            }
 
-        for(const region of selectedData) {            
             const regionData = data[region]
             
             for(const key of Object.keys(regionData)) {
-                plots[region].x.push(key)
-                plots[region].y.push(regionData[key])
+                plots[normalizedRegion].x.push(key)
+                plots[normalizedRegion].y.push(regionData[key])
             }
         }
     
