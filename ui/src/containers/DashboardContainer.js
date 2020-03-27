@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useHistory } from 'react-router'
 
-import { useInterval } from '../hooks/ui'
-
 import { actions } from '../ducks/services'
 
 import { Generic, Tag, Title, Level, Heading, Container, Button, Box, Column } from "rbx"
@@ -14,13 +12,11 @@ import GraphWithLoader from '../components/GraphWithLoader'
 import HeroElement from '../components/HeroElement'
 import LogoElement from '../components/LogoElement'
 
-import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_CONTINENTAL_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
+// import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_CONTINENTAL_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
 import GraphScaleControl from '../components/GraphScaleControl'
 
 import numeral from 'numeral'
-
-import store from 'store2'
 
 import moment from 'moment-timezone'
 
@@ -51,25 +47,6 @@ export const DashboardContainer = ({showLogParam = false}) => {
         dispatch(actions.fetchContinental())
 
     }, [dispatch])
-
-    useInterval(() => {
-        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchTop10Countries({
-                excludeChina: true
-            }))
-            dispatch(actions.fetchTotalGlobalStats())
-        }
-        if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
-            dispatch(actions.fetchTop10USStates())
-            dispatch(actions.fetchTotalUSStatesStats())
-        }
-        if(store.session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
-            dispatch(actions.fetchUSRegions())
-        }
-        if(store.session.get(CACHE_INVALIDATE_CONTINENTAL_KEY)) {
-            dispatch(actions.fetchContinental())
-        }
-    }, ONE_MINUTE)
 
     const lastUpdate = useSelector(state => state.services.lastUpdate)
 

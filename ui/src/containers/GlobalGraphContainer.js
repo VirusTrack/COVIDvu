@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 
 import { useLocation } from 'react-router'
 
-import { useInterval } from '../hooks/ui'
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
 
@@ -12,9 +11,7 @@ import { actions } from '../ducks/services'
 
 import { Tag, Level } from "rbx"
 
-import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 import numeral from 'numeral'
-import store from 'store2'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -46,13 +43,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     useEffect(() => {
         dispatch(actions.fetchGlobal({showLog}))
     }, [dispatch, showLog])
-
-
-    useInterval(() => {
-        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchGlobal({showLog}))
-        }
-    }, ONE_MINUTE)
 
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {

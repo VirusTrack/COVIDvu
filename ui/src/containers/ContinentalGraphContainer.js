@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 
 import { useLocation } from 'react-router'
 
-import { useInterval } from '../hooks/ui'
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
 
@@ -13,10 +12,6 @@ import { actions } from '../ducks/services'
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
-
-import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
-
-import store from 'store2'
 
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
@@ -49,12 +44,6 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
             setSelectedContinents(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
         }
     }, [sortedConfirmed])
-
-    useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchContinental())
-        }
-    }, ONE_MINUTE)
 
     useEffect(() => {
         if(!search) {

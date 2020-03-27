@@ -3,18 +3,16 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router'
 
-import { useInterval } from '../hooks/ui'
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
 
 import numeral from 'numeral'
-import store from 'store2'
 
 import { actions } from '../ducks/services'
 
 import { Tag, Notification, Generic, Title } from "rbx"
 
-import { REGION_URLS, CACHE_INVALIDATE_US_STATES_KEY, ONE_MINUTE } from '../constants'
+import { REGION_URLS } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -63,12 +61,6 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
     useEffect(() => {
         dispatch(actions.fetchUSStates())
     }, [dispatch])
-
-    useInterval(() => {
-        if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
-            dispatch(actions.fetchUSStates())
-        }
-    }, ONE_MINUTE)
 
     useEffect(() => {
         if(!search) {

@@ -3,19 +3,9 @@ const STAGING_DATA_URL = `http://staging.virustrack.live/site-data`
 const LOCAL_DATA_URL = `http://localhost:3100/site-data`
 
 const LAST_UPDATE_KEY = 'covid-lastUpdated'
-const CACHE_INVALIDATE_GLOBAL_KEY = 'covid-cache-invalidate-global'
-const CACHE_INVALIDATE_CONTINENTAL_KEY = 'covid-cache-invalidate-continental'
-const CACHE_INVALIDATE_US_STATES_KEY = 'covid-cache-invalidate-us-states'
-const CACHE_INVALIDATE_US_REGIONS_KEY = 'covid-cache-invalidate-us-regions'
 
 const CACHE_TIMER = 5 * 60 * 1000
-
 const ONE_MINUTE = 1 * 60 * 1000
-
-const GLOBAL_KEY = 'covid-global'
-const CONTINENTAL_KEY = 'covid-continental'
-const US_STATES_KEY = 'covid-us-states'
-const US_REGIONS_KEY = 'covid-us-regions'
 
 const GOOGLE_ANALYTICS_KEY = 'UA-574325-5'
 
@@ -423,12 +413,4 @@ const COUNTRIES = [
     CACHE_TIMER,
     ONE_MINUTE,
     LAST_UPDATE_KEY,
-    GLOBAL_KEY,
-    CONTINENTAL_KEY,
-    US_STATES_KEY,
-    US_REGIONS_KEY,
-    CACHE_INVALIDATE_GLOBAL_KEY,
-    CACHE_INVALIDATE_CONTINENTAL_KEY,
-    CACHE_INVALIDATE_US_STATES_KEY,
-    CACHE_INVALIDATE_US_REGIONS_KEY,
   }

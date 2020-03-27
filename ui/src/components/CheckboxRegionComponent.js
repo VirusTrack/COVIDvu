@@ -23,16 +23,16 @@ export const CheckboxRegionComponent = ({data, selected, handleSelected, default
     }
   }
 
-  const mounted = useRef()
-
-
   const changeAlphaSort = (selectedAlphaSort) => {
+    setAlphaSort(selectedAlphaSort)
     ReactGA.event({
       category: `Region:${parentRegion}`,
       action: `Changed sorting of regions to ${selectedAlphaSort ? 'alphabetical' : 'confirmed'}`
     })
 
   }
+
+  const mounted = useRef()
 
   useEffect(() => {
     if(!mounted.current) {

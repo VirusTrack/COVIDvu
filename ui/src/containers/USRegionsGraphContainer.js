@@ -3,17 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router'
 
-import store from 'store2'
-
-import { useInterval } from '../hooks/ui'
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
 
 import { actions } from '../ducks/services'
 
 import { Tag, Notification, Level } from "rbx"
-
-import { CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -49,12 +44,6 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Cases', showLogPa
             setSelectedRegions(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
         }
     }, [sortedConfirmed])
-
-    useInterval(() => {
-        if(store.session.get(CACHE_INVALIDATE_US_REGIONS_KEY)) {
-            dispatch(actions.fetchUSRegions())
-        }
-    }, ONE_MINUTE)
 
     useEffect(() => {
         if(!search) {
