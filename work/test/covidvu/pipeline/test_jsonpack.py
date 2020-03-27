@@ -4,12 +4,16 @@
 
 
 from covidvu.pipeline.jsonpack import REPORTS
+from covidvu.pipeline.jsonpack import PREDICTIONS_FILE_NAME
 from covidvu.pipeline.jsonpack import loadUSCounties
 from covidvu.pipeline.jsonpack import packDataset
+from covidvu.pipeline.jsonpack import packPredictions
 from covidvu.pipeline.jsonpack import sortByDate
 
 import json
 import os
+
+import pytest
 
 
 # +++ constants +++
@@ -65,10 +69,30 @@ def test_sortByDate():
     }
     result = sortByDate(dataset)
 
-    x = tuple(result['bogus'].keys())[0]
     assert tuple(result['bogus'].keys())[0] == '2020-03-15'
 
 
 def test_main():
     pass  # It runs, the meat is in the packDataset function
+
+
+def test_packPredictions():
+    testFileName = os.path.join(TEST_SITE_DATA, 'prediction-crap.json')
+
+    with open(testFileName, 'w'):
+        pass
+    with pytest.raises(NameError):
+        packPredictions(siteDataDirectory = TEST_SITE_DATA)
+    os.unlink(testFileName)
+
+    result = packPredictions(siteDataDirectory = TEST_SITE_DATA)
+
+    assert 'United Kingdom' in result
+    assert 'confidenceInterval' in result['United Kingdom']
+    assert 'mean' in result['United Kingdom']
+
+    testFileName = os.path.join(TEST_SITE_DATA, PREDICTIONS_FILE_NAME)
+    assert os.path.exists(testFileName)
+    
+    os.unlink(testFileName)
 

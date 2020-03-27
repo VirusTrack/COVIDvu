@@ -22,7 +22,9 @@ GROUPINGS = {
                 '-US'        : 'bundle-US',
                 '-US-Regions': 'bundle-US-Regions',
             }
-REPORTS   = ( 'confirmed', 'deaths', )
+PREDICT_FILE_PREFIX   = 'prediction-'
+PREDICTIONS_FILE_NAME = 'bundle-predictions-global.json'
+REPORTS               = ( 'confirmed', 'deaths', )
 
 
 # +++ functions +++
@@ -63,13 +65,38 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
     return packedDataset
 
 
-# def packPredictions(siteDataDirectory = SITE_DATA):
+def packPredictions(siteDataDirectory = SITE_DATA):
+    predictionFileNames = [ os.path.join(siteDataDirectory, fileName) for fileName in os.listdir(siteDataDirectory) if PREDICT_FILE_PREFIX in fileName ]
     
+    predictions = {  }
+    for fileName in predictionFileNames:
+        if 'conf-int' in fileName:
+            valuesRangeTag = 'confidenceInterval'
+        elif 'mean-' in fileName:
+            valuesRangeTag = 'mean'
+        else:
+            raise NameError
+
+        dataset = json.loads(open(fileName, 'r').read())
+        country = tuple(dataset.keys())[0]
+        if country not in predictions:
+            predictions[country] = dict()
+
+        predictions[country][valuesRangeTag] = dataset[country]
+
+    outputBundleFileName = os.path.join(siteDataDirectory, PREDICTIONS_FILE_NAME)
+
+    with open(outputBundleFileName, 'w') as outputStream:
+        json.dump(predictions, outputStream)
+    
+    return predictions
 
 
 def main():
     for grouping in GROUPINGS:
         packDataset(grouping)
+
+    packPredictions()
 
 
 # *** main ***
