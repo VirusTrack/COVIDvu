@@ -139,6 +139,7 @@ dmypy.json
 **.local
 **.ssh/
 **/*psd
+**/.conda/*
 **/.cufflinks*
 **/.theano
 **/.vim/*
