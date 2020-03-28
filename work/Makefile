@@ -67,12 +67,13 @@ resetpy: ALWAYS
 test: ALWAYS
 	pip install -e .
 	pytest -v ./test/covidvu/pipeline/test_jsonpack.py
+	pytest -v ./test/covidvu/pipeline/test_pyavka.py
 	pytest -v ./test/covidvu/pipeline/test_vucounty.py
 	pytest -v ./test/covidvu/pipeline/test_vuhospitals.py
 	pytest -v ./test/covidvu/pipeline/test_vujson.py
 	pytest -v ./test/covidvu/pipeline/test_vuregions.py
-	pytest -v ./test/covidvu/test_utils.py
 	pytest -v ./test/covidvu/test_predict.py
+	pytest -v ./test/covidvu/test_utils.py
 	pytest -v ./test/covidvu/test_visualize.py
 	pip uninstall -y $(MODULE)==$(VERSION) || true
 	rm -Rfv $$(find covidvu | awk '/__pycache__$$/')

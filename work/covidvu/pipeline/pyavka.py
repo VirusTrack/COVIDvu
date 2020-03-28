@@ -9,6 +9,7 @@ from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vudpatch import SCRAPED_US_DATA
 from covidvu.pipeline.vudpatch import SCRAPED_WORLD_DATA
 
+import copy
 import csv
 import os
 
@@ -17,9 +18,67 @@ import os
 
 US_TABLE_HTML    = os.path.join(SITE_DATA, 'table-01.html')
 WORLD_TABLE_HTML = os.path.join(SITE_DATA, 'table-00.html')
+TABLES_FILES     = {
+                    'WORLD': { 
+                        'fileCSV' : SCRAPED_WORLD_DATA, 
+                        'fileHTML': None,
+                        'ignoreRows': 6,
+                    },
+                    'UNITED STATES': { 
+                        'fileCSV' : SCRAPED_US_DATA, 
+                        'fileHTML': None,
+                        'ignoreRows': 5,
+                    },
+                    'AUSTRALIA': { 
+                        'fileCSV' : None, 
+                        'fileHTML': None,
+                    },
+                    'MAINLAND CHINA': { 
+                        'fileCSV' : None, 
+                        'fileHTML': None,
+                    },
+                    'CANADA': { 
+                        'fileCSV' : None, 
+                        'fileHTML': None,
+                    },
+                    'MUNDO HISPANO': { 
+                        'fileCSV' : None, 
+                        'fileHTML': None,
+                    },
+                   }
 
 
 # +++ functions +++
+
+def detectHTMLTablesRegions(dataLake = SITE_DATA):
+    """
+    Returns a dictionary of file names like:
+
+    {
+        'Global': 'table-00.html',
+        'US'    " 'table-01.html',
+    }
+    """
+    prefix      = 'table-'
+    filesList   = [ os.path.join(dataLake, fileName) for fileName in os.listdir(dataLake) if prefix in fileName and '.swp' not in fileName ]
+    tablesFiles = copy.deepcopy(TABLES_FILES)
+
+    for fileName in filesList:
+        table = BeautifulSoup(open(fileName).read(), 'html.parser')
+
+        for row in table.find_all('tr'):
+            column = row.find('td')
+            if not column:
+                continue
+            
+            text = column.text.strip().upper()
+
+            if text in tablesFiles:
+                tablesFiles[text]['fileHTML'] = fileName
+                break
+
+    return tablesFiles
+      
 
 def _generateCSVTo(targetFileName, dataSource = WORLD_TABLE_HTML, ignoreRows = 6):
     """
@@ -54,9 +113,15 @@ def _generateCSVTo(targetFileName, dataSource = WORLD_TABLE_HTML, ignoreRows = 6
     print('generated %s' % targetFileName)
 
 
+def processHTML2CSV(dataLake = SITE_DATA):
+    # TODO:  This whole thing needs to be cleaned up later.
+    for _, tableSpec in detectHTMLTablesRegions(dataLake).items:
+        if tableSpec['fileCSV']:
+            _generateCSVTo(tableSpec['fileCSV'], dataLake, tableSpec['ignoreRows'])
+
+
 def _main():
-    _generateCSVTo(SCRAPED_WORLD_DATA, WORLD_TABLE_HTML, 6)
-    _generateCSVTo(SCRAPED_US_DATA, US_TABLE_HTML, 5)
+    processHTML2CSV()
 
 
 # --- main ---
