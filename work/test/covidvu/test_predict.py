@@ -124,6 +124,7 @@ def test_predictLogisticGrowth():
                                        jsCSSEReportPath              = TEST_JH_CSSE_REPORT_PATH,
                                        nSamples                      = TEST_N_SAMPLES,
                                        nChains                       = TEST_N_CHAINS,
+                                       nDaysPredict                  = nDaysPredict,
                                        )
 
     predictionIndex = pd.date_range(start = prediction['countryTSClean'].index[0],
