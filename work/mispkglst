@@ -1,0 +1,38 @@
+#!/usr/bin/awk -f
+
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
+#
+# Usage:  mispkglst ubuntu-server-list jupyter-lab-list
+#
+# List format:  output from apt list | awk 'NR > 1'
+#
+
+BEGIN {
+    FS="/";
+}
+
+
+NR == FNR {
+    serverList[$1]++;
+} 
+
+
+NR > FNR {
+    labList[$1]++;
+} 
+
+
+END {
+    printf(" Lab packages not in server\n");
+    printf(" Server = %d, Lab = %d\n", length(serverList), length(labList));
+
+    for (package in labList)
+        if (package in serverList)
+            continue;
+        else
+            print(package);
+} # END
+
