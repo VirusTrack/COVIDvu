@@ -116,7 +116,7 @@ def test_buildLogisticModel():
 def test_predictLogisticGrowth():
     nDaysPredict = 10
     prediction = predictLogisticGrowth(logRegModel,
-                                       countryName                   = 'US',
+                                       regionName                   = 'US',
                                        siteData                      = TEST_SITE_DATA,
                                        jhCSSEFileConfirmed           = TEST_JH_CSSE_FILE_CONFIRMED,
                                        jhCSSEFileDeaths              = TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
@@ -127,8 +127,8 @@ def test_predictLogisticGrowth():
                                        nDaysPredict                  = nDaysPredict,
                                        )
 
-    predictionIndex = pd.date_range(start = prediction['countryTSClean'].index[0],
-                                    end   = prediction['countryTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D'),
+    predictionIndex = pd.date_range(start = prediction['regionTSClean'].index[0],
+                                    end   = prediction['regionTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D'),
                                     )
 
     assert (prediction['predictionsMeanTS'].index == predictionIndex).all()
@@ -138,7 +138,7 @@ def test_predictLogisticGrowth():
     assert (prediction['predictionsMeanTS'].isnull().values).sum() == 0
     assert (prediction['predictionsPercentilesTS'][0][0].isnull().values).sum() == 0
     assert isinstance(prediction['trace'], DataFrame)
-    assert (prediction['countryTSClean'] > MIN_CASES_FILTER).all()
+    assert (prediction['regionTSClean'] > MIN_CASES_FILTER).all()
     return prediction
 
 
@@ -165,10 +165,10 @@ def test__getPredictionsFromPosteriorSamples():
                                                                                   PREDICTIONS_PERCENTILES,
                                                                                   )
     assert isinstance(predictionsMean, ndarray)
-    assert len(predictionsMean) == prediction['countryTSClean'].shape[0] + nDaysPredict
+    assert len(predictionsMean) == prediction['regionTSClean'].shape[0] + nDaysPredict
     assert len(predictionsPercentiles) == len(PREDICTIONS_PERCENTILES)
     assert isinstance(predictionsPercentiles[0][0], ndarray)
-    assert len(predictionsPercentiles[0][0]) == prediction['countryTSClean'].shape[0] + nDaysPredict
+    assert len(predictionsPercentiles[0][0]) == prediction['regionTSClean'].shape[0] + nDaysPredict
 
     prediction['predictionsMean'] = predictionsMean
     prediction['predictionsPercentiles'] = predictionsPercentiles
@@ -180,23 +180,23 @@ def test__castPredictionsAsTS():
     predictions = test__getPredictionsFromPosteriorSamples()
     startDate   = '2020-01-01'
     startDate   = pd.to_datetime(startDate).date()
-    endDate     = startDate + pd.Timedelta(len(predictions['countryTSClean'])-1, 'D')
+    endDate     = startDate + pd.Timedelta(len(predictions['regionTSClean'])-1, 'D')
     predictionIndex = pd.date_range(start = startDate,
                                     end   = endDate,
                                     )
-    countryTSClean = pd.Series(index = predictionIndex, data  = predictions['countryTSClean'])
-    predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(countryTSClean,
+    regionTSClean = pd.Series(index = predictionIndex, data  = predictions['regionTSClean'])
+    predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(regionTSClean,
                                                                        predictions['nDaysPredict'],
                                                                        predictions['predictionsMean'],
                                                                        predictions['predictionsPercentiles'],
                                                                        )
     assert isinstance(predictionsMeanTS, Series)
-    assert predictionsMeanTS.shape[0] == len(predictions['countryTSClean']) + predictions['nDaysPredict']
+    assert predictionsMeanTS.shape[0] == len(predictions['regionTSClean']) + predictions['nDaysPredict']
     assert isinstance(predictionsMeanTS.index, DatetimeIndex)
     assert len(predictionsPercentilesTS) == len(PREDICTIONS_PERCENTILES)
     assert isinstance(predictionsPercentilesTS[0][0], Series)
     assert isinstance(predictionsPercentilesTS[0][0].index, DatetimeIndex)
-    assert predictionsPercentilesTS[0][0].shape[0] == len(predictions['countryTSClean']) + predictions['nDaysPredict']
+    assert predictionsPercentilesTS[0][0].shape[0] == len(predictions['regionTSClean']) + predictions['nDaysPredict']
     return predictionsMeanTS, predictionsPercentilesTS, predictions
 
 
@@ -268,10 +268,10 @@ def test_load():
                          nChains=TEST_N_CHAINS,
               )
 
-        meanPredictionTS, percentilesTS, countryName = load(0, siteData=TEST_SITE_DATA)
+        meanPredictionTS, percentilesTS, regionName = load(0, siteData=TEST_SITE_DATA)
         assert isinstance(meanPredictionTS, Series)
         assert isinstance(percentilesTS, DataFrame)
-        assert isinstance(countryName, str)
+        assert isinstance(regionName, str)
         assert (percentilesTS.columns.isin(['97.5', '2.5', '25', '75'])).all()
     except Exception as e:
         raise e
@@ -291,9 +291,9 @@ def test_getSavedShortCountryNames():
                          nSamples=TEST_N_SAMPLES,
                          nChains=TEST_N_CHAINS,
               )
-        countryNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
-        assert isinstance(countryNameShortAll, list)
-        assert len(countryNameShortAll) == 3
+        regionNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
+        assert isinstance(regionNameShortAll, list)
+        assert len(regionNameShortAll) == 3
     except Exception as e:
         raise e
     finally:
