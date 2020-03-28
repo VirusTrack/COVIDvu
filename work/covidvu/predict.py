@@ -25,11 +25,11 @@ import json
 import numpy as np
 import pandas as pd
 import pystan
+from pystan.model import StanModel
 
-N_SAMPLES        = 2000
-N_TUNE           = 500
-N_BURN           = 100
-N_CHAINS         = 2
+N_SAMPLES        = 3000
+N_BURN           = 1000
+N_CHAINS         = 3
 N_DAYS_PREDICT   = 14
 MIN_CASES_FILTER = 50
 MIN_NUMBER_DAYS_WITH_CASES = 10
@@ -59,7 +59,7 @@ def buildLogisticModel(priorLogCarryingCapacity,
                        nDaysName='nDays',
                        timeName='t',
                        casesLogName='casesLog',
-                       ):
+                       ) -> StanModel:
     logisticGrowthModel = f'''
     data {{
       int<lower=0> {nDaysName};
@@ -86,27 +86,25 @@ def buildLogisticModel(priorLogCarryingCapacity,
       {casesLogName} ~ normal(log(casesLin + 1), sigma);
     }}
     '''
-    logRegModel = pystan.StanModel(model_code=logisticGrowthModel)
-    return logRegModel
+    logGrowthModel = pystan.StanModel(model_code=logisticGrowthModel)
+    return logGrowthModel
 
 
 def _getPredictionsFromPosteriorSamples(t,
                                         trace,
                                         nDaysPredict,
-                                        nSamples,
                                         predictionsPercentiles,
-                                        nBurn,
                                         ):
 
     tPredict = np.arange(len(t) + nDaysPredict)
 
-    predictions = np.zeros((len(t)+nDaysPredict, nSamples - nBurn))
+    predictions = np.zeros((len(t)+nDaysPredict, trace.shape[0]))
 
-    for i in range(len(trace[nBurn:])):
-        carryingCap = 10 ** trace['logCarryingCapacity'][nBurn+i]
+    for i in range(trace.shape[0]):
+        carryingCap = 10 ** trace['logCarryingCapacity'].iloc[i]
 
         predictions[:, i] = carryingCap / (
-                1 + np.exp(-1.0 * trace['growthRate'][nBurn+i] * (tPredict - trace['midPoint'][nBurn+i])))
+                1 + np.exp(-1.0 * trace['growthRate'].iloc[i] * (tPredict - trace['midPoint'].iloc[i])))
 
     predictionsPercentilesTS = []
     for qLow, qHigh in predictionsPercentiles:
@@ -153,24 +151,19 @@ def _castPredictionsAsTS(countryTSClean,
 
     return predictionsMeanTS, predictionsPercentilesTS
 
-def predictLogisticGrowth(countryTrainIndex: int        = None,
+def predictLogisticGrowth(logGrowthModel: StanModel,
+                          countryTrainIndex: int        = None,
                           countryName: str              = None,
                           confirmedCases                = None,
                           target                        = 'confirmed',
                           subGroup                      = 'casesGlobal',
                           nSamples                      = N_SAMPLES,
-                          nTune                         = N_TUNE,
                           nChains                       = N_CHAINS,
                           nBurn                         = N_BURN,
                           nDaysPredict                  = N_DAYS_PREDICT,
                           minCasesFilter                = MIN_CASES_FILTER,
                           minNumberDaysWithCases        = MIN_NUMBER_DAYS_WITH_CASES,
-                          priorLogCarryingCapacity      = PRIOR_LOG_CARRYING_CAPACITY,
-                          priorMidPoint                 = PRIOR_MID_POINT,
-                          priorGrowthRate               = PRIOR_GROWTH_RATE,
-                          priorSigma                    = PRIOR_SIGMA,
                           predictionsPercentiles        = PREDICTIONS_PERCENTILES,
-                          init                          = None,
                           randomSeed                    = 2020,
                           **kwargs
                           ):
@@ -178,6 +171,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
 
     Parameters
     ----------
+    logGrowthModel: A compiled pystan model
     countryTrainIndex: Order countries from highest to lowest, and train the ith country
     countryName: Overwrites countryTrainIndex as the country to train
     confirmedCases: A dataframe of countries as columns, and total number of cases as a time series
@@ -185,19 +179,13 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     target: string in ['confirmed', 'deaths', 'recovered']
     subGroup: A key in the output of covidvu.pipeline.vujson.parseCSSE
     nSamples: Number of samples per chain of MCMC
-    nTune: Number of iterations for tuning MCMC
     nChains: Number of independent chains MCMC
     nBurn: Number of initial iterations to discard for MCMC
     nDaysPredict: Number of days ahead to predict
     minCasesFilter: Minimum number of cases for prediction
     minNumberDaysWithCases: Minimum number of days with at least minCasesFilter
-    priorLogCarryingCapacity: Bounds for the uniform prior for log10 carrying capacity
-    priorMidPoint: Bounds for the uniform prior for the mid-point
-    priorGrowthRate: Bounds for the uniform prior for the growth rate
-    priorSigma: Bounds for the uniform prior for sigma
     predictionsPercentiles: Bayesian confidence intervals to evaluate
-    init: Initialization method for pymc3 sampler
-    randomSeed: Seed for pymc3 sampler
+    randomSeed: Seed for stan sampler
     kwargs: Optional named arguments passed to covidvu.pipeline.vujson.parseCSSE
 
     Returns
@@ -211,12 +199,14 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
 
     if confirmedCases is None:
         confirmedCases = parseCSSE(target,
-                                   siteData            = kwargs.get('siteData', SITE_DATA),
-                                   jhCSSEFileConfirmed=kwargs.get('jhCSSEFileConfirmed',JH_CSSE_FILE_CONFIRMED),
-                                   jhCSSEFileDeaths=kwargs.get('jhCSSEFileDeaths',JH_CSSE_FILE_DEATHS),
-                                   jhCSSEFileConfirmedDeprecated=kwargs.get('jhCSSEFileConfirmedDeprecated',JH_CSSE_FILE_CONFIRMED_DEPRECATED),
-                                   jhCSSEFileDeathsDeprecated=kwargs.get('jhCSSEFileDeathsDeprecated',JH_CSSE_FILE_DEATHS_DEPRECATED),
-                                   jsCSSEReportPath=kwargs.get('jsCSSEReportPath',JH_CSSE_REPORT_PATH),
+                                   siteData                      = kwargs.get('siteData', SITE_DATA),
+                                   jhCSSEFileConfirmed           = kwargs.get('jhCSSEFileConfirmed',JH_CSSE_FILE_CONFIRMED),
+                                   jhCSSEFileDeaths              = kwargs.get('jhCSSEFileDeaths',JH_CSSE_FILE_DEATHS),
+                                   jhCSSEFileConfirmedDeprecated = kwargs.get('jhCSSEFileConfirmedDeprecated',
+                                                                              JH_CSSE_FILE_CONFIRMED_DEPRECATED),
+                                   jhCSSEFileDeathsDeprecated    = kwargs.get('jhCSSEFileDeathsDeprecated',
+                                                                              JH_CSSE_FILE_DEATHS_DEPRECATED),
+                                   jsCSSEReportPath              = kwargs.get('jsCSSEReportPath',JH_CSSE_REPORT_PATH),
                                    )[subGroup]
 
     if countryName is None:
@@ -234,21 +224,18 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     t = np.arange(countryTSClean.shape[0])
     countryTSCleanLog = np.log(countryTSClean.values + 1)
 
+    logisticGrowthData = {'nDays': countryTSClean.shape[0],
+                          't': list(t),
+                          'casesLog': list(countryTSCleanLog)
+                          }
+    fit = logGrowthModel.sampling(data=logisticGrowthData, iter=nSamples, chains=nChains, warmup=nBurn, seed=randomSeed)
+    trace = fit.to_dataframe()
 
-    with logRegModel:
-        if isinstance(init, str):
-            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, init=init, random_seed=randomSeed)
-        else:
-            trace = pm.sample(tune=nTune, draws=nSamples, chains=nChains, random_seed=randomSeed)
-
-    predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(
-        t,
-        trace,
-        nDaysPredict,
-        nSamples,
-        predictionsPercentiles,
-        nBurn,
-    )
+    predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(t,
+                                                                                     trace,
+                                                                                     nDaysPredict,
+                                                                                     predictionsPercentiles,
+                                                                                     )
 
     predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(countryTSClean,
                                                                        nDaysPredict,
@@ -264,6 +251,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
                     'trace':                    trace,
                     'countryTSClean':           countryTSClean,
                     'countryName':              countryName,
+                    't':                        t,
                  }
 
     return prediction
@@ -325,19 +313,24 @@ def _dumpCountryPrediction(prediction, siteData, predictionsPercentiles):
                                          'prediction-conf-int-%s.json' % countryNameSimple),
                                     )
 
-def _main(countryTrainIndex,
-          target = 'confirmed',
-          predictionsPercentiles = PREDICTIONS_PERCENTILES,
-          siteData               = SITE_DATA,
-          subGroup               = 'casesGlobal',
-          jhCSSEFileConfirmed=JH_CSSE_FILE_CONFIRMED,
-          jhCSSEFileDeaths=JH_CSSE_FILE_DEATHS,
-          jhCSSEFileConfirmedDeprecated=JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-          jhCSSEFileDeathsDeprecated=JH_CSSE_FILE_DEATHS_DEPRECATED,
-          jsCSSEReportPath=JH_CSSE_REPORT_PATH,
-          **kwargs
-          ):
-    """
+def predictCountries(countryTrainIndex,
+                     target                        = 'confirmed',
+                     predictionsPercentiles        = PREDICTIONS_PERCENTILES,
+                     siteData                      = SITE_DATA,
+                     subGroup                      = 'casesGlobal',
+                     jhCSSEFileConfirmed           = JH_CSSE_FILE_CONFIRMED,
+                     jhCSSEFileDeaths              = JH_CSSE_FILE_DEATHS,
+                     jhCSSEFileConfirmedDeprecated = JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+                     jhCSSEFileDeathsDeprecated    = JH_CSSE_FILE_DEATHS_DEPRECATED,
+                     jsCSSEReportPath              = JH_CSSE_REPORT_PATH,
+                     priorLogCarryingCapacity      = PRIOR_LOG_CARRYING_CAPACITY,
+                     priorMidPoint                 = PRIOR_MID_POINT,
+                     priorGrowthRate               = PRIOR_GROWTH_RATE,
+                     priorSigma                    = PRIOR_SIGMA,
+                     logRegModel                   = None,
+                     **kwargs
+                     ):
+    """Generate forecasts for countries
 
     Parameters
     ----------
@@ -346,33 +339,56 @@ def _main(countryTrainIndex,
     target: A string in ['confirmed', 'deaths', 'recovered']
     predictionsPercentiles: The posterior percentiles to compute
     siteData: The directory for output data
+    subGroup:
+    jhCSSEFileConfirmed:
+    jhCSSEFileDeaths
+    jhCSSEFileConfirmedDeprecated
+    jhCSSEFileDeathsDeprecated
+    jsCSSEReportPath
+    priorLogCarryingCapacity
+    priorMidPoint
+    priorGrowthRate
+    priorSigma
+    logRegModel
     kwargs: Optional named arguments for covidvu.predictLogisticGrowth
 
     Returns
     -------
-
+    JSON dump of mean prediction and confidence intervals
     """
+    if logRegModel is None:
+        print('Building model. This may take a few moments...')
+        logRegModel = buildLogisticModel(priorLogCarryingCapacity= priorLogCarryingCapacity,
+                                         priorMidPoint           = priorMidPoint,
+                                         priorGrowthRate         = priorGrowthRate,
+                                         priorSigma              = priorSigma,
+                                         )
+        print('Done.')
+    else:
+        assert isinstance(logRegModel, StanModel)
+
     if re.search(r'^\d+$', str(countryTrainIndex)):
-        prediction = predictLogisticGrowth(
-            countryTrainIndex      = countryTrainIndex,
-            predictionsPercentiles = predictionsPercentiles,
-            target                 = target,
-            siteData               = siteData,
-            jhCSSEFileConfirmed    = jhCSSEFileConfirmed,
-            jhCSSEFileDeaths       = jhCSSEFileDeaths,
-            jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
-            jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
-            jsCSSEReportPath              = jsCSSEReportPath,
-            **kwargs
-        )
+        print(f'Training index {countryTrainIndex}')
+        prediction = predictLogisticGrowth(logRegModel,
+                                           countryTrainIndex             = countryTrainIndex,
+                                           predictionsPercentiles        = predictionsPercentiles,
+                                           target                        = target,
+                                           siteData                      = siteData,
+                                           jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
+                                           jhCSSEFileDeaths              = jhCSSEFileDeaths,
+                                           jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
+                                           jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
+                                           jsCSSEReportPath              = jsCSSEReportPath,
+                                           **kwargs
+                                           )
 
         _dumpCountryPrediction(prediction, siteData, predictionsPercentiles)
-
+        print('Done.')
 
     elif countryTrainIndex == 'all':
         confirmedCases = parseCSSE(target,
                                    siteData                      = siteData,
-                                   jhCSSEFileConfirmed            = jhCSSEFileConfirmed,
+                                   jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
                                    jhCSSEFileDeaths              = jhCSSEFileDeaths,
                                    jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
                                    jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
@@ -382,13 +398,14 @@ def _main(countryTrainIndex,
         for countryName in countriesAll:
             print(f'Training {countryName}...')
 
-            prediction = predictLogisticGrowth(countryName            = countryName,
-                                               confirmedCases         = confirmedCases,
-                                               predictionsPercentiles = predictionsPercentiles,
-                                               target                 = target,
-                                               siteData               = siteData,
-                                               jhCSSEFileConfirmed    = jhCSSEFileConfirmed,
-                                               jhCSSEFileDeaths       = jhCSSEFileDeaths,
+            prediction = predictLogisticGrowth(logRegModel,
+                                               countryName                   = countryName,
+                                               confirmedCases                = confirmedCases,
+                                               predictionsPercentiles        = predictionsPercentiles,
+                                               target                        = target,
+                                               siteData                      = siteData,
+                                               jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
+                                               jhCSSEFileDeaths              = jhCSSEFileDeaths,
                                                jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
                                                jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
                                                jsCSSEReportPath              = jsCSSEReportPath,
@@ -399,6 +416,7 @@ def _main(countryTrainIndex,
                 print('Saved.')
             else:
                 print('Skipped.')
+        print('Done.')
     else:
         raise NotImplementedError
 
@@ -457,5 +475,5 @@ def loadAll(target='confirmed', subGroup='casesGlobal', **kwargs):
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
-        _main(argument)
+        predictCountries(argument)
 
