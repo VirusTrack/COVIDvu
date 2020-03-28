@@ -24,8 +24,7 @@ import json
 
 import numpy as np
 import pandas as pd
-import pymc3 as pm
-
+import pystan
 
 N_SAMPLES        = 2000
 N_TUNE           = 500
@@ -35,9 +34,9 @@ N_DAYS_PREDICT   = 14
 MIN_CASES_FILTER = 50
 MIN_NUMBER_DAYS_WITH_CASES = 10
 
-PRIOR_LOG_CARRYING_CAPACITY = (3, 10)
-PRIOR_MID_POINT             = (0, 1e3)
-PRIOR_GROWTH_RATE           = (0, 1)
+PRIOR_LOG_CARRYING_CAPACITY = (0, 5)
+PRIOR_MID_POINT             = (0, 1000)
+PRIOR_GROWTH_RATE           = (0.5, 0.5)
 PRIOR_SIGMA                 = (0, 10)
 
 PREDICTIONS_PERCENTILES = (
@@ -53,47 +52,41 @@ def _getCountryToTrain(countryTrainIndex, confirmedCases):
     return countryName
 
 
-def _initializeLogisticModel(t,
-                             dataLog,
-                             priorLogCarryingCapacity,
-                             priorMidPoint,
-                             priorGrowthRate,
-                             priorSigma,
-                             ):
-    logRegModel = pm.Model()
-    with logRegModel:
-        # Priors
-        logCarryingCapacity = pm.Uniform(name  = 'logCarryingCapacity',
-                                         lower = priorLogCarryingCapacity[0],
-                                         upper =priorLogCarryingCapacity[1],
-                                         )
-
-        midPoint = pm.Uniform(name = 'midPoint',
-                              lower = priorMidPoint[0],
-                              upper = priorMidPoint[1],
-                              )
-
-        growthRate = pm.Uniform(name  = 'growthRate',
-                                lower = priorGrowthRate[0],
-                                upper = priorGrowthRate[1],
-                                )
-
-        sigma = pm.Uniform(name  = 'sigma',
-                           lower = priorSigma[0],
-                           upper = priorSigma[1],
-                           )
-
-        # Mean
-        carryingCap = 10 ** logCarryingCapacity
-        casesLin = carryingCap / (1 + np.exp(-1.0 * growthRate * (t - midPoint)))
-        casesLog = np.log(casesLin + 1)
-
-        # Likelihood
-        _ = pm.Normal(name     = 'casesObsLog',
-                      mu       = casesLog,
-                      sigma    = sigma,
-                      observed = dataLog,
-                      )
+def buildLogisticModel(priorLogCarryingCapacity,
+                       priorMidPoint,
+                       priorGrowthRate,
+                       priorSigma,
+                       nDaysName='nDays',
+                       timeName='t',
+                       casesLogName='casesLog',
+                       ):
+    logisticGrowthModel = f'''
+    data {{
+      int<lower=0> {nDaysName};
+      vector[{nDaysName}] {timeName};
+      vector[{nDaysName}] {casesLogName};
+    }}
+    parameters {{
+      real logCarryingCapacity;
+      real midPoint;
+      real growthRate;
+      real<lower=0> sigma;
+    }}
+    transformed parameters {{
+        real carryingCap;
+        vector[{nDaysName}] casesLin;
+        carryingCap = pow(10, logCarryingCapacity);    
+        casesLin = carryingCap * inv_logit(growthRate * ({timeName} - midPoint));    
+    }}
+    model {{
+      logCarryingCapacity ~ normal({priorLogCarryingCapacity[0]},{priorLogCarryingCapacity[1]}) T[0,];
+      midPoint ~ normal({priorMidPoint[0]}, {priorMidPoint[1]}) T[0,];
+      growthRate ~ normal({priorGrowthRate[0]},{priorGrowthRate[1]});
+      sigma ~ normal({priorSigma[0]},{priorSigma[1]}) T[0,];
+      {casesLogName} ~ normal(log(casesLin + 1), sigma);
+    }}
+    '''
+    logRegModel = pystan.StanModel(model_code=logisticGrowthModel)
     return logRegModel
 
 
@@ -197,6 +190,7 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     nBurn: Number of initial iterations to discard for MCMC
     nDaysPredict: Number of days ahead to predict
     minCasesFilter: Minimum number of cases for prediction
+    minNumberDaysWithCases: Minimum number of days with at least minCasesFilter
     priorLogCarryingCapacity: Bounds for the uniform prior for log10 carrying capacity
     priorMidPoint: Bounds for the uniform prior for the mid-point
     priorGrowthRate: Bounds for the uniform prior for the growth rate
@@ -240,12 +234,6 @@ def predictLogisticGrowth(countryTrainIndex: int        = None,
     t = np.arange(countryTSClean.shape[0])
     countryTSCleanLog = np.log(countryTSClean.values + 1)
 
-    logRegModel = _initializeLogisticModel(t, countryTSCleanLog,
-                                           priorLogCarryingCapacity=priorLogCarryingCapacity,
-                                           priorMidPoint=priorMidPoint,
-                                           priorGrowthRate=priorGrowthRate,
-                                           priorSigma=priorSigma,
-                                           )
 
     with logRegModel:
         if isinstance(init, str):
