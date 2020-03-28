@@ -17,6 +17,8 @@ Listed in the order in which they joined this development effort.
 |[kotiek14](https://github.com/kotek14/)|Stepan Sgibnev|
 |n/a/d|[Jim Key](https://www.linkedin.com/in/jimkey/)|
 |n/a/d|[Jessica Powell](https://www.linkedin.com/in/jessica-powell-28b8b7a/)|
+|[dlwhitehurst](https://www.linkedin.com/in/dlwhitehurst/)|David L. Whitehurst|
+
 
 &#42; _Not a developer_
 
