@@ -121,7 +121,7 @@ function generateVirusUpdateJSONFiles {
 
     env | awk '/VIRT/' | sort
     python3 -m covidvu.pipeline.vujson confirmed deaths
-    ls -Alrt "$SITE_DATA_DIR"
+    ls -Alrt "$SITE_DATA_DIR" | awk '!/conf-int/ && !/mean-/'
 } # generateVirusUpdateJSONFiles
 
 
@@ -172,7 +172,7 @@ function patchJSONFiles {
 
         echo "vudpatch - patching stale JH CSSE data with latest, calculated updates"
         python -m covidvu.pipeline.vudpatch confirmed deaths
-        ls -Alrt "$SITE_DATA_DIR"/*json
+        ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
     fi
 } # patchJSONFiles
 
@@ -180,7 +180,7 @@ function patchJSONFiles {
 function packJSONFiles {
     echo "jsonpack - combine individual JSON files into a single blob"
     python3 -m covidvu.pipeline.jsonpack
-    ls -Alrt "$SITE_DATA_DIR"/*json
+    ls -Alrt "$SITE_DATA_DIR"/*json | awk '!/conf-int/ && !/mean-/'
 } # packJSONFiles
 
 
@@ -188,7 +188,7 @@ function generateRegionsJSONBundle {
     echo "vuregions - generate continental region summaries"
     env | awk '/VIRT/' | sort
     python3 -m covidvu.pipeline.vuregions
-    ls -Alrt "$SITE_DATA_DIR"
+    ls -Alrt "$SITE_DATA_DIR"/bundle*json
 } # generateRegionsJSONBundle
 
 
