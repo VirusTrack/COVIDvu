@@ -15,7 +15,6 @@ export const CheckboxRegionComponent = ({data, selected, handleSelected, default
   }
 
   const onChange = (region) => {
-
     if(selected.indexOf(region) === -1) {
       handleSelected([...selected, region])
     } else {
