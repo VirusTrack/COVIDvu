@@ -24,6 +24,7 @@ export const FooterContainer = () =>{
     const [currentLastUpdate, setCurrentLastUpdate] = useState(lastUpdate)
 
     useInterval(() => {
+        console.log("Fetching latest update...")
         dispatch(actions.fetchLastUpdate())
     }, CACHE_TIMER)
 
