@@ -105,11 +105,11 @@ def test__dumpTimeSeriesAsJSON():
 # THESE TESTS MUST BE RUN IN ORDER
 def test_predictLogisticGrowth():
     nDaysPredict = 10
-    # logRegModel = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
-    #                                  PRIOR_MID_POINT,
-    #                                  PRIOR_GROWTH_RATE,
-    #                                  PRIOR_SIGMA, )
-    prediction = predictLogisticGrowth(None,
+    logRegModel = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
+                                     PRIOR_MID_POINT,
+                                     PRIOR_GROWTH_RATE,
+                                     PRIOR_SIGMA, )
+    prediction = predictLogisticGrowth(logRegModel,
                                        countryName                   = 'US',
                                        siteData                      = TEST_SITE_DATA,
                                        jhCSSEFileConfirmed           = TEST_JH_CSSE_FILE_CONFIRMED,
