@@ -103,12 +103,18 @@ def test__dumpTimeSeriesAsJSON():
 
 # ----------------------------------------------------------------
 # THESE TESTS MUST BE RUN IN ORDER
-def test_predictLogisticGrowth():
-    nDaysPredict = 10
+logRegModel = None
+def test_logRegModel():
+    global logRegModel
     logRegModel = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
                                      PRIOR_MID_POINT,
                                      PRIOR_GROWTH_RATE,
                                      PRIOR_SIGMA, )
+    assert isinstance(logRegModel, StanModel)
+
+
+def test_predictLogisticGrowth():
+    nDaysPredict = 10
     prediction = predictLogisticGrowth(logRegModel,
                                        countryName                   = 'US',
                                        siteData                      = TEST_SITE_DATA,
@@ -119,6 +125,7 @@ def test_predictLogisticGrowth():
                                        nSamples                      = TEST_N_SAMPLES,
                                        nChains                       = TEST_N_CHAINS,
                                        )
+
     predictionIndex = pd.date_range(start = prediction['countryTSClean'].index[0],
                                     end   = prediction['countryTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D'),
                                     )
