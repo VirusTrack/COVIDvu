@@ -108,7 +108,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
 
     return (
         <Generic tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
-            <Plot
+            <Plot id="graphPlot"
                 data={plotsAsValues}
                 layout={layout}
                 config={mergeConfig}

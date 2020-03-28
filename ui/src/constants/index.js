@@ -4,8 +4,8 @@ const LOCAL_DATA_URL = `http://localhost:3100/site-data`
 
 const LAST_UPDATE_KEY = 'covid-lastUpdated'
 
-const CACHE_TIMER = 5 * 60 * 1000
 const ONE_MINUTE = 1 * 60 * 1000
+const CACHE_TIMER = ONE_MINUTE
 
 const GOOGLE_ANALYTICS_KEY = 'UA-574325-5'
 
