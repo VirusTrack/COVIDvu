@@ -44,6 +44,7 @@ export const FooterContainer = () =>{
                 excludeChina: true
             }))
             dispatch(actions.fetchTotalGlobalStats())
+            dispatch(actions.fetchGlobalPredictions())
             dispatch(actions.fetchTop10USStates())
             dispatch(actions.fetchTotalUSStatesStats())    
         } else {
