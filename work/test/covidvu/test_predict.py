@@ -25,7 +25,7 @@ from covidvu.predict import getSavedShortCountryNames
 from covidvu.predict import load
 from covidvu.predict import loadAll
 from covidvu.predict import MIN_CASES_FILTER
-from covidvu.predict import predictCountries
+from covidvu.predict import predictRegions
 from covidvu.predict import PREDICTIONS_PERCENTILES
 from covidvu.predict import predictLogisticGrowth
 from covidvu.predict import PRIOR_GROWTH_RATE
@@ -217,7 +217,7 @@ def test__dumpPredictionCollectionAsJSON():
 
 def test_predictCountries():
     try:
-        predictCountries(0,
+        predictRegions(0,
               nDaysPredict        = 10,
               siteData=TEST_SITE_DATA,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
@@ -231,7 +231,7 @@ def test_predictCountries():
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
 
-        predictCountries('all',
+        predictRegions('all',
               nDaysPredict=10,
               siteData=TEST_SITE_DATA,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
@@ -256,7 +256,7 @@ def test_predictCountries():
 
 def test_load():
     try:
-        predictCountries('all',
+        predictRegions('all',
               siteData=TEST_SITE_DATA,
               nDaysPredict=10,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
@@ -281,7 +281,7 @@ def test_load():
 
 def test_getSavedShortCountryNames():
     try:
-        predictCountries('all',
+        predictRegions('all',
               siteData=TEST_SITE_DATA,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
@@ -302,7 +302,7 @@ def test_getSavedShortCountryNames():
 
 def test_loadAll():
     try:
-        predictCountries('all',
+        predictRegions('all',
               siteData=TEST_SITE_DATA,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,

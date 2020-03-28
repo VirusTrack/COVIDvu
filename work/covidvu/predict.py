@@ -310,7 +310,7 @@ def _dumpCountryPrediction(prediction, siteData, predictionsPercentiles):
                                          'prediction-conf-int-%s.json' % countryNameSimple),
                                     )
 
-def predictCountries(countryTrainIndex,
+def predictRegions(countryTrainIndex,
                      target                        = 'confirmed',
                      predictionsPercentiles        = PREDICTIONS_PERCENTILES,
                      siteData                      = SITE_DATA,
@@ -327,7 +327,7 @@ def predictCountries(countryTrainIndex,
                      logRegModel                   = None,
                      **kwargs
                      ):
-    """Generate forecasts for countries
+    """Generate forecasts for regions
 
     Parameters
     ----------
@@ -472,5 +472,6 @@ def loadAll(target='confirmed', subGroup='casesGlobal', **kwargs):
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
-        predictCountries(argument)
+        predictRegions(argument)
+        predictRegions(argument, subGroup='casesUSStates')
 
