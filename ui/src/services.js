@@ -4,6 +4,7 @@ import {
     DATA_URL, 
     STAGING_DATA_URL, 
     LOCAL_DATA_URL, 
+    LAST_UPDATE_KEY,
 } from './constants'
 
 import store from 'store2'
@@ -28,12 +29,13 @@ function dataUrl() {
     }
 }
 
-
 class DataService {
 
     async getGlobal() {
         try {
-            const response = await axios.get(`${dataUrl()}/bundle-global.json`)
+            const localUpdate = store.session(LAST_UPDATE_KEY) !== null ? store.session(LAST_UPDATE_KEY) : new Date().getTime()
+
+            const response = await axios.get(`${dataUrl()}/bundle-global.json?timestamp=${localUpdate}`)
             return response.data
         } catch(error) {
             console.error(error)
@@ -43,7 +45,8 @@ class DataService {
 
     async getGlobalPredictions() {
         try {
-            const response = await axios.get(`${dataUrl()}/bundle-predictions-global.json`)
+            const localUpdate = store.session(LAST_UPDATE_KEY) !== null ? store.session(LAST_UPDATE_KEY) : new Date().getTime()
+            const response = await axios.get(`${dataUrl()}/bundle-predictions-global.json?timestamp=${localUpdate}`)
             return response.data
         } catch(error) {
             console.error(error)
@@ -53,7 +56,8 @@ class DataService {
 
     async getContinental() {
         try {
-            const response = await axios.get(`${dataUrl()}/bundle-continental-regions.json`)                            
+            const localUpdate = store.session(LAST_UPDATE_KEY) !== null ? store.session(LAST_UPDATE_KEY) : new Date().getTime()
+            const response = await axios.get(`${dataUrl()}/bundle-continental-regions.json?timestamp=${localUpdate}`)                            
             return response.data
         } catch(error) {
             console.error(error)
@@ -63,7 +67,8 @@ class DataService {
 
     async getUSStates() {
         try {
-            const response = await axios.get(`${dataUrl()}/bundle-US.json`)
+            const localUpdate = store.session(LAST_UPDATE_KEY) !== null ? store.session(LAST_UPDATE_KEY) : new Date().getTime()
+            const response = await axios.get(`${dataUrl()}/bundle-US.json?timestamp=${localUpdate}`)
             return response.data
         } catch(error) {
             console.error(error)
@@ -73,7 +78,8 @@ class DataService {
 
     async getUSRegions() {
         try {
-            const response = await axios.get(`${dataUrl()}/bundle-US-Regions.json`)
+            const localUpdate = store.session(LAST_UPDATE_KEY) !== null ? store.session(LAST_UPDATE_KEY) : new Date().getTime()
+            const response = await axios.get(`${dataUrl()}/bundle-US-Regions.json?timestamp=${localUpdate}`)
             return response.data
         } catch(error) {
             console.error(error)

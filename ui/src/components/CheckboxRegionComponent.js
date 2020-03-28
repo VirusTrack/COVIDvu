@@ -5,7 +5,15 @@ import numeral from 'numeral'
 
 import ReactGA from 'react-ga';
 
-export const CheckboxRegionComponent = ({data, selected, handleSelected, defaultSelected = [], showLog = false, parentRegion}) => {
+export const CheckboxRegionComponent = (
+        {
+          data, 
+          selected, 
+          handleSelected, 
+          showLog = false, 
+          showPredictions = false,
+          parentRegion
+        }) => {
 
   const [regionList, setRegionList] = useState(data)
   const [alphaSort, setAlphaSort] = useState(false)
@@ -16,6 +24,11 @@ export const CheckboxRegionComponent = ({data, selected, handleSelected, default
 
   const onChange = (region) => {
 
+    if(showPredictions) {
+      handleSelected([region])
+      return
+    }
+    
     if(selected.indexOf(region) === -1) {
       handleSelected([...selected, region])
     } else {

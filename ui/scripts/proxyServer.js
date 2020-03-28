@@ -51,7 +51,7 @@ const main = async (argv) => {
         fs.writeFileSync('./site-data/bundle-continental-regions.json', JSON.stringify(continental_regions.data))
         fs.writeFileSync('./site-data/bundle-US.json', JSON.stringify(us_states.data))
         fs.writeFileSync('./site-data/bundle-US-Regions.json', JSON.stringify(us_regions.data))
-        fs.writeFileSync('./site-data/last-update.txt', JSON.stringify(last_update.data))
+        fs.writeFileSync('./site-data/last-update.txt', last_update.data)
     } else if(argv.serveLocalCache) {
 
         if(fs.existsSync('./site-data/bundle-global.json') && 
