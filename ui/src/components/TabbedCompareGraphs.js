@@ -3,6 +3,7 @@ import React from 'react'
 import { Tab, Level } from 'rbx'
 
 import GraphWithLoader from '../components/GraphWithLoader'
+import PredictionGraph from '../components/PredictionGraph'
 import GraphScaleControl from '../components/GraphScaleControl'
 import GraphDownloadButton from '../components/GraphDownloadButton'
 
@@ -15,7 +16,10 @@ export const TabbedCompareGraphs = (
         selected,
         handleSelectedGraph,
         handleGraphScale,
+        handleShowPredictions,
+        predictions,
         showLog,
+        showPredictions,
         parentRegion,
     }) => {
     
@@ -88,7 +92,9 @@ export const TabbedCompareGraphs = (
                 <Level.Item align="left">
                     <GraphScaleControl
                         showLog={showLog}
+                        showPredictions={showPredictions}
                         handleGraphScale={handleGraphScale}
+                        handleShowPredictions={handleShowPredictions}
                         secondaryGraph={secondaryGraph}
                         parentRegion={parentRegion}
                     />
@@ -98,14 +104,25 @@ export const TabbedCompareGraphs = (
                 </Level.Item>
             </Level>
 
-            <GraphWithLoader 
-                graphName="Cases"
-                secondaryGraph={secondaryGraph}
-                graph={confirmed}
-                selected={selected}
-                showLog={showLog}
-                y_title="Total confirmed cases"
-            />
+            { showPredictions &&
+                <PredictionGraph
+                    graphName="Cases"
+                    selected={selected}
+                    showLog={showLog}
+                    predictions={predictions}
+                    confirmed={confirmed}
+                />
+            }
+            { !showPredictions &&
+                <GraphWithLoader 
+                    graphName="Cases"
+                    secondaryGraph={secondaryGraph}
+                    graph={confirmed}
+                    selected={selected}
+                    showLog={showLog}
+                    y_title="Total confirmed cases"
+                />
+            }
             
 
             <GraphWithLoader 
