@@ -33,13 +33,18 @@ class DataService {
 
     async getGlobal() {
         try {
-            let global = undefined
-
             const response = await axios.get(`${dataUrl()}/bundle-global.json`)
-            
-            global = response.data
-    
-            return global
+            return response.data
+        } catch(error) {
+            console.error(error)
+            return null
+        }
+    }
+
+    async getGlobalPredictions() {
+        try {
+            const response = await axios.get(`${dataUrl()}/bundle-predictions-global.json`)
+            return response.data
         } catch(error) {
             console.error(error)
             return null
@@ -48,13 +53,8 @@ class DataService {
 
     async getContinental() {
         try {
-            let continental = undefined
-
-            const response = await axios.get(`${dataUrl()}/bundle-continental-regions.json`)
-                            
-            continental = response.data
-    
-            return continental
+            const response = await axios.get(`${dataUrl()}/bundle-continental-regions.json`)                            
+            return response.data
         } catch(error) {
             console.error(error)
             return null
@@ -63,12 +63,8 @@ class DataService {
 
     async getUSStates() {
         try {
-            let us_states = undefined
             const response = await axios.get(`${dataUrl()}/bundle-US.json`)
-
-            us_states = response.data
-
-            return us_states
+            return response.data
         } catch(error) {
             console.error(error)
             return null
@@ -77,12 +73,8 @@ class DataService {
 
     async getUSRegions() {
         try {
-            let us_regions = undefined
-
             const response = await axios.get(`${dataUrl()}/bundle-US-Regions.json`)
-            us_regions = response.data
-
-            return us_regions
+            return response.data
         } catch(error) {
             console.error(error)
             return null

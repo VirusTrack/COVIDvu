@@ -27,7 +27,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
                 name: normalizedRegion,
                 showlegend: true,
                 marker: {
-                    size: 3
+                    size: 5
                 }
             }
 
