@@ -60,9 +60,8 @@ TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID
 TEST_JH_CSSE_FILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
                                                        'csse_covid_19_time_series',
                                                        'time_series_covid19_confirmed_global_small.csv')
-TEST_N_SAMPLES = 500
-TEST_N_CHAINS = 1
-TEST_N_BURN = 500
+TEST_N_SAMPLES = 1000
+TEST_N_CHAINS = 2
 
 # *** functions ***
 def _purge(purgeDirectory, pattern):
@@ -106,11 +105,11 @@ def test__dumpTimeSeriesAsJSON():
 # THESE TESTS MUST BE RUN IN ORDER
 def test_predictLogisticGrowth():
     nDaysPredict = 10
-    logRegModel = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
-                                     PRIOR_MID_POINT,
-                                     PRIOR_GROWTH_RATE,
-                                     PRIOR_SIGMA, )
-    prediction = predictLogisticGrowth(logRegModel,
+    # logRegModel = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
+    #                                  PRIOR_MID_POINT,
+    #                                  PRIOR_GROWTH_RATE,
+    #                                  PRIOR_SIGMA, )
+    prediction = predictLogisticGrowth(None,
                                        countryName                   = 'US',
                                        siteData                      = TEST_SITE_DATA,
                                        jhCSSEFileConfirmed           = TEST_JH_CSSE_FILE_CONFIRMED,
@@ -119,7 +118,6 @@ def test_predictLogisticGrowth():
                                        jsCSSEReportPath              = TEST_JH_CSSE_REPORT_PATH,
                                        nSamples                      = TEST_N_SAMPLES,
                                        nChains                       = TEST_N_CHAINS,
-                                       nBurn                         = TEST_N_BURN,
                                        )
     predictionIndex = pd.date_range(start = prediction['countryTSClean'].index[0],
                                     end   = prediction['countryTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D'),

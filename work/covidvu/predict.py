@@ -28,7 +28,6 @@ import pystan
 from pystan.model import StanModel
 
 N_SAMPLES        = 3000
-N_BURN           = 1000
 N_CHAINS         = 3
 N_DAYS_PREDICT   = 14
 MIN_CASES_FILTER = 50
@@ -159,7 +158,6 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
                           subGroup                      = 'casesGlobal',
                           nSamples                      = N_SAMPLES,
                           nChains                       = N_CHAINS,
-                          nBurn                         = N_BURN,
                           nDaysPredict                  = N_DAYS_PREDICT,
                           minCasesFilter                = MIN_CASES_FILTER,
                           minNumberDaysWithCases        = MIN_NUMBER_DAYS_WITH_CASES,
@@ -180,7 +178,6 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
     subGroup: A key in the output of covidvu.pipeline.vujson.parseCSSE
     nSamples: Number of samples per chain of MCMC
     nChains: Number of independent chains MCMC
-    nBurn: Number of initial iterations to discard for MCMC
     nDaysPredict: Number of days ahead to predict
     minCasesFilter: Minimum number of cases for prediction
     minNumberDaysWithCases: Minimum number of days with at least minCasesFilter
@@ -228,7 +225,7 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
                           't': list(t),
                           'casesLog': list(countryTSCleanLog)
                           }
-    fit = logGrowthModel.sampling(data=logisticGrowthData, iter=nSamples, chains=nChains, warmup=nBurn, seed=randomSeed)
+    fit = logGrowthModel.sampling(data=logisticGrowthData, iter=nSamples, chains=nChains, seed=randomSeed)
     trace = fit.to_dataframe()
 
     predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(t,
