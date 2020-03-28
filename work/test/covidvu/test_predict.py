@@ -104,7 +104,7 @@ def test__dumpTimeSeriesAsJSON():
 # ----------------------------------------------------------------
 # THESE TESTS MUST BE RUN IN ORDER
 logRegModel = None
-def test_logRegModel():
+def test_buildLogisticModel():
     global logRegModel
     logRegModel = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
                                      PRIOR_MID_POINT,
