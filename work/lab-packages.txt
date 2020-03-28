@@ -1,4 +1,3 @@
-Listing...
 0ad/bionic 0.0.22-4 amd64
 0ad-data/bionic 0.0.22-1 all
 0ad-data-common/bionic 0.0.22-1 all
