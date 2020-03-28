@@ -60,7 +60,6 @@ TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID
 TEST_JH_CSSE_FILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
                                                        'csse_covid_19_time_series',
                                                        'time_series_covid19_confirmed_global_small.csv')
-LOG_REG_MODEL = 0
 TEST_N_SAMPLES = 500
 TEST_N_CHAINS = 1
 TEST_N_BURN = 500
@@ -105,18 +104,13 @@ def test__dumpTimeSeriesAsJSON():
 
 # ----------------------------------------------------------------
 # THESE TESTS MUST BE RUN IN ORDER
-def test_buildLogisticModel():
-    global LOG_REG_MODEL
-    LOG_REG_MODEL = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
+def test_predictLogisticGrowth():
+    nDaysPredict = 10
+    logRegModel = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
                                      PRIOR_MID_POINT,
                                      PRIOR_GROWTH_RATE,
                                      PRIOR_SIGMA, )
-    assert isinstance(LOG_REG_MODEL, StanModel)
-
-
-def test_predictLogisticGrowth():
-    nDaysPredict = 10
-    prediction = predictLogisticGrowth(LOG_REG_MODEL,
+    prediction = predictLogisticGrowth(logRegModel,
                                        countryName                   = 'US',
                                        siteData                      = TEST_SITE_DATA,
                                        jhCSSEFileConfirmed           = TEST_JH_CSSE_FILE_CONFIRMED,
@@ -142,192 +136,192 @@ def test_predictLogisticGrowth():
     return prediction
 
 
-def test__dumpCountryPrediction():
-    prediction = test_predictLogisticGrowth()
-    try:
-        _dumpCountryPrediction(prediction, TEST_SITE_DATA, PREDICTIONS_PERCENTILES)
-        _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-US.json'))
-        _assertValidJSON(join(TEST_SITE_DATA,'prediction-conf-int-US.json'))
-
-    except Exception as e:
-        raise e
-    finally:
-        _purge(TEST_SITE_DATA, '.json')
-
-
-def test__getPredictionsFromPosteriorSamples():
-    nDaysPredict   = 14
-    prediction = test_predictLogisticGrowth()
-
-    predictionsMean, predictionsPercentiles = _getPredictionsFromPosteriorSamples(prediction['t'],
-                                                                                  prediction['trace'],
-                                                                                  nDaysPredict,
-                                                                                  PREDICTIONS_PERCENTILES,
-                                                                                  )
-    assert isinstance(predictionsMean, ndarray)
-    assert len(predictionsMean) == prediction['countryTSClean'].shape[0] + nDaysPredict
-    assert len(predictionsPercentiles) == len(PREDICTIONS_PERCENTILES)
-    assert isinstance(predictionsPercentiles[0][0], ndarray)
-    assert len(predictionsPercentiles[0][0]) == prediction['countryTSClean'].shape[0] + nDaysPredict
-
-    prediction['predictionsMean'] = predictionsMean
-    prediction['predictionsPercentiles'] = predictionsPercentiles
-    prediction['nDaysPredict'] = nDaysPredict
-    return prediction
-
-
-def test__castPredictionsAsTS():
-    predictions = test__getPredictionsFromPosteriorSamples()
-    startDate   = '2020-01-01'
-    startDate   = pd.to_datetime(startDate).date()
-    endDate     = startDate + pd.Timedelta(len(predictions['countryTSClean'])-1, 'D')
-    predictionIndex = pd.date_range(start = startDate,
-                                    end   = endDate,
-                                    )
-    countryTSClean = pd.Series(index = predictionIndex, data  = predictions['countryTSClean'])
-    predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(countryTSClean,
-                                                                       predictions['nDaysPredict'],
-                                                                       predictions['predictionsMean'],
-                                                                       predictions['predictionsPercentiles'],
-                                                                       )
-    assert isinstance(predictionsMeanTS, Series)
-    assert predictionsMeanTS.shape[0] == len(predictions['countryTSClean']) + predictions['nDaysPredict']
-    assert isinstance(predictionsMeanTS.index, DatetimeIndex)
-    assert len(predictionsPercentilesTS) == len(PREDICTIONS_PERCENTILES)
-    assert isinstance(predictionsPercentilesTS[0][0], Series)
-    assert isinstance(predictionsPercentilesTS[0][0].index, DatetimeIndex)
-    assert predictionsPercentilesTS[0][0].shape[0] == len(predictions['countryTSClean']) + predictions['nDaysPredict']
-    return predictionsMeanTS, predictionsPercentilesTS, predictions
-
-
-def test__dumpPredictionCollectionAsJSON():
-    predictionsMeanTS, predictionsPercentilesTS, predictions = test__castPredictionsAsTS()
-    try:
-        _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
-                                        'US',
-                                        PREDICTIONS_PERCENTILES,
-                                        join(TEST_SITE_DATA,'test-ts-collection.json'),
-                                        )
-        _assertValidJSON(join(TEST_SITE_DATA, 'test-ts-collection.json'))
-    except Exception as e:
-        raise e
-    finally:
-        _purge(TEST_SITE_DATA, '.json')
-
-
-def test_predictCountries():
-    try:
-        predictCountries(0,
-              nDaysPredict        = 10,
-              siteData=TEST_SITE_DATA,
-              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
-              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel = LOG_REG_MODEL,
-              nSamples=TEST_N_SAMPLES,
-              nChains=TEST_N_CHAINS,
-              nBurn=TEST_N_BURN,
-              )
-        _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
-
-        predictCountries('all',
-              nDaysPredict=10,
-              siteData=TEST_SITE_DATA,
-              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel=LOG_REG_MODEL,
-                         nSamples=TEST_N_SAMPLES,
-                         nChains=TEST_N_CHAINS,
-                         nBurn=TEST_N_BURN,
-              )
-
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-Italy.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-Italy.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-US.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-US.json'))
-
-    except Exception as e:
-        raise e
-    finally:
-        _purge(TEST_SITE_DATA, '.json')
-
-
-def test_load():
-    try:
-        predictCountries('all',
-              siteData=TEST_SITE_DATA,
-              nDaysPredict=10,
-              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel=LOG_REG_MODEL,
-                         nSamples=TEST_N_SAMPLES,
-                         nChains=TEST_N_CHAINS,
-                         nBurn=TEST_N_BURN,
-              )
-
-        meanPredictionTS, percentilesTS, countryName = load(0, siteData=TEST_SITE_DATA)
-        assert isinstance(meanPredictionTS, Series)
-        assert isinstance(percentilesTS, DataFrame)
-        assert isinstance(countryName, str)
-        assert (percentilesTS.columns.isin(['97.5', '2.5', '25', '75'])).all()
-    except Exception as e:
-        raise e
-    finally:
-        _purge(TEST_SITE_DATA, '.json')
-
-
-def test_getSavedShortCountryNames():
-    try:
-        predictCountries('all',
-              siteData=TEST_SITE_DATA,
-              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel=LOG_REG_MODEL,
-                         nSamples=TEST_N_SAMPLES,
-                         nChains=TEST_N_CHAINS,
-                         nBurn=TEST_N_BURN,
-              )
-        countryNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
-        assert isinstance(countryNameShortAll, list)
-        assert len(countryNameShortAll) == 3
-    except Exception as e:
-        raise e
-    finally:
-        _purge(TEST_SITE_DATA, '.json')
-
-
-def test_loadAll():
-    try:
-        predictCountries('all',
-              siteData=TEST_SITE_DATA,
-              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel=LOG_REG_MODEL,
-                         nSamples=TEST_N_SAMPLES,
-                         nChains=TEST_N_CHAINS,
-                         nBurn=TEST_N_BURN,
-              )
-
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA,
-                                                                            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-                                                                            jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-                                                                            jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-                                                                            jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-                                                                            )
-        assert isinstance(confirmedCasesAll, DataFrame)
-        assert isinstance(meanPredictionTSAll, DataFrame)
-        assert isinstance(percentilesTSAll, DataFrame)
-    except Exception as e:
-        raise e
-    finally:
-        _purge(TEST_SITE_DATA, '.json')
+# def test__dumpCountryPrediction():
+#     prediction = test_predictLogisticGrowth()
+#     try:
+#         _dumpCountryPrediction(prediction, TEST_SITE_DATA, PREDICTIONS_PERCENTILES)
+#         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-US.json'))
+#         _assertValidJSON(join(TEST_SITE_DATA,'prediction-conf-int-US.json'))
+#
+#     except Exception as e:
+#         raise e
+#     finally:
+#         _purge(TEST_SITE_DATA, '.json')
+#
+#
+# def test__getPredictionsFromPosteriorSamples():
+#     nDaysPredict   = 14
+#     prediction = test_predictLogisticGrowth()
+#
+#     predictionsMean, predictionsPercentiles = _getPredictionsFromPosteriorSamples(prediction['t'],
+#                                                                                   prediction['trace'],
+#                                                                                   nDaysPredict,
+#                                                                                   PREDICTIONS_PERCENTILES,
+#                                                                                   )
+#     assert isinstance(predictionsMean, ndarray)
+#     assert len(predictionsMean) == prediction['countryTSClean'].shape[0] + nDaysPredict
+#     assert len(predictionsPercentiles) == len(PREDICTIONS_PERCENTILES)
+#     assert isinstance(predictionsPercentiles[0][0], ndarray)
+#     assert len(predictionsPercentiles[0][0]) == prediction['countryTSClean'].shape[0] + nDaysPredict
+#
+#     prediction['predictionsMean'] = predictionsMean
+#     prediction['predictionsPercentiles'] = predictionsPercentiles
+#     prediction['nDaysPredict'] = nDaysPredict
+#     return prediction
+#
+#
+# def test__castPredictionsAsTS():
+#     predictions = test__getPredictionsFromPosteriorSamples()
+#     startDate   = '2020-01-01'
+#     startDate   = pd.to_datetime(startDate).date()
+#     endDate     = startDate + pd.Timedelta(len(predictions['countryTSClean'])-1, 'D')
+#     predictionIndex = pd.date_range(start = startDate,
+#                                     end   = endDate,
+#                                     )
+#     countryTSClean = pd.Series(index = predictionIndex, data  = predictions['countryTSClean'])
+#     predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(countryTSClean,
+#                                                                        predictions['nDaysPredict'],
+#                                                                        predictions['predictionsMean'],
+#                                                                        predictions['predictionsPercentiles'],
+#                                                                        )
+#     assert isinstance(predictionsMeanTS, Series)
+#     assert predictionsMeanTS.shape[0] == len(predictions['countryTSClean']) + predictions['nDaysPredict']
+#     assert isinstance(predictionsMeanTS.index, DatetimeIndex)
+#     assert len(predictionsPercentilesTS) == len(PREDICTIONS_PERCENTILES)
+#     assert isinstance(predictionsPercentilesTS[0][0], Series)
+#     assert isinstance(predictionsPercentilesTS[0][0].index, DatetimeIndex)
+#     assert predictionsPercentilesTS[0][0].shape[0] == len(predictions['countryTSClean']) + predictions['nDaysPredict']
+#     return predictionsMeanTS, predictionsPercentilesTS, predictions
+#
+#
+# def test__dumpPredictionCollectionAsJSON():
+#     predictionsMeanTS, predictionsPercentilesTS, predictions = test__castPredictionsAsTS()
+#     try:
+#         _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
+#                                         'US',
+#                                         PREDICTIONS_PERCENTILES,
+#                                         join(TEST_SITE_DATA,'test-ts-collection.json'),
+#                                         )
+#         _assertValidJSON(join(TEST_SITE_DATA, 'test-ts-collection.json'))
+#     except Exception as e:
+#         raise e
+#     finally:
+#         _purge(TEST_SITE_DATA, '.json')
+#
+#
+# def test_predictCountries():
+#     try:
+#         predictCountries(0,
+#               nDaysPredict        = 10,
+#               siteData=TEST_SITE_DATA,
+#               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+#               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+#               jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+#               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+#               logRegModel = LOG_REG_MODEL,
+#               nSamples=TEST_N_SAMPLES,
+#               nChains=TEST_N_CHAINS,
+#               nBurn=TEST_N_BURN,
+#               )
+#         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
+#         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
+#
+#         predictCountries('all',
+#               nDaysPredict=10,
+#               siteData=TEST_SITE_DATA,
+#               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+#               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+#               jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+#               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+#               logRegModel=LOG_REG_MODEL,
+#                          nSamples=TEST_N_SAMPLES,
+#                          nChains=TEST_N_CHAINS,
+#                          nBurn=TEST_N_BURN,
+#               )
+#
+#         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-Italy.json'))
+#         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-Italy.json'))
+#         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-US.json'))
+#         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-US.json'))
+#
+#     except Exception as e:
+#         raise e
+#     finally:
+#         _purge(TEST_SITE_DATA, '.json')
+#
+#
+# def test_load():
+#     try:
+#         predictCountries('all',
+#               siteData=TEST_SITE_DATA,
+#               nDaysPredict=10,
+#               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+#               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+#               jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+#               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+#               logRegModel=LOG_REG_MODEL,
+#                          nSamples=TEST_N_SAMPLES,
+#                          nChains=TEST_N_CHAINS,
+#                          nBurn=TEST_N_BURN,
+#               )
+#
+#         meanPredictionTS, percentilesTS, countryName = load(0, siteData=TEST_SITE_DATA)
+#         assert isinstance(meanPredictionTS, Series)
+#         assert isinstance(percentilesTS, DataFrame)
+#         assert isinstance(countryName, str)
+#         assert (percentilesTS.columns.isin(['97.5', '2.5', '25', '75'])).all()
+#     except Exception as e:
+#         raise e
+#     finally:
+#         _purge(TEST_SITE_DATA, '.json')
+#
+#
+# def test_getSavedShortCountryNames():
+#     try:
+#         predictCountries('all',
+#               siteData=TEST_SITE_DATA,
+#               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+#               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+#               jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+#               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+#               logRegModel=LOG_REG_MODEL,
+#                          nSamples=TEST_N_SAMPLES,
+#                          nChains=TEST_N_CHAINS,
+#                          nBurn=TEST_N_BURN,
+#               )
+#         countryNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
+#         assert isinstance(countryNameShortAll, list)
+#         assert len(countryNameShortAll) == 3
+#     except Exception as e:
+#         raise e
+#     finally:
+#         _purge(TEST_SITE_DATA, '.json')
+#
+#
+# def test_loadAll():
+#     try:
+#         predictCountries('all',
+#               siteData=TEST_SITE_DATA,
+#               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+#               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+#               jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+#               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+#               logRegModel=LOG_REG_MODEL,
+#                          nSamples=TEST_N_SAMPLES,
+#                          nChains=TEST_N_CHAINS,
+#                          nBurn=TEST_N_BURN,
+#               )
+#
+#         confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA,
+#                                                                             jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+#                                                                             jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+#                                                                             jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+#                                                                             jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+#                                                                             )
+#         assert isinstance(confirmedCasesAll, DataFrame)
+#         assert isinstance(meanPredictionTSAll, DataFrame)
+#         assert isinstance(percentilesTSAll, DataFrame)
+#     except Exception as e:
+#         raise e
+#     finally:
+#         _purge(TEST_SITE_DATA, '.json')
