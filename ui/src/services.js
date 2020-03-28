@@ -46,7 +46,18 @@ class DataService {
     async getGlobalPredictions() {
         try {
             const localUpdate = store.session(LAST_UPDATE_KEY) !== null ? store.session(LAST_UPDATE_KEY) : new Date().getTime()
-            const response = await axios.get(`${dataUrl()}/bundle-predictions-global.json?timestamp=${localUpdate}`)                            
+            const response = await axios.get(`${dataUrl()}/bundle-global-predictions.json?timestamp=${localUpdate}`)                            
+            return response.data
+        } catch(error) {
+            console.error(error)
+            return null
+        }
+    }
+
+    async getUSPredictions() {
+        try {
+            const localUpdate = store.session(LAST_UPDATE_KEY) !== null ? store.session(LAST_UPDATE_KEY) : new Date().getTime()
+            const response = await axios.get(`${dataUrl()}/bundle-US-predictions.json?timestamp=${localUpdate}`)                            
             return response.data
         } catch(error) {
             console.error(error)
