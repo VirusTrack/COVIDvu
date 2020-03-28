@@ -16,7 +16,7 @@ from pandas.core.series import Series
 from pystan.model import StanModel
 
 from covidvu.predict import _castPredictionsAsTS
-from covidvu.predict import _dumpCountryPrediction
+from covidvu.predict import _dumpRegionPrediction
 from covidvu.predict import _dumpPredictionCollectionAsJSON
 from covidvu.predict import _dumpTimeSeriesAsJSON
 from covidvu.predict import _getPredictionsFromPosteriorSamples
@@ -106,10 +106,10 @@ def test__dumpTimeSeriesAsJSON():
 logRegModel = None
 def test_buildLogisticModel():
     global logRegModel
-    logRegModel = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
-                                     PRIOR_MID_POINT,
-                                     PRIOR_GROWTH_RATE,
-                                     PRIOR_SIGMA, )
+    logRegModel = buildLogisticModel(priorLogCarryingCapacity=PRIOR_LOG_CARRYING_CAPACITY,
+                                     priorMidPoint=PRIOR_MID_POINT,
+                                     priorGrowthRate=PRIOR_GROWTH_RATE,
+                                     priorSigma=PRIOR_SIGMA, )
     assert isinstance(logRegModel, StanModel)
 
 
@@ -145,7 +145,7 @@ def test_predictLogisticGrowth():
 def test__dumpCountryPrediction():
     prediction = test_predictLogisticGrowth()
     try:
-        _dumpCountryPrediction(prediction, TEST_SITE_DATA, PREDICTIONS_PERCENTILES)
+        _dumpRegionPrediction(prediction, TEST_SITE_DATA, PREDICTIONS_PERCENTILES)
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-US.json'))
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-conf-int-US.json'))
 
@@ -302,18 +302,8 @@ def test_getSavedShortCountryNames():
 
 def test_loadAll():
     try:
-        predictRegions('all',
-              siteData=TEST_SITE_DATA,
-              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel=logRegModel,
-                         nSamples=TEST_N_SAMPLES,
-                         nChains=TEST_N_CHAINS,
-              )
 
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA,
+        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA,'test-predictions'),
                                                                             jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
                                                                             jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
                                                                             jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
