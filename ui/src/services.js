@@ -43,7 +43,7 @@ class DataService {
         }
     }
 
-    async getContinental() {
+    async getGlobalPredictions() {
         try {
             const localUpdate = store.session(LAST_UPDATE_KEY) !== null ? store.session(LAST_UPDATE_KEY) : new Date().getTime()
             const response = await axios.get(`${dataUrl()}/bundle-continental-regions.json?timestamp=${localUpdate}`)                            
