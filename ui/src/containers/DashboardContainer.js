@@ -12,8 +12,6 @@ import GraphWithLoader from '../components/GraphWithLoader'
 import HeroElement from '../components/HeroElement'
 import LogoElement from '../components/LogoElement'
 
-// import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_CONTINENTAL_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
-import GraphImageDownloadButton from '../components/GraphImageDownloadButton'
 import GraphScaleControl from '../components/GraphScaleControl'
 import GraphControls from '../components/GraphControls'
 

@@ -92,7 +92,7 @@ export const TabbedCompareGraphs = (
                 handleGraphScale={handleGraphScale} 
                 secondaryGraph={secondaryGraph} 
                 parentRegion={parentRegion} 
-                
+                selected={selected}
                 downloadCSV
                 data={activeData()}
 

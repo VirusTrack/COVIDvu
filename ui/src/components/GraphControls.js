@@ -6,7 +6,17 @@ import GraphImageDownloadButton from '../components/GraphImageDownloadButton'
 import GraphScaleControl from '../components/GraphScaleControl'
 import GraphDownloadButton from '../components/GraphDownloadButton'
 
-export const GraphControls = ({scale, downloadImage, downloadCSV, secondaryGraph, showLog, handleGraphScale, data, centered = false}) => {
+export const GraphControls = ({
+                                scale, 
+                                downloadImage, 
+                                downloadCSV, 
+                                secondaryGraph, 
+                                showLog, 
+                                parentRegion, 
+                                handleGraphScale, 
+                                selected, 
+                                data, 
+                                centered = false}) => {
   return (
       <Column.Group centered> 
       
@@ -18,7 +28,7 @@ export const GraphControls = ({scale, downloadImage, downloadCSV, secondaryGraph
           centered={centered} />
           </Column>
         }
-      {downloadImage && <Column narrow><GraphImageDownloadButton /></Column>}
+      {downloadImage && <Column narrow><GraphImageDownloadButton secondaryGraph={secondaryGraph} parentRegion={parentRegion} selected={selected} showLog={showLog} /></Column>}
       {downloadCSV && <Column narrow><GraphDownloadButton data={data} /></Column>}
       </Column.Group>
   )

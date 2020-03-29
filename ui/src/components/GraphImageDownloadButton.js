@@ -6,10 +6,20 @@ import imgDownload from '../images/fa-icon-download.svg'
 import html2canvas from 'html2canvas'
 import reimg from 'reimg'
 
-export const GraphImageDownloadButton = () => {
+import moment from 'moment'
+
+export const GraphImageDownloadButton = ({secondaryGraph, parentRegion, selected, showLog}) => {
     const ref = React.createRef()
 
     const saveImage = () => {
+
+      const today = moment().format('YYYY-MM-DD')
+      const selectedAsText = selected.map(region => region.startsWith('!') ? region.substr(1) : region).join('_')
+      const graphScaleText = showLog ? 'logarithmic' : 'linear'
+      const filename = `${secondaryGraph}-${selectedAsText}-${graphScaleText}-${today}.png`
+
+      console.log(`filename: ${filename}`)
+
       const button = ref.current
       const input = button.closest('.box').querySelector('.vt-graph')
       // Only works correctly when scrolled to top of page
@@ -20,7 +30,7 @@ export const GraphImageDownloadButton = () => {
         useCORS: true
       })
         .then(canvas => {
-            reimg.ReImg.fromCanvas(canvas).downloadPng()
+            reimg.ReImg.fromCanvas(canvas).downloadPng(filename)
         })
       // Reset users scroll position after download
       document.documentElement.scrollTop = oldScrollPosition
