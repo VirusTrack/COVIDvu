@@ -13,7 +13,8 @@ export const CheckboxRegionComponent = (
           handleSelected, 
           showLog = false, 
           showPredictions = false,
-          parentRegion
+          parentRegion,
+          secondaryGraph,
         }) => {
 
   const [regionList, setRegionList] = useState(data)
@@ -60,7 +61,7 @@ export const CheckboxRegionComponent = (
     if(!mounted.current) {
       mounted.current = true
     } else {
-      if(showPredictions) {
+      if(showPredictions && secondaryGraph === 'Cases') {
           const countryByKey = groupByKey("region", data)
           const predictionsList = Object.keys(predictions).map(region => ({ region: region, stats: countryByKey[region].stats}))
 
@@ -79,7 +80,7 @@ export const CheckboxRegionComponent = (
         }
       }
     }
-  }, [alphaSort, showPredictions])
+  }, [alphaSort, showPredictions, secondaryGraph])
 
   const AlphaOrByConfirmedButton = () => (
     <>
