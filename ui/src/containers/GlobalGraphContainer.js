@@ -144,6 +144,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                         defaultSelected={region}
                         showPredictions={showPredictions}
                         predictions={globalPredictions}
+                        secondaryGraph={secondaryGraph}
                         showLog={showLog}
                         parentRegion="Global"
                     />
