@@ -3,6 +3,7 @@ import axios from "axios"
 import { 
     DATA_URL, 
     STAGING_DATA_URL, 
+    TEST_DATA_URL,
     LOCAL_DATA_URL, 
     LAST_UPDATE_KEY,
 } from './constants'
@@ -20,8 +21,10 @@ function dataUrl() {
     switch (REACT_APP_DEPLOY_ENV) {
         case "staging":
             return STAGING_DATA_URL
-        case "prod":
+        case "production":
             return DATA_URL
+        case "test":
+            return TEST_DATA_URL
         case "local":
             return LOCAL_DATA_URL
         default:
