@@ -116,9 +116,6 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     plots[normalizedRegion].y.push(regionData[key])
                 }
 
-                console.log(`region: ${region}`)
-                console.dir(predictions)
-
                 for(const key of Object.keys(predictions[region].confidenceInterval['2.5'])) {
                     plots_2_5[normalizedRegion].x.push(key)
                     plots_2_5[normalizedRegion].y.push(predictions[region].confidenceInterval['2.5'][key])
