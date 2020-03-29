@@ -6,15 +6,11 @@ import { useMobileDetect } from '../hooks/ui'
 
 import { Generic } from 'rbx'
 
-export const PredictionGraph = ({title, data=[], predictions, confirmed, selected, showLog = false}) => {
+export const PredictionGraph = ({title, predictions, confirmed, selected, showLog = false}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
 
     const detectMobile = useMobileDetect()
-
-    const color_1 = 'rgb(85, 12, 0)'
-    const color_2 = 'rgb(128, 36, 21)'
-    const color_3 = 'rgb(255, 182, 170)'
 
     var colors = ['green', 'red', 'blue']
 
@@ -119,6 +115,9 @@ export const PredictionGraph = ({title, data=[], predictions, confirmed, selecte
                     plots[normalizedRegion].x.push(key)
                     plots[normalizedRegion].y.push(regionData[key])
                 }
+
+                console.log(`region: ${region}`)
+                console.dir(predictions)
 
                 for(const key of Object.keys(predictions[region].confidenceInterval['2.5'])) {
                     plots_2_5[normalizedRegion].x.push(key)
