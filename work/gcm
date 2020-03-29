@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
+# --- functions ---
+
+function die {
+    echo "$1"
+    exit "$2"
+} # die
+
+
+function assertCommitMessage {
+    [[ -n "$1" ]] || die "no commit message" 1
+} # assertCommitMessage
+
+
+function assertValidBranch {
+    local activeBranch=$(git branch | awk '/\*/ { print($2); }')
+
+    case "$activeBranch" in
+        "staging")
+            ;&
+        "production")
+            ;&
+        "master")
+            die "Invalid active branch = $activeBranch" 2
+            ;;
+    esac
+} # assertValidBranch
+
+
+function getTicketID {
+    ticketID=$(git branch | awk -F "[- ]" '/\*/ { print($2); }')
+
+    echo "$ticketID"
+} # getTicketID
+
+
+# -- main --
+
+assertCommitMessage "$1"
+assertValidBranch
+ticketID=$(getTicketID)
+
+if [[ -n "$ticketID" ]]
+then
+    message=$(printf "\"%s - %s\"" "$ticketID" "$1")
+else
+    message="$1"
+fi
+
+git commit -a -m "$message"
+

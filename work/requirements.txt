@@ -5,7 +5,8 @@ matplotlib
 numpy
 pandas
 plotly
-pudb
-pytest
-pymc3
 pre-commit
+pudb
+pystan
+pytest
+tqdm

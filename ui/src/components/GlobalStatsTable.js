@@ -57,13 +57,13 @@ export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExter
                             <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
                         </Table.Cell>
                         <Table.Cell>
-                            <Title size={5}>{numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')}</Title>
+                            <Title size={5}>{numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')} ({stat.confirmedDayChange < 0 ? "0%" : numeral(stat.confirmedDayChange / stat.confirmed).format('0%')})</Title>
                         </Table.Cell>
                         <Table.Cell>
                             <Title size={5}>{numeral(stat.deaths).format('0,0')}</Title>
                         </Table.Cell>
                         <Table.Cell>
-                            <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')}</Title>
+                            <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')} ({stat.deathsDayChange < 0 ? "0%" : numeral(stat.deathsDayChange / stat.deaths).format('0%')})</Title>
                         </Table.Cell>
                         <Table.Cell>
                             <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>

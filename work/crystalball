@@ -1,0 +1,19 @@
+#!/bin/bash
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+
+source ./pyrunner
+
+export COUNTY_CASES_US_ENDPOINT="https://coronavirus-tracker-api.herokuapp.com/v2/locations?source=csbs"
+
+
+# *** main ***
+
+echo "running the predictions models for all locations"
+
+python -m covidvu.predict all
+

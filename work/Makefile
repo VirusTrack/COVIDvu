@@ -15,6 +15,7 @@ MODULE=$(shell cat modulename.txt)
 # REQUIREMENTS=$(shell cat requirements.txt)
 REQUIREMENTS=requirements.txt
 VERSION=$(shell cat version.txt)
+SITE_DATA=./site-data
 
 
 # Targets:
@@ -43,14 +44,19 @@ module:
 	python setup.py bdist_wheel
 
 
-publish:
-	@echo "publishing NOOP"
-
-
 nuke: ALWAYS
 	make clean
 	rm -Rf $(shell find covidvu | awk '/__pycache__$$/')
 	rm -Rf $(shell find test/ | awk '/__pycache__$$/')
+
+
+publish:
+	@echo "publishing NOOP"
+
+
+refresh: ALWAYS
+	conda install mkl-service
+	pip install -U -r requirements.txt
 
 
 # Delete the Python virtual environment - necessary when updating the
@@ -59,18 +65,18 @@ resetpy: ALWAYS
 	rm -Rfv ./.Python ./bin ./build ./dist ./include ./lib
 
 
-# TODO:  Juvid - https://github.com/VirusTrack/COVIDvu/issues/318
-#        There is #\t at the beginning of the line!
-#	pytest -v ./test/covidvu/test_predict.py
-#	pytest -v ./test/covidvu/test_visualize.py
 test: ALWAYS
+	[[ -d $(SITE_DATA) ]] || mkdir -p $(SITE_DATA)
 	pip install -e .
 	pytest -v ./test/covidvu/pipeline/test_jsonpack.py
+	pytest -v ./test/covidvu/pipeline/test_pyavka.py
 	pytest -v ./test/covidvu/pipeline/test_vucounty.py
 	pytest -v ./test/covidvu/pipeline/test_vuhospitals.py
 	pytest -v ./test/covidvu/pipeline/test_vujson.py
 	pytest -v ./test/covidvu/pipeline/test_vuregions.py
+	pytest -v ./test/covidvu/test_predict.py
 	pytest -v ./test/covidvu/test_utils.py
+	pytest -v ./test/covidvu/test_visualize.py
 	pip uninstall -y $(MODULE)==$(VERSION) || true
 	rm -Rfv $$(find covidvu | awk '/__pycache__$$/')
 	rm -Rfv $$(find test | awk '/__pycache__$$/')

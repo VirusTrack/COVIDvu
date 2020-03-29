@@ -139,9 +139,11 @@ dmypy.json
 **.local
 **.ssh/
 **/*psd
+**/.conda/*
 **/.cufflinks*
 **/.theano
 **/.vim/*
+**/pyvenv.cfg
 **/resources/counties-US-all*json
 **/resources/hospital-beds-*US.json
 **/work/*.tar.gz
@@ -153,6 +155,7 @@ dmypy.json
 *swp
 .viminfo
 work/*.json
+**/snapshots/*
 
 # Python virtual environment
 

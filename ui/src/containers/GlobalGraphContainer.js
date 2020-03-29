@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 
 import { useLocation } from 'react-router'
 
-import { useInterval } from '../hooks/ui'
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
 
@@ -12,9 +11,7 @@ import { actions } from '../ducks/services'
 
 import { Tag, Level } from "rbx"
 
-import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
 import numeral from 'numeral'
-import store from 'store2'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -22,6 +19,8 @@ import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
+
+import ReactGA from 'react-ga';
 
 export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
 
@@ -44,13 +43,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     useEffect(() => {
         dispatch(actions.fetchGlobal({showLog}))
     }, [dispatch, showLog])
-
-
-    useInterval(() => {
-        if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchGlobal({showLog}))
-        }
-    }, ONE_MINUTE)
 
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
@@ -84,16 +76,37 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     const handleSelectedRegion = (regionList) => {
         setSelectedCountries(regionList)
         handleHistory(regionList, secondaryGraph, showLog)
+
+        let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
+
+        if(regionList.length === 0) {
+            actionDescription = 'Deselected All Regions'
+        }
+
+        ReactGA.event({
+            category: 'Region:Global',
+            action: `Changed selected regions to ${regionList.join(', ')}`
+        })
     }
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
         handleHistory(selectedCountries, selectedGraph, showLog)
+
+        ReactGA.event({
+            category: 'Region:Global',
+            action: `Changed selected graph to ${selectedGraph}`
+        })
     }    
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
         handleHistory(selectedCountries, secondaryGraph, logScale)
+
+        ReactGA.event({
+            category: 'Region:Global',
+            action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`
+        })
     }
 
     return (
@@ -119,6 +132,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                         handleSelected={dataList => handleSelectedRegion(dataList)} 
                         defaultSelected={region}
                         showLog={showLog}
+                        parentRegion="Global"
                     />
 
                 </>

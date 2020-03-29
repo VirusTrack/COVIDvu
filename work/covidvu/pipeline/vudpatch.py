@@ -34,9 +34,14 @@ NIXED_ROWS_INDEX = (
     'Grand Princess',
     'Queue',
     'TBD',
+    'US',
     'Unassigned',
     'Wuhan (repatriated)',
+    'Wuhan Evacuee',
     'Wuhan',
+    'United States Virgin Islands',
+    'Northern Marianas',
+    'Recovered',
 )
 US_STATE_NAMES = {
                     'U.S. TOTAL'              : '!Total US',
@@ -155,22 +160,30 @@ def _patchUSData(target, columnRef):
     # Heuristic - CSSE data includes DC twice; the deleted one is empty.
     del(dataUS['Washington D.C.'])
 
-    allTime   = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
-    yesterday = dataUS['!Total US'][allTime[len(allTime)-2]]
-    today     = dataUS['!Total US'][allTime[len(allTime)-1]]
+    allTime      = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
+    yesterday    = dataUS['!Total US'][allTime[len(allTime)-2]]
+    today        = dataUS['!Total US'][allTime[len(allTime)-1]]
+    retardedKeys = list()
 
     for location in updateUS.keys():
         try:
-                if location in NIXED_ROWS_INDEX:
-                    continue
+            if location in NIXED_ROWS_INDEX:
+                retardedKeys.append(location)
+                continue
 
-                dataUS[location][SCRAPED_TODAY] = updateUS[location][SCRAPED_TODAY]
+            dataUS[location][SCRAPED_TODAY] = updateUS[location][SCRAPED_TODAY]
         except:
             print('  || Invalid location: %s' % location)
             continue
 
     if today == 0.0:
        dataUS['!Total US'][allTime[len(allTime)-1]] = yesterday
+
+    for key in retardedKeys:
+        try:
+            del(dataUS[key])
+        except:
+            pass
 
     return dataUS
 
@@ -203,8 +216,6 @@ def _patchUSRegionsData(target, dataUS):
         yesterday = dataUS['!Total US'][allTime[len(allTime)-2]]
         dataUSRegions['!Total US'][SCRAPED_TODAY] = yesterday
 
-#     if 'Unassigned' in dataUSRegions:
-#         del(dataUSRegions['Unassigned'])
     if 'Unassigned' not in dataUSRegions:
         dataUSRegions['Unassigned'] = { SCRAPED_TODAY: 0.0, }
 

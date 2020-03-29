@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { Tab, Level, Notification } from 'rbx'
+import { Tab } from 'rbx'
 
 import GraphWithLoader from '../components/GraphWithLoader'
-import GraphScaleControl from '../components/GraphScaleControl'
-import GraphDownloadButton from '../components/GraphDownloadButton'
+
+import GraphControls from '../components/GraphControls'
 
 export const TabbedCompareGraphs = (
     {
@@ -16,6 +16,7 @@ export const TabbedCompareGraphs = (
         handleSelectedGraph,
         handleGraphScale,
         showLog,
+        parentRegion,
     }) => {
     
     const activeData = () => {
@@ -83,18 +84,17 @@ export const TabbedCompareGraphs = (
                 <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
             </Tab.Group>
 
-            <Level className="TabbedCompareGraphs__controls">
-                <Level.Item align="left">
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={secondaryGraph}
-                    />
-                </Level.Item>
-                <Level.Item align="right">
-                    <GraphDownloadButton data={activeData()} />
-                </Level.Item>
-            </Level>
+            <GraphControls className="TabbedCompareGraphs__controls"
+                scale
+                showLog={showLog} 
+                handleGraphScale={handleGraphScale} 
+                secondaryGraph={secondaryGraph} 
+                parentRegion={parentRegion} 
+                selected={selected}
+                downloadCSV
+                data={activeData()}
+                downloadImage
+                />
 
             <GraphWithLoader 
                 graphName="Cases"

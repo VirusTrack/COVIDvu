@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 
 import { useLocation } from 'react-router'
 
-import { useInterval } from '../hooks/ui'
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
 
@@ -14,13 +13,11 @@ import TwoGraphLayout from '../layouts/TwoGraphLayout'
 
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
-import { CACHE_INVALIDATE_GLOBAL_KEY, ONE_MINUTE } from '../constants'
-
-import store from 'store2'
-
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
+
+import ReactGA from 'react-ga';
 
 export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
 
@@ -48,12 +45,6 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
         }
     }, [sortedConfirmed])
 
-    useInterval(() => {
-        if(store.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-            dispatch(actions.fetchContinental())
-        }
-    }, ONE_MINUTE)
-
     useEffect(() => {
         if(!search) {
             handleHistory(selectedContinents, secondaryGraph)
@@ -64,16 +55,31 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
     const handleSelectedRegion = (regionList) => {
         setSelectedContinents(regionList)
         handleHistory(regionList, secondaryGraph, showLog)
+
+        ReactGA.event({
+            category: 'Region:Continental',
+            action: `Changed selected regions to ${regionList.join(', ')}`
+        })
     }
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
         handleHistory(selectedContinents, selectedGraph, showLog)
+
+        ReactGA.event({
+            category: 'Region:Continental',
+            action: `Changed selected graph to ${selectedGraph}`
+        })
     }
     
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
         handleHistory(selectedContinents, secondaryGraph, logScale)
+
+        ReactGA.event({
+            category: 'Region:Continental',
+            action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`
+        })
     }
 
     return (
@@ -97,6 +103,7 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
                     handleSelected={dataList => handleSelectedRegion(dataList)} 
                     defaultSelected={region}
                     showLog={showLog}
+                    parentRegion="Continental"
                 />
 
                 <TabbedCompareGraphs

@@ -20,6 +20,8 @@ HTML_FILE_NAME="$SITE_DATA_DIR/table-%02d.html"
 JSON_DATA_BUNDLE="COVID19-cases.tar.gz"
 RAW_DATA_FILE="$SITE_DATA_DIR/raw-source.html"
 RAW_DATA_SOURCE="https://docs.google.com/spreadsheets/d/e/2PACX-1vR30F8lYP3jG7YOq8es0PBpJIE5yvRVZffOyaqC0GgMBN6yt0Q-NI8pxS7hd1F9dYXnowSC6zpZmW9D/pubhtml?gid=0&amp;single=false&amp;widget=true&amp;headers=true"
+RESOURCES_DIR="./resources"
+SNAPSHOTS_DIR="./snapshots"
 TMP_OUTPUT="/tmp/refreshdata.log"
 UPDATE_ERROR="$SITE_DATA_DIR/ERROR.txt"
 # -- order is imortant:
@@ -84,7 +86,10 @@ function assertCountiesUSJSONFiles {
 
 function resetSiteData {
     echo "resetting $SITE_DATA_DIR"
-    rm -f "$SITE_DATA_DIR"/*
+    for fileNamePrefix in bundle confirmed counties deaths hospital last raw scraped table
+    do
+        rm -f "$SITE_DATA_DIR/$fileNamePrefix"*
+    done
 } # resetSiteData
 
 
@@ -97,16 +102,14 @@ function nukeDeploymentSite {
 
 
 function updateCOVID19DataSources {
-    echo "refreshing COVID-19 JS CSSE dataset from GitHub" | tee "$TMP_OUTPUT"
+    echo "refreshing COVID-19 JS CSSE dataset from GitHub" 
 
-    pushd "$COVID_19_DIR" >> "$TMP_OUTPUT"
-    git checkout master >> "$TMP_OUTPUT" 2> /dev/null
-    git fetch >> "$TMP_OUTPUT"
-    git pull >> "$TMP_OUTPUT"
-    popd >> "$TMP_OUTPUT"
-
-    cat "$TMP_OUTPUT" | tee -a "$UPDATE_NOTICE"
-    rm -f "$TMP_OUTPUT"
+    pushd "$COVID_19_DIR"
+    git checkout master
+    git fetch
+    git pull
+    [[ "0" != "$?" ]] && die "COVID-19 repository failed to update" 16
+    popd
 
     timeStamp=$(TZ=":Etc/UTC" date +"%Y-%m-%dT%H:%M:%SZ")
     printf "\nCompleted on %s\n" "$timeStamp" >> "$UPDATE_NOTICE"
@@ -118,7 +121,8 @@ function generateVirusUpdateJSONFiles {
 
     env | awk '/VIRT/' | sort
     python3 -m covidvu.pipeline.vujson confirmed deaths
-    ls -Alrt "$SITE_DATA_DIR"
+    [[ "0" != "$?" ]] && die "generateVirusUpdateJSONFiles - failed" 17
+    ls -Alrt "$SITE_DATA_DIR" | awk '!/conf-int/ && !/mean-/'
 } # generateVirusUpdateJSONFiles
 
 
@@ -127,6 +131,7 @@ function generateHospitalBedsJSONFiles {
 
     printf "fetching current US hospital beds count\n  "
     cp -vf "$HOSPITAL_BEDS_US_FILE" "$hospitalBedsTargetFile"
+    [[ "0" != "$?" ]] && die "generateHospitalBedsJSONFiles - failed" 18
 } # generateHospitalBedsJSONFiles
 
 
@@ -135,17 +140,18 @@ function generateCountiesUSJSONFile {
 
     printf "fetching current US counties report\n  "
     cp -vf "$COUNTY_CASES_US_FILE" "$countiesUSTargetFile"
+    [[ "0" != "$?" ]] && die "generateCountiesUSJSONFile - failed" 19
 } # generateCountiesUSJSONFile
 
 
 function fetchBNODataSource {
-    echo "-----"
+    echo "+++++"
     curl -A "$PYAVKA_USER_AGENT" -vi -o "$RAW_DATA_FILE" --connect-timeout 20 "$RAW_DATA_SOURCE" | 
-    [[ "$?" == 0 ]] || exit 99
+    [[ "0" != "$?" ]] && die "fetchBNODataSource unable to fetch $RAW_DATA_SOURCE" 20
 
     cat "$RAW_DATA_FILE" | awk '/<table/ { gsub("<table", "\n<table"); gsub("/table>", "/table>\n"); print; }' | \
     awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
-
+    [[ "0" != "$?" ]] && die "fetchBNODataSource invalid $RAW_DATA_FILE HTML scraping issue" 21
     echo "+++++"
 } # fetchBNODataSource
 
@@ -169,7 +175,7 @@ function patchJSONFiles {
 
         echo "vudpatch - patching stale JH CSSE data with latest, calculated updates"
         python -m covidvu.pipeline.vudpatch confirmed deaths
-        ls -Alrt "$SITE_DATA_DIR"/*json
+        ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
     fi
 } # patchJSONFiles
 
@@ -177,7 +183,8 @@ function patchJSONFiles {
 function packJSONFiles {
     echo "jsonpack - combine individual JSON files into a single blob"
     python3 -m covidvu.pipeline.jsonpack
-    ls -Alrt "$SITE_DATA_DIR"/*json
+    [[ "0" != "$?" ]] && die "jsonpack failed" 22
+    ls -Alrt "$SITE_DATA_DIR"/*json | awk '!/conf-int/ && !/mean-/'
 } # packJSONFiles
 
 
@@ -185,12 +192,14 @@ function generateRegionsJSONBundle {
     echo "vuregions - generate continental region summaries"
     env | awk '/VIRT/' | sort
     python3 -m covidvu.pipeline.vuregions
-    ls -Alrt "$SITE_DATA_DIR"
+    [[ "0" != "$?" ]] && die "vuregions failed" 23
+    ls -Alrt "$SITE_DATA_DIR"/bundle*json
 } # generateRegionsJSONBundle
 
 
 function invalidateCloudFrontCache {
     aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths "/*"
+    [[ "0" != "$?" ]] && die "invalidateCloudFrontCache failed" 24
 } # invalidateCloudFrontCache
 
 
@@ -201,6 +210,7 @@ function deployVirusUpdateJSON {
 
     echo "cloning $SITE_DATA_DIR to the $targetBucket website"
     rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$targetBucket/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
+    [[ "0" != "$?" ]] && die "rclone failed" 25
 
     case "$targetBucket" in
         "$SITE_BUCKET")
@@ -209,6 +219,22 @@ function deployVirusUpdateJSON {
             ;;
     esac
 } # deployVirusUpdateJSON
+
+
+function makeDataSnapshot {
+    # EXPERIMENTAL:  transitional feature until we get the database back-end going
+    local minutes=$(awk 'BEGIN { "date +\"%s\"" | getline time; print(int((time%3600)/60)); }')
+
+    if [[ "0" == "minutes" ]]
+    then
+        mkdir -p "$SNAPSHOTS_DIR"
+        local now=$(date +"%Y%m%d-%H%M")
+        local fileName="$SNAPSHOTS_DIR/snapshot-$now.tar.bz2"
+
+        tar cvjf "$fileName" "$SITE_DATA_DIR" "$RESOURCES_DIR/"*.json
+        [[ "0" != "$?" ]] && die "makeDataSnapshot failed - tar/bzip2 issue"  26
+    fi
+} # makeDataSnapshot
 
 
 # *** main ***
@@ -247,8 +273,15 @@ case "$1" in
     "stage")
         deployVirusUpdateJSON "$STAGE_BUCKET"
         ;;
+    "testing")
+        ;&
+    "test")
+        deployVirusUpdateJSON "$TEST_BUCKET"
+        ;;
     *)
         die "invalid command - use stage|publish|nuke|noop" 11
         ;;
 esac
+
+makeDataSnapshot
 

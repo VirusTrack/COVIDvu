@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useInterval } from '../hooks/ui'
 
@@ -21,13 +21,35 @@ export const FooterContainer = () =>{
 
     const lastUpdate = useSelector(state => state.services.lastUpdate)
 
+    const [currentLastUpdate, setCurrentLastUpdate] = useState(lastUpdate)
+
     useInterval(() => {
+        console.log(`Fetching latest update... ${new Date().getTime()}`)
         dispatch(actions.fetchLastUpdate())
     }, CACHE_TIMER)
 
     useEffect(() => {
         dispatch(actions.fetchLastUpdate())
     }, [dispatch])
+
+    useEffect(() => {
+        if(currentLastUpdate && lastUpdate !== currentLastUpdate) {
+            dispatch(actions.clearGraphs())
+            dispatch(actions.clearGraphs())
+            dispatch(actions.fetchGlobal())
+            dispatch(actions.fetchUSStates())
+            dispatch(actions.fetchUSRegions())
+            dispatch(actions.fetchContinental())
+            dispatch(actions.fetchTop10Countries({
+                excludeChina: true
+            }))
+            dispatch(actions.fetchTotalGlobalStats())
+            dispatch(actions.fetchTop10USStates())
+            dispatch(actions.fetchTotalUSStatesStats())    
+        } else {
+            setCurrentLastUpdate(lastUpdate)
+        }
+    }, [lastUpdate])
 
     return (
         <>

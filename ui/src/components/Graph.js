@@ -5,12 +5,15 @@ import Plot from 'react-plotly.js'
 import { useMobileDetect } from '../hooks/ui'
 
 import { Generic } from 'rbx'
+import LogoElement from './LogoElement'
 
-export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, showLog = false}) => {
+export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, showLog = false, ref=null}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
 
     const detectMobile = useMobileDetect()
+
+    const graphEl = React.createRef()
 
     useEffect(() => {
         let plots = {}
@@ -18,25 +21,24 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         const selectedData = Object.keys(data).filter(entry => selected.indexOf(entry) !== -1)
 
         for(const region of selectedData) {
-            plots[region] = {
+            const normalizedRegion = region.startsWith('!') ? region.substring(1) : region
+            plots[normalizedRegion] = {
                 x: [],
                 y: [],
                 type: 'scatter',
                 mode: 'lines+markers',
-                name: region,
+                name: normalizedRegion,
                 showlegend: true,
                 marker: {
                     size: 3
                 }
-            }            
-        }
+            }
 
-        for(const region of selectedData) {            
             const regionData = data[region]
             
-            for(const key of Object.keys(regionData)) {
-                plots[region].x.push(key)
-                plots[region].y.push(regionData[key])
+            for(const key of Object.keys(regionData).sort()) {
+                plots[normalizedRegion].x.push(key)
+                plots[normalizedRegion].y.push(regionData[key])
             }
         }
     
@@ -107,9 +109,12 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         x:0.5,
     }
 
+
     return (
-        <Generic tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
-            <Plot
+        <>
+        <Generic id="graphPlot" ref={ref} className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
+            <div className="vt-graph-logo"><LogoElement url /></div>
+            <Plot 
                 data={plotsAsValues}
                 layout={layout}
                 config={mergeConfig}
@@ -117,6 +122,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
                 style={{width: '100%', height: '100%', minHeight: '45rem'}}
             />
         </Generic>
+        </>
     )
 }
 

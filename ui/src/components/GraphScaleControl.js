@@ -2,7 +2,13 @@ import React from 'react'
 
 import { Generic, Button } from 'rbx'
 
-export const GraphScaleControl = ({showLog, handleGraphScale, secondaryGraph, align = 'flex-start'}) => {
+export const GraphScaleControl = ({
+    showLog, 
+    handleGraphScale, 
+    secondaryGraph, 
+    align = 'flex-start',
+    parentRegion,
+}) => {
 
     if(secondaryGraph === 'Mortality') {
         return null

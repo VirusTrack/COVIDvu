@@ -3,12 +3,18 @@
 # vim: set fileencoding=utf-8:
 
 
+from covidvu.pipeline.jsonpack import PREDICTIONS_GLOBAL_FILE_NAME
+from covidvu.pipeline.jsonpack import PREDICT_FILE_WORLD_PREFIX
 from covidvu.pipeline.jsonpack import REPORTS
 from covidvu.pipeline.jsonpack import loadUSCounties
 from covidvu.pipeline.jsonpack import packDataset
+from covidvu.pipeline.jsonpack import packPredictions
+from covidvu.pipeline.jsonpack import sortByDate
 
 import json
 import os
+
+import pytest
 
 
 # +++ constants +++
@@ -55,8 +61,39 @@ def test_packDataset():
             assert 'Alabama' in packedDataset['hospitalBeds']
 
 
+def test_sortByDate():
+    dataset = {
+        'bogus': {
+            '2020-03-26': 42,
+            '2020-03-15': 69,
+        }
+    }
+    result = sortByDate(dataset)
+
+    assert tuple(result['bogus'].keys())[0] == '2020-03-15'
+
+
 def test_main():
     pass  # It runs, the meat is in the packDataset function
 
-test_loadUSCounties()
+
+def test_packPredictions():
+    testFileName = os.path.join(TEST_SITE_DATA, 'prediction-crap.json')
+
+    with open(testFileName, 'w'):
+        pass
+    with pytest.raises(NameError):
+        packPredictions(siteDataDirectory = TEST_SITE_DATA, predictFilePrefix = 'bogus-bigus')
+    os.unlink(testFileName)
+
+    result = packPredictions(siteDataDirectory = TEST_SITE_DATA, predictFilePrefix = PREDICT_FILE_WORLD_PREFIX)
+
+    assert 'United Kingdom' in result
+    assert 'confidenceInterval' in result['United Kingdom']
+    assert 'mean' in result['United Kingdom']
+
+    testFileName = os.path.join(TEST_SITE_DATA, PREDICTIONS_GLOBAL_FILE_NAME)
+    assert os.path.exists(testFileName)
+    
+    os.unlink(testFileName)
 

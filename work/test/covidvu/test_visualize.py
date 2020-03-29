@@ -8,7 +8,6 @@ from covidvu.visualize import plotPrediction
 from covidvu.visualize import plotDataAndPredictionsWithCI
 from covidvu.visualize import castHexToRGBA_string
 from covidvu.visualize import hexToRGB
-from covidvu.predict import _main
 from covidvu.predict import loadAll
 import pandas as pd
 import numpy as np
@@ -17,11 +16,31 @@ import os
 import re
 
 # *** constants ***
-TEST_JH_CSSE_DATA_HOME           = join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
-                                           'csse_covid_19_time_series')
-TEST_SITE_DATA                   = join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_FILE_CONFIRMED      = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed.csv')
-TEST_JH_CSSEFILE_CONFIRMED_SMALL = join(TEST_JH_CSSE_DATA_HOME, 'time_series_19-covid-Confirmed-small.csv')
+TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19',)
+
+TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_confirmed_global.csv')
+
+TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_deaths_global.csv')
+
+TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
+                                                       'time_series_19-covid-Confirmed_archived_0325.csv')
+
+TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
+                                                       'time_series_19-covid-Deaths_archived_0325.csv')
+
+
+TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
+TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test_site_data')
+TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
+                                           'csse_covid_19_daily_reports')
+
+TEST_JH_CSSE_FILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
+                                                       'csse_covid_19_time_series',
+                                                       'time_series_covid19_confirmed_global_small.csv')
 
 # *** functions ***
 def _makeTimeSeries():
@@ -88,17 +107,12 @@ def test_plotPrediction():
 
 def test_plotDataAndPredictionsWithCI():
     try:
-        _main('all',
-              siteData=TEST_SITE_DATA,
-              nSamples=10,
-              nTune=10,
-              nChains=1,
-              nBurn=0,
-              nDaysPredict=10,
-              jhCSSEFileConfirmed=TEST_JH_CSSEFILE_CONFIRMED_SMALL,
-              )
-
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA)
+        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA, 'test-predictions'),
+                                                                            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+                                                                            jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+                                                                            jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+                                                                            jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+                                                                            )
         _ = plotDataAndPredictionsWithCI(meanPredictionTSAll,
                                      confirmedCasesAll,
                                      percentilesTSAll,
@@ -107,7 +121,8 @@ def test_plotDataAndPredictionsWithCI():
     except Exception as e:
         raise e
     finally:
-        _purge(TEST_SITE_DATA, '.json')
+        _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed*.json')
+
 
 
 def test_castHexToRGBA_string():

@@ -1,10 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { Box, Content, Title } from 'rbx'
 
 import ContentLayout from '../layouts/ContentLayout'
 
+import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+
 export const AboutPage = () => {
+
+    useEffect(() => {
+        document.title = `About the Project | ${DEFAULT_DOCUMENT_TITLE}`        
+    }, [])
+    
 
     return (
         

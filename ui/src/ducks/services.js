@@ -5,9 +5,6 @@ import DataService from '../services'
 import { 
     US_STATES_WITH_ABBREVIATION,
     LAST_UPDATE_KEY, 
-    CACHE_INVALIDATE_GLOBAL_KEY,
-    CACHE_INVALIDATE_US_STATES_KEY,
-    CACHE_INVALIDATE_US_REGIONS_KEY
 } from '../constants'
 
 import { createAction } from '@reduxjs/toolkit'
@@ -280,10 +277,14 @@ const calculateMortality = (deaths, confirmed) => {
 }
 
 const extractLatestCounts = (stats, daysAgo = 0) => {
+
+    // const today = moment().subtract(0 + daysAgo, 'days').format("YYYY-MM-DD")
+    // const yesterday = moment().subtract(1 + daysAgo, 'days').format("YYYY-MM-DD")
+
     const regionWithLatestCounts = []
 
     for(const region of Object.keys(stats)) {
-        const dates = Object.keys(stats[region])
+        const dates = Object.keys(stats[region]).sort()
 
         const lastDate = dates[dates.length - daysAgo - 1]
 
@@ -357,9 +358,6 @@ export function* fetchLastUpdate() {
     const lastUpdateLocalStorage = store.session.get(LAST_UPDATE_KEY)
 
     if(!lastUpdateLocalStorage || lastUpdateLocalStorage < lastUpdateAsNumeric) {
-        store.session.set(CACHE_INVALIDATE_GLOBAL_KEY, true)
-        store.session.set(CACHE_INVALIDATE_US_STATES_KEY, true)
-        store.session.set(CACHE_INVALIDATE_US_REGIONS_KEY, true)
         store.session.set(LAST_UPDATE_KEY, lastUpdateAsNumeric)
     }
     
