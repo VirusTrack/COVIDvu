@@ -8,7 +8,6 @@ source ./pyrunner
 
 # *** main ***
 
-# TODO: fix this 'keep' flag - not needed later
-python3 -m covidvu.pipeline.jsonpack keep
+python3 -m covidvu.pipeline.jsonpack
 ls -Alrt "$SITE_DATA_DIR"/*json
 

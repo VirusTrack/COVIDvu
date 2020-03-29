@@ -22,9 +22,10 @@ GROUPINGS = {
                 '-US'        : 'bundle-US',
                 '-US-Regions': 'bundle-US-Regions',
             }
-PREDICT_FILE_PREFIX   = 'prediction-'
-PREDICTIONS_FILE_NAME = 'bundle-predictions-global.json'
-REPORTS               = ( 'confirmed', 'deaths', )
+PREDICT_FILE_US_PREFIX    = 'prediction-world'
+PREDICT_FILE_WORLD_PREFIX = 'prediction-world'
+PREDICTIONS_FILE_NAME     = 'bundle-predictions-global.json'
+REPORTS                   = ( 'confirmed', 'deaths', )
 
 
 # +++ functions +++
@@ -65,10 +66,14 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
     return packedDataset
 
 
-def packWorldPredictions(siteDataDirectory = SITE_DATA):
-    predictionFileNames = [ os.path.join(siteDataDirectory, fileName) for fileName in os.listdir(siteDataDirectory) if PREDICT_FILE_PREFIX in fileName ]
+def packPredictions(siteDataDirectory = SITE_DATA, predictFilePrefix = PREDICT_FILE_WORLD_PREFIX):
+    predictionFileNames = [ os.path.join(siteDataDirectory, fileName) for fileName in os.listdir(siteDataDirectory) if predictFilePrefix in fileName ]
     
     predictions = {  }
+
+    if not len(predictionFileNames):
+        raise NameError
+
     for fileName in predictionFileNames:
         if 'conf-int' in fileName:
             valuesRangeTag = 'confidenceInterval'
@@ -96,7 +101,8 @@ def main():
     for grouping in GROUPINGS:
         packDataset(grouping)
 
-    packWorldPredictions()
+    packPredictions()
+    packPredictions(predictFilePrefix = PREDICT_FILE_US_PREFIX)
 
 
 # *** main ***

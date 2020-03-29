@@ -303,8 +303,8 @@ def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
 
 
 def _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
-                           meanFilename='prediction-mean-%s.json',
-                           confIntFilename='prediction-conf-int-%s.json',
+                           meanFilename='prediction-world-mean-%s.json',
+                           confIntFilename='prediction-world-conf-int-%s.json',
                            ):
     regionNameSimple = ''.join(e for e in prediction['regionName'] if e.isalnum())
     prediction['predictionsMeanTS'].name = prediction['regionName']
@@ -392,8 +392,8 @@ def predictRegions(regionTrainIndex,
             _dumpRegionPrediction(prediction, siteData, predictionsPercentiles)
         elif subGroup == 'casesUSStates':
             _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
-                                  meanFilename='prediction-mean-USStates-%s.json',
-                                  confIntFilename='prediction-conf-int-USStates-%s.json',)
+                                  meanFilename='prediction-US-mean-%s.json',
+                                  confIntFilename='prediction-US-conf-int-USStates-%s.json',)
         else:
             raise NotImplementedError
 
@@ -430,8 +430,8 @@ def predictRegions(regionTrainIndex,
                     _dumpRegionPrediction(prediction, siteData, predictionsPercentiles)
                 elif subGroup == 'casesUSStates':
                     _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
-                                          meanFilename='prediction-mean-USStates-%s.json',
-                                          confIntFilename='prediction-conf-int-USStates-%s.json', )
+                                          meanFilename='prediction-US-mean-%s.json',
+                                          confIntFilename='prediction-US-conf-int-USStates-%s.json', )
                 else:
                     raise NotImplementedError
                 print('Saved.')
@@ -443,7 +443,7 @@ def predictRegions(regionTrainIndex,
 
 
 def getSavedShortCountryNames(siteData = SITE_DATA,
-                              confIntFilename='prediction-conf-int-%s.json',
+                              confIntFilename='prediction-world-conf-int-%s.json',
                               ):
     regionNameShortAll = []
     pattern = '^' + confIntFilename.replace('%s', '(.*\w)')
@@ -457,8 +457,8 @@ def getSavedShortCountryNames(siteData = SITE_DATA,
 def load(regionIndex = None,
          regionNameShort = None,
          siteData=SITE_DATA,
-         meanFilename='prediction-mean-%s.json',
-         confIntFilename='prediction-conf-int-%s.json',):
+         meanFilename='prediction-world-mean-%s.json',
+         confIntFilename='prediction-world-conf-int-%s.json',):
 
     if regionNameShort is None:
         assert isinstance(regionIndex, int)
@@ -485,7 +485,7 @@ def load(regionIndex = None,
     return meanPredictionTS, percentilesTS, regionName
 
 
-def loadAll(target='confirmed', subGroup='casesGlobal', confIntFilename='prediction-conf-int-%s.json', **kwargs):
+def loadAll(target='confirmed', subGroup='casesGlobal', confIntFilename='prediction-world-conf-int-%s.json', **kwargs):
     confirmedCasesAll = parseCSSE(target, **kwargs)[subGroup]
     nTrainedRegions = len(getSavedShortCountryNames(siteData = kwargs.get('siteData', SITE_DATA),
                                                       confIntFilename = confIntFilename,

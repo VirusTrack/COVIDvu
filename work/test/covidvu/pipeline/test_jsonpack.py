@@ -3,11 +3,12 @@
 # vim: set fileencoding=utf-8:
 
 
-from covidvu.pipeline.jsonpack import REPORTS
 from covidvu.pipeline.jsonpack import PREDICTIONS_FILE_NAME
+from covidvu.pipeline.jsonpack import PREDICT_FILE_WORLD_PREFIX
+from covidvu.pipeline.jsonpack import REPORTS
 from covidvu.pipeline.jsonpack import loadUSCounties
 from covidvu.pipeline.jsonpack import packDataset
-from covidvu.pipeline.jsonpack import packWorldPredictions
+from covidvu.pipeline.jsonpack import packPredictions
 from covidvu.pipeline.jsonpack import sortByDate
 
 import json
@@ -76,16 +77,16 @@ def test_main():
     pass  # It runs, the meat is in the packDataset function
 
 
-def test_packWorldPredictions():
+def test_packPredictions():
     testFileName = os.path.join(TEST_SITE_DATA, 'prediction-crap.json')
 
     with open(testFileName, 'w'):
         pass
     with pytest.raises(NameError):
-        packWorldPredictions(siteDataDirectory = TEST_SITE_DATA)
+        packPredictions(siteDataDirectory = TEST_SITE_DATA, predictFilePrefix = 'bogus-bigus')
     os.unlink(testFileName)
 
-    result = packWorldPredictions(siteDataDirectory = TEST_SITE_DATA)
+    result = packPredictions(siteDataDirectory = TEST_SITE_DATA, predictFilePrefix = PREDICT_FILE_WORLD_PREFIX)
 
     assert 'United Kingdom' in result
     assert 'confidenceInterval' in result['United Kingdom']
