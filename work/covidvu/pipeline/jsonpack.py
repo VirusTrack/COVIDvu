@@ -22,7 +22,7 @@ GROUPINGS = {
                 '-US'        : 'bundle-US',
                 '-US-Regions': 'bundle-US-Regions',
             }
-PREDICT_FILE_US_PREFIX    = 'prediction-world'
+PREDICT_FILE_US_PREFIX    = 'prediction-US'
 PREDICT_FILE_WORLD_PREFIX = 'prediction-world'
 PREDICTIONS_FILE_NAME     = 'bundle-predictions-global.json'
 REPORTS                   = ( 'confirmed', 'deaths', )
