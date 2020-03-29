@@ -1,5 +1,6 @@
 const DATA_URL = `/site-data`
 const STAGING_DATA_URL = `http://staging.virustrack.live/site-data`
+const TEST_DATA_URL = `http://test.virustrack.live/site-data`
 const LOCAL_DATA_URL = `http://localhost:3100/site-data`
 
 const LAST_UPDATE_KEY = 'covid-lastUpdated'
@@ -409,6 +410,7 @@ const COUNTRIES = [
     DATA_URL,
     STAGING_DATA_URL,
     LOCAL_DATA_URL,
+    TEST_DATA_URL,
     REGION_URLS,
     CACHE_TIMER,
     ONE_MINUTE,
