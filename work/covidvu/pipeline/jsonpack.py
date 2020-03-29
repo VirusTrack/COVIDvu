@@ -22,10 +22,12 @@ GROUPINGS = {
                 '-US'        : 'bundle-US',
                 '-US-Regions': 'bundle-US-Regions',
             }
-PREDICT_FILE_US_PREFIX    = 'prediction-US'
-PREDICT_FILE_WORLD_PREFIX = 'prediction-world'
-PREDICTIONS_FILE_NAME     = 'bundle-predictions-global.json'
-REPORTS                   = ( 'confirmed', 'deaths', )
+PREDICT_FILE_US_PREFIX        = 'prediction-US'
+PREDICT_FILE_WORLD_PREFIX     = 'prediction-world'
+# TODO:  Make these configurable or template
+PREDICTIONS_GLOBAL_FILE_NAME  = 'bundle-global-predictions.json'
+PREDICTIONS_US_FILE_NAME      = 'bundle-US-predictions.json' 
+REPORTS                       = ( 'confirmed', 'deaths', )
 
 
 # +++ functions +++
@@ -66,7 +68,10 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
     return packedDataset
 
 
-def packPredictions(siteDataDirectory = SITE_DATA, predictFilePrefix = PREDICT_FILE_WORLD_PREFIX):
+def packPredictions( 
+            siteDataDirectory = SITE_DATA,
+            predictFilePrefix = PREDICT_FILE_WORLD_PREFIX,
+            bundleTargetFileName = PREDICTIONS_GLOBAL_FILE_NAME):
     predictionFileNames = [ os.path.join(siteDataDirectory, fileName) for fileName in os.listdir(siteDataDirectory) if predictFilePrefix in fileName ]
     
     predictions = {  }
@@ -89,7 +94,7 @@ def packPredictions(siteDataDirectory = SITE_DATA, predictFilePrefix = PREDICT_F
 
         predictions[country][valuesRangeTag] = dataset[country]
 
-    outputBundleFileName = os.path.join(siteDataDirectory, PREDICTIONS_FILE_NAME)
+    outputBundleFileName = os.path.join(siteDataDirectory, bundleTargetFileName)
 
     with open(outputBundleFileName, 'w') as outputStream:
         json.dump(predictions, outputStream)
@@ -102,7 +107,7 @@ def main():
         packDataset(grouping)
 
     packPredictions()
-    packPredictions(predictFilePrefix = PREDICT_FILE_US_PREFIX)
+    packPredictions(predictFilePrefix = PREDICT_FILE_US_PREFIX, bundleTargetFileName = PREDICTIONS_US_FILE_NAME)
 
 
 # *** main ***
