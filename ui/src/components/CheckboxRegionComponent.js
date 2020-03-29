@@ -61,10 +61,13 @@ export const CheckboxRegionComponent = (
     if(!mounted.current) {
       mounted.current = true
     } else {
+      console.log(`showPredictions: ${showPredictions}`)
+      console.log(`secondaryGraph: ${secondaryGraph}`)
       if(showPredictions && secondaryGraph === 'Cases') {
           const countryByKey = groupByKey("region", data)
           const predictionsList = Object.keys(predictions).map(region => ({ region: region, stats: countryByKey[region].stats}))
 
+          console.dir(predictionsList)
           if(alphaSort) {
             const sortedList = predictionsList.concat().sort((a, b) => a.region.localeCompare(b.region))
             setRegionList(sortedList)
