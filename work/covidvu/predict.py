@@ -32,8 +32,9 @@ N_CHAINS         = 3
 N_DAYS_PREDICT   = 14
 MIN_CASES_FILTER = 50
 MIN_NUMBER_DAYS_WITH_CASES = 10
+MAX_TREEDEPTH = 12
 
-PRIOR_LOG_CARRYING_CAPACITY = (0, 5)
+PRIOR_LOG_CARRYING_CAPACITY = (0, 10)
 PRIOR_MID_POINT             = (0, 1000)
 PRIOR_GROWTH_RATE           = (0.5, 0.5)
 PRIOR_SIGMA                 = (0, 10)
@@ -44,17 +45,17 @@ PREDICTIONS_PERCENTILES = (
                           )
 
 
-def _getCountryToTrain(countryTrainIndex, confirmedCases):
+def _getCountryToTrain(regionTrainIndex, confirmedCases):
     topCountries = confirmedCases.iloc[-1, confirmedCases.columns.map(lambda c: c[0] != '!')]
     topCountries = topCountries.sort_values(ascending=False)
-    countryName = topCountries.index[countryTrainIndex]
-    return countryName
+    regionName = topCountries.index[regionTrainIndex]
+    return regionName
 
 
-def buildLogisticModel(priorLogCarryingCapacity,
-                       priorMidPoint,
-                       priorGrowthRate,
-                       priorSigma,
+def buildLogisticModel(priorLogCarryingCapacity = PRIOR_LOG_CARRYING_CAPACITY,
+                       priorMidPoint = PRIOR_MID_POINT,
+                       priorGrowthRate = PRIOR_GROWTH_RATE,
+                       priorSigma = PRIOR_SIGMA,
                        nDaysName='nDays',
                        timeName='t',
                        casesLogName='casesLog',
@@ -78,7 +79,7 @@ def buildLogisticModel(priorLogCarryingCapacity,
         casesLin = carryingCap * inv_logit(growthRate * ({timeName} - midPoint));    
     }}
     model {{
-      logCarryingCapacity ~ normal({priorLogCarryingCapacity[0]},{priorLogCarryingCapacity[1]}) T[0,];
+      logCarryingCapacity ~ uniform({priorLogCarryingCapacity[0]},{priorLogCarryingCapacity[1]});
       midPoint ~ normal({priorMidPoint[0]}, {priorMidPoint[1]}) T[0,];
       growthRate ~ normal({priorGrowthRate[0]},{priorGrowthRate[1]});
       sigma ~ normal({priorSigma[0]},{priorSigma[1]}) T[0,];
@@ -115,15 +116,15 @@ def _getPredictionsFromPosteriorSamples(t,
     return predictionsMean, predictionsPercentilesTS
 
 
-def _castPredictionsAsTS(countryTSClean,
+def _castPredictionsAsTS(regionTSClean,
                          nDaysPredict,
                          predictionsMean,
                          predictionsPercentiles,
                          ):
     predictionsMeanTS = pd.Series(
         index = pd.date_range(
-                                start = countryTSClean.index[0],
-                                end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
+                                start = regionTSClean.index[0],
+                                end   = regionTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                              ),
         data  = predictionsMean,
     )
@@ -133,16 +134,16 @@ def _castPredictionsAsTS(countryTSClean,
 
         predictionsLow  = pd.Series(
             index = pd.date_range(
-                                    start = countryTSClean.index[0],
-                                    end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
+                                    start = regionTSClean.index[0],
+                                    end   = regionTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                                  ),
             data  = qLow,
         )
 
         predictionsHigh = pd.Series(
             index = pd.date_range(
-                                    start = countryTSClean.index[0],
-                                    end   = countryTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
+                                    start = regionTSClean.index[0],
+                                    end   = regionTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
                                  ),
             data  = qHigh,
         )
@@ -151,8 +152,8 @@ def _castPredictionsAsTS(countryTSClean,
     return predictionsMeanTS, predictionsPercentilesTS
 
 def predictLogisticGrowth(logGrowthModel: StanModel,
-                          countryTrainIndex: int        = None,
-                          countryName: str              = None,
+                          regionTrainIndex: int        = None,
+                          regionName: str              = None,
                           confirmedCases                = None,
                           target                        = 'confirmed',
                           subGroup                      = 'casesGlobal',
@@ -165,13 +166,13 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
                           randomSeed                    = 2020,
                           **kwargs
                           ):
-    """Predict the country with the nth highest number of cases
+    """Predict the region with the nth highest number of cases
 
     Parameters
     ----------
     logGrowthModel: A compiled pystan model
-    countryTrainIndex: Order countries from highest to lowest, and train the ith country
-    countryName: Overwrites countryTrainIndex as the country to train
+    regionTrainIndex: Order countries from highest to lowest, and train the ith region
+    regionName: Overwrites regionTrainIndex as the region to train
     confirmedCases: A dataframe of countries as columns, and total number of cases as a time series
         (see covidvu.vujson.parseCSSE)
     target: string in ['confirmed', 'deaths', 'recovered']
@@ -187,12 +188,13 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
 
     Returns
     -------
-    countryTS: All data for the queried country
+    regionTS: All data for the queried region
     predictionsMeanTS: Posterior mean prediction
     predictionsPercentilesTS: Posterior percentiles
     trace: pymc3 trace object
-    countryTSClean: Data used for training
+    regionTSClean: Data used for training
     """
+    maxTreeDepth = kwargs.get('maxTreedepth', MAX_TREEDEPTH)
 
     if confirmedCases is None:
         confirmedCases = parseCSSE(target,
@@ -206,26 +208,31 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
                                    jsCSSEReportPath              = kwargs.get('jsCSSEReportPath',JH_CSSE_REPORT_PATH),
                                    )[subGroup]
 
-    if countryName is None:
-        countryName = _getCountryToTrain(int(countryTrainIndex), confirmedCases)
+    if regionName is None:
+        regionName = _getCountryToTrain(int(regionTrainIndex), confirmedCases)
     else:
-        assert isinstance(countryName, str)
+        assert isinstance(regionName, str)
 
-    countryTS = confirmedCases[countryName]
-    countryTSClean = countryTS[countryTS > minCasesFilter]
-    if countryTSClean.shape[0] < minNumberDaysWithCases:
+    regionTS = confirmedCases[regionName]
+    regionTSClean = regionTS[regionTS > minCasesFilter]
+    if regionTSClean.shape[0] < minNumberDaysWithCases:
         return None
 
-    countryTSClean.index = pd.to_datetime(countryTSClean.index)
+    regionTSClean.index = pd.to_datetime(regionTSClean.index)
 
-    t = np.arange(countryTSClean.shape[0])
-    countryTSCleanLog = np.log(countryTSClean.values + 1)
+    t = np.arange(regionTSClean.shape[0])
+    regionTSCleanLog = np.log(regionTSClean.values + 1)
 
-    logisticGrowthData = {'nDays': countryTSClean.shape[0],
+    logisticGrowthData = {'nDays': regionTSClean.shape[0],
                           't': list(t),
-                          'casesLog': list(countryTSCleanLog)
+                          'casesLog': list(regionTSCleanLog)
                           }
-    fit = logGrowthModel.sampling(data=logisticGrowthData, iter=nSamples, chains=nChains, seed=randomSeed)
+
+
+    fit = logGrowthModel.sampling(data=logisticGrowthData, iter=nSamples, chains=nChains, seed=randomSeed,
+                                  control={'max_treedepth':maxTreeDepth}
+                                  )
+
     trace = fit.to_dataframe()
 
     predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(t,
@@ -234,20 +241,20 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
                                                                                      predictionsPercentiles,
                                                                                      )
 
-    predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(countryTSClean,
+    predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(regionTSClean,
                                                                        nDaysPredict,
                                                                        predictionsMean,
                                                                        predictionsPercentilesTS,
                                                                        )
 
-    countryTS.index = pd.to_datetime(countryTS.index)
+    regionTS.index = pd.to_datetime(regionTS.index)
     prediction = {
-                    'countryTS':                countryTS,
+                    'regionTS':                regionTS,
                     'predictionsMeanTS':        predictionsMeanTS,
                     'predictionsPercentilesTS': predictionsPercentilesTS,
                     'trace':                    trace,
-                    'countryTSClean':           countryTSClean,
-                    'countryName':              countryName,
+                    'regionTSClean':           regionTSClean,
+                    'regionName':              regionName,
                     't':                        t,
                  }
 
@@ -272,7 +279,7 @@ def _dumpTimeSeriesAsJSON(timeSeries, target = None):
 
 
 def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
-                                    countryName,
+                                    regionName,
                                     predictionsPercentiles,
                                     target,
                                     ):
@@ -287,7 +294,7 @@ def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
         result[qLow] = tsLow.to_dict()
         result[qHigh] = tsHigh.to_dict()
     result = {
-        countryName: result
+        regionName: result
     }
     if target:
         dumpJSON(result, target)
@@ -295,22 +302,25 @@ def _dumpPredictionCollectionAsJSON(predictionsPercentilesTS,
     return result
 
 
-def _dumpCountryPrediction(prediction, siteData, predictionsPercentiles):
-    countryNameSimple = ''.join(e for e in prediction['countryName'] if e.isalnum())
-    prediction['predictionsMeanTS'].name = prediction['countryName']
+def _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
+                           meanFilename='prediction-mean-%s.json',
+                           confIntFilename='prediction-conf-int-%s.json',
+                           ):
+    regionNameSimple = ''.join(e for e in prediction['regionName'] if e.isalnum())
+    prediction['predictionsMeanTS'].name = prediction['regionName']
 
     _dumpTimeSeriesAsJSON(prediction['predictionsMeanTS'],
-                          join(siteData, 'prediction-mean-%s.json' % countryNameSimple),
+                          join(siteData, meanFilename % regionNameSimple),
                           )
 
     _dumpPredictionCollectionAsJSON(prediction['predictionsPercentilesTS'],
                                     prediction['predictionsMeanTS'].name,
                                     predictionsPercentiles,
                                     join(siteData,
-                                         'prediction-conf-int-%s.json' % countryNameSimple),
+                                         confIntFilename % regionNameSimple),
                                     )
 
-def predictCountries(countryTrainIndex,
+def predictRegions(regionTrainIndex,
                      target                        = 'confirmed',
                      predictionsPercentiles        = PREDICTIONS_PERCENTILES,
                      siteData                      = SITE_DATA,
@@ -327,12 +337,12 @@ def predictCountries(countryTrainIndex,
                      logRegModel                   = None,
                      **kwargs
                      ):
-    """Generate forecasts for countries
+    """Generate forecasts for regions
 
     Parameters
     ----------
-    countryTrainIndex: If an integer, trains the country ranked i+1 in order of total number of cases. If 'all',
-        predicts all countries
+    regionTrainIndex: If an integer, trains the region ranked i+1 in order of total number of cases. If 'all',
+        predicts all regions
     target: A string in ['confirmed', 'deaths', 'recovered']
     predictionsPercentiles: The posterior percentiles to compute
     siteData: The directory for output data
@@ -364,10 +374,10 @@ def predictCountries(countryTrainIndex,
     else:
         assert isinstance(logRegModel, StanModel)
 
-    if re.search(r'^\d+$', str(countryTrainIndex)):
-        print(f'Training index {countryTrainIndex}')
+    if re.search(r'^\d+$', str(regionTrainIndex)):
+        print(f'Training index {regionTrainIndex}')
         prediction = predictLogisticGrowth(logRegModel,
-                                           countryTrainIndex             = countryTrainIndex,
+                                           regionTrainIndex             = regionTrainIndex,
                                            predictionsPercentiles        = predictionsPercentiles,
                                            target                        = target,
                                            siteData                      = siteData,
@@ -378,11 +388,18 @@ def predictCountries(countryTrainIndex,
                                            jsCSSEReportPath              = jsCSSEReportPath,
                                            **kwargs
                                            )
+        if subGroup == 'casesGlobal':
+            _dumpRegionPrediction(prediction, siteData, predictionsPercentiles)
+        elif subGroup == 'casesUSStates':
+            _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
+                                  meanFilename='prediction-mean-USStates-%s.json',
+                                  confIntFilename='prediction-conf-int-USStates-%s.json',)
+        else:
+            raise NotImplementedError
 
-        _dumpCountryPrediction(prediction, siteData, predictionsPercentiles)
         print('Done.')
 
-    elif countryTrainIndex == 'all':
+    elif regionTrainIndex == 'all':
         confirmedCases = parseCSSE(target,
                                    siteData                      = siteData,
                                    jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
@@ -392,11 +409,11 @@ def predictCountries(countryTrainIndex,
                                    jsCSSEReportPath              = jsCSSEReportPath,
                                    )[subGroup]
         countriesAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
-        for countryName in countriesAll:
-            print(f'Training {countryName}...')
+        for regionName in countriesAll:
+            print(f'Training {regionName}...')
 
             prediction = predictLogisticGrowth(logRegModel,
-                                               countryName                   = countryName,
+                                               regionName                    = regionName,
                                                confirmedCases                = confirmedCases,
                                                predictionsPercentiles        = predictionsPercentiles,
                                                target                        = target,
@@ -409,7 +426,14 @@ def predictCountries(countryTrainIndex,
                                                **kwargs,
                                                )
             if prediction:
-                _dumpCountryPrediction(prediction, siteData, predictionsPercentiles)
+                if subGroup == 'casesGlobal':
+                    _dumpRegionPrediction(prediction, siteData, predictionsPercentiles)
+                elif subGroup == 'casesUSStates':
+                    _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
+                                          meanFilename='prediction-mean-USStates-%s.json',
+                                          confIntFilename='prediction-conf-int-USStates-%s.json', )
+                else:
+                    raise NotImplementedError
                 print('Saved.')
             else:
                 print('Skipped.')
@@ -418,26 +442,36 @@ def predictCountries(countryTrainIndex,
         raise NotImplementedError
 
 
-def getSavedShortCountryNames(siteData = SITE_DATA):
-    countryNameShortAll = []
+def getSavedShortCountryNames(siteData = SITE_DATA,
+                              confIntFilename='prediction-conf-int-%s.json',
+                              ):
+    regionNameShortAll = []
+    pattern = '^' + confIntFilename.replace('%s', '(.*\w)')
     for filename in os.listdir(siteData):
-        match = re.search(r'^prediction-conf-int-(.*\w).json', filename)
+        match = re.search(pattern, filename)
         if match:
-            countryNameShort = match.groups()[0]
-            countryNameShortAll.append(countryNameShort)
-    return countryNameShortAll
+            regionNameShort = match.groups()[0]
+            regionNameShortAll.append(regionNameShort)
+    return regionNameShortAll
 
-def load(countryIndex: int, siteData=SITE_DATA):
-    assert isinstance(countryIndex, int)
+def load(regionIndex = None,
+         regionNameShort = None,
+         siteData=SITE_DATA,
+         meanFilename='prediction-mean-%s.json',
+         confIntFilename='prediction-conf-int-%s.json',):
 
-    countryNameShortAll = getSavedShortCountryNames(siteData=siteData)
+    if regionNameShort is None:
+        assert isinstance(regionIndex, int)
+        regionNameShortAll = getSavedShortCountryNames(siteData=siteData)
+        regionNameShort = regionNameShortAll[regionIndex]
+        assert abs(regionIndex) < len(regionNameShortAll)
+    else:
+        assert isinstance(regionNameShort, str)
 
-    assert abs(countryIndex) < len(countryNameShortAll)
-
-    with open(join(siteData, 'prediction-conf-int-%s.json' % countryNameShortAll[countryIndex])) as jsonFile:
+    with open(join(siteData, confIntFilename % regionNameShort)) as jsonFile:
         confidenceIntervals = json.load(jsonFile)
 
-    with open(join(siteData, 'prediction-mean-%s.json' % countryNameShortAll[countryIndex])) as jsonFile:
+    with open(join(siteData, meanFilename % regionNameShort)) as jsonFile:
         meanPrediction = json.load(jsonFile)
 
     meanPredictionTS = pd.Series(list(meanPrediction.values())[0])
@@ -446,31 +480,38 @@ def load(countryIndex: int, siteData=SITE_DATA):
     percentilesTS = pd.DataFrame(list(confidenceIntervals.values())[0])
     percentilesTS.index = pd.to_datetime(percentilesTS.index)
 
-    countryName = list(meanPrediction.keys())[0]
+    regionName = list(meanPrediction.keys())[0]
 
-    return meanPredictionTS, percentilesTS, countryName
+    return meanPredictionTS, percentilesTS, regionName
 
 
-def loadAll(target='confirmed', subGroup='casesGlobal', **kwargs):
+def loadAll(target='confirmed', subGroup='casesGlobal', confIntFilename='prediction-conf-int-%s.json', **kwargs):
     confirmedCasesAll = parseCSSE(target, **kwargs)[subGroup]
-    nTrainedCountries = len(getSavedShortCountryNames(siteData = kwargs.get('siteData', SITE_DATA)))
+    nTrainedRegions = len(getSavedShortCountryNames(siteData = kwargs.get('siteData', SITE_DATA),
+                                                      confIntFilename = confIntFilename,
+                                                      ))
     meanPredictionTSAll = pd.DataFrame()
     percentilesTSAll = pd.DataFrame()
-    for i in range(nTrainedCountries):
-        meanPredictionTS, percentilesTS, countryName = load(i, siteData=kwargs.get('siteData', SITE_DATA))
+    for i in range(nTrainedRegions):
+        meanPredictionTS, percentilesTS, regionName = load(i,
+                                                            siteData=kwargs.get('siteData', SITE_DATA),
+                                                            confIntFilename=confIntFilename,
+                                                            )
         meanPredictionTS.name = 'meanPrediction'
         meanPredictionTS = meanPredictionTS.to_frame()
-        meanPredictionTS['countryName'] = countryName
-        percentilesTS['countryName'] = countryName
+        meanPredictionTS['regionName'] = regionName
+        percentilesTS['regionName'] = regionName
         percentilesTSAll = percentilesTSAll.append(percentilesTS)
         meanPredictionTSAll = meanPredictionTSAll.append(meanPredictionTS)
-    percentilesTSAll = percentilesTSAll.pivot(columns='countryName')
-    meanPredictionTSAll = meanPredictionTSAll.pivot(columns='countryName')
+    percentilesTSAll = percentilesTSAll.pivot(columns='regionName')
+    meanPredictionTSAll = meanPredictionTSAll.pivot(columns='regionName')
     meanPredictionTSAll.columns = meanPredictionTSAll.columns.droplevel(level=0)
     return confirmedCasesAll, meanPredictionTSAll, percentilesTSAll
 
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
-        predictCountries(argument)
+        logRegModel = buildLogisticModel()
+        predictRegions(argument, logRegModel=logRegModel)
+        predictRegions(argument, logRegModel=logRegModel, subGroup='casesUSStates')
 

@@ -255,8 +255,8 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
                    mode="lines",
                    name="2.5%",
                    fill=None,
-                   showlegend=False,
-                   hoverinfo='skip',
+                   showlegend=True,
+                   #hoverinfo='skip',
                    )
     )
     fig.add_trace(
@@ -266,8 +266,8 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
                    mode="lines",
                    fill='tonexty',
                    name="97.5%",
-                   showlegend=False,
-                   hoverinfo='skip',
+                   showlegend=True,
+                   #hoverinfo='skip',
                    )
     )
 
@@ -278,8 +278,8 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
                    mode="lines",
                    name="25%",
                    fill=None,
-                   showlegend=False,
-                   hoverinfo='skip',
+                   showlegend=True,
+                   #hoverinfo='skip',
                    )
     )
     fig.add_trace(
@@ -289,8 +289,8 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
                    mode="lines",
                    fill='tonexty',
                    name="75%",
-                   showlegend=False,
-                   hoverinfo='skip',
+                   showlegend=True,
+                   #hoverinfo='skip',
                    )
     )
     fig.add_trace(
@@ -300,7 +300,7 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
                    line=dict(color=color_data,
                              dash='dash',
                              ),
-                   showlegend=False,
+                   showlegend=True,
                    mode="lines",
                    marker={"size": 5},
                    )
@@ -347,9 +347,6 @@ def plotDataAndPredictionsWithCI(meanPredictionTSAll,
     percentilesTSAllSelected = percentilesTSAll.loc[:, (slice(None), selectedColumns)]
 
     if log:
-        meanPredictionTSSelected  = np.log10(meanPredictionTSSelected + 1)
-        confirmedCasesAllSelected = np.log10(confirmedCasesAllSelected + 1)
-        percentilesTSAllSelected  = np.log10(percentilesTSAllSelected + 1)
         yLabel =  "Log10 " + yLabel
 
 
@@ -381,5 +378,8 @@ def plotDataAndPredictionsWithCI(meanPredictionTSAll,
                          countryName, colorData, colorCI,
                          fig=fig,
                          )
-    fig.update_layout(title_text=title)
+    if log:
+        fig.update_layout(title_text=title, yaxis_type = "log")
+    else:
+        fig.update_layout(title_text=title)
     return fig

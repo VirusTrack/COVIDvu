@@ -16,7 +16,7 @@ from pandas.core.series import Series
 from pystan.model import StanModel
 
 from covidvu.predict import _castPredictionsAsTS
-from covidvu.predict import _dumpCountryPrediction
+from covidvu.predict import _dumpRegionPrediction
 from covidvu.predict import _dumpPredictionCollectionAsJSON
 from covidvu.predict import _dumpTimeSeriesAsJSON
 from covidvu.predict import _getPredictionsFromPosteriorSamples
@@ -25,7 +25,7 @@ from covidvu.predict import getSavedShortCountryNames
 from covidvu.predict import load
 from covidvu.predict import loadAll
 from covidvu.predict import MIN_CASES_FILTER
-from covidvu.predict import predictCountries
+from covidvu.predict import predictRegions
 from covidvu.predict import PREDICTIONS_PERCENTILES
 from covidvu.predict import predictLogisticGrowth
 from covidvu.predict import PRIOR_GROWTH_RATE
@@ -106,17 +106,17 @@ def test__dumpTimeSeriesAsJSON():
 logRegModel = None
 def test_buildLogisticModel():
     global logRegModel
-    logRegModel = buildLogisticModel(PRIOR_LOG_CARRYING_CAPACITY,
-                                     PRIOR_MID_POINT,
-                                     PRIOR_GROWTH_RATE,
-                                     PRIOR_SIGMA, )
+    logRegModel = buildLogisticModel(priorLogCarryingCapacity=PRIOR_LOG_CARRYING_CAPACITY,
+                                     priorMidPoint=PRIOR_MID_POINT,
+                                     priorGrowthRate=PRIOR_GROWTH_RATE,
+                                     priorSigma=PRIOR_SIGMA, )
     assert isinstance(logRegModel, StanModel)
 
 
 def test_predictLogisticGrowth():
     nDaysPredict = 10
     prediction = predictLogisticGrowth(logRegModel,
-                                       countryName                   = 'US',
+                                       regionName                   = 'US',
                                        siteData                      = TEST_SITE_DATA,
                                        jhCSSEFileConfirmed           = TEST_JH_CSSE_FILE_CONFIRMED,
                                        jhCSSEFileDeaths              = TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
@@ -127,8 +127,8 @@ def test_predictLogisticGrowth():
                                        nDaysPredict                  = nDaysPredict,
                                        )
 
-    predictionIndex = pd.date_range(start = prediction['countryTSClean'].index[0],
-                                    end   = prediction['countryTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D'),
+    predictionIndex = pd.date_range(start = prediction['regionTSClean'].index[0],
+                                    end   = prediction['regionTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D'),
                                     )
 
     assert (prediction['predictionsMeanTS'].index == predictionIndex).all()
@@ -138,14 +138,14 @@ def test_predictLogisticGrowth():
     assert (prediction['predictionsMeanTS'].isnull().values).sum() == 0
     assert (prediction['predictionsPercentilesTS'][0][0].isnull().values).sum() == 0
     assert isinstance(prediction['trace'], DataFrame)
-    assert (prediction['countryTSClean'] > MIN_CASES_FILTER).all()
+    assert (prediction['regionTSClean'] > MIN_CASES_FILTER).all()
     return prediction
 
 
 def test__dumpCountryPrediction():
     prediction = test_predictLogisticGrowth()
     try:
-        _dumpCountryPrediction(prediction, TEST_SITE_DATA, PREDICTIONS_PERCENTILES)
+        _dumpRegionPrediction(prediction, TEST_SITE_DATA, PREDICTIONS_PERCENTILES)
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-US.json'))
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-conf-int-US.json'))
 
@@ -165,10 +165,10 @@ def test__getPredictionsFromPosteriorSamples():
                                                                                   PREDICTIONS_PERCENTILES,
                                                                                   )
     assert isinstance(predictionsMean, ndarray)
-    assert len(predictionsMean) == prediction['countryTSClean'].shape[0] + nDaysPredict
+    assert len(predictionsMean) == prediction['regionTSClean'].shape[0] + nDaysPredict
     assert len(predictionsPercentiles) == len(PREDICTIONS_PERCENTILES)
     assert isinstance(predictionsPercentiles[0][0], ndarray)
-    assert len(predictionsPercentiles[0][0]) == prediction['countryTSClean'].shape[0] + nDaysPredict
+    assert len(predictionsPercentiles[0][0]) == prediction['regionTSClean'].shape[0] + nDaysPredict
 
     prediction['predictionsMean'] = predictionsMean
     prediction['predictionsPercentiles'] = predictionsPercentiles
@@ -180,23 +180,23 @@ def test__castPredictionsAsTS():
     predictions = test__getPredictionsFromPosteriorSamples()
     startDate   = '2020-01-01'
     startDate   = pd.to_datetime(startDate).date()
-    endDate     = startDate + pd.Timedelta(len(predictions['countryTSClean'])-1, 'D')
+    endDate     = startDate + pd.Timedelta(len(predictions['regionTSClean'])-1, 'D')
     predictionIndex = pd.date_range(start = startDate,
                                     end   = endDate,
                                     )
-    countryTSClean = pd.Series(index = predictionIndex, data  = predictions['countryTSClean'])
-    predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(countryTSClean,
+    regionTSClean = pd.Series(index = predictionIndex, data  = predictions['regionTSClean'])
+    predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(regionTSClean,
                                                                        predictions['nDaysPredict'],
                                                                        predictions['predictionsMean'],
                                                                        predictions['predictionsPercentiles'],
                                                                        )
     assert isinstance(predictionsMeanTS, Series)
-    assert predictionsMeanTS.shape[0] == len(predictions['countryTSClean']) + predictions['nDaysPredict']
+    assert predictionsMeanTS.shape[0] == len(predictions['regionTSClean']) + predictions['nDaysPredict']
     assert isinstance(predictionsMeanTS.index, DatetimeIndex)
     assert len(predictionsPercentilesTS) == len(PREDICTIONS_PERCENTILES)
     assert isinstance(predictionsPercentilesTS[0][0], Series)
     assert isinstance(predictionsPercentilesTS[0][0].index, DatetimeIndex)
-    assert predictionsPercentilesTS[0][0].shape[0] == len(predictions['countryTSClean']) + predictions['nDaysPredict']
+    assert predictionsPercentilesTS[0][0].shape[0] == len(predictions['regionTSClean']) + predictions['nDaysPredict']
     return predictionsMeanTS, predictionsPercentilesTS, predictions
 
 
@@ -217,7 +217,7 @@ def test__dumpPredictionCollectionAsJSON():
 
 def test_predictCountries():
     try:
-        predictCountries(0,
+        predictRegions(0,
               nDaysPredict        = 10,
               siteData=TEST_SITE_DATA,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
@@ -231,7 +231,7 @@ def test_predictCountries():
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
 
-        predictCountries('all',
+        predictRegions('all',
               nDaysPredict=10,
               siteData=TEST_SITE_DATA,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
@@ -256,7 +256,7 @@ def test_predictCountries():
 
 def test_load():
     try:
-        predictCountries('all',
+        predictRegions('all',
               siteData=TEST_SITE_DATA,
               nDaysPredict=10,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
@@ -268,10 +268,10 @@ def test_load():
                          nChains=TEST_N_CHAINS,
               )
 
-        meanPredictionTS, percentilesTS, countryName = load(0, siteData=TEST_SITE_DATA)
+        meanPredictionTS, percentilesTS, regionName = load(0, siteData=TEST_SITE_DATA)
         assert isinstance(meanPredictionTS, Series)
         assert isinstance(percentilesTS, DataFrame)
-        assert isinstance(countryName, str)
+        assert isinstance(regionName, str)
         assert (percentilesTS.columns.isin(['97.5', '2.5', '25', '75'])).all()
     except Exception as e:
         raise e
@@ -281,7 +281,7 @@ def test_load():
 
 def test_getSavedShortCountryNames():
     try:
-        predictCountries('all',
+        predictRegions('all',
               siteData=TEST_SITE_DATA,
               jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
@@ -291,9 +291,9 @@ def test_getSavedShortCountryNames():
                          nSamples=TEST_N_SAMPLES,
                          nChains=TEST_N_CHAINS,
               )
-        countryNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
-        assert isinstance(countryNameShortAll, list)
-        assert len(countryNameShortAll) == 3
+        regionNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
+        assert isinstance(regionNameShortAll, list)
+        assert len(regionNameShortAll) == 3
     except Exception as e:
         raise e
     finally:
@@ -302,18 +302,8 @@ def test_getSavedShortCountryNames():
 
 def test_loadAll():
     try:
-        predictCountries('all',
-              siteData=TEST_SITE_DATA,
-              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel=logRegModel,
-                         nSamples=TEST_N_SAMPLES,
-                         nChains=TEST_N_CHAINS,
-              )
 
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA,
+        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA,'test-predictions'),
                                                                             jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
                                                                             jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
                                                                             jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
