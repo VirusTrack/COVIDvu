@@ -15,6 +15,7 @@ MODULE=$(shell cat modulename.txt)
 # REQUIREMENTS=$(shell cat requirements.txt)
 REQUIREMENTS=requirements.txt
 VERSION=$(shell cat version.txt)
+SITE_DATA=./site-data
 
 
 # Targets:
@@ -65,6 +66,7 @@ resetpy: ALWAYS
 
 
 test: ALWAYS
+	[[ -d $(SITE_DATA) ]] || mkdir -p $(SITE_DATA)
 	pip install -e .
 	pytest -v ./test/covidvu/pipeline/test_jsonpack.py
 	pytest -v ./test/covidvu/pipeline/test_pyavka.py
