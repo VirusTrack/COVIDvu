@@ -9,5 +9,5 @@ source ./pyrunner
 # *** main ***
 
 python3 -m covidvu.pipeline.jsonpack
-ls -Alrt "$SITE_DATA_DIR"/*json
+ls -Alrt "$SITE_DATA_DIR"/bundle*json
 

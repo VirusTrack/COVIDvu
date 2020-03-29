@@ -316,3 +316,17 @@ def test_loadAll():
         raise e
     finally:
         _purge(TEST_SITE_DATA, '.json')
+
+
+
+# test__dumpTimeSeriesAsJSON()
+# test_buildLogisticModel()
+# test_predictLogisticGrowth()
+# test__dumpCountryPrediction()
+# test__getPredictionsFromPosteriorSamples()
+# test__castPredictionsAsTS()
+# test__dumpPredictionCollectionAsJSON()
+# test_predictCountries()
+# test_load()
+# test_getSavedShortCountryNames()
+test_loadAll()
