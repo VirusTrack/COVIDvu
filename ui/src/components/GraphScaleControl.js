@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Generic, Button, Checkbox } from 'rbx'
+import { Generic, Button, Checkbox, Column } from 'rbx'
 
 export const GraphScaleControl = ({
     showLog = false, 
@@ -18,15 +18,25 @@ export const GraphScaleControl = ({
 
     return (
         <Generic as="div" align={align} >
-            <span style={{fontSize: '1.4rem'}}>Graph Scale:&nbsp;</span>
-            <Button size="medium" outlined color={!showLog?"secondary":"default"} onClick={() => { if(showLog) { handleGraphScale(false) } }}>Linear</Button>&nbsp; 
-            <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" color={showLog?"secondary":"default"} outlined onClick={() => { if(!showLog) { handleGraphScale(true) } }}>Logarithmic</Button>
-            &nbsp;
-            { (parentRegion === 'Global' && secondaryGraph === 'Cases') &&
-                <span style={{fontSize: '1.4rem'}}>
-                    <Checkbox onChange={handleShowPredictions} checked={showPredictions} /> Show Predictions
-                </span>
-            }
+            <Column.Group style={{alignItems: 'baseline'}} breakpoint="tablet">
+                <Column narrow gapSize={0}>    
+                    <span style={{fontSize: '1.4rem'}}>Graph Scale:&nbsp;</span>
+                </Column>
+                <Column narrow>
+                    <Button.Group hasAddons>
+                        <Button  size="medium" selected={!showLog? true : null} color={!showLog?"default":"light"} onClick={() => { if(showLog) { handleGraphScale(false) } }}>Linear</Button>
+                        <Button  tooltip="Steeper slope on log scale means faster disease spread" size="medium" color={showLog?"default":"light"} onClick={() => { if(!showLog) { handleGraphScale(true) } }}>Logarithmic</Button>
+                    </Button.Group>
+                </Column>
+            
+                <Column gapSize={3}>
+                { (parentRegion === 'Global' && secondaryGraph === 'Cases') &&
+                    <span style={{fontSize: '1.4rem'}}>
+                        <Button size="medium" outlined={!showPredictions?true:null} color={!showPredictions?'primary':'light'} onClick={handleShowPredictions}>{showPredictions ? 'Hide Predictions' : 'Show Predictions'}</Button>
+                    </span>
+                }
+                </Column>
+            </Column.Group>
         </Generic>
     )
 }
