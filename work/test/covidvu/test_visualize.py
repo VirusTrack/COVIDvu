@@ -8,7 +8,6 @@ from covidvu.visualize import plotPrediction
 from covidvu.visualize import plotDataAndPredictionsWithCI
 from covidvu.visualize import castHexToRGBA_string
 from covidvu.visualize import hexToRGB
-from covidvu.predict import _main
 from covidvu.predict import loadAll
 import pandas as pd
 import numpy as np
@@ -108,20 +107,7 @@ def test_plotPrediction():
 
 def test_plotDataAndPredictionsWithCI():
     try:
-        _main('all',
-              siteData=TEST_SITE_DATA,
-              nSamples=10,
-              nTune=10,
-              nChains=1,
-              nBurn=0,
-              nDaysPredict=10,
-              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-              jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-              jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              )
-
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA,
+        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA, 'test-predictions'),
                                                                             jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
                                                                             jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
                                                                             jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
@@ -135,7 +121,8 @@ def test_plotDataAndPredictionsWithCI():
     except Exception as e:
         raise e
     finally:
-        _purge(TEST_SITE_DATA, '.json')
+        _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed*.json')
+
 
 
 def test_castHexToRGBA_string():

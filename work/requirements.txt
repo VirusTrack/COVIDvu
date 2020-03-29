@@ -2,13 +2,11 @@ beautifulsoup4
 cufflinks
 jupyter
 matplotlib
-mkl
 numpy
 pandas
 plotly
 pre-commit
 pudb
-pymc3
+pystan
 pytest
-theano
-
+tqdm

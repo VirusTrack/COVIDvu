@@ -5,6 +5,7 @@ import Plot from 'react-plotly.js'
 import { useMobileDetect } from '../hooks/ui'
 
 import { Generic } from 'rbx'
+import LogoElement from './LogoElement'
 
 export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, showLog = false}) => {
 
@@ -107,8 +108,9 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
     }
 
     return (
-        <Generic tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
-            <Plot
+        <Generic className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
+            <div className="vt-graph-logo"><LogoElement /></div>
+            <Plot id="graphPlot"
                 data={plotsAsValues}
                 layout={layout}
                 config={mergeConfig}

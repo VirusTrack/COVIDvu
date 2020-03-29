@@ -23,7 +23,7 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
     const history = useHistory()
 
     const [selectedTab, setSelectedTab] = useState(filter)
-    const [filterRegion, setFilterRegion] = useState('')
+    const [filterRegion, setFilterRegion] = useState('NY')
     const [daysAgo, setDaysAgo] = useState(daysAgoParam)
     const [sort, setSort] = useState('confirmed')
 
