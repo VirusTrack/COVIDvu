@@ -7,6 +7,6 @@ pandas
 plotly
 pre-commit
 pudb
-pytest
 pystan
-
+pytest
+tqdm
