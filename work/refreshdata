@@ -250,6 +250,11 @@ case "$1" in
     "stage")
         deployVirusUpdateJSON "$STAGE_BUCKET"
         ;;
+    "testing")
+        ;&
+    "test")
+        deployVirusUpdateJSON "$TEST_BUCKET"
+        ;;
     *)
         die "invalid command - use stage|publish|nuke|noop" 11
         ;;
