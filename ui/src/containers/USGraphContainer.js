@@ -145,6 +145,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
                         defaultSelected={region}
                         showPredictions={showPredictions}
                         predictions={usPredictions}
+                        secondaryGraph={secondaryGraph}
                         showLog={showLog}
                         parentRegion="US"
                     />

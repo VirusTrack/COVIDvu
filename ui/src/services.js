@@ -68,7 +68,7 @@ class DataService {
     async getUSPredictions() {
         try {
             const localUpdate = store.session(LAST_UPDATE_KEY) !== null ? store.session(LAST_UPDATE_KEY) : new Date().getTime()
-            const response = await axios.get(`${dataUrl()}/bundle-predictions-US.json?timestamp=${localUpdate}`)
+            const response = await axios.get(`${dataUrl()}/bundle-US-predictions.json?timestamp=${localUpdate}`)
             return response.data
         } catch(error) {
             console.error(error)

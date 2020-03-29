@@ -28,7 +28,8 @@ const main = async (argv) => {
 
         if(fs.existsSync('site-data')) {
             fs.existsSync('./site-data/bundle-global.json') && fs.unlinkSync('./site-data/bundle-global.json')
-            fs.existsSync('./site-data/bundle-predictions-global.json') && fs.unlinkSync('./site-data/bundle-predictions-global.json')
+            fs.existsSync('./site-data/bundle-global-predictions.json') && fs.unlinkSync('./site-data/bundle-global-predictions.json')
+            fs.existsSync('./site-data/bundle-US-predictions.json') && fs.unlinkSync('./site-data/bundle-US-predictions.json')
             fs.existsSync('./site-data/bundle-continental-regions.json') && fs.unlinkSync('./site-data/bundle-continental-regions.json')
             fs.existsSync('./site-data/bundle-US.json') && fs.unlinkSync('./site-data/bundle-US.json')
             fs.existsSync('./site-data/bundle-US-Regions.json') && fs.unlinkSync('./site-data/bundle-US-Regions.json')
@@ -40,14 +41,16 @@ const main = async (argv) => {
         const content_url = environment === "production" ? PRODUCTION_URL : STAGING_URL
 
         const global = await axios.get(`${content_url}/bundle-global.json`)
-        const predictions_global = await axios.get(`${content_url}/bundle-predictions-global.json`)
+        const predictions_global = await axios.get(`${content_url}/bundle-global-predictions.json`)
+        const predictions_us = await axios.get(`${content_url}/bundle-US-predictions.json`)
         const continental_regions = await axios.get(`${content_url}/bundle-continental-regions.json`)
         const us_states = await axios.get(`${content_url}/bundle-US.json`)
         const us_regions = await axios.get(`${content_url}/bundle-US-Regions.json`)
         const last_update = await axios.get(`${content_url}/last-update.txt`)
            
         fs.writeFileSync('./site-data/bundle-global.json', JSON.stringify(global.data))
-        fs.writeFileSync('./site-data/bundle-predictions-global.json', JSON.stringify(predictions_global.data))
+        fs.writeFileSync('./site-data/bundle-global-predictions.json', JSON.stringify(predictions_global.data))
+        fs.writeFileSync('./site-data/bundle-US-predictions.json', JSON.stringify(predictions_us.data))
         fs.writeFileSync('./site-data/bundle-continental-regions.json', JSON.stringify(continental_regions.data))
         fs.writeFileSync('./site-data/bundle-US.json', JSON.stringify(us_states.data))
         fs.writeFileSync('./site-data/bundle-US-Regions.json', JSON.stringify(us_regions.data))
@@ -55,7 +58,8 @@ const main = async (argv) => {
     } else if(argv.serveLocalCache) {
 
         if(fs.existsSync('./site-data/bundle-global.json') && 
-                fs.existsSync('./site-data/bundle-predictions-global.json') && 
+                fs.existsSync('./site-data/bundle-global-predictions.json') && 
+                fs.existsSync('./site-data/bundle-US-predictions.json') && 
                 fs.existsSync('./site-data/bundle-continental-regions.json') && 
                 fs.existsSync('./site-data/bundle-US.json') && 
                 fs.existsSync('./site-data/bundle-US-Regions.json') &&
@@ -65,8 +69,12 @@ const main = async (argv) => {
                 res.send(fs.readFileSync('./site-data/bundle-global.json'))
             })
 
-            app.use('/site-data/bundle-predictions-global.json', cors(corsOptions), (req, res) => {
-                res.send(fs.readFileSync('./site-data/bundle-predictions-global.json'))
+            app.use('/site-data/bundle-global-predictions.json', cors(corsOptions), (req, res) => {
+                res.send(fs.readFileSync('./site-data/bundle-global-predictions.json'))
+            })
+
+            app.use('/site-data/bundle-US-predictions.json', cors(corsOptions), (req, res) => {
+                res.send(fs.readFileSync('./site-data/bundle-US-predictions.json'))
             })
 
             app.use('/site-data/bundle-continental-regions.json', cors(corsOptions), (req, res) => {
@@ -92,7 +100,8 @@ const main = async (argv) => {
         const content_url = environment === "production" ? PRODUCTION_URL : STAGING_URL
 
         const global = await axios.get(`${content_url}/bundle-global.json`)
-        const predictions_global = await axios.get(`${content_url}/bundle-predictions-global.json`)
+        const predictions_global = await axios.get(`${content_url}/bundle-global-predictions.json`)
+        const predictions_us = await axios.get(`${content_url}/bundle-US-predictions.json`)
         const continental_regions = await axios.get(`${content_url}/bundle-continental-regions.json`)
         const us_states = await axios.get(`${content_url}/bundle-US.json`)
         const us_regions = await axios.get(`${content_url}/bundle-US-Regions.json`)
@@ -102,8 +111,12 @@ const main = async (argv) => {
             res.send(global.data)
         })
 
-        app.use('/site-data/bundle-predictions-global.json', cors(corsOptions), (req, res) => {
+        app.use('/site-data/bundle-global-predictions.json', cors(corsOptions), (req, res) => {
             res.send(predictions_global.data)
+        })
+
+        app.use('/site-data/bundle-US-predictions.json', cors(corsOptions), (req, res) => {
+            res.send(predictions_us.data)
         })
 
         app.use('/site-data/bundle-continental-regions.json', cors(corsOptions), (req, res) => {
