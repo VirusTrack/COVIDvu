@@ -13,10 +13,7 @@ export COUNTY_CASES_US_ENDPOINT="https://coronavirus-tracker-api.herokuapp.com/v
 
 # *** main ***
 
-echo "fetchcing counties data from $COUNTY_CASES_US_ENDPOINT"
+echo "running the predictions models for all locations"
 
-curl -A "$PYAVKA_USER_AGENT" -s "$COUNTY_CASES_US_ENDPOINT" | jq -M '.locations' > "$COUNTY_CASES_CSBS_FILE" 
-
-python -m covidvu.pipeline.vucounty
-python -m covidvu.pipeline.vuhospitals
+python -m covidvu.predict all
 

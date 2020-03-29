@@ -146,8 +146,8 @@ def test__dumpCountryPrediction():
     prediction = test_predictLogisticGrowth()
     try:
         _dumpRegionPrediction(prediction, TEST_SITE_DATA, PREDICTIONS_PERCENTILES)
-        _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-US.json'))
-        _assertValidJSON(join(TEST_SITE_DATA,'prediction-conf-int-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA,'prediction-world-mean-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA,'prediction-world-conf-int-US.json'))
 
     except Exception as e:
         raise e
@@ -228,8 +228,8 @@ def test_predictCountries():
               nSamples=TEST_N_SAMPLES,
               nChains=TEST_N_CHAINS,
               )
-        _assertValidJSON(join(TEST_SITE_DATA,'prediction-mean-China.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-China.json'))
+        _assertValidJSON(join(TEST_SITE_DATA,'prediction-world-mean-China.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-China.json'))
 
         predictRegions('all',
               nDaysPredict=10,
@@ -243,10 +243,10 @@ def test_predictCountries():
                          nChains=TEST_N_CHAINS,
               )
 
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-Italy.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-Italy.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-mean-US.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-conf-int-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-mean-Italy.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-Italy.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-mean-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
 
     except Exception as e:
         raise e
@@ -316,3 +316,17 @@ def test_loadAll():
         raise e
     finally:
         _purge(TEST_SITE_DATA, '.json')
+
+
+
+# test__dumpTimeSeriesAsJSON()
+# test_buildLogisticModel()
+# test_predictLogisticGrowth()
+# test__dumpCountryPrediction()
+# test__getPredictionsFromPosteriorSamples()
+# test__castPredictionsAsTS()
+# test__dumpPredictionCollectionAsJSON()
+# test_predictCountries()
+# test_load()
+# test_getSavedShortCountryNames()
+test_loadAll()
