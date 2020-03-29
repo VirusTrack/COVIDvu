@@ -155,6 +155,7 @@ dmypy.json
 *swp
 .viminfo
 work/*.json
+**/snapshots/*
 
 # Python virtual environment
 
