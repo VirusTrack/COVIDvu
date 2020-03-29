@@ -9,7 +9,7 @@ import LogoElement from './LogoElement'
 
 import html2canvas from 'html2canvas'
 import fileDownload from 'js-file-download'
-import c2i from 'canvas2image'
+import reimg from 'reimg'
 
 export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, showLog = false}) => {
 
@@ -112,15 +112,22 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
     }
 
     const saveImage = () => {
+        // const inputs = document.querySelectorAll(".main-svg")
+        // console.log(inputs)
+        // console.dir(inputs[0])
+        
+        // reimg.ReImg.fromSvg(inputs[0]).downloadPng()
         const input = document.getElementById('graphPlot')
           html2canvas(input, {
             useCORS: true
           })
             .then(canvas => {
 
-                console.dir(c2i.Canvas2Image)
+                reimg.ReImg.fromCanvas(canvas).downloadPng()
+
+                // fileDownload(png, 'graph.png', 'image/png')
             //   const imgData = canvas.toDataURL('image/png')
-            c2i.Canvas2Image.saveAsPNG(canvas, 450, 500)
+            // c2i.Canvas2Image.saveAsPNG(canvas, 450, 500)
             //   fileDownload(imgData, 'graph.png', 'image/png')
             //   console.log(imgData); //Maybe blank, maybe full image, maybe half of image
             })
@@ -129,17 +136,15 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
     return (
         <>
         <Button onClick={()=>{ saveImage() }}>Save Image</Button>
-        <Generic className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
-            <div id="graphPlot">
+        <Generic id="graphPlot" className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
             <div className="vt-graph-logo"><LogoElement /></div>
-            <Plot
+            <Plot 
                 data={plotsAsValues}
                 layout={layout}
                 config={mergeConfig}
                 useResizeHandler={true}
                 style={{width: '100%', height: '100%', minHeight: '45rem'}}
             />
-            </div>
         </Generic>
         </>
     )
