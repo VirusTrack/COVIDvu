@@ -38,7 +38,7 @@ export const USStatsTable = ({statsForGraph, redirectToExternalLink, isExternalL
                     <Table.Heading>
                         New Deaths
                     </Table.Heading>
-                    <Table.Heading onClick={() => { console.log("hi"); onSort('mortality')}} style={{ cursor: 'pointer'}}>
+                    <Table.Heading onClick={() => { onSort('mortality')}} style={{ cursor: 'pointer'}}>
                         Mortality Rate
                         {sort === 'mortality' &&
                             <ColumnSortIcon direction='desc' />

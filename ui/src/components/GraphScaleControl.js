@@ -22,7 +22,7 @@ export const GraphScaleControl = ({
             <Button size="medium" outlined color={!showLog?"secondary":"default"} onClick={() => { if(showLog) { handleGraphScale(false) } }}>Linear</Button>&nbsp; 
             <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" color={showLog?"secondary":"default"} outlined onClick={() => { if(!showLog) { handleGraphScale(true) } }}>Logarithmic</Button>
             &nbsp;
-            { parentRegion === 'Global' &&
+            { (parentRegion === 'Global' && secondaryGraph === 'Cases') &&
                 <span style={{fontSize: '1.4rem'}}>
                     <Checkbox onChange={handleShowPredictions} checked={showPredictions} /> Show Predictions
                 </span>

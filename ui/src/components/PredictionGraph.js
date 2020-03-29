@@ -167,7 +167,6 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
         }
     }
     
-    console.dir(plotsAsValues)
     if(showLog) {
         layout['yaxis'] = {
             type: 'log',

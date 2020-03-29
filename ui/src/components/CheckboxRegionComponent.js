@@ -64,14 +64,11 @@ export const CheckboxRegionComponent = (
           const countryByKey = groupByKey("region", data)
           const predictionsList = Object.keys(predictions).map(region => ({ region: region, stats: countryByKey[region].stats}))
 
-          console.dir(predictionsList)
           if(alphaSort) {
             const sortedList = predictionsList.concat().sort((a, b) => a.region.localeCompare(b.region))
-            console.dir(sortedList)
             setRegionList(sortedList)
           } else {
             const sortedList = predictionsList.concat().sort((a, b) => b.stats - a.stats)
-            console.dir(sortedList)
             setRegionList(sortedList)
           }
       } else {
