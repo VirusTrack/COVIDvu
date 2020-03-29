@@ -65,7 +65,7 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
     return packedDataset
 
 
-def packPredictions(siteDataDirectory = SITE_DATA):
+def packWorldPredictions(siteDataDirectory = SITE_DATA):
     predictionFileNames = [ os.path.join(siteDataDirectory, fileName) for fileName in os.listdir(siteDataDirectory) if PREDICT_FILE_PREFIX in fileName ]
     
     predictions = {  }
@@ -96,7 +96,7 @@ def main():
     for grouping in GROUPINGS:
         packDataset(grouping)
 
-    packPredictions()
+    packWorldPredictions()
 
 
 # *** main ***

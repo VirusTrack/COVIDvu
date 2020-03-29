@@ -7,7 +7,7 @@ from covidvu.pipeline.jsonpack import REPORTS
 from covidvu.pipeline.jsonpack import PREDICTIONS_FILE_NAME
 from covidvu.pipeline.jsonpack import loadUSCounties
 from covidvu.pipeline.jsonpack import packDataset
-from covidvu.pipeline.jsonpack import packPredictions
+from covidvu.pipeline.jsonpack import packWorldPredictions
 from covidvu.pipeline.jsonpack import sortByDate
 
 import json
@@ -76,16 +76,16 @@ def test_main():
     pass  # It runs, the meat is in the packDataset function
 
 
-def test_packPredictions():
+def test_packWorldPredictions():
     testFileName = os.path.join(TEST_SITE_DATA, 'prediction-crap.json')
 
     with open(testFileName, 'w'):
         pass
     with pytest.raises(NameError):
-        packPredictions(siteDataDirectory = TEST_SITE_DATA)
+        packWorldPredictions(siteDataDirectory = TEST_SITE_DATA)
     os.unlink(testFileName)
 
-    result = packPredictions(siteDataDirectory = TEST_SITE_DATA)
+    result = packWorldPredictions(siteDataDirectory = TEST_SITE_DATA)
 
     assert 'United Kingdom' in result
     assert 'confidenceInterval' in result['United Kingdom']
