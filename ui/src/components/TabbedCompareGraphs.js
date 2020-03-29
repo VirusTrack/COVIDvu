@@ -104,7 +104,7 @@ export const TabbedCompareGraphs = (
                 </Level.Item>
             </Level>
 
-            { showPredictions &&
+            { (showPredictions && secondaryGraph === 'Cases') &&
                 <PredictionGraph
                     graphName="Cases"
                     selected={selected}
