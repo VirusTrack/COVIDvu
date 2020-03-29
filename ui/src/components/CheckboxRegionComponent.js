@@ -8,6 +8,7 @@ import ReactGA from 'react-ga';
 export const CheckboxRegionComponent = (
         {
           data, 
+          predictions,
           selected, 
           handleSelected, 
           showLog = false, 
@@ -45,20 +46,43 @@ export const CheckboxRegionComponent = (
 
   }
 
+  const groupByKey = (key, array) => {
+      return array.reduce((obj, item) => {
+          const objKey = item[key]
+          obj[objKey] = item
+          return obj
+      }, {})
+  }
+
   const mounted = useRef()
 
   useEffect(() => {
     if(!mounted.current) {
       mounted.current = true
     } else {
-      if(alphaSort) {
-        let sortedRegionList = data.concat().sort((a, b) => a.region.localeCompare(b.region))
-        setRegionList(sortedRegionList)
+      if(showPredictions) {
+          const countryByKey = groupByKey("region", data)
+          const predictionsList = Object.keys(predictions).map(region => ({ region: region, stats: countryByKey[region].stats}))
+
+          console.dir(predictionsList)
+          if(alphaSort) {
+            const sortedList = predictionsList.concat().sort((a, b) => a.region.localeCompare(b.region))
+            console.dir(sortedList)
+            setRegionList(sortedList)
+          } else {
+            const sortedList = predictionsList.concat().sort((a, b) => b.stats - a.stats)
+            console.dir(sortedList)
+            setRegionList(sortedList)
+          }
       } else {
-        setRegionList(data)
+        if(alphaSort) {
+          setRegionList(data.concat().sort((a, b) => a.region.localeCompare(b.region)))
+        } else {
+          setRegionList(data)
+        }
       }
     }
-  }, [alphaSort])
+  }, [alphaSort, showPredictions])
 
   const AlphaOrByConfirmedButton = () => (
     <>

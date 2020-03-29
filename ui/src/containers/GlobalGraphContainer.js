@@ -114,6 +114,9 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     }
 
     const handleShowPredictions = () => {
+        if(selectedCountries.length > 1) {
+            setSelectedCountries(['US'])
+        }
         setShowPredictions(!showPredictions)
     }
 
@@ -140,6 +143,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                         handleSelected={dataList => handleSelectedRegion(dataList)} 
                         defaultSelected={region}
                         showPredictions={showPredictions}
+                        predictions={globalPredictions}
                         showLog={showLog}
                         parentRegion="Global"
                     />
