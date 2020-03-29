@@ -30,7 +30,7 @@ export const GraphScaleControl = ({
                 </Column>
             
                 <Column gapSize={3}>
-                { (parentRegion === 'Global' && secondaryGraph === 'Cases') &&
+                { ((parentRegion === 'Global' || parentRegion === 'US') && secondaryGraph === 'Cases') &&
                     <span style={{fontSize: '1.4rem'}}>
                         <Button size="medium" outlined={!showPredictions?true:null} color={!showPredictions?'primary':'light'} onClick={handleShowPredictions}>{showPredictions ? 'Hide Predictions' : 'Show Predictions'}</Button>
                     </span>

@@ -30,6 +30,10 @@ export const types = {
     FETCH_GLOBAL_PREDICTIONS_SUCCESS: 'FETCH_GLOBAL_PREDICTIONS_SUCCESS',
     FETCH_GLOBAL_PREDICTIONS_ERROR: 'FETCH_GLOBAL_PREDICTIONS_ERROR',
 
+    FETCH_US_PREDICTIONS: 'FETCH_US_PREDICTIONS',
+    FETCH_US_PREDICTIONS_SUCCESS: 'FETCH_US_PREDICTIONS_SUCCESS',
+    FETCH_US_PREDICTIONS_ERROR: 'FETCH_US_PREDICTIONS_ERROR',
+
     FETCH_REGION: 'FETCH_REGION',
     FETCH_REGION_SUCCESS: 'FETCH_REGION_SUCCESS',
     FETCH_REGION_ERROR: 'FETCH_REGION_ERROR',
@@ -89,6 +93,7 @@ export const actions = {
 
     fetchGlobal: createAction(types.FETCH_GLOBAL),
     fetchGlobalPredictions: createAction(types.FETCH_GLOBAL_PREDICTIONS),
+    fetchUSPredictions: createAction(types.FETCH_US_PREDICTIONS),
 
     fetchRegion: createAction(types.FETCH_REGION),
     fetchContinental: createAction(types.FETCH_CONTINENTAL),
@@ -113,6 +118,7 @@ export const actions = {
 export const initialState = {
     global: {},
     globalPredictions: {},
+    usPredictions: {},
     region: {},
     continental: {},
     globalTop10: {},
@@ -135,6 +141,7 @@ export default function (state = initialState, action) {
                 ...state,
                 global: {},
                 globalPredictions: {},
+                usPredictions: {},
                 region: {},
                 continental: {},
                 globalTop10: {},
@@ -181,6 +188,11 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 globalPredictions: action.payload
+            }
+        case types.FETCH_US_PREDICTIONS_SUCCESS:
+            return {
+                ...state,
+                usPredictions: action.payload
             }
         case types.FETCH_REGION_SUCCESS:
             return {
@@ -775,6 +787,31 @@ export function* fetchGlobalPredictions({payload}) {
     console.timeEnd('fetchGlobalPredictions')
 }
 
+export function* fetchUSPredictions({payload}) {
+    console.time('fetchUSPredictions')
+
+    const dataService = new DataService()
+
+    try {
+        console.time('fetchUSPredictions.axios')
+
+        const usPredictions = yield call(dataService.getUSPredictions)
+
+        console.timeEnd('fetchUSPredictions.axios')
+        
+        yield put(
+            { 
+                type: types.FETCH_US_PREDICTIONS_SUCCESS, 
+                payload: usPredictions
+            }
+        )    
+    } catch(error) {
+        console.error(error)
+    }
+
+    console.timeEnd('fetchUSPredictions')
+}
+
 export function* fetchGlobal({payload}) {
     console.time('fetchGlobal')
 
@@ -1082,6 +1119,8 @@ export const sagas = [
     takeEvery(types.FETCH_GLOBAL_PREDICTIONS, fetchGlobalPredictions),
     takeEvery(types.FETCH_REGION, fetchRegion),
     takeEvery(types.FETCH_CONTINENTAL, fetchContinental),
+
+    takeEvery(types.FETCH_US_PREDICTIONS, fetchUSPredictions),
     takeEvery(types.FETCH_US_STATES, fetchUSStates),
     takeEvery(types.FETCH_US_REGIONS, fetchUSRegions),
     takeEvery(types.FETCH_LAST_UPDATE, fetchLastUpdate),
