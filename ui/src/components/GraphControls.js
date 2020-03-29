@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Column } from 'rbx'
+import { useMobileDetect } from '../hooks/ui'
 
 import GraphImageDownloadButton from '../components/GraphImageDownloadButton'
 import GraphScaleControl from '../components/GraphScaleControl'
@@ -17,6 +18,9 @@ export const GraphControls = ({
                                 selected, 
                                 data, 
                                 centered = false}) => {
+
+  const detectMobile = useMobileDetect()
+
   return (
       <Column.Group centered> 
       
@@ -28,7 +32,7 @@ export const GraphControls = ({
           centered={centered} />
           </Column>
         }
-      {downloadImage && <Column narrow><GraphImageDownloadButton secondaryGraph={secondaryGraph} parentRegion={parentRegion} selected={selected} showLog={showLog} /></Column>}
+      {(!detectMobile.isMobile() && downloadImage) && <Column narrow><GraphImageDownloadButton secondaryGraph={secondaryGraph} parentRegion={parentRegion} selected={selected} showLog={showLog} /></Column>}
       {downloadCSV && <Column narrow><GraphDownloadButton data={data} /></Column>}
       </Column.Group>
   )

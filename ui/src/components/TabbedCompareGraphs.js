@@ -1,10 +1,8 @@
 import React from 'react'
 
-import { Tab, Level } from 'rbx'
+import { Tab } from 'rbx'
 
 import GraphWithLoader from '../components/GraphWithLoader'
-import GraphScaleControl from '../components/GraphScaleControl'
-import GraphDownloadButton from '../components/GraphDownloadButton'
 
 import GraphControls from '../components/GraphControls'
 
@@ -95,7 +93,6 @@ export const TabbedCompareGraphs = (
                 selected={selected}
                 downloadCSV
                 data={activeData()}
-
                 downloadImage
                 />
 
