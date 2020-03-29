@@ -19,7 +19,7 @@ export const GraphScaleControl = ({
     return (
         <Generic as="div" align={align} >
             <Column.Group style={{alignItems: 'baseline'}} breakpoint="tablet">
-                <Column narrow gapSize={0}>    
+                <Column narrow>
                     <span style={{fontSize: '1.4rem'}}>Graph Scale:&nbsp;</span>
                 </Column>
                 <Column narrow>
@@ -29,7 +29,7 @@ export const GraphScaleControl = ({
                     </Button.Group>
                 </Column>
             
-                <Column gapSize={3}>
+                <Column>
                 { ((parentRegion === 'Global' || parentRegion === 'US') && secondaryGraph === 'Cases') &&
                     <span style={{fontSize: '1.4rem'}}>
                         <Button size="medium" outlined={!showPredictions?true:null} color={!showPredictions?'primary':'light'} onClick={handleShowPredictions}>{showPredictions ? 'Hide Predictions' : 'Show Predictions'}</Button>
