@@ -3,7 +3,7 @@
 # vim: set fileencoding=utf-8:
 
 
-from covidvu.pipeline.jsonpack import PREDICTIONS_FILE_NAME
+from covidvu.pipeline.jsonpack import PREDICTIONS_GLOBAL_FILE_NAME
 from covidvu.pipeline.jsonpack import PREDICT_FILE_WORLD_PREFIX
 from covidvu.pipeline.jsonpack import REPORTS
 from covidvu.pipeline.jsonpack import loadUSCounties
@@ -92,7 +92,7 @@ def test_packPredictions():
     assert 'confidenceInterval' in result['United Kingdom']
     assert 'mean' in result['United Kingdom']
 
-    testFileName = os.path.join(TEST_SITE_DATA, PREDICTIONS_FILE_NAME)
+    testFileName = os.path.join(TEST_SITE_DATA, PREDICTIONS_GLOBAL_FILE_NAME)
     assert os.path.exists(testFileName)
     
     os.unlink(testFileName)
