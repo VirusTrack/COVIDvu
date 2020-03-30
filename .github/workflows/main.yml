@@ -3,8 +3,9 @@ name: Update COVIDvu
 on:
   push:
     branches:
-    - master
+    - production
     - staging
+    - testing
 
 jobs:
   deploy:
@@ -20,8 +21,13 @@ jobs:
       with:
         node-version: '10.x'
     - run: npm install
-      if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/master'
+      working-directory: ${{env.working-directory}}
+    - run: NODE_OPTIONS=--max_old_space_size=4096 npm run deploy
+      if: github.ref == 'refs/heads/production'
       working-directory: ${{env.working-directory}}
     - run: NODE_OPTIONS=--max_old_space_size=4096 npm run deploy:staging
       if: github.ref == 'refs/heads/staging'
+      working-directory: ${{env.working-directory}}
+    - run: NODE_OPTIONS=--max_old_space_size=4096 npm run deploy:testing
+      if: github.ref == 'refs/heads/testing'
       working-directory: ${{env.working-directory}}
