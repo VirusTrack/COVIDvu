@@ -83,7 +83,7 @@ def test_packPredictions():
     with open(testFileName, 'w'):
         pass
     with pytest.raises(NameError):
-        packPredictions(siteDataDirectory = TEST_SITE_DATA, predictFilePrefix = 'bogus-bigus')
+        packPredictions(siteDataDirectory = TEST_SITE_DATA, predictFilePrefix = 'prediction-')
     os.unlink(testFileName)
 
     result = packPredictions(siteDataDirectory = TEST_SITE_DATA, predictFilePrefix = PREDICT_FILE_WORLD_PREFIX)
@@ -96,4 +96,7 @@ def test_packPredictions():
     assert os.path.exists(testFileName)
     
     os.unlink(testFileName)
+
+
+test_packPredictions()
 
