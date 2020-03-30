@@ -23,16 +23,23 @@ function assertContainerSigFileIsDefined {
 
 
 function runtimePythonEnvironment {
-if [[ "Linux" == $(uname) ]]
-then
-    echo "  host system: " $(uname) " looking for $CONTAINER_SIG_FILE"
-    awk '/docker/ || /lxc/ { exit(99); }' "$CONTAINER_SIG_FILE"
-    if [[ "$?" == 0 ]]
+    if [[ -n "$VIRTUAL_ENV" ]]
     then
-        echo "activating the virtual environment"
-        source ./bin/activate || die "unable to start virtualenv" 1
+        echo "  already in Python virtual environment"
+        return
     fi
-fi
+
+    echo "  not VIRTUAL_ENV"
+    if [[ "Linux" == $(uname) ]]
+    then
+        echo "  host system: " $(uname) " looking for $CONTAINER_SIG_FILE"
+        awk '/docker/ || /lxc/ { exit(99); }' "$CONTAINER_SIG_FILE"
+        if [[ "$?" == 0 ]]
+        then
+            echo "activating the virtual environment"
+            source ./bin/activate || die "unable to start virtualenv" 1
+        fi
+    fi
 } # runtimePythonEnvironment
 
 
