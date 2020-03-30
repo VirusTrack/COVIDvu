@@ -76,9 +76,6 @@ def packPredictions(
     
     predictions = {  }
 
-    if not len(predictionFileNames):
-        return
-
     for fileName in predictionFileNames:
         if 'conf-int' in fileName:
             valuesRangeTag = 'confidenceInterval'
