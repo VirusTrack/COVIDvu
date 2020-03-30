@@ -12,9 +12,8 @@ import GraphWithLoader from '../components/GraphWithLoader'
 import HeroElement from '../components/HeroElement'
 import LogoElement from '../components/LogoElement'
 
-// import { CACHE_INVALIDATE_GLOBAL_KEY, CACHE_INVALIDATE_US_STATES_KEY, CACHE_INVALIDATE_CONTINENTAL_KEY, CACHE_INVALIDATE_US_REGIONS_KEY, ONE_MINUTE } from '../constants'
-
 import GraphScaleControl from '../components/GraphScaleControl'
+import GraphControls from '../components/GraphControls'
 
 import numeral from 'numeral'
 
@@ -64,6 +63,11 @@ export const DashboardContainer = ({showLogParam = false}) => {
     
     const confirmedUSRegions = useSelector(state => state.services.usRegions.confirmed)
     const confirmedContinental = useSelector(state => state.services.continental.confirmed)
+
+    const countryRef = React.createRef()
+    const continentRef = React.createRef()
+    const usStateRef = React.createRef()
+    const usRegionRef = React.createRef()
 
     const renderChangeDifference = (value) => {
         
@@ -163,12 +167,15 @@ export const DashboardContainer = ({showLogParam = false}) => {
                     </Title>
 
                     <Generic style={{paddingBottom: '1rem'}}>
-                        <GraphScaleControl
-                            showLog={showLog}
-                            handleGraphScale={handleGraphScale}
-                            secondaryGraph={globalTop10}
-                            align={graphControlsAlign}
-                        />
+                        <GraphControls 
+                            scale
+                            showLog={showLog} 
+                            handleGraphScale={handleGraphScale} 
+                            secondaryGraph={globalTop10} 
+                            centered
+
+                            
+                            />
                     </Generic>
                     <GraphWithLoader 
                         graphName="Top 10 Confirmed Cases"
@@ -189,12 +196,15 @@ export const DashboardContainer = ({showLogParam = false}) => {
                     </Title>
                     
                     <Generic style={{marginBottom: '1rem'}}>
-                        <GraphScaleControl
-                            showLog={showLog}
-                            handleGraphScale={handleGraphScale}
-                            secondaryGraph={confirmedContinental}
-                            align={graphControlsAlign}
-                        />
+                    <GraphControls 
+                            scale
+                            showLog={showLog} 
+                            handleGraphScale={handleGraphScale} 
+                            secondaryGraph={confirmedContinental} 
+                            centered
+
+                            
+                            />
                     </Generic>
                     <GraphWithLoader 
                         graphName="continental_graph"
@@ -276,12 +286,15 @@ export const DashboardContainer = ({showLogParam = false}) => {
                 <Title size={2} align="center"><Heading>Top 10 Confirmed</Heading>Cases by State</Title>
                 
                 <Generic style={{marginBottom: '1rem'}}>
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={usStateNamesTop10}
-                        align={graphControlsAlign}
-                    />
+                    <GraphControls 
+                        scale
+                        showLog={showLog} 
+                        handleGraphScale={handleGraphScale} 
+                        secondaryGraph={usStateNamesTop10} 
+                        centered
+
+                        
+                        />
                 </Generic>
                 <GraphWithLoader 
                     graphName="Top 10 Confirmed Cases"
@@ -296,12 +309,15 @@ export const DashboardContainer = ({showLogParam = false}) => {
                 <Title size={2} align="center"><Heading>Top Coronavirus Cases</Heading>By U.S. Region</Title>
                 
                 <Generic style={{marginBottom: '1rem'}}>
-                    <GraphScaleControl
-                        showLog={showLog}
-                        handleGraphScale={handleGraphScale}
-                        secondaryGraph={confirmedUSRegions}
-                        align={graphControlsAlign}
-                    />
+                    <GraphControls 
+                        scale
+                        showLog={showLog} 
+                        handleGraphScale={handleGraphScale} 
+                        secondaryGraph={confirmedUSRegions} 
+                        centered
+
+                        
+                        />
                 </Generic>
                 <GraphWithLoader 
                     graphName="Top Regions Cases"

@@ -3,8 +3,9 @@
 # vim: set fileencoding=utf-8:
 
 
+from covidvu.pipeline.jsonpack import PREDICTIONS_GLOBAL_FILE_NAME
+from covidvu.pipeline.jsonpack import PREDICT_FILE_WORLD_PREFIX
 from covidvu.pipeline.jsonpack import REPORTS
-from covidvu.pipeline.jsonpack import PREDICTIONS_FILE_NAME
 from covidvu.pipeline.jsonpack import loadUSCounties
 from covidvu.pipeline.jsonpack import packDataset
 from covidvu.pipeline.jsonpack import packPredictions
@@ -82,16 +83,16 @@ def test_packPredictions():
     with open(testFileName, 'w'):
         pass
     with pytest.raises(NameError):
-        packPredictions(siteDataDirectory = TEST_SITE_DATA)
+        packPredictions(siteDataDirectory = TEST_SITE_DATA, predictFilePrefix = 'bogus-bigus')
     os.unlink(testFileName)
 
-    result = packPredictions(siteDataDirectory = TEST_SITE_DATA)
+    result = packPredictions(siteDataDirectory = TEST_SITE_DATA, predictFilePrefix = PREDICT_FILE_WORLD_PREFIX)
 
     assert 'United Kingdom' in result
     assert 'confidenceInterval' in result['United Kingdom']
     assert 'mean' in result['United Kingdom']
 
-    testFileName = os.path.join(TEST_SITE_DATA, PREDICTIONS_FILE_NAME)
+    testFileName = os.path.join(TEST_SITE_DATA, PREDICTIONS_GLOBAL_FILE_NAME)
     assert os.path.exists(testFileName)
     
     os.unlink(testFileName)

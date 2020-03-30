@@ -12,7 +12,8 @@ export const GraphWithLoader = ({
         graph, 
         selected, 
         config, 
-        showLog
+        showLog,
+        ref
     }) => {
     
     return (
@@ -28,6 +29,7 @@ export const GraphWithLoader = ({
                 x_title={x_title}
                 y_title={y_title}
                 showLog={showLog}
+                ref={ref}
             />
 
             ) : (

@@ -22,9 +22,12 @@ GROUPINGS = {
                 '-US'        : 'bundle-US',
                 '-US-Regions': 'bundle-US-Regions',
             }
-PREDICT_FILE_PREFIX   = 'prediction-'
-PREDICTIONS_FILE_NAME = 'bundle-predictions-global.json'
-REPORTS               = ( 'confirmed', 'deaths', )
+PREDICT_FILE_US_PREFIX        = 'prediction-US'
+PREDICT_FILE_WORLD_PREFIX     = 'prediction-world'
+# TODO:  Make these configurable or template
+PREDICTIONS_GLOBAL_FILE_NAME  = 'bundle-global-predictions.json'
+PREDICTIONS_US_FILE_NAME      = 'bundle-US-predictions.json' 
+REPORTS                       = ( 'confirmed', 'deaths', )
 
 
 # +++ functions +++
@@ -65,10 +68,17 @@ def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, 
     return packedDataset
 
 
-def packPredictions(siteDataDirectory = SITE_DATA):
-    predictionFileNames = [ os.path.join(siteDataDirectory, fileName) for fileName in os.listdir(siteDataDirectory) if PREDICT_FILE_PREFIX in fileName ]
+def packPredictions( 
+            siteDataDirectory = SITE_DATA,
+            predictFilePrefix = PREDICT_FILE_WORLD_PREFIX,
+            bundleTargetFileName = PREDICTIONS_GLOBAL_FILE_NAME):
+    predictionFileNames = [ os.path.join(siteDataDirectory, fileName) for fileName in os.listdir(siteDataDirectory) if predictFilePrefix in fileName ]
     
     predictions = {  }
+
+    if not len(predictionFileNames):
+        raise NameError
+
     for fileName in predictionFileNames:
         if 'conf-int' in fileName:
             valuesRangeTag = 'confidenceInterval'
@@ -84,7 +94,7 @@ def packPredictions(siteDataDirectory = SITE_DATA):
 
         predictions[country][valuesRangeTag] = dataset[country]
 
-    outputBundleFileName = os.path.join(siteDataDirectory, PREDICTIONS_FILE_NAME)
+    outputBundleFileName = os.path.join(siteDataDirectory, bundleTargetFileName)
 
     with open(outputBundleFileName, 'w') as outputStream:
         json.dump(predictions, outputStream)
@@ -97,6 +107,7 @@ def main():
         packDataset(grouping)
 
     packPredictions()
+    packPredictions(predictFilePrefix = PREDICT_FILE_US_PREFIX, bundleTargetFileName = PREDICTIONS_US_FILE_NAME)
 
 
 # *** main ***

@@ -5,12 +5,15 @@ import Plot from 'react-plotly.js'
 import { useMobileDetect } from '../hooks/ui'
 
 import { Generic } from 'rbx'
+import LogoElement from './LogoElement'
 
-export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, showLog = false}) => {
+export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, showLog = false, ref=null}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
 
     const detectMobile = useMobileDetect()
+
+    const graphEl = React.createRef()
 
     useEffect(() => {
         let plots = {}
@@ -106,9 +109,12 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         x:0.5,
     }
 
+
     return (
-        <Generic tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
-            <Plot
+        <>
+        <Generic id="graphPlot" ref={ref} className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
+            <div className="vt-graph-logo"><LogoElement url /></div>
+            <Plot 
                 data={plotsAsValues}
                 layout={layout}
                 config={mergeConfig}
@@ -116,6 +122,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
                 style={{width: '100%', height: '100%', minHeight: '45rem'}}
             />
         </Generic>
+        </>
     )
 }
 

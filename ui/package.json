@@ -10,6 +10,7 @@
     "axios": "^0.19.2",
     "connected-react-router": "^6.6.1",
     "history": "^4.10.1",
+    "html2canvas": "^1.0.0-rc.5",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.28",
     "node-sass": "^4.13.1",
@@ -28,6 +29,7 @@
     "react-scripts": "3.4.0",
     "redux": "^4.0.5",
     "redux-saga": "^1.1.3",
+    "reimg": "^1.0.0",
     "store2": "^2.10.0",
     "zlib": "^1.0.5"
   },
@@ -37,8 +39,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "deploy": "REACT_APP_DEPLOY_ENV=prod npm run build && aws s3 sync build/ s3://virustrack.live --acl public-read",
-    "deploy:staging": "REACT_APP_DEPLOY_ENV=staging npm run build && aws s3 sync build/ s3://staging.virustrack.live --acl public-read",
+    "deploy": "REACT_APP_DEPLOY_ENV=production npm run build && aws s3 sync build/ s3://virustrack.live --exclude site-data/** --delete --acl public-read",
+    "deploy:staging": "REACT_APP_DEPLOY_ENV=staging npm run build && aws s3 sync build/ s3://staging.virustrack.live --exclude site-data/** --delete --acl public-read",
+    "deploy:test": "REACT_APP_DEPLOY_ENV=test npm run build && aws s3 sync build/ s3://test.virustrack.live --exclude site-data/** --delete --acl public-read",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "upgrade-interactive": "npm-check --update"
