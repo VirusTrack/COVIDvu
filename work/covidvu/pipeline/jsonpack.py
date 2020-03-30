@@ -77,7 +77,7 @@ def packPredictions(
     predictions = {  }
 
     if not len(predictionFileNames):
-        raise NameError
+        return
 
     for fileName in predictionFileNames:
         if 'conf-int' in fileName:
