@@ -13,8 +13,10 @@ export const GraphControls = ({
                                 downloadCSV, 
                                 secondaryGraph, 
                                 showLog, 
+                                showPredictions,
                                 parentRegion, 
                                 handleGraphScale, 
+                                handleShowPredictions,
                                 selected, 
                                 data, 
                                 centered = false}) => {
@@ -28,7 +30,10 @@ export const GraphControls = ({
         <GraphScaleControl 
           showLog={showLog}
           handleGraphScale={handleGraphScale}
+          showPredictions={showPredictions}
+          handleShowPredictions={handleShowPredictions}
           secondaryGraph={secondaryGraph}
+          parentRegion={parentRegion}
           centered={centered} />
           </Column>
         }
