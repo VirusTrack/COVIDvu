@@ -324,6 +324,19 @@ def _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
                                          confIntFilename % regionNameSimple),
                                     )
 
+
+def castPercentilesAsDF(predictionsPercentilesTS, predictionsPercentiles):
+    percentiles = pd.DataFrame()
+    predictionsPercentilesTS = predictionsPercentilesTS
+    for i, (qLow, qHigh) in enumerate(predictionsPercentiles):
+        tsLow = predictionsPercentilesTS[i][0]
+        tsHigh = predictionsPercentilesTS[i][1]
+
+        percentiles[str(qLow)] = tsLow
+        percentiles[str(qHigh)] = tsHigh
+    return percentiles
+
+
 def predictRegions(regionTrainIndex,
                      target                        = 'confirmed',
                      predictionsPercentiles        = PREDICTIONS_PERCENTILES,
@@ -338,7 +351,7 @@ def predictRegions(regionTrainIndex,
                      priorMidPoint                 = PRIOR_MID_POINT,
                      priorGrowthRate               = PRIOR_GROWTH_RATE,
                      priorSigma                    = PRIOR_SIGMA,
-                     logRegModel                   = None,
+                     logGrowthModel                   = None,
                      **kwargs
                      ):
     """Generate forecasts for regions
@@ -360,27 +373,27 @@ def predictRegions(regionTrainIndex,
     priorMidPoint
     priorGrowthRate
     priorSigma
-    logRegModel
+    logGrowthModel
     kwargs: Optional named arguments for covidvu.predictLogisticGrowth
 
     Returns
     -------
     JSON dump of mean prediction and confidence intervals
     """
-    if logRegModel is None:
+    if logGrowthModel is None:
         print('Building model. This may take a few moments...')
-        logRegModel = buildLogisticModel(priorLogCarryingCapacity= priorLogCarryingCapacity,
+        logGrowthModel = buildLogisticModel(priorLogCarryingCapacity= priorLogCarryingCapacity,
                                          priorMidPoint           = priorMidPoint,
                                          priorGrowthRate         = priorGrowthRate,
                                          priorSigma              = priorSigma,
                                          )
         print('Done.')
     else:
-        assert isinstance(logRegModel, StanModel)
+        assert isinstance(logGrowthModel, StanModel)
 
     if re.search(r'^\d+$', str(regionTrainIndex)):
         print(f'Training index {regionTrainIndex}')
-        prediction = predictLogisticGrowth(logRegModel,
+        prediction = predictLogisticGrowth(logGrowthModel,
                                            regionTrainIndex              = regionTrainIndex,
                                            predictionsPercentiles        = predictionsPercentiles,
                                            target                        = target,
@@ -416,7 +429,7 @@ def predictRegions(regionTrainIndex,
         for regionName in regionsAll:
             print(f'Training {regionName}...')
 
-            prediction = predictLogisticGrowth(logRegModel,
+            prediction = predictLogisticGrowth(logGrowthModel,
                                                regionName                    = regionName,
                                                confirmedCases                = confirmedCases,
                                                predictionsPercentiles        = predictionsPercentiles,
@@ -495,6 +508,7 @@ def loadAll(target='confirmed', subGroup='casesGlobal', confIntFilename=PREDICTI
     nTrainedRegions = len(getSavedShortCountryNames(siteData = kwargs.get('siteData', SITE_DATA),
                                                       confIntFilename = confIntFilename,
                                                       ))
+    assert nTrainedRegions > 0
     meanPredictionTSAll = pd.DataFrame()
     percentilesTSAll = pd.DataFrame()
     for i in range(nTrainedRegions):
@@ -516,7 +530,7 @@ def loadAll(target='confirmed', subGroup='casesGlobal', confIntFilename=PREDICTI
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
-        logRegModel = buildLogisticModel()
-        predictRegions(argument, logRegModel=logRegModel)
-        predictRegions(argument, logRegModel=logRegModel, subGroup='casesUSStates')
+        logGrowthModel = buildLogisticModel()
+        predictRegions(argument, logGrowthModel=logGrowthModel)
+        predictRegions(argument, logGrowthModel=logGrowthModel, subGroup='casesUSStates')
 

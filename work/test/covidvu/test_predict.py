@@ -21,6 +21,7 @@ from covidvu.predict import _dumpPredictionCollectionAsJSON
 from covidvu.predict import _dumpTimeSeriesAsJSON
 from covidvu.predict import _getPredictionsFromPosteriorSamples
 from covidvu.predict import buildLogisticModel
+from covidvu.predict import castPercentilesAsDF
 from covidvu.predict import getSavedShortCountryNames
 from covidvu.predict import load
 from covidvu.predict import loadAll
@@ -103,19 +104,19 @@ def test__dumpTimeSeriesAsJSON():
 
 # ----------------------------------------------------------------
 # THESE TESTS MUST BE RUN IN ORDER
-logRegModel = None
+logGrowthModel = None
 def test_buildLogisticModel():
-    global logRegModel
-    logRegModel = buildLogisticModel(priorLogCarryingCapacity=PRIOR_LOG_CARRYING_CAPACITY,
+    global logGrowthModel
+    logGrowthModel = buildLogisticModel(priorLogCarryingCapacity=PRIOR_LOG_CARRYING_CAPACITY,
                                      priorMidPoint=PRIOR_MID_POINT,
                                      priorGrowthRate=PRIOR_GROWTH_RATE,
                                      priorSigma=PRIOR_SIGMA, )
-    assert isinstance(logRegModel, StanModel)
+    assert isinstance(logGrowthModel, StanModel)
 
 
 def test_predictLogisticGrowth():
     nDaysPredict = 10
-    prediction = predictLogisticGrowth(logRegModel,
+    prediction = predictLogisticGrowth(logGrowthModel,
                                        regionName                   = 'US',
                                        siteData                      = TEST_SITE_DATA,
                                        jhCSSEFileConfirmed           = TEST_JH_CSSE_FILE_CONFIRMED,
@@ -140,6 +141,15 @@ def test_predictLogisticGrowth():
     assert isinstance(prediction['trace'], DataFrame)
     assert (prediction['regionTSClean'] > MIN_CASES_FILTER).all()
     return prediction
+
+def test_castPercentilesAsDF():
+    prediction = test_predictLogisticGrowth()
+    percentiles = castPercentilesAsDF(prediction['predictionsPercentilesTS'], PREDICTIONS_PERCENTILES)
+    assert isinstance(percentiles, DataFrame)
+    assert '2.5' in percentiles.columns
+    assert '25' in percentiles.columns
+    assert '75' in percentiles.columns
+    assert '97.5' in percentiles.columns
 
 
 def test__dumpCountryPrediction():
@@ -224,7 +234,7 @@ def test_predictCountries():
               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
               jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel = logRegModel,
+              logGrowthModel = logGrowthModel,
               nSamples=TEST_N_SAMPLES,
               nChains=TEST_N_CHAINS,
               )
@@ -238,7 +248,7 @@ def test_predictCountries():
               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
               jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel=logRegModel,
+              logGrowthModel=logGrowthModel,
                          nSamples=TEST_N_SAMPLES,
                          nChains=TEST_N_CHAINS,
               )
@@ -263,7 +273,7 @@ def test_load():
               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
               jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel=logRegModel,
+              logGrowthModel=logGrowthModel,
                          nSamples=TEST_N_SAMPLES,
                          nChains=TEST_N_CHAINS,
               )
@@ -287,7 +297,7 @@ def test_getSavedShortCountryNames():
               jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
               jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
               jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-              logRegModel=logRegModel,
+              logGrowthModel=logGrowthModel,
                          nSamples=TEST_N_SAMPLES,
                          nChains=TEST_N_CHAINS,
               )
