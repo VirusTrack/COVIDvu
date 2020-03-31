@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Tab, Notification } from 'rbx'
+import { Tab } from 'rbx'
 
 import { TERMS } from '../constants/dictionary'
 
@@ -107,11 +107,9 @@ export const TabbedCompareGraphs = (
 
             { (showPredictions && secondaryGraph === 'Cases') &&
                 <>
-                    <Notification>
-                        For a detailed explanation of how predictions work, please visit our <a href="/about/methodology/predictions">methodology page</a>.
-                    </Notification>
                     <PredictionGraph
                         graphName="Cases"
+                        title={selected}
                         selected={selected}
                         showLog={showLog}
                         predictions={predictions}

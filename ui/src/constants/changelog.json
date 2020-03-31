@@ -1,5 +1,11 @@
 [
     {
+        "date": "2020-03-31",
+        "changes": [
+            "Added a new What's New Page to the website :-)"
+        ]
+    },
+    {
         "date": "2020-03-30",
         "changes": [
             "All logarithmic graphs now draw only after 100 cases / deaths on the scale",

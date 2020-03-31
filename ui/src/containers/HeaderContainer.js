@@ -110,7 +110,7 @@ export const HeaderContainer = () => {
 
                 <Navbar.Segment align="end">
                     <Navbar.Item color="info">
-                        <Button size="medium" color="info" active={selectedNav === '/whatsnew'} onClick={() => { history.push('/whatsnew') }}>
+                        <Button size="medium" color="info" active={(selectedNav === '/whatsnew').toString()} onClick={() => { history.push('/whatsnew') }}>
                             <strong>What's New</strong>
                         </Button>
                     </Navbar.Item>

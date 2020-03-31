@@ -12,7 +12,7 @@ const GOOGLE_ANALYTICS_KEY = 'UA-574325-5'
 
 const DEFAULT_DOCUMENT_TITLE = "COVID-19 Novel Coronavirus Data Visualization and Statistics"
 
-const ENABLE_PREDICTIONS = true
+const ENABLE_PREDICTIONS = false
 
 const COUNTRIES = [
   "!Global",

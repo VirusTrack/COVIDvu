@@ -4,10 +4,11 @@ import Plot from 'react-plotly.js'
 
 import { useMobileDetect } from '../hooks/ui'
 
-import { Generic } from 'rbx'
+import { Generic, Notification, Title } from 'rbx'
 
 import LogoElement from './LogoElement'
 
+import numeral from 'numeral'
 import moment from 'moment'
 
 export const PredictionGraph = ({title, predictions, confirmed, selected, showLog = false}) => {
@@ -21,6 +22,9 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
     const today = moment()
     // const today = moment().subtract(1, 'days')
 
+    const [upper, setUpper] = useState(0)
+    const [lower, setLower] = useState(0)
+    
     useEffect(() => {
 
         if(Object.keys(predictions).length > 0 && Object.keys(confirmed).length > 0) {
@@ -57,8 +61,8 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     },
                     type: 'scatter',
                     mode: 'lines',
-                    name: "2.5%",
-                    showlegend: true,
+                    name: "Lower",
+                    showlegend: false,
                     // hoverinfo: 'skip',
                 }
                 plots_97_5[normalizedRegion] = {
@@ -70,8 +74,8 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     type: 'scatter',
                     mode: 'lines',
                     fill: 'tonexty',
-                    name: "97.5%",
-                    showlegend: true,
+                    name: "Upper",
+                    showlegend: false,
                     // hoverinfo: 'skip',
                 }
                 plots_25[normalizedRegion] = {
@@ -84,8 +88,8 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     mode: 'lines',
                     name: "25%",
                     fill: null,
-                    showlegend: true,
-                    // hoverinfo: 'skip',
+                    showlegend: false,
+                    hoverinfo: 'skip',
                 }
                 plots_75[normalizedRegion] = {
                     x: [],
@@ -97,8 +101,8 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     mode: 'lines',
                     fill: 'tonexty',
                     name: "75%",
-                    showlegend: true,
-                    // hoverinfo: 'skip',
+                    showlegend: false,
+                    hoverinfo: 'skip',
 
                 }
                 plots_mean[normalizedRegion] = {
@@ -106,7 +110,7 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     y: [],
                     type: 'scatter',
                     mode: 'lines',
-                    name: "Mean prediction",
+                    name: "Mean",
                     line: {
                         color: colors[0],
                         dash: 'dash'
@@ -119,18 +123,27 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
 
                 const regionData = confirmed[region]
                 for(const key of Object.keys(regionData).sort()) {
-                    plots[normalizedRegion].x.push(key)
-                    plots[normalizedRegion].y.push(regionData[key])
+                    if((showLog && regionData[key] > 100) || !showLog) {
+                        plots[normalizedRegion].x.push(key)
+                        plots[normalizedRegion].y.push(regionData[key])
+                    }
                 }
 
                 for(const key of Object.keys(predictions[region].confidenceInterval['2.5'])) {
                     if(moment(key).isSameOrAfter(today, "day")) {
+                        if(moment(key).isSame(today, "day")) {
+                            setLower(predictions[region].confidenceInterval['2.5'][key])
+                        }
+
                         plots_2_5[normalizedRegion].x.push(key)
                         plots_2_5[normalizedRegion].y.push(predictions[region].confidenceInterval['2.5'][key])
                     }
                 }
                 for(const key of Object.keys(predictions[region].confidenceInterval['97.5'])) {
                     if(moment(key).isSameOrAfter(today, "day")) {
+                        if(moment(key).isSame(today, "day")) {
+                            setUpper(predictions[region].confidenceInterval['97.5'][key])
+                        }
                         plots_97_5[normalizedRegion].x.push(key)
                         plots_97_5[normalizedRegion].y.push(predictions[region].confidenceInterval['97.5'][key])
                     }
@@ -221,6 +234,13 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
     }
 
     return (
+        <>
+        <Notification>
+            <Title size={4}>Predictions for Today {today.format('YYYY-MM-DD')} in {title[0]}</Title>
+            Between <em>{numeral(lower).format('0,0')}</em> and <em>{numeral(upper).format('0,0')}</em>.<br/><br />
+            For a detailed explanation of how predictions work, please visit our <a href="/about/methodology/predictions">methodology page</a>.
+        </Notification>
+
         <Generic tooltipPosition="top" className="vt-graph" tooltip="Clicking on legend items will remove them from graph">
             <div className="vt-graph-logo"><LogoElement url /></div>
             <Plot
@@ -231,6 +251,7 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                 style={{width: '100%', height: '100%', minHeight: '45rem'}}
             />
         </Generic>
+        </>
     )
 }
 

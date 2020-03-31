@@ -116,12 +116,15 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     }
 
     const handleShowPredictions = () => {
+        let historicSelectedCountries = selectedCountries
+
         if(selectedCountries.length > 1) {
-            setSelectedCountries(['US'])
+            historicSelectedCountries = ['US']
+            setSelectedCountries(historicSelectedCountries)
         }
         setShowPredictions(!showPredictions)
-
-        handleHistory(selectedCountries, secondaryGraph, showLog, !showPredictions)
+        
+        handleHistory(historicSelectedCountries, secondaryGraph, showLog, !showPredictions)
     }
 
     return (
