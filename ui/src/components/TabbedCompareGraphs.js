@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Tab } from 'rbx'
 
+import { TERMS } from '../constants/dictionary'
+
 import GraphWithLoader from '../components/GraphWithLoader'
 
 import GraphControls from '../components/GraphControls'
@@ -81,7 +83,7 @@ export const TabbedCompareGraphs = (
             <Tab.Group size="large" kind="boxed">
                 <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
                 <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
+                <Tab tooltipPosition="right" tooltip={TERMS['CFR_DEFINITION']} active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Case Fatality Rate')}}>Case Fatality Rate</Tab>
             </Tab.Group>
 
             <GraphControls className="TabbedCompareGraphs__controls"
@@ -121,7 +123,7 @@ export const TabbedCompareGraphs = (
                 graph={mortality}
                 selected={selected}
                 y_type="percent"
-                y_title="Mortality Rate Percentage"
+                y_title="Case Fatality Rate Percentage"
             />
 
         </>        

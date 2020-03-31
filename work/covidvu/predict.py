@@ -381,7 +381,7 @@ def predictRegions(regionTrainIndex,
     if re.search(r'^\d+$', str(regionTrainIndex)):
         print(f'Training index {regionTrainIndex}')
         prediction = predictLogisticGrowth(logRegModel,
-                                           regionTrainIndex             = regionTrainIndex,
+                                           regionTrainIndex              = regionTrainIndex,
                                            predictionsPercentiles        = predictionsPercentiles,
                                            target                        = target,
                                            siteData                      = siteData,
@@ -412,8 +412,8 @@ def predictRegions(regionTrainIndex,
                                    jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
                                    jsCSSEReportPath              = jsCSSEReportPath,
                                    )[subGroup]
-        countriesAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
-        for regionName in countriesAll:
+        regionsAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
+        for regionName in regionsAll:
             print(f'Training {regionName}...')
 
             prediction = predictLogisticGrowth(logRegModel,
@@ -457,6 +457,7 @@ def getSavedShortCountryNames(siteData = SITE_DATA,
             regionNameShort = match.groups()[0]
             regionNameShortAll.append(regionNameShort)
     return regionNameShortAll
+
 
 def load(regionIndex = None,
          regionNameShort = None,
