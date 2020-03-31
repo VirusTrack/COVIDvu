@@ -16,6 +16,11 @@ function die {
 
 
 function assertContainerSigFileIsDefined {
+    if [[ -n "$CLICOLOR" ]] # in Jupyter environment only
+    then
+        return
+    fi
+
     local cwd=$(pwd)
     echo "  asserting CONTAINER_SIG_FILE exists (Now: $cwd)"
     [[ -n "$CONTAINER_SIG_FILE" ]] || die "CONTAINER_SIG_FILE environment variable undefined" 2
@@ -23,6 +28,11 @@ function assertContainerSigFileIsDefined {
 
 
 function runtimePythonEnvironment {
+    if [[ -n "$CLICOLOR" ]] # in Jupyter environment only
+    then
+        return
+    fi
+
     if [[ -n "$VIRTUAL_ENV" ]]
     then
         echo "  already in Python virtual environment"

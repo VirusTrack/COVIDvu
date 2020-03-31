@@ -13,8 +13,6 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
 
     const detectMobile = useMobileDetect()
 
-    const graphEl = React.createRef()
-
     useEffect(() => {
         let plots = {}
 

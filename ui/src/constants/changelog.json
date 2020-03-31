@@ -1,0 +1,60 @@
+[
+    {
+        "date": "2020-03-31",
+        "changes": [
+            "Added a new What's New Page to the website :-)"
+        ]
+    },
+    {
+        "date": "2020-03-30",
+        "changes": [
+            "All logarithmic graphs now draw only after 100 cases / deaths on the scale",
+            "Changed terminology from Mortality Rate -> Case Fatality Rate",
+            "Moved graph legend on US Counties stats to top right"
+        ]
+    },
+    {
+        "date": "2020-03-29",
+        "changes": [
+            "All graphs viewed on desktop can be saved to disk"
+        ]
+    },
+    {
+        "date": "2020-03-28",
+        "changes": [
+            "Changed caching to auto-refresh whenever new data exists"
+        ]
+    },
+    {
+        "date": "2020-03-27",
+        "changes": [
+            "Add percentages to daily change in stats pages for Global and United States"
+        ]
+    },
+    {
+        "date": "2020-03-26",
+        "changes": [
+            "Integrate new Open Graph image so we have beautiful preview when sharing on social media"
+        ]
+    },
+    {
+        "date": "2020-03-25",
+        "changes": [
+            "Download CSV available on all graphs",
+            "Offer sorting options on stats pages for confirmed, deaths, and mortality rate",
+            "Redesign region selector on all pages to look great on mobile"
+        ]
+    },
+    {
+        "date": "2020-03-24",
+        "changes": [
+            "Add CSBS to footer as a new data source for U.S. County data"
+        ]
+    },
+    {
+        "date": "2020-03-23",
+        "changes": [
+            "Add graph scale buttons linear/logarithmic for dashboard"
+        ]
+    }
+]
