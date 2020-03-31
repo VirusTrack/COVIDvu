@@ -1,0 +1,37 @@
+#!/bin/bash
+# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+[[ -e "$REFRESHDATA_CONFIG" ]] || exit 250
+
+source ./pyrunner
+
+
+HTML_FILE_NAME="$SITE_DATA_DIR/table-%02d.html"
+PYAVKA_USER_AGENT="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:74.0) Gecko/20100101 Firefox/74.0"
+
+
+# ::: functions :::
+
+function fetchRawDataSource {
+    local fileSuffix="$2"
+    local rawDataSource="$1"
+    local rawHTMLFile=$(printf "$HTML_FILE_NAME" "$fileSuffix")
+
+    echo "-----"
+    echo "  processing $rawDataSource"
+    curl -A "$PYAVKA_USER_AGENT" -vi --connect-timeout 20 "$rawDataSource" | \
+        awk 'BEGIN { c = 0; } /<table/ &&  /today/ { c = 1; } /<\/table/ { c = 0; print; } c == 1' > "$rawHTMLFile"
+    echo "+++++"
+} # fetchBNODataSource
+
+
+# *** main ***
+
+fetchRawDataSource "$RAW_DATA_SOURCE_00" 00
+fetchRawDataSource "$RAW_DATA_SOURCE_01" 01
+# python3 -m covidvu.pipeline.pyavka
+
