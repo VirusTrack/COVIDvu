@@ -57,7 +57,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
     useEffect(() => {
         if(!search) {
-            handleHistory(selectedCountries, secondaryGraph)
+            handleHistory(selectedCountries, secondaryGraph, showLog)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -118,6 +118,8 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
             setSelectedCountries(['US'])
         }
         setShowPredictions(!showPredictions)
+
+        handleHistory(selectedCountries, secondaryGraph, showLog, !showPredictions)
     }
 
     return (

@@ -1,8 +1,10 @@
 import React from 'react'
 
-import { Tab } from 'rbx'
+import { Tab, Notification } from 'rbx'
 
 import { TERMS } from '../constants/dictionary'
+
+import { ENABLE_PREDICTIONS } from '../constants'
 
 import GraphControls from '../components/GraphControls'
 import GraphWithLoader from '../components/GraphWithLoader'
@@ -104,13 +106,18 @@ export const TabbedCompareGraphs = (
                 />
 
             { (showPredictions && secondaryGraph === 'Cases') &&
-                <PredictionGraph
-                    graphName="Cases"
-                    selected={selected}
-                    showLog={showLog}
-                    predictions={predictions}
-                    confirmed={confirmed}
-                />
+                <>
+                    <Notification>
+                        For a detailed explanation of how predictions work, please visit our <a href="/about/methodology/predictions">methodology page</a>.
+                    </Notification>
+                    <PredictionGraph
+                        graphName="Cases"
+                        selected={selected}
+                        showLog={showLog}
+                        predictions={predictions}
+                        confirmed={confirmed}
+                    />
+                </>
             }
             { !showPredictions &&
                 <GraphWithLoader 

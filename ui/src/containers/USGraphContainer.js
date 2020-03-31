@@ -68,7 +68,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
 
     useEffect(() => {
         if(!search) {
-            handleHistory(selectedStates, secondaryGraph)
+            handleHistory(selectedStates, secondaryGraph, showLog)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -85,7 +85,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
     
     const handleSelectedRegion = (regionList) => {
         setSelectedStates(regionList)
-        handleHistory(regionList, graph, showLog)
+        handleHistory(regionList, graph, showLog, showPredictions)
 
         ReactGA.event({
             category: 'Region:United States',
@@ -119,6 +119,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
             setSelectedStates(['New York'])
         }
         setShowPredictions(!showPredictions)
+        handleHistory(selectedStates, secondaryGraph, showLog, !showPredictions)
     }
 
     return (

@@ -13,9 +13,7 @@ export const PredictionMethodologyPage = () => {
     useEffect(() => {
         document.title = `Prediction Methdology | ${DEFAULT_DOCUMENT_TITLE}`        
     }, [])
-    
 
-    console.dir(MathJax)
     return (
         
             <ContentLayout>

@@ -8,6 +8,8 @@ import { Generic } from 'rbx'
 
 import LogoElement from './LogoElement'
 
+import moment from 'moment'
+
 export const PredictionGraph = ({title, predictions, confirmed, selected, showLog = false}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
@@ -15,6 +17,8 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
     const detectMobile = useMobileDetect()
 
     var colors = ['green', 'red', 'blue']
+
+    const todayAsText = moment().format('YYYY-MM-DD')
 
     useEffect(() => {
 
@@ -169,15 +173,15 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
         },  
         annotations: [
             {
-              x: '2020-03-30',
-              y: 5,
+              x: todayAsText,
+              y: 0,
               xref: 'x',
               yref: 'y',
               text: 'We Are Here',
               showarrow: true,
               arrowhead: 7,
               ax: 0,
-              ay: -40
+              ay: -80
             }
           ],
     }

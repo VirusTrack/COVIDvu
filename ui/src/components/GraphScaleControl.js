@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Generic, Button, Column } from 'rbx'
 
+import { ENABLE_PREDICTIONS } from '../constants'
+
 export const GraphScaleControl = ({
     showLog = false, 
     showPredictions = false,
@@ -30,7 +32,7 @@ export const GraphScaleControl = ({
                 </Column>
             
                 <Column>
-                { ((parentRegion === 'Global' || parentRegion === 'US') && secondaryGraph === 'Cases') &&
+                { ((parentRegion === 'Global' || parentRegion === 'US') && secondaryGraph === 'Cases' && ENABLE_PREDICTIONS) &&
                     <span style={{fontSize: '1.4rem'}}>
                         <Button size="medium" outlined={!showPredictions?true:null} color={!showPredictions?'primary':'light'} onClick={handleShowPredictions}>{showPredictions ? 'Hide Predictions' : 'Show Predictions'}</Button>
                     </span>

@@ -20,6 +20,7 @@ export const CovidUSPage = () => {
     let region = query.region ? Array.isArray(query.region) ? query.region : [query.region] : undefined
     let graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
     let showLog = query.showLog === 'true' ? true : false
+    let showPredictions = query.showPredictions === 'true' ? true : false
 
     useEffect(() => {
         document.title = `United States Graphs | ${DEFAULT_DOCUMENT_TITLE}`        
@@ -29,7 +30,7 @@ export const CovidUSPage = () => {
     return (
         <MainLayout>
             <ErrorBoundary>
-                <USGraphContainer region={region} graph={graph} showLogParam={showLog} />
+                <USGraphContainer region={region} graph={graph} showLogParam={showLog} showPredictionsParam={showPredictions} />
             </ErrorBoundary>
         </MainLayout>
     )
