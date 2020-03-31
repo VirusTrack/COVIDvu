@@ -24,9 +24,9 @@ export const GraphControls = ({
   const detectMobile = useMobileDetect()
 
   return (
-      <Column.Group centered> 
+      <Column.Group className="graph-controls" breakpoint="desktop"> 
       
-      {scale && <Column narrow={centered}>
+      {scale && 
         <GraphScaleControl 
           showLog={showLog}
           handleGraphScale={handleGraphScale}
@@ -35,10 +35,14 @@ export const GraphControls = ({
           secondaryGraph={secondaryGraph}
           parentRegion={parentRegion}
           centered={centered} />
-          </Column>
         }
-      {(!detectMobile.isMobile() && downloadImage) && <Column narrow><GraphImageDownloadButton secondaryGraph={secondaryGraph} parentRegion={parentRegion} selected={selected} showLog={showLog} /></Column>}
+      <Column.Group breakpoint="mobile" style={{alignItems: 'center'}} >
+      {(!detectMobile.isMobile() && downloadImage) && 
+      <Column narrow>
+        <GraphImageDownloadButton secondaryGraph={secondaryGraph} parentRegion={parentRegion} selected={selected} showLog={showLog} />
+        </Column>}
       {downloadCSV && <Column narrow><GraphDownloadButton data={data} /></Column>}
+      </Column.Group>
       </Column.Group>
   )
 }
