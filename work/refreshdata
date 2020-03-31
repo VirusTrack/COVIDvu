@@ -225,11 +225,15 @@ function makeDataSnapshot {
     # EXPERIMENTAL:  transitional feature until we get the database back-end going
     local minutes=$(awk 'BEGIN { "date +\"%s\"" | getline time; print(int((time%3600)/60)); }')
 
-    if [[ "0" == "minutes" ]]
+    echo "data snapshot time check - current minutes offset = $minutes"
+
+    if [[ "0" == "$minutes" ]]
     then
         mkdir -p "$SNAPSHOTS_DIR"
         local now=$(date +"%Y%m%d-%H%M")
         local fileName="$SNAPSHOTS_DIR/snapshot-$now.tar.bz2"
+
+        echo "  creating snapshot at $fileName"
 
         tar cvjf "$fileName" "$SITE_DATA_DIR" "$RESOURCES_DIR/"*.json
         [[ "0" != "$?" ]] && die "makeDataSnapshot failed - tar/bzip2 issue"  26
