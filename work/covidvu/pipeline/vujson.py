@@ -202,6 +202,11 @@ def _parseBoundary2(cases):
     casesBoats.rename(BOAT_NAMES, axis=1, inplace=True)
     casesBoats       = casesBoats.groupby(casesBoats.columns, axis=1).sum()
 
+    casesGlobal.sort_index(inplace=True)
+    casesUSRegions.sort_index(inplace=True)
+    casesUSStates.sort_index(inplace=True)
+    casesBoats.sort_index(inplace=True)
+
     output = {
                 'casesGlobal':    casesGlobal,
                 'casesUSRegions': casesUSRegions,
@@ -236,6 +241,9 @@ def _parseGlobal(sourceFileName):
     casesGlobal = utils.computeCasesOutside(casesGlobal,
                                       ['China', '!Global'],
                                       '!Outside China')
+
+    casesGlobal.sort_index(inplace=True)
+    casesBoats.sort_index(inplace=True)
     return casesGlobal, casesBoats
 
 
@@ -333,6 +341,7 @@ def _resampleByRegionUS_mode2(casesUS):
     casesUS['!Total US'] = casesUS.loc[:, casesUS.columns != 'Unassigned'].sum(axis=1)
     casesUS              = casesUS.reindex(sorted(casesUS.columns), axis=1)
     casesUS.index        = pd.to_datetime(casesUS.index)
+    casesUS.sort_index(inplace=True)
     return casesUS
 
 
@@ -418,11 +427,14 @@ def _readSourceDeprecated(sourceFileName):
     cases = cases.groupby(['Province/State', 'Country/Region']).sum().T
     cases = cases.rename(COUNTRY_NAMES, axis=1)
     cases.index = pd.to_datetime(cases.index)
+    cases.sort_index(inplace=True)
     return cases
 
 def _parseBoundary1(cases):
     casesBoats, casesNotBoats = _getBoats_mode1(cases)
     casesUSStates, casesUSRegions = allUSCases(casesNotBoats)
+    casesBoats.sort_index(inplace=True)
+    casesNotBoats.sort_index(inplace=True)
 
     output = {
                 'casesGlobal': allCases(casesNotBoats),
@@ -473,6 +485,8 @@ def _parseBoundary3(jsCSSEReportPath=JH_CSSE_REPORT_PATH, targetReportName='Conf
         casesUSStates.append(reportUSConfirmed)
     casesUSStates = pd.concat(casesUSStates)
     casesUSStates['!Total US'] = casesUSStates.loc[:, casesUSStates.columns != 'Unassigned'].sum(axis=1)
+
+    casesUSStates.sort_index(inplace=True)
     return casesUSStates
 
 
@@ -544,6 +558,11 @@ def parseCSSE(target,
     casesUSStates   = casesUSStates.fillna(value=0, axis=0).fillna(0)
     casesUSRegions  = casesUSRegions.fillna(value=0, axis=0).fillna(0)
     casesBoats      = casesBoats.fillna(value=0, axis=0).fillna(0)
+
+    casesGlobal.sort_index(inplace=True)
+    casesUSStates.sort_index(inplace=True)
+    casesUSRegions.sort_index(inplace=True)
+    casesBoats.sort_index(inplace=True)
 
     output = {
         'casesGlobal': casesGlobal,
