@@ -6,6 +6,8 @@ import { Title, Generic, Table } from 'rbx'
 
 import { ColumnSortIcon } from './ColumnSortIcon'
 
+import { TERMS } from '../constants/dictionary'
+
 export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, sort, onSort}) => {
     return (
 
@@ -34,8 +36,8 @@ export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExter
                         <Table.Heading>
                             New Deaths
                         </Table.Heading>
-                        <Table.Heading onClick={() => { console.log("hi"); onSort('mortality')}} style={{ cursor: 'pointer'}}>
-                            Mortality Rate
+                        <Table.Heading tooltipPosition="bottom" tooltip={TERMS['CFR_DEFINITION']} onClick={() => { onSort('mortality')}} style={{ cursor: 'pointer'}}>
+                            Case Fatality Rate
                             {sort === 'mortality' &&
                                 <ColumnSortIcon direction='desc' />
                             }
