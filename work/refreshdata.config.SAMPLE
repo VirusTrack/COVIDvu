@@ -9,8 +9,8 @@ export VIRUSTRACK_CLOUDFRONT_ID="E000000aa000aI"
 # --- config
 #
 export CONTAINER_SIG_FILE="/proc/1/cgroup"
-export STAGE_BUCKET="staging.virustrack.live"
+export COUNTY_CASES_US_FILE="resources/counties-US-all.json" # timestamp = implementation date
+export HOSPITAL_BEDS_US_FILE="resources/hospital-beds-count-US.json"
 export SITE_BUCKET="virustrack.live"
 export SITE_DATA_DIR="site-data"
-export HOSPITAL_BEDS_US_FILE="resources/hospital-beds-count-US-20200320.json"
-
+export STAGE_BUCKET="staging.virustrack.live"

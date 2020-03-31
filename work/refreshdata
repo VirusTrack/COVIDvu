@@ -8,6 +8,7 @@
 
 REFRESHDATA_CONFIG="./refreshdata.config"
 [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+[[ -e "$REFRESHDATA_CONFIG" ]] || exit 250
 
 source ./pyrunner
 

@@ -314,13 +314,14 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
 def plotDataAndPredictionsWithCI(meanPredictionTSAll,
                                  confirmedCasesAll,
                                  percentilesTSAll,
-                                 selectedColumns,
+                                 selectedColumns=None,
                                  log=False,
                                  **kwargs,
                                  ):
-    yLabel = kwargs.get("yLabel", 'Total confirmed cases')
-    cmapName = kwargs.get("cmapName")
-    title    = kwargs.get('title', 'COVID-19 predictions for total confirmed cases')
+    yLabel     = kwargs.get("yLabel", 'Total confirmed cases')
+    cmapName   = kwargs.get("cmapName")
+    title      = kwargs.get('title', 'COVID-19 predictions for total confirmed cases')
+    plotSingle = kwargs.get('plotSingle', False)
 
     if cmapName is None:
         cm = plt.get_cmap("nipy_spectral")
@@ -334,21 +335,18 @@ def plotDataAndPredictionsWithCI(meanPredictionTSAll,
         nvalues = len(list(selectedColumns))
     elif isinstance(selectedColumns, list):
         nvalues = len(selectedColumns)
+    elif selectedColumns is None:
+        assert plotSingle
     else:
-        print('No columns selected')
+        raise ValueError
 
     if nvalues > 1:
         cols = cm(np.arange(0, nvalues + 1, nvalues / (nvalues - 1)) / nvalues)
     else:
         cols = cm(0.5)
 
-    meanPredictionTSSelected = meanPredictionTSAll[selectedColumns]
-    confirmedCasesAllSelected = confirmedCasesAll[selectedColumns]
-    percentilesTSAllSelected = percentilesTSAll.loc[:, (slice(None), selectedColumns)]
-
     if log:
         yLabel =  "Log10 " + yLabel
-
 
     fig = go.Figure(layout={"yaxis_title": yLabel,
                             "legend": {"itemsizing": "constant"},
@@ -356,28 +354,49 @@ def plotDataAndPredictionsWithCI(meanPredictionTSAll,
                             # "template": "plotly_dark"
                             })
 
-    for ii, countryName in enumerate(selectedColumns):
-        meanPredictionTSThisCountry = meanPredictionTSSelected[countryName]
-        percentilesTSThisCountry = percentilesTSAllSelected.xs(countryName, level=1, axis=1)
-        confirmedCasesThisCountry = confirmedCasesAllSelected[countryName]
-
-        if nvalues > 1:
-            colorData = f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{cols[ii][3]})'
-            colorCI = (f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{0.1})',
-                       f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{0.5})',
-                       )
-        else:
-            colorData = f'rgba({cols[0]},{cols[1]},{cols[2]},{cols[3]})'
-            colorCI = (f'rgba({cols[0]},{cols[1]},{cols[2]},{0.1})',
-                       f'rgba({cols[0]},{cols[1]},{cols[2]},{0.5})',
-                       )
-
-        fig = plotWithCI(confirmedCasesThisCountry,
-                         percentilesTSThisCountry,
-                         meanPredictionTSThisCountry,
+    if plotSingle:
+        meanPrediction = meanPredictionTSAll
+        confirmedCases = confirmedCasesAll
+        percentilesTS = percentilesTSAll
+        countryName = kwargs.get('countryName')
+        colorData = f'rgba({cols[0]},{cols[1]},{cols[2]},{cols[3]})'
+        colorCI = (f'rgba({cols[0]},{cols[1]},{cols[2]},{0.1})',
+                   f'rgba({cols[0]},{cols[1]},{cols[2]},{0.5})',
+                   )
+        fig = plotWithCI(confirmedCases,
+                         percentilesTS,
+                         meanPrediction,
                          countryName, colorData, colorCI,
                          fig=fig,
                          )
+    else:
+        meanPredictionTSSelected = meanPredictionTSAll[selectedColumns]
+        confirmedCasesAllSelected = confirmedCasesAll[selectedColumns]
+        percentilesTSAllSelected = percentilesTSAll.loc[:, (slice(None), selectedColumns)]
+        for ii, countryName in enumerate(selectedColumns):
+            meanPredictionTSThisCountry = meanPredictionTSSelected[countryName]
+            percentilesTSThisCountry = percentilesTSAllSelected.xs(countryName, level=1, axis=1)
+            confirmedCasesThisCountry = confirmedCasesAllSelected[countryName]
+
+            if nvalues > 1:
+                colorData = f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{cols[ii][3]})'
+                colorCI = (f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{0.1})',
+                           f'rgba({cols[ii][0]},{cols[ii][1]},{cols[ii][2]},{0.5})',
+                           )
+            else:
+                colorData = f'rgba({cols[0]},{cols[1]},{cols[2]},{cols[3]})'
+                colorCI = (f'rgba({cols[0]},{cols[1]},{cols[2]},{0.1})',
+                           f'rgba({cols[0]},{cols[1]},{cols[2]},{0.5})',
+                           )
+
+            fig = plotWithCI(confirmedCasesThisCountry,
+                             percentilesTSThisCountry,
+                             meanPredictionTSThisCountry,
+                             countryName, colorData, colorCI,
+                             fig=fig,
+                             )
+
+
     if log:
         fig.update_layout(title_text=title, yaxis_type = "log")
     else:
