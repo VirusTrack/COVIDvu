@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
 
-import { Box, Content, Title } from 'rbx'
+import { Box, Content, Title, Notification } from 'rbx'
 
 import ContentLayout from '../layouts/ContentLayout'
 
-import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+import { DEFAULT_DOCUMENT_TITLE, ENABLE_PREDICTIONS } from '../constants'
 
 export const AboutPage = () => {
 
@@ -19,13 +19,23 @@ export const AboutPage = () => {
                 <Box>
                 <Content>
                     <Title size={2}>About The Project</Title>
+
+                    <Notification color="info">
+                        Check out our <a href="/whatsnew">What's New</a> page for more details on the latest features on the site.
+                    </Notification>
+
                     <p>
                     Volunteers building and sharing current, accurate, near real-time COVID-19 tracking and prediction tools.
                     </p>
-                    <Title size={4}>Methodology</Title>
-                    <p>
-                        Check out <a href="/about/methodology/prediction">how we model predictions</a> and how we arrived at the numbers seen after clicking "Show Predictions".
-                    </p>
+
+                    { ENABLE_PREDICTIONS &&
+                        <>
+                            <Title size={4}>Methodology</Title>
+                            <p>
+                                Check out <a href="/about/methodology/prediction">how we model predictions</a> and how we arrived at the numbers seen after clicking "Show Predictions".
+                            </p>
+                        </>
+                    }
                     <Title size={4}>How can you help?</Title>
                     <p>
                         If you are a backend developer we need your help with getting at more data so we can fill the graphs on the frontend. Frontend 
