@@ -36,7 +36,7 @@ export const GraphControls = ({
           parentRegion={parentRegion}
           centered={centered} />
         }
-      <Column.Group breakpoint="mobile" style={{alignItems: 'center'}} >
+      <Column.Group breakpoint="mobile" >
       {(!detectMobile.isMobile() && downloadImage) && 
       <Column narrow>
         <GraphImageDownloadButton secondaryGraph={secondaryGraph} parentRegion={parentRegion} selected={selected} showLog={showLog} />

@@ -6,6 +6,8 @@ import { useMobileDetect } from '../hooks/ui'
 
 import { Generic } from 'rbx'
 
+import LogoElement from './LogoElement'
+
 export const PredictionGraph = ({title, predictions, confirmed, selected, showLog = false}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
@@ -213,7 +215,8 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
     }
 
     return (
-        <Generic tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
+        <Generic tooltipPosition="top" className="vt-graph" tooltip="Clicking on legend items will remove them from graph">
+            <div className="vt-graph-logo"><LogoElement url /></div>
             <Plot
                 data={plotsAsValues}
                 layout={layout}
