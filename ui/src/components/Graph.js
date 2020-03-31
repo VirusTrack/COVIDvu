@@ -61,7 +61,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             l: 70,
             t: 5,
             r: 10,
-        }
+        },
     }
     
     if(showLog) {

@@ -164,7 +164,20 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
             l: 70,
             t: 5,
             r: 10,
-        }
+        },  
+        annotations: [
+            {
+              x: '2020-03-30',
+              y: 5,
+              xref: 'x',
+              yref: 'y',
+              text: 'We Are Here',
+              showarrow: true,
+              arrowhead: 7,
+              ax: 0,
+              ay: -40
+            }
+          ],
     }
     
     if(showLog) {
