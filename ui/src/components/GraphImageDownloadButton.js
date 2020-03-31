@@ -39,7 +39,7 @@ export const GraphImageDownloadButton = ({secondaryGraph, parentRegion, selected
     return (
       <>
         <Button size="medium" outlined onClick={()=>{ saveImage() }} ref={ref}>
-            <Icon size="small"><img src={imgDownload} style={{height: '1rem'}} /></Icon>
+            <Icon size="small"><img src={imgDownload} style={{height: '1rem'}} alt="Download Image Button" /></Icon>
             <span>Download Image</span>
         </Button>
       </>

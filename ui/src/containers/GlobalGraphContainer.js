@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { useLocation } from 'react-router'
 
@@ -22,7 +22,7 @@ import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 import ReactGA from 'react-ga';
 
-export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
+export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
 
     const dispatch = useDispatch()
     const { search } = useLocation()
@@ -30,10 +30,13 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     const handleHistory = useHandleHistory('/covid')
 
     const [showLog, setShowLog] = useState(showLogParam)
+    const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
     const [selectedCountries, setSelectedCountries] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
     
-    const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("global")
+    const {confirmed, sortedConfirmed, deaths, mortality} = useGraphData("global")
+
+    const globalPredictions = useSelector(state => state.services.globalPredictions)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
 
@@ -42,18 +45,19 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
      */
     useEffect(() => {
         dispatch(actions.fetchGlobal({showLog}))
+        dispatch(actions.fetchGlobalPredictions())
     }, [dispatch, showLog])
 
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
         if(sortedConfirmed && region.length === 0) {
-            setSelectedCountries(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
+            setSelectedCountries(sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region))
         }
     }, [sortedConfirmed])
 
     useEffect(() => {
         if(!search) {
-            handleHistory(selectedCountries, secondaryGraph)
+            handleHistory(selectedCountries, secondaryGraph, showLog)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -109,6 +113,15 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
         })
     }
 
+    const handleShowPredictions = () => {
+        if(selectedCountries.length > 1) {
+            setSelectedCountries(['US'])
+        }
+        setShowPredictions(!showPredictions)
+
+        handleHistory(selectedCountries, secondaryGraph, showLog, !showPredictions)
+    }
+
     return (
         <>
         <HeroElement
@@ -131,6 +144,9 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                         selected={selectedCountries}
                         handleSelected={dataList => handleSelectedRegion(dataList)} 
                         defaultSelected={region}
+                        showPredictions={showPredictions}
+                        predictions={globalPredictions}
+                        secondaryGraph={secondaryGraph}
                         showLog={showLog}
                         parentRegion="Global"
                     />
@@ -145,7 +161,11 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                     selected={selectedCountries}
                     handleSelectedGraph={handleSelectedGraph}
                     handleGraphScale={handleGraphScale}
+                    handleShowPredictions={handleShowPredictions}
+                    predictions={globalPredictions}
                     showLog={showLog}
+                    showPredictions={showPredictions}
+                    parentRegion="Global"
                 />
 
                 <>

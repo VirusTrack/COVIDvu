@@ -9,11 +9,11 @@ export const ColumnSortIcon = ({direction = 'desc'}) => {
 
     if(direction === 'desc') {
         return (
-            <Icon size="small" style={{marginLeft: '.5rem', opacity: '.83'}}><img src={imgAngleDown} /></Icon>
+            <Icon size="small" style={{marginLeft: '.5rem', opacity: '.83'}}><img src={imgAngleDown} alt="Angle Down Icon" /></Icon>
         )
     } else {
         return (
-            <Icon size="small" style={{marginLeft: '.5rem', opacity: '.83'}}><img src={imgAngleUp} /></Icon>
+            <Icon size="small" style={{marginLeft: '.5rem', opacity: '.83'}}><img src={imgAngleUp} alt="Angle Up Icon" /></Icon>
         )
     }
 }

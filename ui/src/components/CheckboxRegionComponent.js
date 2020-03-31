@@ -5,7 +5,17 @@ import numeral from 'numeral'
 
 import ReactGA from 'react-ga';
 
-export const CheckboxRegionComponent = ({data, selected, handleSelected, defaultSelected = [], showLog = false, parentRegion}) => {
+export const CheckboxRegionComponent = (
+        {
+          data, 
+          predictions,
+          selected, 
+          handleSelected, 
+          showLog = false, 
+          showPredictions = false,
+          parentRegion,
+          secondaryGraph,
+        }) => {
 
   const [regionList, setRegionList] = useState(data)
   const [alphaSort, setAlphaSort] = useState(false)
@@ -15,6 +25,12 @@ export const CheckboxRegionComponent = ({data, selected, handleSelected, default
   }
 
   const onChange = (region) => {
+
+    if(showPredictions) {
+      handleSelected([region])
+      return
+    }
+    
     if(selected.indexOf(region) === -1) {
       handleSelected([...selected, region])
     } else {
@@ -31,20 +47,42 @@ export const CheckboxRegionComponent = ({data, selected, handleSelected, default
 
   }
 
+  const groupByKey = (key, array) => {
+      return array.reduce((obj, item) => {
+          const objKey = item[key]
+          obj[objKey] = item
+          return obj
+      }, {})
+  }
+
   const mounted = useRef()
 
   useEffect(() => {
     if(!mounted.current) {
       mounted.current = true
     } else {
-      if(alphaSort) {
-        let sortedRegionList = data.concat().sort((a, b) => a.region.localeCompare(b.region))
-        setRegionList(sortedRegionList)
+      console.log(`showPredictions: ${showPredictions}`)
+      console.log(`secondaryGraph: ${secondaryGraph}`)
+      if(showPredictions && secondaryGraph === 'Cases') {
+          const countryByKey = groupByKey("region", data)
+          const predictionsList = Object.keys(predictions).map(region => ({ region: region, stats: countryByKey[region].stats}))
+
+          if(alphaSort) {
+            const sortedList = predictionsList.concat().sort((a, b) => a.region.localeCompare(b.region))
+            setRegionList(sortedList)
+          } else {
+            const sortedList = predictionsList.concat().sort((a, b) => b.stats - a.stats)
+            setRegionList(sortedList)
+          }
       } else {
-        setRegionList(data)
+        if(alphaSort) {
+          setRegionList(data.concat().sort((a, b) => a.region.localeCompare(b.region)))
+        } else {
+          setRegionList(data)
+        }
       }
     }
-  }, [alphaSort])
+  }, [alphaSort, showPredictions, secondaryGraph])
 
   const AlphaOrByConfirmedButton = () => (
     <>

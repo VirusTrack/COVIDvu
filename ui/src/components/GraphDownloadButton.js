@@ -24,7 +24,7 @@ export const GraphDownloadButton = ({data}) => {
         
         }
         <Button size="medium" outlined onClick={() => { setDownloadCsv(true) }}>
-            <Icon size="small"><img src={imgDownload} style={{height: '1rem'}} /></Icon>
+            <Icon size="small"><img src={imgDownload} style={{height: '1rem'}} alt="Download CSV Icon" /></Icon>
             <span>Download CSV</span>
         </Button>
       </>

@@ -1,12 +1,14 @@
 import React from 'react'
 
-import { Tab } from 'rbx'
+import { Tab, Notification } from 'rbx'
 
 import { TERMS } from '../constants/dictionary'
 
-import GraphWithLoader from '../components/GraphWithLoader'
+import { ENABLE_PREDICTIONS } from '../constants'
 
 import GraphControls from '../components/GraphControls'
+import GraphWithLoader from '../components/GraphWithLoader'
+import PredictionGraph from '../components/PredictionGraph'
 
 export const TabbedCompareGraphs = (
     {
@@ -17,7 +19,10 @@ export const TabbedCompareGraphs = (
         selected,
         handleSelectedGraph,
         handleGraphScale,
+        handleShowPredictions,
+        predictions,
         showLog,
+        showPredictions,
         parentRegion,
     }) => {
     
@@ -83,13 +88,15 @@ export const TabbedCompareGraphs = (
             <Tab.Group size="large" kind="boxed">
                 <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
                 <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
-                <Tab tooltipPosition="right" tooltip={TERMS['CFR_DEFINITION']} active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Case Fatality Rate')}}>Case Fatality Rate</Tab>
+                <Tab tooltipPosition="right" tooltip={TERMS['CFR_DEFINITION']} active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Case Fatality Rate</Tab>
             </Tab.Group>
 
             <GraphControls className="TabbedCompareGraphs__controls"
                 scale
                 showLog={showLog} 
                 handleGraphScale={handleGraphScale} 
+                showPredictions={showPredictions}
+                handleShowPredictions={handleShowPredictions}                
                 secondaryGraph={secondaryGraph} 
                 parentRegion={parentRegion} 
                 selected={selected}
@@ -98,14 +105,30 @@ export const TabbedCompareGraphs = (
                 downloadImage
                 />
 
-            <GraphWithLoader 
-                graphName="Cases"
-                secondaryGraph={secondaryGraph}
-                graph={confirmed}
-                selected={selected}
-                showLog={showLog}
-                y_title="Total confirmed cases"
-            />
+            { (showPredictions && secondaryGraph === 'Cases') &&
+                <>
+                    <Notification>
+                        For a detailed explanation of how predictions work, please visit our <a href="/about/methodology/predictions">methodology page</a>.
+                    </Notification>
+                    <PredictionGraph
+                        graphName="Cases"
+                        selected={selected}
+                        showLog={showLog}
+                        predictions={predictions}
+                        confirmed={confirmed}
+                    />
+                </>
+            }
+            { !showPredictions &&
+                <GraphWithLoader 
+                    graphName="Cases"
+                    secondaryGraph={secondaryGraph}
+                    graph={confirmed}
+                    selected={selected}
+                    showLog={showLog}
+                    y_title="Total confirmed cases"
+                />
+            }
             
 
             <GraphWithLoader 

@@ -22,6 +22,10 @@ export const AboutPage = () => {
                     <p>
                     Volunteers building and sharing current, accurate, near real-time COVID-19 tracking and prediction tools.
                     </p>
+                    <Title size={4}>Methodology</Title>
+                    <p>
+                        Check out <a href="/about/methodology/prediction">how we model predictions</a> and how we arrived at the numbers seen after clicking "Show Predictions".
+                    </p>
                     <Title size={4}>How can you help?</Title>
                     <p>
                         If you are a backend developer we need your help with getting at more data so we can fill the graphs on the frontend. Frontend 
