@@ -135,6 +135,7 @@ const main = async (argv) => {
             res.send(last_update.data)
         })
 
+        console.log("Done grabbing data and now listening...")
         app.listen(process.env.PORT || 3100)
 
     } else {

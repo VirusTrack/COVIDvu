@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 
 import { actions } from '../ducks/services'
 
-import { Navbar, Notification } from "rbx"
+import { Navbar, Notification, Button } from "rbx"
 import LogoElement from '../components/LogoElement'
 
 import store from 'store2'
@@ -98,7 +98,7 @@ export const HeaderContainer = () => {
                     </Navbar.Item>
 
                     <Navbar.Item hoverable dropdown>
-                        <Navbar.Link arrowless onClick={() => { changePage('/covid/us')}}><img src={usflagImg} alt=""/>United States</Navbar.Link>
+                        <Navbar.Link arrowless onClick={() => { changePage('/covid/us')}}><img src={usflagImg} alt="United States Flag"/>United States</Navbar.Link>
                         <Navbar.Dropdown boxed>
                             <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {changePage('/covid/us')}}>US States</Navbar.Item>
                             <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{changePage('/covid/us/regions')}}>US Regions</Navbar.Item>
@@ -109,8 +109,12 @@ export const HeaderContainer = () => {
                 </Navbar.Segment>
 
                 <Navbar.Segment align="end">
-                    <Navbar.Item onClick={() => { forceRefresh() }}><img src={syncImg} alt=""/>Refresh</Navbar.Item>
-                    <Navbar.Item active={selectedNav === '/about'} onClick={()=>{history.push('/about')}}><img src={infoImg} alt=""/>About</Navbar.Item>
+                    <Navbar.Item color="info">
+                        <Button size="medium" color="info" active={selectedNav === '/whatsnew'} onClick={() => { history.push('/whatsnew') }}>
+                            <strong>What's New</strong>
+                        </Button>
+                    </Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/about'} onClick={()=>{history.push('/about')}}><img src={infoImg} alt="About Site"/>About</Navbar.Item>
                 </Navbar.Segment>
             </Navbar.Menu>
         </Navbar>

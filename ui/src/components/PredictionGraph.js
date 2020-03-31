@@ -18,7 +18,8 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
 
     var colors = ['green', 'red', 'blue']
 
-    const todayAsText = moment().format('YYYY-MM-DD')
+    const today = moment()
+    // const today = moment().subtract(1, 'days')
 
     useEffect(() => {
 
@@ -52,13 +53,13 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     x: [],
                     y: [],
                     line: {
-                        color: colors[0],
+                        color: '#17BECF',
                     },
                     type: 'scatter',
                     mode: 'lines',
                     name: "2.5%",
-                    showlegend: false,
-                    hoverinfo: 'skip',
+                    showlegend: true,
+                    // hoverinfo: 'skip',
                 }
                 plots_97_5[normalizedRegion] = {
                     x: [],
@@ -70,23 +71,10 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     mode: 'lines',
                     fill: 'tonexty',
                     name: "97.5%",
-                    showlegend: false,
-                    hoverinfo: 'skip',
+                    showlegend: true,
+                    // hoverinfo: 'skip',
                 }
                 plots_25[normalizedRegion] = {
-                    x: [],
-                    y: [],
-                    line: {
-                        color: colors[0],
-                    },
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: "25%",
-                    fill: null,
-                    showlegend: false,
-                    hoverinfo: 'skip',
-                }
-                plots_75[normalizedRegion] = {
                     x: [],
                     y: [],
                     line: {
@@ -94,10 +82,23 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     },
                     type: 'scatter',
                     mode: 'lines',
+                    name: "25%",
+                    fill: null,
+                    showlegend: true,
+                    // hoverinfo: 'skip',
+                }
+                plots_75[normalizedRegion] = {
+                    x: [],
+                    y: [],
+                    line: {
+                        color: '#179090',
+                    },
+                    type: 'scatter',
+                    mode: 'lines',
                     fill: 'tonexty',
                     name: "75%",
-                    showlegend: false,
-                    hoverinfo: 'skip',
+                    showlegend: true,
+                    // hoverinfo: 'skip',
 
                 }
                 plots_mean[normalizedRegion] = {
@@ -113,7 +114,7 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     marker: {
                         size: 5
                     },
-                    showlegend: false
+                    showlegend: true
                 }
 
                 const regionData = confirmed[region]
@@ -123,24 +124,38 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                 }
 
                 for(const key of Object.keys(predictions[region].confidenceInterval['2.5'])) {
-                    plots_2_5[normalizedRegion].x.push(key)
-                    plots_2_5[normalizedRegion].y.push(predictions[region].confidenceInterval['2.5'][key])
+                    if(moment(key).isSameOrAfter(today, "day")) {
+                        plots_2_5[normalizedRegion].x.push(key)
+                        plots_2_5[normalizedRegion].y.push(predictions[region].confidenceInterval['2.5'][key])
+                    }
                 }
                 for(const key of Object.keys(predictions[region].confidenceInterval['97.5'])) {
-                    plots_97_5[normalizedRegion].x.push(key)
-                    plots_97_5[normalizedRegion].y.push(predictions[region].confidenceInterval['97.5'][key])
+                    if(moment(key).isSameOrAfter(today, "day")) {
+                        plots_97_5[normalizedRegion].x.push(key)
+                        plots_97_5[normalizedRegion].y.push(predictions[region].confidenceInterval['97.5'][key])
+                    }
                 }
                 for(const key of Object.keys(predictions[region].confidenceInterval['25'])) {
-                    plots_25[normalizedRegion].x.push(key)
-                    plots_25[normalizedRegion].y.push(predictions[region].confidenceInterval['25'][key])
+                    if(moment(key).isSameOrAfter(today, "day")) {
+                        plots_25[normalizedRegion].x.push(key)
+                        plots_25[normalizedRegion].y.push(predictions[region].confidenceInterval['25'][key])
+                    }
                 }
                 for(const key of Object.keys(predictions[region].confidenceInterval['75'])) {
-                    plots_75[normalizedRegion].x.push(key)
-                    plots_75[normalizedRegion].y.push(predictions[region].confidenceInterval['75'][key])
+                    if(moment(key).isSameOrAfter(today, "day")) {
+                        plots_75[normalizedRegion].x.push(key)
+                        plots_75[normalizedRegion].y.push(predictions[region].confidenceInterval['75'][key])
+                    }
                 }
                 for(const key of Object.keys(predictions[region].mean)) {
-                    plots_mean[normalizedRegion].x.push(key)
-                    plots_mean[normalizedRegion].y.push(predictions[region].mean[key])
+                    console.log(`moment(${key}).isSameOrAfter(${today}) ${moment(key).isSameOrAfter(today, "day")}`)
+                    if(moment(key).isSameOrAfter(today, "day")) {
+
+                        console.log(`Today: ${today.format('YYYY-MM-DD')}`)
+                        console.log(`key: ${key}`)
+                        plots_mean[normalizedRegion].x.push(key)
+                        plots_mean[normalizedRegion].y.push(predictions[region].mean[key])
+                    }
                 }
 
                 plotList = [...plotList, 
@@ -171,19 +186,6 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
             t: 5,
             r: 10,
         },  
-        annotations: [
-            {
-              x: todayAsText,
-              y: 0,
-              xref: 'x',
-              yref: 'y',
-              text: 'We Are Here',
-              showarrow: true,
-              arrowhead: 7,
-              ax: 0,
-              ay: -80
-            }
-          ],
     }
     
     if(showLog) {

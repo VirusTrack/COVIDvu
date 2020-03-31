@@ -51,7 +51,9 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
         if(sortedConfirmed && region.length === 0) {
-            setSelectedCountries(sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region))
+            const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
+            setSelectedCountries(newSelectedCountries)
+            handleHistory(newSelectedCountries, secondaryGraph, showLog)
         }
     }, [sortedConfirmed])
 
