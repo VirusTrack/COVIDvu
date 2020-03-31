@@ -30,20 +30,22 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
                 name: normalizedRegion,
                 showlegend: true,
                 marker: {
-                    size: 3
+                    size: 5
                 }
             }
 
             const regionData = data[region]
             
             for(const key of Object.keys(regionData).sort()) {
-                plots[normalizedRegion].x.push(key)
-                plots[normalizedRegion].y.push(regionData[key])
+                if((showLog && regionData[key] > 100) || !showLog) {
+                    plots[normalizedRegion].x.push(key)
+                    plots[normalizedRegion].y.push(regionData[key])
+                }
             }
         }
     
         setPlotsAsValues(Object.values(plots))
-    }, [selected, data, y_type])
+    }, [selected, data, y_type, showLog])
 
     let mergeConfig = { ...config,
         displayModeBar: false,
@@ -59,7 +61,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             l: 70,
             t: 5,
             r: 10,
-        }
+        },
     }
     
     if(showLog) {

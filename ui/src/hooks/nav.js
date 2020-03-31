@@ -17,12 +17,13 @@ import queryString from 'query-string'
 export function useHandleHistory(urlFragment) {
     const history = useHistory()
 
-    return (region, graph, showLog) => {
+    return (region, graph, showLog, showPredictions) => {
 
         const query = queryString.stringify({
             region,
             graph,
-            showLog
+            showLog,
+            showPredictions
         })
 
         history.replace(`${urlFragment}?${query}`)

@@ -9,6 +9,7 @@ import { CovidUSRegionsPage } from './CovidUSRegionsPage'
 import { CovidRegionPage } from './CovidRegionPage'
 import { StatsPage } from './StatsPage'
 import { AboutPage } from './AboutPage'
+import { PredictionMethodologyPage } from './PredictionMethodologyPage'
 
 import {
     Switch,
@@ -41,6 +42,9 @@ const App = () => (
         </Route>
         <Route path="/stats">
             <StatsPage />
+        </Route>
+        <Route path="/about/methodology/prediction">
+            <PredictionMethodologyPage />
         </Route>
         <Route path="/about">
             <AboutPage />
