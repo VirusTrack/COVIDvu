@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Generic, Button, Checkbox, Column } from 'rbx'
+import { Generic, Button, Column } from 'rbx'
 
 export const GraphScaleControl = ({
     showLog = false, 

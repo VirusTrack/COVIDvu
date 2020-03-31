@@ -12,7 +12,8 @@ import GraphWithLoader from '../components/GraphWithLoader'
 import HeroElement from '../components/HeroElement'
 import LogoElement from '../components/LogoElement'
 
-import GraphScaleControl from '../components/GraphScaleControl'
+import { TERMS } from '../constants/dictionary'
+
 import GraphControls from '../components/GraphControls'
 
 import numeral from 'numeral'
@@ -145,7 +146,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                     <Level breakpoint="mobile"> 
                         <Level.Item textAlign="centered">
                             <div>
-                            <Heading>Mortality Rate</Heading>
+                            <Heading tooltip={TERMS['CFR_DEFINITION']}>Case Fatality Rate</Heading>
                             <Title as="p">{numeral(globalStats.mortality).format('0.0 %')}</Title>
                             </div>
                         </Level.Item>
@@ -266,7 +267,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                 <Level breakpoint="mobile"> 
                     <Level.Item textAlign="centered">
                         <div>
-                        <Heading>Mortality Rate</Heading>
+                        <Heading tooltip={TERMS['CFR_DEFINITION']}>Case Fatality Rate</Heading>
                         <Title as="p">{numeral(usStatesStats.mortality).format('0.0 %')}</Title>
                         </div>
                     </Level.Item>

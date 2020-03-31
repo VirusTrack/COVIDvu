@@ -37,8 +37,10 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             const regionData = data[region]
             
             for(const key of Object.keys(regionData).sort()) {
-                plots[normalizedRegion].x.push(key)
-                plots[normalizedRegion].y.push(regionData[key])
+                if((showLog && regionData[key] > 100) || !showLog) {
+                    plots[normalizedRegion].x.push(key)
+                    plots[normalizedRegion].y.push(regionData[key])
+                }
             }
         }
     
@@ -94,7 +96,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         }
     }
 
-    if(y_title === 'Mortality Rate Percentage') {
+    if(y_title === 'Case Fatality Rate Percentage') {
         layout['yaxis'] = { ...layout['yaxis'], tickformat: '.1%'}
     }
 

@@ -1,6 +1,7 @@
 import React from 'react'
 
 import numeral from 'numeral'
+import { TERMS } from '../constants/dictionary'
 
 import { Title, Generic, Table } from 'rbx'
 
@@ -38,8 +39,8 @@ export const USStatsTable = ({statsForGraph, redirectToExternalLink, isExternalL
                     <Table.Heading>
                         New Deaths
                     </Table.Heading>
-                    <Table.Heading onClick={() => { onSort('mortality')}} style={{ cursor: 'pointer'}}>
-                        Mortality Rate
+                    <Table.Heading tooltipPosition="left" tooltip={TERMS['CFR_DEFINITION']} onClick={() => { onSort('mortality')}} style={{ cursor: 'pointer'}}>
+                        Case Fatality Rate
                         {sort === 'mortality' &&
                             <ColumnSortIcon direction='desc' />
                         }

@@ -48,8 +48,6 @@ export const CountyBarGraph = ({statsForGraph, filterRegion}) => {
         legend: {
             xanchor: 'center',
             yanchor: 'top',
-            y: -0.1,
-            x: 0.5,
         }
     }
 
