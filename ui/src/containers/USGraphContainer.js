@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 
 import { useHandleHistory } from '../hooks/nav'
@@ -23,17 +23,20 @@ import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 import ReactGA from 'react-ga';
 
-export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = false}) => {
+export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
 
     const dispatch = useDispatch()
     const { search } = useLocation()
     const handleHistory = useHandleHistory('/covid/us')
 
     const [showLog, setShowLog] = useState(showLogParam)
+    const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
     const [selectedStates, setSelectedStates] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
     const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("usStates")
+
+    const usPredictions = useSelector(state => state.services.usPredictions)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
     const [unassignedCases, setUnassignedCases] = useState(0)
@@ -60,11 +63,12 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
 
     useEffect(() => {
         dispatch(actions.fetchUSStates())
+        dispatch(actions.fetchUSPredictions())
     }, [dispatch])
 
     useEffect(() => {
         if(!search) {
-            handleHistory(selectedStates, secondaryGraph)
+            handleHistory(selectedStates, secondaryGraph, showLog)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -81,7 +85,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
     
     const handleSelectedRegion = (regionList) => {
         setSelectedStates(regionList)
-        handleHistory(regionList, graph, showLog)
+        handleHistory(regionList, graph, showLog, showPredictions)
 
         ReactGA.event({
             category: 'Region:United States',
@@ -110,6 +114,13 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
         })
     }
 
+    const handleShowPredictions = () => {
+        if(selectedStates.length > 1) {
+            setSelectedStates(['New York'])
+        }
+        setShowPredictions(!showPredictions)
+        handleHistory(selectedStates, secondaryGraph, showLog, !showPredictions)
+    }
 
     return (
         <>
@@ -133,8 +144,11 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
                         selected={selectedStates}
                         handleSelected={dataList => handleSelectedRegion(dataList)} 
                         defaultSelected={region}
+                        showPredictions={showPredictions}
+                        predictions={usPredictions}
+                        secondaryGraph={secondaryGraph}
                         showLog={showLog}
-                        parentRegion="Continental"                        
+                        parentRegion="US"
                     />
                 </>
 
@@ -146,7 +160,11 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
                     selected={selectedStates}
                     handleSelectedGraph={handleSelectedGraph}
                     handleGraphScale={handleGraphScale}
+                    handleShowPredictions={handleShowPredictions}
+                    predictions={usPredictions}
                     showLog={showLog}
+                    showPredictions={showPredictions}
+                    parentRegion="US"
                 />
 
                 <>

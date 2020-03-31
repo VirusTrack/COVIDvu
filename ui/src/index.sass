@@ -243,7 +243,7 @@ code
           padding-bottom: 0
           .statistics
             margin-right: 1.5rem
-          .column 
+          > .column 
             > *:first-child 
               margin-top: 1.5rem
             > *:last-child
@@ -300,16 +300,24 @@ hr
       font-size: 5.6rem
 
 .button
+  &.is-selected,&:focus
+    z-index: 2
+    position: relative
   &.is-primary
     background-color: #{$secondary}
     &.is-outlined,&.is-outlined:focus
       background: transparent
       color: #{$secondary}
       border-color: #{$secondary}
-    &:hover
+    &:hover,
+    &.is-outlined:hover,
+    &.is-outlined:focus:hover
+      color: white
       background-color: #{lighten($secondary, 5%)}
+      border-color: #{lighten($secondary, 5%)}
   &.is-secondary
     background-color: #{$primary}
+    color: white
     &.is-outlined,&.is-outlined:focus
       background: transparent
       color: #{$primary}
@@ -494,3 +502,30 @@ label
   img 
     max-height: 2rem
     margin-right: 1rem
+
+.graph-controls
+  margin: 0
+  justify-content: space-between
+  
+  @media screen and (min-width: 540px)
+    .columns.is-tablet
+      display: flex
+      justify-content: flex-start
+      margin-bottom: 1rem
+      > .column
+        flex-basis: auto
+        flex-grow: 0
+  @media screen and (min-width: $desktop)
+    .columns.is-mobile
+      align-items: start
+  .button
+    margin: 0
+
+.content.dashboard
+  
+  .graph-controls
+    justify-content: center
+    .columns.is-tablet
+      justify-content: center
+      @media screen and (min-width: 540px)
+        justify-content: center
