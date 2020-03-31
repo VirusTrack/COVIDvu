@@ -23,7 +23,7 @@ export const DashboardPage = () => {
     }, [])
     
     return (
-        <MainLayout>
+        <MainLayout className="dashboard">
             <ErrorBoundary>
                 <DashboardContainer showLogParam={showLog} />
             </ErrorBoundary>

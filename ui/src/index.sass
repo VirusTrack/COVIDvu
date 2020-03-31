@@ -243,7 +243,7 @@ code
           padding-bottom: 0
           .statistics
             margin-right: 1.5rem
-          .column 
+          > .column 
             > *:first-child 
               margin-top: 1.5rem
             > *:last-child
@@ -502,3 +502,25 @@ label
   img 
     max-height: 2rem
     margin-right: 1rem
+
+.graph-controls
+  margin: 0
+  justify-content: space-between
+  
+  @media screen and (min-width: 540px)
+    .columns.is-tablet
+      display: flex
+      justify-content: flex-start
+      margin-bottom: 1rem
+      > .column
+        flex-basis: auto
+        flex-grow: 0
+  @media screen and (min-width: $desktop)
+    .columns.is-mobile
+      align-items: start
+  .button
+    margin: 0
+.content.dashboard
+  .graph-controls
+    .columns.is-tablet
+      justify-content: center
