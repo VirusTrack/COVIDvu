@@ -1,11 +1,10 @@
 import React from 'react'
 
-import { Tab, Level } from 'rbx'
+import { Tab } from 'rbx'
 
+import GraphControls from '../components/GraphControls'
 import GraphWithLoader from '../components/GraphWithLoader'
 import PredictionGraph from '../components/PredictionGraph'
-import GraphScaleControl from '../components/GraphScaleControl'
-import GraphDownloadButton from '../components/GraphDownloadButton'
 
 export const TabbedCompareGraphs = (
     {
@@ -88,21 +87,19 @@ export const TabbedCompareGraphs = (
                 <Tab active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Mortality</Tab>
             </Tab.Group>
 
-            <Level className="TabbedCompareGraphs__controls">
-                <Level.Item align="left">
-                    <GraphScaleControl
-                        showLog={showLog}
-                        showPredictions={showPredictions}
-                        handleGraphScale={handleGraphScale}
-                        handleShowPredictions={handleShowPredictions}
-                        secondaryGraph={secondaryGraph}
-                        parentRegion={parentRegion}
-                    />
-                </Level.Item>
-                <Level.Item align="right">
-                    <GraphDownloadButton data={activeData()} />
-                </Level.Item>
-            </Level>
+            <GraphControls className="TabbedCompareGraphs__controls"
+                scale
+                showLog={showLog} 
+                handleGraphScale={handleGraphScale} 
+                showPredictions={showPredictions}
+                handleShowPredictions={handleShowPredictions}                
+                secondaryGraph={secondaryGraph} 
+                parentRegion={parentRegion} 
+                selected={selected}
+                downloadCSV
+                data={activeData()}
+                downloadImage
+                />
 
             { (showPredictions && secondaryGraph === 'Cases') &&
                 <PredictionGraph
