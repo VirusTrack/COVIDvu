@@ -8,11 +8,6 @@ from os.path import join
 
 from pandas.core.indexes.datetimes import DatetimeIndex
 
-from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
-from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED_DEPRECATED
-from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
-from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS_DEPRECATED
-from covidvu.pipeline.vujson import JH_CSSE_REPORT_PATH
 from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import dumpJSON
 from covidvu.pipeline.vujson import parseCSSE
@@ -43,6 +38,14 @@ PREDICTIONS_PERCENTILES = (
                                 (2.5, 97.5),
                                 (25, 75),
                           )
+
+JH_CSSE_DATA_HOME                  = 'COVID-19'
+JH_CSSE_PATH                       = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOME), 'csse_covid_19_data/csse_covid_19_time_series')
+
+JH_CSSE_FILE_CONFIRMED             = os.path.join(JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
+JH_CSSE_FILE_DEATHS                = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
+JH_CSSE_FILE_CONFIRMED_US          = os.path.join(JH_CSSE_PATH, 'time_series_covid19_confirmed_US.csv')
+JH_CSSE_FILE_DEATHS_US             = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_US')
 
 PREDICTION_MEAN_JSON_FILENAME_WORLD = 'prediction-world-mean-%s.json'
 PREDICTION_CI_JSON_FILENAME_WORLD   = 'prediction-world-conf-int-%s.json'
@@ -155,6 +158,7 @@ def _castPredictionsAsTS(regionTSClean,
 
     return predictionsMeanTS, predictionsPercentilesTS
 
+
 def predictLogisticGrowth(logGrowthModel: StanModel,
                           regionTrainIndex: int        = None,
                           regionName: str              = None,
@@ -205,11 +209,8 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
                                    siteData                      = kwargs.get('siteData', SITE_DATA),
                                    jhCSSEFileConfirmed           = kwargs.get('jhCSSEFileConfirmed',JH_CSSE_FILE_CONFIRMED),
                                    jhCSSEFileDeaths              = kwargs.get('jhCSSEFileDeaths',JH_CSSE_FILE_DEATHS),
-                                   jhCSSEFileConfirmedDeprecated = kwargs.get('jhCSSEFileConfirmedDeprecated',
-                                                                              JH_CSSE_FILE_CONFIRMED_DEPRECATED),
-                                   jhCSSEFileDeathsDeprecated    = kwargs.get('jhCSSEFileDeathsDeprecated',
-                                                                              JH_CSSE_FILE_DEATHS_DEPRECATED),
-                                   jsCSSEReportPath              = kwargs.get('jsCSSEReportPath',JH_CSSE_REPORT_PATH),
+                                   jhCSSEFileConfirmedUS = kwargs.get('jhCSSEFileConfirmedUS',JH_CSSE_FILE_CONFIRMED_US),
+                                   jhCSSEFileDeathsUS = kwargs.get('jhCSSEFileDeathsUS', JH_CSSE_FILE_DEATHS_US)
                                    )[subGroup]
 
     if regionName is None:
@@ -342,11 +343,10 @@ def predictRegions(regionTrainIndex,
                      predictionsPercentiles        = PREDICTIONS_PERCENTILES,
                      siteData                      = SITE_DATA,
                      subGroup                      = 'casesGlobal',
-                     jhCSSEFileConfirmed           = JH_CSSE_FILE_CONFIRMED,
-                     jhCSSEFileDeaths              = JH_CSSE_FILE_DEATHS,
-                     jhCSSEFileConfirmedDeprecated = JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-                     jhCSSEFileDeathsDeprecated    = JH_CSSE_FILE_DEATHS_DEPRECATED,
-                     jsCSSEReportPath              = JH_CSSE_REPORT_PATH,
+                   jhCSSEFileConfirmed=JH_CSSE_FILE_CONFIRMED,
+                   jhCSSEFileDeaths=JH_CSSE_FILE_DEATHS,
+                   jhCSSEFileConfirmedUS=JH_CSSE_FILE_CONFIRMED_US,
+                   jhCSSEFileDeathsUS=JH_CSSE_FILE_DEATHS_US,
                      priorLogCarryingCapacity      = PRIOR_LOG_CARRYING_CAPACITY,
                      priorMidPoint                 = PRIOR_MID_POINT,
                      priorGrowthRate               = PRIOR_GROWTH_RATE,
@@ -400,9 +400,8 @@ def predictRegions(regionTrainIndex,
                                            siteData                      = siteData,
                                            jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
                                            jhCSSEFileDeaths              = jhCSSEFileDeaths,
-                                           jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
-                                           jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
-                                           jsCSSEReportPath              = jsCSSEReportPath,
+                                           jhCSSEFileConfirmedUS=jhCSSEFileConfirmedUS,
+                                           jhCSSEFileDeathsUS=jhCSSEFileDeathsUS,
                                            **kwargs
                                            )
         if subGroup == 'casesGlobal':
@@ -419,11 +418,10 @@ def predictRegions(regionTrainIndex,
     elif regionTrainIndex == 'all':
         confirmedCases = parseCSSE(target,
                                    siteData                      = siteData,
-                                   jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
-                                   jhCSSEFileDeaths              = jhCSSEFileDeaths,
-                                   jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
-                                   jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
-                                   jsCSSEReportPath              = jsCSSEReportPath,
+                                   jhCSSEFileConfirmed=jhCSSEFileConfirmed,
+                                   jhCSSEFileDeaths=jhCSSEFileDeaths,
+                                   jhCSSEFileConfirmedUS=jhCSSEFileConfirmedUS,
+                                   jhCSSEFileDeathsUS=jhCSSEFileDeathsUS,
                                    )[subGroup]
         regionsAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
         for regionName in regionsAll:
@@ -435,11 +433,10 @@ def predictRegions(regionTrainIndex,
                                                predictionsPercentiles        = predictionsPercentiles,
                                                target                        = target,
                                                siteData                      = siteData,
-                                               jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
-                                               jhCSSEFileDeaths              = jhCSSEFileDeaths,
-                                               jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
-                                               jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
-                                               jsCSSEReportPath              = jsCSSEReportPath,
+                                               jhCSSEFileConfirmed=jhCSSEFileConfirmed,
+                                               jhCSSEFileDeaths=jhCSSEFileDeaths,
+                                               jhCSSEFileConfirmedUS=jhCSSEFileConfirmedUS,
+                                               jhCSSEFileDeathsUS=jhCSSEFileDeathsUS,
                                                **kwargs,
                                                )
             if prediction:

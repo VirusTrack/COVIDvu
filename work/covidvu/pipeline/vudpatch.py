@@ -4,7 +4,11 @@
 
 
 from covidvu.pipeline.vujson import SITE_DATA
-from covidvu.pipeline.vujson import US_REGIONS_LONG
+from covidvu.pipeline.vujson import US_REGIONS
+# TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
+#
+# Confirm that US_REGIONS has the same behavior as the old US_REGIONS_LONG. Thx!
+# from covidvu.pipeline.vujson import US_REGIONS_LONG
 from covidvu.pipeline.vujson import resolveReportFileName
 
 import csv
@@ -32,16 +36,17 @@ NIXED_ROWS_INDEX = (
     'Diamond Princess',
     'Grand Princess (repatriated)',
     'Grand Princess',
+    'Northern Marianas',
     'Queue',
+    'Recovered',
     'TBD',
     'US',
     'Unassigned',
+    'United States Virgin Islands',
+    'Washington D.C.',
     'Wuhan (repatriated)',
     'Wuhan Evacuee',
     'Wuhan',
-    'United States Virgin Islands',
-    'Northern Marianas',
-    'Recovered',
 )
 US_STATE_NAMES = {
                     'U.S. TOTAL'              : '!Total US',
@@ -138,6 +143,7 @@ def _applyNewRecordsFrom(dataset, updates):
 
 
 def _patchWorldData(target, columnRef):
+    print('  patching world...')
     updateWorld = _fetchCurrentUpdates(columnRef)
     updateWorld = _homologizeUpdateData(updateWorld, COUNTRY_NAMES)
     dataWorld   = fetchJSONData(target)
@@ -152,13 +158,11 @@ def _patchWorldData(target, columnRef):
 
 
 def _patchUSData(target, columnRef):
+    print('  patching US...')
     updateUS  = _fetchCurrentUpdatesUS(columnRef = columnRef)
     # TODO:  Determine if there's need to homologize them
     updateUS  = _homologizeUpdateData(updateUS, US_STATE_NAMES)
     dataUS    = fetchJSONData(target, "-US")
-
-    # Heuristic - CSSE data includes DC twice; the deleted one is empty.
-    del(dataUS['Washington D.C.'])
 
     allTime      = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
     yesterday    = dataUS['!Total US'][allTime[len(allTime)-2]]
@@ -189,6 +193,7 @@ def _patchUSData(target, columnRef):
 
 
 def _patchUSRegionsData(target, dataUS):
+    print('  patching US regions...')
     dataUSRegions   = fetchJSONData(target, '-US-Regions')
     updateUSRegions = dict()
     allTime         = list(dataUS['!Total US'].keys())    # TODO:  Fix until we identify better data sources.
@@ -197,7 +202,7 @@ def _patchUSRegionsData(target, dataUS):
         if location in NIXED_ROWS_INDEX:
             continue
         try:
-            region = US_REGIONS_LONG[location]
+            region = US_REGIONS[location]
             if region not in updateUSRegions:
                 updateUSRegions[region] = { SCRAPED_TODAY: 0.0, }
 
@@ -241,7 +246,9 @@ def estimatedUnassignedCasesIn(dataset, totalTag = '!Total US'):
     grandTotal = 0.0
     allTime    = list(dataset[totalTag].keys())    # TODO:  Fix until we identify better data sources.
     yesterday  = dataset[totalTag][allTime[len(allTime)-2]]
-    dataset['Unassigned'][SCRAPED_TODAY] = grandTotal
+
+    if 'Unassigned' in dataset:
+        dataset['Unassigned'][SCRAPED_TODAY] = grandTotal
 
     for key in dataset.keys():
         if totalTag == key:
@@ -254,7 +261,8 @@ def estimatedUnassignedCasesIn(dataset, totalTag = '!Total US'):
                 break
                 
 
-    dataset['Unassigned'][SCRAPED_TODAY] = abs(grandTotal-total)
+    if 'Unassigned' in dataset:
+        dataset['Unassigned'][SCRAPED_TODAY] = abs(grandTotal-total)
 
 
 def _nukeUnassignedIn(dataset):

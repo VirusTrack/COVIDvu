@@ -30,7 +30,7 @@ TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19','csse
 TEST_JH_CSSE_FILE_CONFIRMED    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
 TEST_JH_CSSE_FILE_DEATHS       = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
 TEST_JH_CSSE_FILE_CONFIRMED_US = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_US.csv')
-TEST_JH_CSSE_FILE_DEATHS_US    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_US')
+TEST_JH_CSSE_FILE_DEATHS_US    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_US.csv')
 
 
 # *** functions ***
@@ -79,28 +79,40 @@ def assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoa
 
     assert isinstance(casesUSCounties, DataFrame)
 
+
+def checkParsing(target):
+    output = parseCSSE(target,
+                       siteData=TEST_SITE_DATA,
+                       jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+                       jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
+                       jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
+                       jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
+                       )
+    casesGlobal = output['casesGlobal']
+    casesUSStates = output['casesUSStates']
+    casesUSRegions = output['casesUSRegions']
+    casesBoats = output['casesBoats']
+    casesUSCounties = output['casesUSCounties']
+
+    assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoats, casesUSCounties)
+
+
 def test_parseCSSE():
     try:
-        output = parseCSSE('confirmed',
-                           siteData=TEST_SITE_DATA,
-                           jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
-                           jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
-                           jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
-                           jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
-                           )
-        casesGlobal = output['casesGlobal']
-        casesUSStates = output['casesUSStates']
-        casesUSRegions = output['casesUSRegions']
-        casesBoats = output['casesBoats']
-        casesUSCounties = output['casesUSCounties']
-
-        assertDataCompatibility(casesGlobal, casesUSStates, casesUSRegions, casesBoats, casesUSCounties)
-
+        checkParsing('confirmed')
         assertValidJSON('confirmed-US-Regions.json')
         assertValidJSON('confirmed-US.json')
         assertValidJSON('confirmed-boats.json')
         assertValidJSON('confirmed.json')
         assertValidJSON('confirmed-US-Counties.json')
+
+        checkParsing('deaths')
+        assertValidJSON('deaths-US-Regions.json')
+        assertValidJSON('deaths-US.json')
+        assertValidJSON('deaths-boats.json')
+        assertValidJSON('deaths.json')
+        assertValidJSON('deaths-US-Counties.json')
+
     except Exception as e:
         raise e
     finally:
