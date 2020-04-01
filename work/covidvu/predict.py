@@ -209,6 +209,8 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
                                    siteData                      = kwargs.get('siteData', SITE_DATA),
                                    jhCSSEFileConfirmed           = kwargs.get('jhCSSEFileConfirmed',JH_CSSE_FILE_CONFIRMED),
                                    jhCSSEFileDeaths              = kwargs.get('jhCSSEFileDeaths',JH_CSSE_FILE_DEATHS),
+                                   jhCSSEFileConfirmedUS = kwargs.get('jhCSSEFileConfirmedUS',JH_CSSE_FILE_CONFIRMED_US),
+                                   jhCSSEFileDeathsUS = kwargs.get('jhCSSEFileDeathsUS', JH_CSSE_FILE_DEATHS_US)
                                    )[subGroup]
 
     if regionName is None:
@@ -341,8 +343,10 @@ def predictRegions(regionTrainIndex,
                      predictionsPercentiles        = PREDICTIONS_PERCENTILES,
                      siteData                      = SITE_DATA,
                      subGroup                      = 'casesGlobal',
-                     jhCSSEFileConfirmed           = JH_CSSE_FILE_CONFIRMED,
-                     jhCSSEFileDeaths              = JH_CSSE_FILE_DEATHS,
+                   jhCSSEFileConfirmed=JH_CSSE_FILE_CONFIRMED,
+                   jhCSSEFileDeaths=JH_CSSE_FILE_DEATHS,
+                   jhCSSEFileConfirmedUS=JH_CSSE_FILE_CONFIRMED_US,
+                   jhCSSEFileDeathsUS=JH_CSSE_FILE_DEATHS_US,
                      priorLogCarryingCapacity      = PRIOR_LOG_CARRYING_CAPACITY,
                      priorMidPoint                 = PRIOR_MID_POINT,
                      priorGrowthRate               = PRIOR_GROWTH_RATE,
@@ -396,6 +400,8 @@ def predictRegions(regionTrainIndex,
                                            siteData                      = siteData,
                                            jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
                                            jhCSSEFileDeaths              = jhCSSEFileDeaths,
+                                           jhCSSEFileConfirmedUS=jhCSSEFileConfirmedUS,
+                                           jhCSSEFileDeathsUS=jhCSSEFileDeathsUS,
                                            **kwargs
                                            )
         if subGroup == 'casesGlobal':
@@ -412,8 +418,10 @@ def predictRegions(regionTrainIndex,
     elif regionTrainIndex == 'all':
         confirmedCases = parseCSSE(target,
                                    siteData                      = siteData,
-                                   jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
-                                   jhCSSEFileDeaths              = jhCSSEFileDeaths,
+                                   jhCSSEFileConfirmed=jhCSSEFileConfirmed,
+                                   jhCSSEFileDeaths=jhCSSEFileDeaths,
+                                   jhCSSEFileConfirmedUS=jhCSSEFileConfirmedUS,
+                                   jhCSSEFileDeathsUS=jhCSSEFileDeathsUS,
                                    )[subGroup]
         regionsAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
         for regionName in regionsAll:
@@ -425,8 +433,10 @@ def predictRegions(regionTrainIndex,
                                                predictionsPercentiles        = predictionsPercentiles,
                                                target                        = target,
                                                siteData                      = siteData,
-                                               jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
-                                               jhCSSEFileDeaths              = jhCSSEFileDeaths,
+                                               jhCSSEFileConfirmed=jhCSSEFileConfirmed,
+                                               jhCSSEFileDeaths=jhCSSEFileDeaths,
+                                               jhCSSEFileConfirmedUS=jhCSSEFileConfirmedUS,
+                                               jhCSSEFileDeathsUS=jhCSSEFileDeathsUS,
                                                **kwargs,
                                                )
             if prediction:
