@@ -308,8 +308,19 @@ def test_getSavedShortCountryNames():
 
 def test_loadAll():
     try:
+        predictRegions('all',
+                       nDaysPredict=10,
+                       siteData=TEST_SITE_DATA,
+                       jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+                       jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
+                       jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
+                       jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
+                       logGrowthModel=logGrowthModel,
+                       nSamples=TEST_N_SAMPLES,
+                       nChains=TEST_N_CHAINS,
+                       )
 
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA,'test-predictions'),
+        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=TEST_SITE_DATA,
                                                                             jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
                                                                             jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
                                                                             jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
