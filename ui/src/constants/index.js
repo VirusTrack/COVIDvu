@@ -343,7 +343,7 @@ const COUNTRIES = [
   const REGION_URLS = {
     "!Total US": "https://www.cdc.gov/coronavirus/2019-ncov/index.html",
     "Washington": "https://www.doh.wa.gov/Emergencies/Coronavirus",
-    "New York": "https://www1.nyc.gov/site/doh/health/health-topics/coronavirus.page",
+    "New York": "https://coronavirus.health.ny.gov/home",
     "California": "https://www.cdph.ca.gov/Programs/CID/DCDC/Pages/Immunization/nCOV2019.aspx",
     "Massachusetts": "https://www.mass.gov/info-details/covid-19-cases-quarantine-and-monitoring",
     "Diamond Princess": "https://www.cdc.gov/media/releases/2020/s0215-Diamond-Princess-Repatriation.html",
