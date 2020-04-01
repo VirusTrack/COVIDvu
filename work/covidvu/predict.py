@@ -8,13 +8,6 @@ from os.path import join
 
 from pandas.core.indexes.datetimes import DatetimeIndex
 
-from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED
-# TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
-# from covidvu.pipeline.vujson import JH_CSSE_FILE_CONFIRMED_DEPRECATED
-from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS
-# TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
-# from covidvu.pipeline.vujson import JH_CSSE_FILE_DEATHS_DEPRECATED
-# from covidvu.pipeline.vujson import JH_CSSE_REPORT_PATH
 from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import dumpJSON
 from covidvu.pipeline.vujson import parseCSSE
@@ -45,6 +38,14 @@ PREDICTIONS_PERCENTILES = (
                                 (2.5, 97.5),
                                 (25, 75),
                           )
+
+JH_CSSE_DATA_HOME                  = 'COVID-19'
+JH_CSSE_PATH                       = os.path.join(os.path.join(os.getcwd(), JH_CSSE_DATA_HOME), 'csse_covid_19_data/csse_covid_19_time_series')
+
+JH_CSSE_FILE_CONFIRMED             = os.path.join(JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
+JH_CSSE_FILE_DEATHS                = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
+JH_CSSE_FILE_CONFIRMED_US          = os.path.join(JH_CSSE_PATH, 'time_series_covid19_confirmed_US.csv')
+JH_CSSE_FILE_DEATHS_US             = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_US')
 
 PREDICTION_MEAN_JSON_FILENAME_WORLD = 'prediction-world-mean-%s.json'
 PREDICTION_CI_JSON_FILENAME_WORLD   = 'prediction-world-conf-int-%s.json'
@@ -158,115 +159,109 @@ def _castPredictionsAsTS(regionTSClean,
     return predictionsMeanTS, predictionsPercentilesTS
 
 
-# TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
-# def predictLogisticGrowth(logGrowthModel: StanModel,
-#                           regionTrainIndex: int        = None,
-#                           regionName: str              = None,
-#                           confirmedCases                = None,
-#                           target                        = 'confirmed',
-#                           subGroup                      = 'casesGlobal',
-#                           nSamples                      = N_SAMPLES,
-#                           nChains                       = N_CHAINS,
-#                           nDaysPredict                  = N_DAYS_PREDICT,
-#                           minCasesFilter                = MIN_CASES_FILTER,
-#                           minNumberDaysWithCases        = MIN_NUMBER_DAYS_WITH_CASES,
-#                           predictionsPercentiles        = PREDICTIONS_PERCENTILES,
-#                           randomSeed                    = 2020,
-#                           **kwargs
-#                           ):
-#     """Predict the region with the nth highest number of cases
-# 
-#     Parameters
-#     ----------
-#     logGrowthModel: A compiled pystan model
-#     regionTrainIndex: Order countries from highest to lowest, and train the ith region
-#     regionName: Overwrites regionTrainIndex as the region to train
-#     confirmedCases: A dataframe of countries as columns, and total number of cases as a time series
-#         (see covidvu.vujson.parseCSSE)
-#     target: string in ['confirmed', 'deaths', 'recovered']
-#     subGroup: A key in the output of covidvu.pipeline.vujson.parseCSSE
-#     nSamples: Number of samples per chain of MCMC
-#     nChains: Number of independent chains MCMC
-#     nDaysPredict: Number of days ahead to predict
-#     minCasesFilter: Minimum number of cases for prediction
-#     minNumberDaysWithCases: Minimum number of days with at least minCasesFilter
-#     predictionsPercentiles: Bayesian confidence intervals to evaluate
-#     randomSeed: Seed for stan sampler
-#     kwargs: Optional named arguments passed to covidvu.pipeline.vujson.parseCSSE
-# 
-#     Returns
-#     -------
-#     regionTS: All data for the queried region
-#     predictionsMeanTS: Posterior mean prediction
-#     predictionsPercentilesTS: Posterior percentiles
-#     trace: pymc3 trace object
-#     regionTSClean: Data used for training
-#     """
-#     maxTreeDepth = kwargs.get('maxTreedepth', MAX_TREEDEPTH)
-# 
-#     if confirmedCases is None:
-#         confirmedCases = parseCSSE(target,
-#                                    siteData                      = kwargs.get('siteData', SITE_DATA),
-#                                    jhCSSEFileConfirmed           = kwargs.get('jhCSSEFileConfirmed',JH_CSSE_FILE_CONFIRMED),
-#                                    jhCSSEFileDeaths              = kwargs.get('jhCSSEFileDeaths',JH_CSSE_FILE_DEATHS),
-#                                    jhCSSEFileConfirmedDeprecated = kwargs.get('jhCSSEFileConfirmedDeprecated',
-#                                                                               JH_CSSE_FILE_CONFIRMED_DEPRECATED),
-#                                    jhCSSEFileDeathsDeprecated    = kwargs.get('jhCSSEFileDeathsDeprecated',
-#                                                                               JH_CSSE_FILE_DEATHS_DEPRECATED),
-#                                    jsCSSEReportPath              = kwargs.get('jsCSSEReportPath',JH_CSSE_REPORT_PATH),
-#                                    )[subGroup]
-# 
-#     if regionName is None:
-#         regionName = _getCountryToTrain(int(regionTrainIndex), confirmedCases)
-#     else:
-#         assert isinstance(regionName, str)
-# 
-#     regionTS = confirmedCases[regionName]
-#     regionTSClean = regionTS[regionTS > minCasesFilter]
-#     if regionTSClean.shape[0] < minNumberDaysWithCases:
-#         return None
-# 
-#     regionTSClean.index = pd.to_datetime(regionTSClean.index)
-# 
-#     t = np.arange(regionTSClean.shape[0])
-#     regionTSCleanLog = np.log(regionTSClean.values + 1)
-# 
-#     logisticGrowthData = {'nDays': regionTSClean.shape[0],
-#                           't': list(t),
-#                           'casesLog': list(regionTSCleanLog)
-#                           }
-# 
-# 
-#     fit = logGrowthModel.sampling(data=logisticGrowthData, iter=nSamples, chains=nChains, seed=randomSeed,
-#                                   control={'max_treedepth':maxTreeDepth}
-#                                   )
-# 
-#     trace = fit.to_dataframe()
-# 
-#     predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(t,
-#                                                                                      trace,
-#                                                                                      nDaysPredict,
-#                                                                                      predictionsPercentiles,
-#                                                                                      )
-# 
-#     predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(regionTSClean,
-#                                                                        nDaysPredict,
-#                                                                        predictionsMean,
-#                                                                        predictionsPercentilesTS,
-#                                                                        )
-# 
-#     regionTS.index = pd.to_datetime(regionTS.index)
-#     prediction = {
-#                     'regionTS':                 regionTS,
-#                     'predictionsMeanTS':        predictionsMeanTS,
-#                     'predictionsPercentilesTS': predictionsPercentilesTS,
-#                     'trace':                    trace,
-#                     'regionTSClean':            regionTSClean,
-#                     'regionName':               regionName,
-#                     't':                        t,
-#                  }
-# 
-#     return prediction
+def predictLogisticGrowth(logGrowthModel: StanModel,
+                          regionTrainIndex: int        = None,
+                          regionName: str              = None,
+                          confirmedCases                = None,
+                          target                        = 'confirmed',
+                          subGroup                      = 'casesGlobal',
+                          nSamples                      = N_SAMPLES,
+                          nChains                       = N_CHAINS,
+                          nDaysPredict                  = N_DAYS_PREDICT,
+                          minCasesFilter                = MIN_CASES_FILTER,
+                          minNumberDaysWithCases        = MIN_NUMBER_DAYS_WITH_CASES,
+                          predictionsPercentiles        = PREDICTIONS_PERCENTILES,
+                          randomSeed                    = 2020,
+                          **kwargs
+                          ):
+    """Predict the region with the nth highest number of cases
+
+    Parameters
+    ----------
+    logGrowthModel: A compiled pystan model
+    regionTrainIndex: Order countries from highest to lowest, and train the ith region
+    regionName: Overwrites regionTrainIndex as the region to train
+    confirmedCases: A dataframe of countries as columns, and total number of cases as a time series
+        (see covidvu.vujson.parseCSSE)
+    target: string in ['confirmed', 'deaths', 'recovered']
+    subGroup: A key in the output of covidvu.pipeline.vujson.parseCSSE
+    nSamples: Number of samples per chain of MCMC
+    nChains: Number of independent chains MCMC
+    nDaysPredict: Number of days ahead to predict
+    minCasesFilter: Minimum number of cases for prediction
+    minNumberDaysWithCases: Minimum number of days with at least minCasesFilter
+    predictionsPercentiles: Bayesian confidence intervals to evaluate
+    randomSeed: Seed for stan sampler
+    kwargs: Optional named arguments passed to covidvu.pipeline.vujson.parseCSSE
+
+    Returns
+    -------
+    regionTS: All data for the queried region
+    predictionsMeanTS: Posterior mean prediction
+    predictionsPercentilesTS: Posterior percentiles
+    trace: pymc3 trace object
+    regionTSClean: Data used for training
+    """
+    maxTreeDepth = kwargs.get('maxTreedepth', MAX_TREEDEPTH)
+
+    if confirmedCases is None:
+        confirmedCases = parseCSSE(target,
+                                   siteData                      = kwargs.get('siteData', SITE_DATA),
+                                   jhCSSEFileConfirmed           = kwargs.get('jhCSSEFileConfirmed',JH_CSSE_FILE_CONFIRMED),
+                                   jhCSSEFileDeaths              = kwargs.get('jhCSSEFileDeaths',JH_CSSE_FILE_DEATHS),
+                                   )[subGroup]
+
+    if regionName is None:
+        regionName = _getCountryToTrain(int(regionTrainIndex), confirmedCases)
+    else:
+        assert isinstance(regionName, str)
+
+    regionTS = confirmedCases[regionName]
+    regionTSClean = regionTS[regionTS > minCasesFilter]
+    if regionTSClean.shape[0] < minNumberDaysWithCases:
+        return None
+
+    regionTSClean.index = pd.to_datetime(regionTSClean.index)
+
+    t = np.arange(regionTSClean.shape[0])
+    regionTSCleanLog = np.log(regionTSClean.values + 1)
+
+    logisticGrowthData = {'nDays': regionTSClean.shape[0],
+                          't': list(t),
+                          'casesLog': list(regionTSCleanLog)
+                          }
+
+
+    fit = logGrowthModel.sampling(data=logisticGrowthData, iter=nSamples, chains=nChains, seed=randomSeed,
+                                  control={'max_treedepth':maxTreeDepth}
+                                  )
+
+    trace = fit.to_dataframe()
+
+    predictionsMean, predictionsPercentilesTS =  _getPredictionsFromPosteriorSamples(t,
+                                                                                     trace,
+                                                                                     nDaysPredict,
+                                                                                     predictionsPercentiles,
+                                                                                     )
+
+    predictionsMeanTS, predictionsPercentilesTS = _castPredictionsAsTS(regionTSClean,
+                                                                       nDaysPredict,
+                                                                       predictionsMean,
+                                                                       predictionsPercentilesTS,
+                                                                       )
+
+    regionTS.index = pd.to_datetime(regionTS.index)
+    prediction = {
+                    'regionTS':                 regionTS,
+                    'predictionsMeanTS':        predictionsMeanTS,
+                    'predictionsPercentilesTS': predictionsPercentilesTS,
+                    'trace':                    trace,
+                    'regionTSClean':            regionTSClean,
+                    'regionName':               regionName,
+                    't':                        t,
+                 }
+
+    return prediction
 
 
 def _castDatetimeIndexToStr(timeSeries, dateCode = '%Y-%m-%d'):
@@ -341,127 +336,114 @@ def castPercentilesAsDF(predictionsPercentilesTS, predictionsPercentiles):
     return percentiles
 
 
-# TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
-# def predictRegions(regionTrainIndex,
-#                      target                        = 'confirmed',
-#                      predictionsPercentiles        = PREDICTIONS_PERCENTILES,
-#                      siteData                      = SITE_DATA,
-#                      subGroup                      = 'casesGlobal',
-#                      jhCSSEFileConfirmed           = JH_CSSE_FILE_CONFIRMED,
-#                      jhCSSEFileDeaths              = JH_CSSE_FILE_DEATHS,
-#                      jhCSSEFileConfirmedDeprecated = JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-#                      jhCSSEFileDeathsDeprecated    = JH_CSSE_FILE_DEATHS_DEPRECATED,
-#                      jsCSSEReportPath              = JH_CSSE_REPORT_PATH,
-#                      priorLogCarryingCapacity      = PRIOR_LOG_CARRYING_CAPACITY,
-#                      priorMidPoint                 = PRIOR_MID_POINT,
-#                      priorGrowthRate               = PRIOR_GROWTH_RATE,
-#                      priorSigma                    = PRIOR_SIGMA,
-#                      logGrowthModel                   = None,
-#                      **kwargs
-#                      ):
-#     """Generate forecasts for regions
-# 
-#     Parameters
-#     ----------
-#     regionTrainIndex: If an integer, trains the region ranked i+1 in order of total number of cases. If 'all',
-#         predicts all regions
-#     target: A string in ['confirmed', 'deaths', 'recovered']
-#     predictionsPercentiles: The posterior percentiles to compute
-#     siteData: The directory for output data
-#     subGroup:
-#     jhCSSEFileConfirmed:
-#     jhCSSEFileDeaths
-#     jhCSSEFileConfirmedDeprecated
-#     jhCSSEFileDeathsDeprecated
-#     jsCSSEReportPath
-#     priorLogCarryingCapacity
-#     priorMidPoint
-#     priorGrowthRate
-#     priorSigma
-#     logGrowthModel
-#     kwargs: Optional named arguments for covidvu.predictLogisticGrowth
-# 
-#     Returns
-#     -------
-#     JSON dump of mean prediction and confidence intervals
-#     """
-#     if logGrowthModel is None:
-#         print('Building model. This may take a few moments...')
-#         logGrowthModel = buildLogisticModel(priorLogCarryingCapacity= priorLogCarryingCapacity,
-#                                          priorMidPoint           = priorMidPoint,
-#                                          priorGrowthRate         = priorGrowthRate,
-#                                          priorSigma              = priorSigma,
-#                                          )
-#         print('Done.')
-#     else:
-#         assert isinstance(logGrowthModel, StanModel)
-# 
-#     if re.search(r'^\d+$', str(regionTrainIndex)):
-#         print(f'Training index {regionTrainIndex}')
-#         prediction = predictLogisticGrowth(logGrowthModel,
-#                                            regionTrainIndex              = regionTrainIndex,
-#                                            predictionsPercentiles        = predictionsPercentiles,
-#                                            target                        = target,
-#                                            siteData                      = siteData,
-#                                            jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
-#                                            jhCSSEFileDeaths              = jhCSSEFileDeaths,
-#                                            jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
-#                                            jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
-#                                            jsCSSEReportPath              = jsCSSEReportPath,
-#                                            **kwargs
-#                                            )
-#         if subGroup == 'casesGlobal':
-#             _dumpRegionPrediction(prediction, siteData, predictionsPercentiles)
-#         elif subGroup == 'casesUSStates':
-#             _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
-#                                   meanFilename=PREDICTION_MEAN_JSON_FILENAME_US,
-#                                   confIntFilename=PREDICTION_CI_JSON_FILENAME_US,)
-#         else:
-#             raise NotImplementedError
-# 
-#         print('Done.')
-# 
-#     elif regionTrainIndex == 'all':
-#         confirmedCases = parseCSSE(target,
-#                                    siteData                      = siteData,
-#                                    jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
-#                                    jhCSSEFileDeaths              = jhCSSEFileDeaths,
-#                                    jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
-#                                    jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
-#                                    jsCSSEReportPath              = jsCSSEReportPath,
-#                                    )[subGroup]
-#         regionsAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
-#         for regionName in regionsAll:
-#             print(f'Training {regionName}...')
-# 
-#             prediction = predictLogisticGrowth(logGrowthModel,
-#                                                regionName                    = regionName,
-#                                                confirmedCases                = confirmedCases,
-#                                                predictionsPercentiles        = predictionsPercentiles,
-#                                                target                        = target,
-#                                                siteData                      = siteData,
-#                                                jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
-#                                                jhCSSEFileDeaths              = jhCSSEFileDeaths,
-#                                                jhCSSEFileConfirmedDeprecated = jhCSSEFileConfirmedDeprecated,
-#                                                jhCSSEFileDeathsDeprecated    = jhCSSEFileDeathsDeprecated,
-#                                                jsCSSEReportPath              = jsCSSEReportPath,
-#                                                **kwargs,
-#                                                )
-#             if prediction:
-#                 if subGroup == 'casesGlobal':
-#                     _dumpRegionPrediction(prediction, siteData, predictionsPercentiles)
-#                 elif subGroup == 'casesUSStates':
-#                     _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
-#                                           meanFilename=PREDICTION_MEAN_JSON_FILENAME_US,
-#                                           confIntFilename=PREDICTION_CI_JSON_FILENAME_US, )
-#                 else:
-#                     raise NotImplementedError
-#                 print('Saved.')
-#             else:
-#                 print('Skipped.')
-#         print('Done.')
-#     else:
-#         raise NotImplementedError
+def predictRegions(regionTrainIndex,
+                     target                        = 'confirmed',
+                     predictionsPercentiles        = PREDICTIONS_PERCENTILES,
+                     siteData                      = SITE_DATA,
+                     subGroup                      = 'casesGlobal',
+                     jhCSSEFileConfirmed           = JH_CSSE_FILE_CONFIRMED,
+                     jhCSSEFileDeaths              = JH_CSSE_FILE_DEATHS,
+                     priorLogCarryingCapacity      = PRIOR_LOG_CARRYING_CAPACITY,
+                     priorMidPoint                 = PRIOR_MID_POINT,
+                     priorGrowthRate               = PRIOR_GROWTH_RATE,
+                     priorSigma                    = PRIOR_SIGMA,
+                     logGrowthModel                   = None,
+                     **kwargs
+                     ):
+    """Generate forecasts for regions
+
+    Parameters
+    ----------
+    regionTrainIndex: If an integer, trains the region ranked i+1 in order of total number of cases. If 'all',
+        predicts all regions
+    target: A string in ['confirmed', 'deaths', 'recovered']
+    predictionsPercentiles: The posterior percentiles to compute
+    siteData: The directory for output data
+    subGroup:
+    jhCSSEFileConfirmed:
+    jhCSSEFileDeaths
+    jhCSSEFileConfirmedDeprecated
+    jhCSSEFileDeathsDeprecated
+    jsCSSEReportPath
+    priorLogCarryingCapacity
+    priorMidPoint
+    priorGrowthRate
+    priorSigma
+    logGrowthModel
+    kwargs: Optional named arguments for covidvu.predictLogisticGrowth
+
+    Returns
+    -------
+    JSON dump of mean prediction and confidence intervals
+    """
+    if logGrowthModel is None:
+        print('Building model. This may take a few moments...')
+        logGrowthModel = buildLogisticModel(priorLogCarryingCapacity= priorLogCarryingCapacity,
+                                         priorMidPoint           = priorMidPoint,
+                                         priorGrowthRate         = priorGrowthRate,
+                                         priorSigma              = priorSigma,
+                                         )
+        print('Done.')
+    else:
+        assert isinstance(logGrowthModel, StanModel)
+
+    if re.search(r'^\d+$', str(regionTrainIndex)):
+        print(f'Training index {regionTrainIndex}')
+        prediction = predictLogisticGrowth(logGrowthModel,
+                                           regionTrainIndex              = regionTrainIndex,
+                                           predictionsPercentiles        = predictionsPercentiles,
+                                           target                        = target,
+                                           siteData                      = siteData,
+                                           jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
+                                           jhCSSEFileDeaths              = jhCSSEFileDeaths,
+                                           **kwargs
+                                           )
+        if subGroup == 'casesGlobal':
+            _dumpRegionPrediction(prediction, siteData, predictionsPercentiles)
+        elif subGroup == 'casesUSStates':
+            _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
+                                  meanFilename=PREDICTION_MEAN_JSON_FILENAME_US,
+                                  confIntFilename=PREDICTION_CI_JSON_FILENAME_US,)
+        else:
+            raise NotImplementedError
+
+        print('Done.')
+
+    elif regionTrainIndex == 'all':
+        confirmedCases = parseCSSE(target,
+                                   siteData                      = siteData,
+                                   jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
+                                   jhCSSEFileDeaths              = jhCSSEFileDeaths,
+                                   )[subGroup]
+        regionsAll = confirmedCases.columns[confirmedCases.columns.map(lambda c: c[0]!='!')]
+        for regionName in regionsAll:
+            print(f'Training {regionName}...')
+
+            prediction = predictLogisticGrowth(logGrowthModel,
+                                               regionName                    = regionName,
+                                               confirmedCases                = confirmedCases,
+                                               predictionsPercentiles        = predictionsPercentiles,
+                                               target                        = target,
+                                               siteData                      = siteData,
+                                               jhCSSEFileConfirmed           = jhCSSEFileConfirmed,
+                                               jhCSSEFileDeaths              = jhCSSEFileDeaths,
+                                               **kwargs,
+                                               )
+            if prediction:
+                if subGroup == 'casesGlobal':
+                    _dumpRegionPrediction(prediction, siteData, predictionsPercentiles)
+                elif subGroup == 'casesUSStates':
+                    _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
+                                          meanFilename=PREDICTION_MEAN_JSON_FILENAME_US,
+                                          confIntFilename=PREDICTION_CI_JSON_FILENAME_US, )
+                else:
+                    raise NotImplementedError
+                print('Saved.')
+            else:
+                print('Skipped.')
+        print('Done.')
+    else:
+        raise NotImplementedError
 
 
 def getSavedShortCountryNames(siteData = SITE_DATA,
