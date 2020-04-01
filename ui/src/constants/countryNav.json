@@ -1,0 +1,14 @@
+{
+    "US": {
+        "page": "/covid/us",
+        "name": "United States"
+    },
+    "GB": {
+        "page": "/covid/global?region=United Kingdom",
+        "name": "United Kingdom"
+    },
+    "IT": {
+        "page": "/covid/global?region=Italy",
+        "name": "Italy"
+    }
+}

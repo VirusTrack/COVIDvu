@@ -117,6 +117,7 @@ class DataService {
 
         return lastUpdate
     }
+
 }
 
 export default DataService

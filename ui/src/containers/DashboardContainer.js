@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { useHistory } from 'react-router'
+import { useClientCountry } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
@@ -49,6 +50,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
     }, [dispatch])
 
     const lastUpdate = useSelector(state => state.services.lastUpdate)
+    const clientCountry = useClientCountry()
 
     useEffect(() => {
         dispatch(actions.fetchLastUpdate())

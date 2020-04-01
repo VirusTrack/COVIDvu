@@ -5,6 +5,8 @@ const LOCAL_DATA_URL = `http://localhost:3100/site-data`
 
 const LAST_UPDATE_KEY = 'covid-lastUpdated'
 
+const CLIENT_COUNTRY_KEY = 'covid-clientCountry'
+
 const ONE_MINUTE = 1 * 60 * 1000
 const CACHE_TIMER = ONE_MINUTE
 
@@ -578,4 +580,5 @@ const COUNTRIES = [
     CACHE_TIMER,
     ONE_MINUTE,
     LAST_UPDATE_KEY,
+    CLIENT_COUNTRY_KEY,
   }
