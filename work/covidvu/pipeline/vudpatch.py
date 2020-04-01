@@ -4,7 +4,11 @@
 
 
 from covidvu.pipeline.vujson import SITE_DATA
-from covidvu.pipeline.vujson import US_REGIONS_LONG
+from covidvu.pipeline.vujson import US_REGIONS
+# TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
+#
+# Confirm that US_REGIONS has the same behavior as the old US_REGIONS_LONG. Thx!
+# from covidvu.pipeline.vujson import US_REGIONS_LONG
 from covidvu.pipeline.vujson import resolveReportFileName
 
 import csv
@@ -197,7 +201,7 @@ def _patchUSRegionsData(target, dataUS):
         if location in NIXED_ROWS_INDEX:
             continue
         try:
-            region = US_REGIONS_LONG[location]
+            region = US_REGIONS[location]
             if region not in updateUSRegions:
                 updateUSRegions[region] = { SCRAPED_TODAY: 0.0, }
 
