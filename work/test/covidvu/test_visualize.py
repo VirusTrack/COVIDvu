@@ -16,31 +16,14 @@ import os
 import re
 
 # *** constants ***
-TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19',)
+TEST_SITE_DATA = os.path.join(os.getcwd(), 'resources', 'test_site_data')
+TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19','csse_covid_19_data','csse_covid_19_time_series')
+TEST_JH_CSSE_FILE_CONFIRMED    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
+TEST_JH_CSSE_FILE_DEATHS       = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
+TEST_JH_CSSE_FILE_CONFIRMED_US = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_US.csv')
+TEST_JH_CSSE_FILE_DEATHS_US    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_US')
 
-TEST_JH_CSSE_FILE_CONFIRMED             = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
-                                                       'csse_covid_19_time_series',
-                                                       'time_series_covid19_confirmed_global.csv')
-
-TEST_JH_CSSE_FILE_DEATHS                = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
-                                                       'csse_covid_19_time_series',
-                                                       'time_series_covid19_deaths_global.csv')
-
-TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED  = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
-                                                       'time_series_19-covid-Confirmed_archived_0325.csv')
-
-TEST_JH_CSSE_FILE_DEATHS_DEPRECATED     = os.path.join(TEST_JH_CSSE_PATH, 'archived_data', 'archived_time_series',
-                                                       'time_series_19-covid-Deaths_archived_0325.csv')
-
-
-TEST_STATE_CODES_PATH       = os.path.join(os.getcwd(), 'stateCodesUS.csv')
-TEST_SITE_DATA              = os.path.join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_REPORT_PATH    = os.path.join(os.getcwd(), 'resources', 'test_COVID-19', 'csse_covid_19_data',
-                                           'csse_covid_19_daily_reports')
-
-TEST_JH_CSSE_FILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH, 'csse_covid_19_data',
-                                                       'csse_covid_19_time_series',
-                                                       'time_series_covid19_confirmed_global_small.csv')
+TEST_JH_CSSE_FILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH,  'time_series_covid19_confirmed_global_small.csv')
 
 # *** functions ***
 def _makeTimeSeries():
@@ -105,24 +88,23 @@ def test_plotPrediction():
     _, _ = plotPrediction(data, meanPredictionTS, percentilesTS, countryName, log=False)
 
 
-# TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
-# def test_plotDataAndPredictionsWithCI():
-#     try:
-#         confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA, 'test-predictions'),
-#                                                                             jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-#                                                                             jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-#                                                                             jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-#                                                                             jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-#                                                                             )
-#         _ = plotDataAndPredictionsWithCI(meanPredictionTSAll,
-#                                      confirmedCasesAll,
-#                                      percentilesTSAll,
-#                                      ['US', 'Italy'],
-#                                      )
-#     except Exception as e:
-#         raise e
-#     finally:
-#         _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed*.json')
+def test_plotDataAndPredictionsWithCI():
+    try:
+        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA, 'test-predictions'),
+                                                                            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+                                                                            jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
+                                                                            jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
+                                                                            jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
+                                                                            )
+        _ = plotDataAndPredictionsWithCI(meanPredictionTSAll,
+                                     confirmedCasesAll,
+                                     percentilesTSAll,
+                                     ['Albania', 'Algeria'],
+                                     )
+    except Exception as e:
+        raise e
+    finally:
+        _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed.*\w?.json')
 
 
 

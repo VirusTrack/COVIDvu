@@ -218,7 +218,7 @@ def _getStateCounts(cases, target):
                            axis=1)
     cases = cases.set_index('Province_State')
     cases = cases.T
-    cases.index = pd.to_datetime(cases.index, format='%m/%d/%Y')
+    cases.index = pd.to_datetime(cases.index, format='%m/%d/%y')
     cases = cases.groupby(axis=1, level=0).sum()
     cases = cases.sort_index()
     return cases
@@ -233,7 +233,7 @@ def _getCountyCounts(cases, target):
                            axis=1)
     cases = cases.set_index(['Admin2','Province_State'])
     cases = cases.T
-    cases.index = pd.to_datetime(cases.index, format='%m/%d/%Y')
+    cases.index = pd.to_datetime(cases.index, format='%m/%d/%y')
     cases = cases.sort_index()
     return cases
 

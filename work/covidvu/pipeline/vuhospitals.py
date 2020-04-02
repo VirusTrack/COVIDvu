@@ -67,6 +67,7 @@ def _main(siteDataDirectory = SITE_RESOURCES,
     #       This file was deprecated, but the vuhospitals module uses
     #       it.  Revive the file (fastest) or implement a dictionary
     #       of state codes.
+    # TODO: Eugene - I'm confused -- ./work/stateCodesUS.csv is there
     postCodes = pd.read_csv(STATE_CODES_PATH)
 
     print('vuhospitals - getting the total hospital beds count per state')
