@@ -7,6 +7,7 @@ import { actions } from '../ducks/services'
 
 import { Navbar, Notification, Button } from "rbx"
 import LogoElement from '../components/LogoElement'
+import SocialIcons from '../components/SocialIcons'
 
 import { useClientCountry } from '../hooks/ui'
 
@@ -59,12 +60,14 @@ export const HeaderContainer = () => {
 
     return (
         <>
-        { false &&
-            <Notification color="warning" style={{marginBottom: '0'}}>
-                Due to problems with one of our data sources, all data on the site at the moment is for yesterday 03/25. Our amazing volunteer team is in the middle of fixing this linkage and
-                it will be resolved shortly. Thank you for your patience!
-            </Notification>
-        }
+
+            <div className="meta-nav">
+                <p>{ false && `Due to problems with one of our data sources, all data on the site at the moment is for yesterday 03/25. Our amazing volunteer team is in the middle of fixing this linkage and
+                it will be resolved shortly. Thank you for your patience!`}</p>
+                
+                <SocialIcons size="small" donate />
+            </div>
+        
         <Navbar>
             <Navbar.Brand>
                 <Navbar.Item onClick={() => { changePage('/dashboard') }}>
