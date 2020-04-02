@@ -98,9 +98,9 @@ export const FooterContainer = () =>{
                     </p>
 
                     <p>
-                        Stay up to date: <br/>
-                        <SocialIcons size="large" donate style={{marginTop: '.5rem'}}/>
+                        Stay up to date:
                     </p>
+                    <SocialIcons size="large" donate style={{marginTop: '.5rem'}}/>
                 </Column>
 
                 

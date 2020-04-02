@@ -375,7 +375,7 @@ const groupByKey = (key, array) => {
  */
 export function* fetchLastUpdate() {
     const dataService = new DataService()
-
+    
     const lastUpdate = yield call(dataService.fetchLastUpdate)
 
     const lastUpdateAsNumeric = moment(lastUpdate).valueOf()

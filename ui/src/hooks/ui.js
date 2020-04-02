@@ -1,5 +1,17 @@
 import { useLayoutEffect, useState, useEffect, useRef } from 'react'
 
+import { useLocation } from 'react-router'
+
+import store from 'store2'
+
+import { 
+    CLIENT_COUNTRY_KEY,
+} from '../constants'
+
+import queryString from 'query-string'
+
+const isoCountries = require('../constants/iso-countries.json')
+
 export function useWindowSize() {
     const [size, setSize] = useState([0, 0])
     useLayoutEffect(() => {
@@ -54,4 +66,20 @@ export const useMobileDetect = () => {
   useEffect(() => {}, [])
     const userAgent = typeof navigator === 'undefined' ? 'SSR' : navigator.userAgent;
     return getMobileDetect(userAgent);
+}
+
+export const useClientCountry = () => {
+    const { search } = useLocation()
+
+    let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
+
+    if(query.clientCountry && isoCountries.hasOwnProperty(query.clientCountry)) {
+        store.set(CLIENT_COUNTRY_KEY, query.clientCountry)
+    }
+
+    if(!store.get(CLIENT_COUNTRY_KEY)) {
+        return "US"         // always default to the US
+    } else {
+        return store.get(CLIENT_COUNTRY_KEY)
+    }
 }

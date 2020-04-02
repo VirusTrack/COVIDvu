@@ -9,21 +9,22 @@ import { Navbar, Notification, Button } from "rbx"
 import LogoElement from '../components/LogoElement'
 import SocialIcons from '../components/SocialIcons'
 
-import store from 'store2'
+import { useClientCountry } from '../hooks/ui'
 
 import { 
     GOOGLE_ANALYTICS_KEY,
-    LAST_UPDATE_KEY, 
 } from '../constants'
 
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga'
 
 import compassImg from '../images/fa-icon-compass.svg'
 import globeImg from '../images/fa-icon-globe.svg'
+import flagImg from '../images/fa-icon-flag-regular.svg'
 import usflagImg from '../images/fa-icon-usflag.svg'
 import chartImg from '../images/fa-icon-chart.svg'
-import syncImg from '../images/fa-icon-sync.svg'
 import infoImg from '../images/fa-icon-info.svg'
+
+const countryNav = require('../constants/countryNav.json')
 
 export const HeaderContainer = () => {
     const history = useHistory()
@@ -35,28 +36,25 @@ export const HeaderContainer = () => {
     ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
     ReactGA.pageview(window.location.pathname + window.location.search)
 
-    const forceRefresh = () => {
-        store.session.remove(LAST_UPDATE_KEY)
+    const clientCountry = useClientCountry()
     
-        dispatch(actions.clearGraphs())
-        dispatch(actions.fetchGlobal())
-        dispatch(actions.fetchUSStates())
-        dispatch(actions.fetchUSRegions())
-        dispatch(actions.fetchContinental())
-        dispatch(actions.fetchTop10Countries({
-            excludeChina: true
-        }))
-        dispatch(actions.fetchTotalGlobalStats())
-
-        dispatch(actions.fetchTop10USStates())
-        dispatch(actions.fetchTotalUSStatesStats())
-
-    }
-
     const changePage = (pageLocation) => {
         if(location.pathname !== pageLocation) {
             dispatch(actions.clearGraphs())
             history.push(pageLocation)
+        }
+    }
+
+    function localizedNavMenu() {
+
+        if(countryNav.hasOwnProperty(clientCountry)) {
+            return (
+                <Navbar.Item onClick={() => { changePage(countryNav[clientCountry].page)}}><img src={flagImg} alt=""/>{countryNav[clientCountry].name}</Navbar.Item>
+            )
+        } else {
+            return (
+                <Navbar.Item onClick={() => { changePage('/covid/us')}}><img src={flagImg} alt=""/>United States</Navbar.Item>
+            )
         }
     }
 
@@ -79,7 +77,7 @@ export const HeaderContainer = () => {
             </Navbar.Brand>
             <Navbar.Menu>
                 <Navbar.Segment align="start">
-                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{changePage('/dashboard')}}><img src={compassImg} alt=""/>Dashboard</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{changePage('/dashboard')}}><img src={compassImg} alt="Compass"/>Dashboard</Navbar.Item>
                     
                     <Navbar.Item hoverable dropdown>
                         <Navbar.Link arrowless 
@@ -100,13 +98,15 @@ export const HeaderContainer = () => {
                         </Navbar.Dropdown>
                     </Navbar.Item>
 
-                    <Navbar.Item hoverable dropdown>
+                    {localizedNavMenu()}
+
+                    {/* <Navbar.Item hoverable dropdown>
                         <Navbar.Link arrowless onClick={() => { changePage('/covid/us')}}><img src={usflagImg} alt="United States Flag"/>United States</Navbar.Link>
                         <Navbar.Dropdown boxed>
                             <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {changePage('/covid/us')}}>US States</Navbar.Item>
                             <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{changePage('/covid/us/regions')}}>US Regions</Navbar.Item>
                         </Navbar.Dropdown>
-                    </Navbar.Item>
+                    </Navbar.Item> */}
                     
                     <Navbar.Item active={selectedNav === '/stats'} onClick={()=>{changePage('/stats')}}><img src={chartImg} alt=""/>Stats</Navbar.Item>
                 </Navbar.Segment>

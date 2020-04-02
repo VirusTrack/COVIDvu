@@ -117,6 +117,13 @@ class DataService {
 
         return lastUpdate
     }
+
+    async fetchUserCountry() {
+        const response = await axios.get(`http://ip-api.com/json`)
+
+        console.dir(response.headers)
+        console.dir(response.data)
+    }
 }
 
 export default DataService
