@@ -66,6 +66,7 @@ def test_RegionsAggregator_JSON():
 
 
 # TODO:  Juvid - https://github.com/VirusTrack/COVIDvu/issues/455
+# TODO: Eugene - I don't understand what I need to do here
 # def test_COUNTRIES_REGIONS_table():
 #     # :o - this uses the actual current list!
 #     officialCountriesFileName = resolveReportFileName(SITE_DATA, 'confirmed', '')

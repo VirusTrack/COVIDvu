@@ -5,10 +5,10 @@
 
 from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import US_REGIONS
-# TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
-#
+
 # Confirm that US_REGIONS has the same behavior as the old US_REGIONS_LONG. Thx!
 # from covidvu.pipeline.vujson import US_REGIONS_LONG
+# TODO: Eugene - that is correct.
 from covidvu.pipeline.vujson import resolveReportFileName
 
 import csv

@@ -218,9 +218,9 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
     else:
         assert isinstance(regionName, str)
 
-    # TODO:  Juvid - https://github.com/VirusTrack/COVIDvu/issues/455
     regionTS = confirmedCases[regionName]
-    regionTSClean = regionTS[regionTS > minCasesFilter]
+    minIndex = (confirmedCases[regionName] > minCasesFilter).values.argmax()
+    regionTSClean = regionTS.iloc[minIndex:]
     if regionTSClean.shape[0] < minNumberDaysWithCases:
         return None
 
@@ -503,14 +503,14 @@ def load(regionIndex = None,
 
 def loadAll(target='confirmed', subGroup='casesGlobal', confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD, **kwargs):
     confirmedCasesAll = parseCSSE(target, **kwargs)[subGroup]
-    nTrainedRegions = len(getSavedShortCountryNames(siteData = kwargs.get('siteData', SITE_DATA),
+    trainedRegions = getSavedShortCountryNames(siteData = kwargs.get('siteData', SITE_DATA),
                                                       confIntFilename = confIntFilename,
-                                                      ))
-    assert nTrainedRegions > 0
+                                                      )
+    assert len(trainedRegions) > 0
     meanPredictionTSAll = pd.DataFrame()
     percentilesTSAll = pd.DataFrame()
-    for i in range(nTrainedRegions):
-        meanPredictionTS, percentilesTS, regionName = load(i,
+    for regionNameShort in trainedRegions:
+        meanPredictionTS, percentilesTS, regionName = load(regionNameShort=regionNameShort,
                                                             siteData=kwargs.get('siteData', SITE_DATA),
                                                             confIntFilename=confIntFilename,
                                                             )
