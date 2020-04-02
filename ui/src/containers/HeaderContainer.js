@@ -18,6 +18,7 @@ import ReactGA from 'react-ga'
 
 import compassImg from '../images/fa-icon-compass.svg'
 import globeImg from '../images/fa-icon-globe.svg'
+import flagImg from '../images/fa-icon-flag-regular.svg'
 import usflagImg from '../images/fa-icon-usflag.svg'
 import chartImg from '../images/fa-icon-chart.svg'
 import infoImg from '../images/fa-icon-info.svg'
@@ -47,11 +48,11 @@ export const HeaderContainer = () => {
 
         if(countryNav.hasOwnProperty(clientCountry)) {
             return (
-                <Navbar.Item onClick={() => { changePage(countryNav[clientCountry].page)}}>{countryNav[clientCountry].name}</Navbar.Item>
+                <Navbar.Item onClick={() => { changePage(countryNav[clientCountry].page)}}><img src={flagImg} alt=""/>{countryNav[clientCountry].name}</Navbar.Item>
             )
         } else {
             return (
-                <Navbar.Item onClick={() => { changePage('/covid/us')}}>United States</Navbar.Item>
+                <Navbar.Item onClick={() => { changePage('/covid/us')}}><img src={flagImg} alt=""/>United States</Navbar.Item>
             )
         }
     }
@@ -73,7 +74,7 @@ export const HeaderContainer = () => {
             </Navbar.Brand>
             <Navbar.Menu>
                 <Navbar.Segment align="start">
-                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{changePage('/dashboard')}}><img src={compassImg} alt=""/>Dashboard</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{changePage('/dashboard')}}><img src={compassImg} alt="Compass"/>Dashboard</Navbar.Item>
                     
                     <Navbar.Item hoverable dropdown>
                         <Navbar.Link arrowless 
