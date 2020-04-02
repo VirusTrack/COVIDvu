@@ -4,8 +4,6 @@ import faTwitter from '../images/fa-icon-twitter.svg'
 import faFacebook from '../images/fa-icon-facebook.svg'
 import faLinkedin from '../images/fa-icon-linkedin.svg'
 
-import { Button } from 'rbx'
-
 export const SocialIcons = ({donate, size, style}) => (
   <div className={`social-icons ${size ? size : ''}`} style={style}>
     <div className='social-icons__icons'>
@@ -15,11 +13,10 @@ export const SocialIcons = ({donate, size, style}) => (
     </div>
 
     {donate && 
-      <div className="paypal-form">
-        <Button size={size} color="primary" onClick={() => { window.open("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=52U5RTY2YY3WS&source=url", "_new") }}> Donate</Button>
-      </div>
-      }
-
+    <div className="paypal-button">
+      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=52U5RTY2YY3WS&source=url" target="_blank" rel="noopener noreferrer">Donate</a>
+    </div> }
+  
   </div>
   )
 
