@@ -218,6 +218,7 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
     else:
         assert isinstance(regionName, str)
 
+    # TODO:  Juvid - https://github.com/VirusTrack/COVIDvu/issues/455
     regionTS = confirmedCases[regionName]
     regionTSClean = regionTS[regionTS > minCasesFilter]
     if regionTSClean.shape[0] < minNumberDaysWithCases:
