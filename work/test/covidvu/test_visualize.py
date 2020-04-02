@@ -105,23 +105,24 @@ def test_plotPrediction():
     _, _ = plotPrediction(data, meanPredictionTS, percentilesTS, countryName, log=False)
 
 
-def test_plotDataAndPredictionsWithCI():
-    try:
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA, 'test-predictions'),
-                                                                            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-                                                                            jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
-                                                                            jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
-                                                                            jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
-                                                                            )
-        _ = plotDataAndPredictionsWithCI(meanPredictionTSAll,
-                                     confirmedCasesAll,
-                                     percentilesTSAll,
-                                     ['US', 'Italy'],
-                                     )
-    except Exception as e:
-        raise e
-    finally:
-        _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed*.json')
+# TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
+# def test_plotDataAndPredictionsWithCI():
+#     try:
+#         confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA, 'test-predictions'),
+#                                                                             jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
+#                                                                             jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS_DEPRECATED,
+#                                                                             jhCSSEFileConfirmedDeprecated=TEST_JH_CSSE_FILE_CONFIRMED_DEPRECATED,
+#                                                                             jsCSSEReportPath=TEST_JH_CSSE_REPORT_PATH,
+#                                                                             )
+#         _ = plotDataAndPredictionsWithCI(meanPredictionTSAll,
+#                                      confirmedCasesAll,
+#                                      percentilesTSAll,
+#                                      ['US', 'Italy'],
+#                                      )
+#     except Exception as e:
+#         raise e
+#     finally:
+#         _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed*.json')
 
 
 

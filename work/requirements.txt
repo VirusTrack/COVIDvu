@@ -9,4 +9,6 @@ pre-commit
 pudb
 pystan
 pytest
+python-lambda-local
 tqdm
+
