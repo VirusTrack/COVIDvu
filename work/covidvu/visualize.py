@@ -253,7 +253,7 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
                    y=percentilesTS['2.5'],
                    line_color=color_conf[0],
                    mode="lines",
-                   name="2.5%",
+                   name="Lower",
                    fill=None,
                    showlegend=True,
                    #hoverinfo='skip',
@@ -265,7 +265,7 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
                    line_color=color_conf[0],
                    mode="lines",
                    fill='tonexty',
-                   name="97.5%",
+                   name="Upper",
                    showlegend=True,
                    #hoverinfo='skip',
                    )
@@ -278,8 +278,8 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
                    mode="lines",
                    name="25%",
                    fill=None,
-                   showlegend=True,
-                   #hoverinfo='skip',
+                   showlegend=False,
+                   hoverinfo='skip',
                    )
     )
     fig.add_trace(
@@ -289,14 +289,14 @@ def plotWithCI(data, percentilesTS, meanPredictionTS, countryName, color_data, c
                    mode="lines",
                    fill='tonexty',
                    name="75%",
-                   showlegend=True,
-                   #hoverinfo='skip',
+                   showlegend=False,
+                   hoverinfo='skip',
                    )
     )
     fig.add_trace(
         go.Scatter(x=meanPredictionTS.index,
                    y=meanPredictionTS,
-                   name="Mean prediction",
+                   name="Mean",
                    line=dict(color=color_data,
                              dash='dash',
                              ),
