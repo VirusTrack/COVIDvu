@@ -53,13 +53,18 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
         if(sortedConfirmed && region.length === 0) {
             const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
             setSelectedCountries(newSelectedCountries)
-            handleHistory(newSelectedCountries, secondaryGraph, showLog)
+            handleHistory(newSelectedCountries, secondaryGraph, showLog, showPredictions)
+        } else if(showPredictions) {
+            if((region.length === 1 && !globalPredictions.hasOwnProperty(region)) || region.length > 1) {
+                setSelectedCountries(['US'])
+                handleHistory(['US'], secondaryGraph, showLog, showPredictions)
+            }
         }
     }, [sortedConfirmed])
 
     useEffect(() => {
         if(!search) {
-            handleHistory(selectedCountries, secondaryGraph, showLog)
+            handleHistory(selectedCountries, secondaryGraph, showLog, showPredictions)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -81,7 +86,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
     const handleSelectedRegion = (regionList) => {
         setSelectedCountries(regionList)
-        handleHistory(regionList, secondaryGraph, showLog)
+        handleHistory(regionList, secondaryGraph, showLog, showPredictions)
 
         let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
 
@@ -97,7 +102,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
-        handleHistory(selectedCountries, selectedGraph, showLog)
+        handleHistory(selectedCountries, selectedGraph, showLog, showPredictions)
 
         ReactGA.event({
             category: 'Region:Global',
@@ -107,7 +112,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
-        handleHistory(selectedCountries, secondaryGraph, logScale)
+        handleHistory(selectedCountries, secondaryGraph, logScale, showPredictions)
 
         ReactGA.event({
             category: 'Region:Global',
