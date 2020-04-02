@@ -9,7 +9,7 @@ import { useGraphData } from '../hooks/graphData'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Level } from "rbx"
+import {Tag, Level, Title, Generic, Notification} from "rbx"
 
 import numeral from 'numeral'
 
@@ -21,6 +21,7 @@ import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 import ReactGA from 'react-ga';
+import { REGION_URLS } from '../constants'
 
 export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
 
@@ -33,12 +34,25 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
     const [selectedCountries, setSelectedCountries] = useState(region)
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
-    
+
     const {confirmed, sortedConfirmed, deaths, mortality} = useGraphData("global")
 
     const globalPredictions = useSelector(state => state.services.globalPredictions)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
+
+    const renderDisplay = (value) => {
+      return value.startsWith('!') ? value.substring(1) : value
+    }
+
+    const isExternalLinkAvailable = (key) => {
+      return REGION_URLS.hasOwnProperty(key)
+    }
+
+    const redirectToExternalLink = (key) => {
+      if(REGION_URLS.hasOwnProperty(key))
+        window.open(REGION_URLS[key], "_blank")
+    }
 
     /**
      * Fetch all the data
@@ -103,7 +117,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
             category: 'Region:Global',
             action: `Changed selected graph to ${selectedGraph}`
         })
-    }    
+    }
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
@@ -123,7 +137,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
             setSelectedCountries(historicSelectedCountries)
         }
         setShowPredictions(!showPredictions)
-        
+
         handleHistory(historicSelectedCountries, secondaryGraph, showLog, !showPredictions)
     }
 
@@ -147,7 +161,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                     <CheckboxRegionComponent
                         data={sortedConfirmed}
                         selected={selectedCountries}
-                        handleSelected={dataList => handleSelectedRegion(dataList)} 
+                        handleSelected={dataList => handleSelectedRegion(dataList)}
                         defaultSelected={region}
                         showPredictions={showPredictions}
                         predictions={globalPredictions}
@@ -176,8 +190,8 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                 <>
                     <Level>
                         <Level.Item>
-                            {!showLog && 
-                            
+                            {!showLog &&
+
                                 <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
 
                             }
@@ -185,12 +199,23 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                     </Level>
 
                 </>
+                <>
+
+                  <Title size={3}>Government and Health Ministry Services: </Title>
+                    <ul>
+                      {selectedCountries.map((region, idx) => (
+                        <React.Fragment key={idx}>
+                        <li><Generic as="a" tooltipPosition="left" onClick={()=>{ redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : "No external link for region yet"}>{renderDisplay(region)}</Generic></li>
+                        </React.Fragment>
+                      ))}
+                    </ul>
+                </>
 
             </TwoGraphLayout>
         </BoxWithLoadingIndicator>
 
         </>
-    )    
+    )
 }
 
 export default GlobalGraphContainer
