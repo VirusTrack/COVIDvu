@@ -12,17 +12,29 @@ from covidvu.pipeline.vuregions import RegionsAggregator
 
 import json
 import os
+import re
 
 
 # --- constants ---
 
 TEST_SITE_DATA = './resources/test_pipeline'
 
+TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19','csse_covid_19_data','csse_covid_19_time_series')
+TEST_JH_CSSE_FILE_CONFIRMED    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
+TEST_JH_CSSE_FILE_DEATHS       = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
+TEST_JH_CSSE_FILE_CONFIRMED_US = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_US.csv')
+TEST_JH_CSSE_FILE_DEATHS_US    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_US.csv')
 
 # +++ tests +++
 
 expectedPath      = None
 regionsAggregator = None    # global object - used in all tests
+
+
+def _purge(purgeDirectory, pattern):
+    for f in os.listdir(purgeDirectory):
+        if re.search(pattern, f):
+            os.remove(os.path.join(purgeDirectory, f))
 
 
 def test_RegionsAggregator_object():
@@ -66,19 +78,27 @@ def test_RegionsAggregator_JSON():
 
 
 def test_COUNTRIES_REGIONS_table():
-    # :o - this uses the actual current list!
-    officialCountriesFileName = resolveReportFileName(SITE_DATA, 'confirmed', '')
+    testSiteData = os.path.join(os.getcwd(), 'resources', 'test_site_data')
+    officialCountriesFileName = resolveReportFileName(testSiteData, 'confirmed', '')
 
-    if not os.path.exists(officialCountriesFileName):
-        parseCSSE('confirmed')
+    try:
+        _ =  parseCSSE('confirmed',
+              siteData=testSiteData,
+              jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
+              jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
+              jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
+              jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
+              )
 
-    countriesCSSE = json.load(open(officialCountriesFileName, 'r')).keys()
+        countriesCSSE = json.load(open(officialCountriesFileName, 'r')).keys()
 
-    countriesCheck = [countries for countries in COUNTRIES_REGIONS.keys() if countries not in countriesCSSE ]
+        countriesCheck = [countries for countries in COUNTRIES_REGIONS.keys() if countries not in countriesCSSE ]
 
-    assert len(countriesCheck)
-    assert 'Other Region' in countriesCheck
+        assert len(countriesCheck)
+        assert 'Other Region' in countriesCheck
+    except Exception as e:
+        raise e
+    finally:
+        _purge(testSiteData, '.json')
 
-
-# test_COUNTRIES_REGIONS_table()
 

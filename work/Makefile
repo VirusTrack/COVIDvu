@@ -67,6 +67,7 @@ resetpy: ALWAYS
 
 test: ALWAYS
 	[[ -d $(SITE_DATA) ]] || mkdir -p $(SITE_DATA)
+	pip install -r requirements.txt
 	pip install -e .
 	pytest -v ./test/covidvu/pipeline/test_jsonpack.py
 	pytest -v ./test/covidvu/pipeline/test_pyavka.py
