@@ -1,5 +1,12 @@
 [
     {
+        "date": "2020-04-01",
+        "changes": [
+            "Added predictions to Global and U.S.A. compare graphs",
+            "Added social icons and a donate button"
+        ]
+    },
+    {
         "date": "2020-03-31",
         "changes": [
             "Added a new What's New Page to the website :-)"

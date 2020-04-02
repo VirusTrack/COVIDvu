@@ -5,6 +5,8 @@ const LOCAL_DATA_URL = `http://localhost:3100/site-data`
 
 const LAST_UPDATE_KEY = 'covid-lastUpdated'
 
+const CLIENT_COUNTRY_KEY = 'covid-clientCountry'
+
 const ONE_MINUTE = 1 * 60 * 1000
 const CACHE_TIMER = ONE_MINUTE
 
@@ -12,7 +14,7 @@ const GOOGLE_ANALYTICS_KEY = 'UA-574325-5'
 
 const DEFAULT_DOCUMENT_TITLE = "COVID-19 Novel Coronavirus Data Visualization and Statistics"
 
-const ENABLE_PREDICTIONS = false
+const ENABLE_PREDICTIONS = true
 
 const COUNTRIES = [
   "!Global",
@@ -578,4 +580,5 @@ const COUNTRIES = [
     CACHE_TIMER,
     ONE_MINUTE,
     LAST_UPDATE_KEY,
+    CLIENT_COUNTRY_KEY,
   }
