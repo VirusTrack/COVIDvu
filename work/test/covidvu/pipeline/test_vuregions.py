@@ -78,7 +78,7 @@ def test_RegionsAggregator_JSON():
 
 
 def test_COUNTRIES_REGIONS_table():
-    testSiteData = os.path.join(os.getcwd(), 'resources')
+    testSiteData = os.path.join(os.getcwd(), 'resources', 'test_site_data')
     officialCountriesFileName = resolveReportFileName(testSiteData, 'confirmed', '')
 
     try:

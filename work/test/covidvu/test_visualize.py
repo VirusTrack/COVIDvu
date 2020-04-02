@@ -16,7 +16,7 @@ import os
 import re
 
 # *** constants ***
-TEST_SITE_DATA = os.path.join(os.getcwd(), 'resources')
+TEST_SITE_DATA = os.path.join(os.getcwd(), 'resources', 'test_site_data')
 TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19','csse_covid_19_data','csse_covid_19_time_series')
 TEST_JH_CSSE_FILE_CONFIRMED    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
 TEST_JH_CSSE_FILE_DEATHS       = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
@@ -104,7 +104,7 @@ def test_plotDataAndPredictionsWithCI():
     except Exception as e:
         raise e
     finally:
-        _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed*.json')
+        _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed.*\w?.json')
 
 
 
