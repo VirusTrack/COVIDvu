@@ -4,6 +4,8 @@ import faTwitter from '../images/fa-icon-twitter.svg'
 import faFacebook from '../images/fa-icon-facebook.svg'
 import faLinkedin from '../images/fa-icon-linkedin.svg'
 
+import { Button } from 'rbx'
+
 export const SocialIcons = ({donate, size, style}) => (
   <div className={`social-icons ${size ? size : ''}`} style={style}>
     <div className='social-icons__icons'>
@@ -13,13 +15,11 @@ export const SocialIcons = ({donate, size, style}) => (
     </div>
 
     {donate && 
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" className="paypal-form">
-      <input type="hidden" name="cmd" value="_s-xclick" />
-      <input type="hidden" name="hosted_button_id" value="52U5RTY2YY3WS" />
-      <input type="button" name="submit" title="PayPal - The safer, easier way to pay online!" value="Donate" />
-      <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-    </form> }
-  
+      <div className="paypal-form">
+        <Button size={size} color="primary" onClick={() => { window.open("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=52U5RTY2YY3WS&source=url", "_new") }}> Donate</Button>
+      </div>
+      }
+
   </div>
   )
 
