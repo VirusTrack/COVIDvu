@@ -13,12 +13,9 @@ export const SocialIcons = ({donate, size, style}) => (
     </div>
 
     {donate && 
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" className="paypal-form">
-      <input type="hidden" name="cmd" value="_s-xclick" />
-      <input type="hidden" name="hosted_button_id" value="52U5RTY2YY3WS" />
-      <input type="button" name="submit" title="PayPal - The safer, easier way to pay online!" value="Donate" />
-      <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-    </form> }
+    <div className="paypal-button">
+      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=52U5RTY2YY3WS&source=url" target="_blank" rel="noopener noreferrer">Donate</a>
+    </div> }
   
   </div>
   )
