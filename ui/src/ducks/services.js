@@ -378,8 +378,6 @@ export function* fetchLastUpdate() {
     
     const lastUpdate = yield call(dataService.fetchLastUpdate)
 
-    yield call(dataService.fetchUserCountry)
-
     const lastUpdateAsNumeric = moment(lastUpdate).valueOf()
 
     const lastUpdateLocalStorage = store.session.get(LAST_UPDATE_KEY)
