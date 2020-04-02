@@ -9,11 +9,14 @@ import {Container, Footer, Tag, Column} from "rbx"
 
 import { CACHE_TIMER } from '../constants'
 
-import CCSAByLogo from '../images/cc_sa.png'
+import ccBy from '../images/cc-by.svg'
+import ccSa from '../images/cc-sa.svg'
 
 import CookieConsent from "react-cookie-consent";
 
 import moment from 'moment'
+
+import SocialIcons from '../components/SocialIcons'
 
 export const FooterContainer = () =>{
 
@@ -68,20 +71,12 @@ export const FooterContainer = () =>{
                         We welcome information about data sources, suggestions, and general feedback via <a href="mailto:feedback@virustrack.live">feedback@virustrack.live</a>
                     </p>
 
-                    <Column.Group>
-                        <Column>
-                            <p>
-                                <strong><a href="https://github.com/VirusTrack/covidvu" target="_new" rel="noopener noreferrer">COVIDvu GitHub</a></strong> Support by: <br/>
-                                <a href="https://cime.net" target="_new" rel="noopener noreferrer">CIME</a>, <a href="https://mysticcoders.com" target="_new" rel="noopener noreferrer">Mystic Coders</a> and <a href="https://farad.ai" target="_new" rel="noopener noreferrer">Farad.ai</a>
-                            </p>
-                        </Column>
-                        <Column>
-                            <p>
-                                Follow us on Twitter <br/>
-                                <a href="https://twitter.com/covidvu" target="_new" rel="noopener noreferrer">@covidvu</a>
-                            </p>
-                        </Column>
-                    </Column.Group>
+                    <p>
+                        <strong><a href="https://github.com/VirusTrack/covidvu" target="_new" rel="noopener noreferrer">COVIDvu GitHub</a></strong> Support by: <br/>
+                        <a href="https://cime.net" target="_new" rel="noopener noreferrer">CIME</a>, <a href="https://mysticcoders.com" target="_new" rel="noopener noreferrer">Mystic Coders</a> and <a href="https://farad.ai" target="_new" rel="noopener noreferrer">Farad.ai</a>
+                    </p>
+
+                    
 
                     <p>
                         { lastUpdate && 
@@ -94,11 +89,17 @@ export const FooterContainer = () =>{
                 </Column>
                 <Column align="left">
                     <p>                    
-                        <img src={CCSAByLogo} alt="Creative Commons Attribution-ShareAlike 4.0 International license" /> <br />
+                        <img src={ccBy} style={{height: '2.4rem', marginRight: '.5rem'}} alt="Creative Commons Attribution-ShareAlike 4.0 International license" />
+                        <img src={ccSa} style={{height: '2.4rem'}} alt="Creative Commons Attribution-ShareAlike 4.0 International license" /> <br />
                         <em>Except where otherwise noted, content on this site is licensed under 
                             the <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_new" rel="noopener noreferrer">Creative Commons Attribution-ShareAlike 4.0 International license </a>
                              by the COVIDvu Open Source Virus Tracking Team.
                             </em>
+                    </p>
+
+                    <p>
+                        Stay up to date: <br/>
+                        <SocialIcons size="large" donate style={{marginTop: '.5rem'}}/>
                     </p>
                 </Column>
 
