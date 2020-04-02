@@ -59,7 +59,12 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
         if(sortedConfirmed && region.length === 0) {
             const newSelectedStates = sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region)
             setSelectedStates(newSelectedStates)
-            handleHistory(newSelectedStates, secondaryGraph, showLog)
+            handleHistory(newSelectedStates, secondaryGraph, showLog, showPredictions)
+        } else if(showPredictions) {
+            if((region.length === 1 && !usPredictions.hasOwnProperty(region)) || region.length > 1) {
+                setSelectedStates(['New York'])
+                handleHistory(['New York'], secondaryGraph, showLog, showPredictions)
+            }
         }
     }, [sortedConfirmed])
 
@@ -70,7 +75,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
 
     useEffect(() => {
         if(!search) {
-            handleHistory(selectedStates, secondaryGraph, showLog)
+            handleHistory(selectedStates, secondaryGraph, showLog, showPredictions)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -98,7 +103,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
 
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
-        handleHistory(selectedStates, graph, showLog)
+        handleHistory(selectedStates, graph, showLog, showPredictions)
 
         ReactGA.event({
             category: 'Region:United States',
@@ -108,7 +113,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
-        handleHistory(selectedStates, secondaryGraph, logScale)
+        handleHistory(selectedStates, secondaryGraph, logScale, showPredictions)
 
         ReactGA.event({
             category: 'Region:United States',
@@ -117,11 +122,14 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
     }
 
     const handleShowPredictions = () => {
+        let historicSelectedStates = selectedStates
+
         if(selectedStates.length > 1) {
-            setSelectedStates(['New York'])
+            historicSelectedStates = ['New York']
+            setSelectedStates(historicSelectedStates)
         }
         setShowPredictions(!showPredictions)
-        handleHistory(selectedStates, secondaryGraph, showLog, !showPredictions)
+        handleHistory(historicSelectedStates, secondaryGraph, showLog, !showPredictions)
     }
 
     return (
