@@ -13,6 +13,7 @@ export COUNTY_CASES_US_ENDPOINT="https://coronavirus-tracker-api.herokuapp.com/v
 
 # *** main ***
 
+./refreshdata local
 echo "running the predictions models for all locations"
 
 python -m covidvu.predict all
