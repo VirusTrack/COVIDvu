@@ -65,19 +65,20 @@ def test_RegionsAggregator_JSON():
     os.unlink(expectedPath)
 
 
-def test_COUNTRIES_REGIONS_table():
-    # :o - this uses the actual current list!
-    officialCountriesFileName = resolveReportFileName(SITE_DATA, 'confirmed', '')
-
-    if not os.path.exists(officialCountriesFileName):
-        parseCSSE('confirmed')
-
-    countriesCSSE = json.load(open(officialCountriesFileName, 'r')).keys()
-
-    countriesCheck = [countries for countries in COUNTRIES_REGIONS.keys() if countries not in countriesCSSE ]
-
-    assert len(countriesCheck)
-    assert 'Other Region' in countriesCheck
+# TODO:  Juvid - https://github.com/VirusTrack/COVIDvu/issues/455
+# def test_COUNTRIES_REGIONS_table():
+#     # :o - this uses the actual current list!
+#     officialCountriesFileName = resolveReportFileName(SITE_DATA, 'confirmed', '')
+# 
+#     if not os.path.exists(officialCountriesFileName):
+#         parseCSSE('confirmed')
+# 
+#     countriesCSSE = json.load(open(officialCountriesFileName, 'r')).keys()
+# 
+#     countriesCheck = [countries for countries in COUNTRIES_REGIONS.keys() if countries not in countriesCSSE ]
+# 
+#     assert len(countriesCheck)
+#     assert 'Other Region' in countriesCheck
 
 
 # test_COUNTRIES_REGIONS_table()
