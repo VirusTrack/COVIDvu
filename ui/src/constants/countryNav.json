@@ -1,0 +1,59 @@
+{
+    "US": {
+        "page": "/covid/us",
+        "name": "United States"
+    },
+    "GB": {
+        "page": "/covid/global?region=United Kingdom",
+        "name": "United Kingdom"
+    },
+    "IT": {
+        "page": "/covid/global?region=Italy",
+        "name": "Italy"
+    },
+    "ES": {
+        "page": "/covid/global?region=Spain",
+        "name": "Spain"
+    },
+
+    "DE": {
+        "page": "/covid/global?region=Germany",
+        "name": "Germany"
+    },
+
+    "FR": {
+        "page": "/covid/global?region=France",
+        "name": "France"
+    },
+
+    "IR": {
+        "page": "/covid/global?region=Iran",
+        "name": "Iran"
+    },
+
+    "CH": {
+        "page": "/covid/global?region=Switzerland",
+        "name": "Switzerland"
+    },
+
+    "BE": {
+        "page": "/covid/global?region=Belgium",
+        "name": "Belgium"
+    },
+
+    "NL": {
+        "page": "/covid/global?region=Netherlands",
+        "name": "Netherlands"
+    },
+
+    "MX": {
+        "page": "/covid/global?region=Mexico",
+        "name": "Mexico"
+    },
+
+    "RU": {
+        "page": "/covid/global?region=Russia",
+        "name": "Russia"
+    }
+
+}
