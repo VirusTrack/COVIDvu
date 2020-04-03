@@ -129,58 +129,58 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     }
                 }
 
-                for(const key of Object.keys(predictions[region].confidenceInterval['2.5'])) {
-                    if(moment(key).isSameOrAfter(today, "day")) {
-                        if(moment(key).isSame(today, "day")) {
-                            setLower(predictions[region].confidenceInterval['2.5'][key])
+                if(predictions.hasOwnProperty(region)) {
+                    for(const key of Object.keys(predictions[region].confidenceInterval['2.5'])) {
+                        if(moment(key).isSameOrAfter(today, "day")) {
+                            if(moment(key).isSame(today, "day")) {
+                                setLower(predictions[region].confidenceInterval['2.5'][key])
+                            }
+
+                            plots_2_5[normalizedRegion].x.push(key)
+                            plots_2_5[normalizedRegion].y.push(predictions[region].confidenceInterval['2.5'][key])
                         }
-
-                        plots_2_5[normalizedRegion].x.push(key)
-                        plots_2_5[normalizedRegion].y.push(predictions[region].confidenceInterval['2.5'][key])
                     }
-                }
-                for(const key of Object.keys(predictions[region].confidenceInterval['97.5'])) {
-                    if(moment(key).isSameOrAfter(today, "day")) {
-                        if(moment(key).isSame(today, "day")) {
-                            setUpper(predictions[region].confidenceInterval['97.5'][key])
+                    for(const key of Object.keys(predictions[region].confidenceInterval['97.5'])) {
+                        if(moment(key).isSameOrAfter(today, "day")) {
+                            if(moment(key).isSame(today, "day")) {
+                                setUpper(predictions[region].confidenceInterval['97.5'][key])
+                            }
+                            plots_97_5[normalizedRegion].x.push(key)
+                            plots_97_5[normalizedRegion].y.push(predictions[region].confidenceInterval['97.5'][key])
                         }
-                        plots_97_5[normalizedRegion].x.push(key)
-                        plots_97_5[normalizedRegion].y.push(predictions[region].confidenceInterval['97.5'][key])
                     }
-                }
-                for(const key of Object.keys(predictions[region].confidenceInterval['25'])) {
-                    if(moment(key).isSameOrAfter(today, "day")) {
-                        plots_25[normalizedRegion].x.push(key)
-                        plots_25[normalizedRegion].y.push(predictions[region].confidenceInterval['25'][key])
+                    for(const key of Object.keys(predictions[region].confidenceInterval['25'])) {
+                        if(moment(key).isSameOrAfter(today, "day")) {
+                            plots_25[normalizedRegion].x.push(key)
+                            plots_25[normalizedRegion].y.push(predictions[region].confidenceInterval['25'][key])
+                        }
                     }
-                }
-                for(const key of Object.keys(predictions[region].confidenceInterval['75'])) {
-                    if(moment(key).isSameOrAfter(today, "day")) {
-                        plots_75[normalizedRegion].x.push(key)
-                        plots_75[normalizedRegion].y.push(predictions[region].confidenceInterval['75'][key])
+                    for(const key of Object.keys(predictions[region].confidenceInterval['75'])) {
+                        if(moment(key).isSameOrAfter(today, "day")) {
+                            plots_75[normalizedRegion].x.push(key)
+                            plots_75[normalizedRegion].y.push(predictions[region].confidenceInterval['75'][key])
+                        }
                     }
-                }
-                for(const key of Object.keys(predictions[region].mean)) {
-                    console.log(`moment(${key}).isSameOrAfter(${today}) ${moment(key).isSameOrAfter(today, "day")}`)
-                    if(moment(key).isSameOrAfter(today, "day")) {
+                    for(const key of Object.keys(predictions[region].mean)) {
+                        if(moment(key).isSameOrAfter(today, "day")) {
+                            plots_mean[normalizedRegion].x.push(key)
+                            plots_mean[normalizedRegion].y.push(predictions[region].mean[key])
+                        }
+                    }
 
-                        console.log(`Today: ${today.format('YYYY-MM-DD')}`)
-                        console.log(`key: ${key}`)
-                        plots_mean[normalizedRegion].x.push(key)
-                        plots_mean[normalizedRegion].y.push(predictions[region].mean[key])
+                    plotList = [...plotList, 
+                        ...Object.values(plots), 
+                        ...Object.values(plots_2_5), 
+                        ...Object.values(plots_97_5), 
+                        ...Object.values(plots_25), 
+                        ...Object.values(plots_75), 
+                        ...Object.values(plots_mean)]
                     }
+        
+                    setPlotsAsValues(plotList)
+    
                 }
 
-                plotList = [...plotList, 
-                    ...Object.values(plots), 
-                    ...Object.values(plots_2_5), 
-                    ...Object.values(plots_97_5), 
-                    ...Object.values(plots_25), 
-                    ...Object.values(plots_75), 
-                    ...Object.values(plots_mean)]
-            }
-
-            setPlotsAsValues(plotList)
         }
     }, [selected, predictions])
 

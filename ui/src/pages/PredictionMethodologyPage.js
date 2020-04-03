@@ -81,8 +81,7 @@ export const PredictionMethodologyPage = () => {
                     <p>
                         Let <MathJax.Node inline formula={'\\hat{X}(t)'} /> be a time series corresponding to measurements of <MathJax.Node inline formula={'X(t)'} />. We take 
                         a log transformation of <MathJax.Node inline formula={'X(t)'} /> for numerical stability, <MathJax.Node inline formula={'Y(t) = \\ln(X(t)+1)'} />. 
-                        Allowing <MathJax.Node inline formula={'\\theta'} /> to denote the parameter vector <MathJax.Node inline formula={'\\theta=(L, k, t_0)'} />, and 
-                        <MathJax.Node inline formula={'Y_\\theta(t)'} /> the corresponding parametrised curve, we assume that <MathJax.Node inline formula={'\\hat{Y}(t)'} /> obeys the 
+                        Allowing <MathJax.Node inline formula={'\\theta'} /> to denote the parameter vector <MathJax.Node inline formula={'\\theta=(L, k, t_0)'} />, and <MathJax.Node inline formula={'Y_\\theta(t)'} /> the corresponding parametrised curve, we assume that <MathJax.Node inline formula={'\\hat{Y}(t)'} /> obeys the 
                         following likelihood
                     </p>
 
@@ -104,12 +103,24 @@ export const PredictionMethodologyPage = () => {
                     </p>
 
                     <MathJax.Node formula={`
-                        P(\\sigma) = \\mathrm{HalfNormal}(0, 100)
+                        P(\log_{10}{K}) = \\mathrm{Unif}(0, 10)
+                    `} />
+
+                    <MathJax.Node formula={`
+                        P(t_0) = \\mathrm{HalfNormal}(0, 10^6)
+                    `} />
+
+                    <MathJax.Node formula={`
+                        P(k) = \\mathcal{N}(0.5, 0.25)
+                    `} />
+
+                    <MathJax.Node formula={`
+                        P(\sigma) = \\mathrm{HalfNormal}(0, 100)
                     `} />
 
                     <p>
-                        where <MathJax.Node inline formula={`\\mathrm{Unif}(a,b)`} /> is a uniform distribution between <MathJax.Node inline formula={`a`} /> and <MathJax.Node inline formula={`b`} />, and 
-                        <MathJax.Node inline formula={`\\mathrm{HalfNormal}(\\mu, \\sigma^2)`} /> is a normal distribution with mean <MathJax.Node inline formula={`\\mu`} /> and variance <MathJax.Node inline formula={`\\sigma^2`} />, which 
+                        where <MathJax.Node inline formula={`\\mathrm{Unif}(a,b)`} /> is a uniform distribution between <MathJax.Node inline formula={`a`} /> 
+                        and <MathJax.Node inline formula={`b`} />, and <MathJax.Node inline formula={`\\mathrm{HalfNormal}(\\mu, \\sigma^2)`} /> is a normal distribution with mean <MathJax.Node inline formula={`\\mu`} /> and variance <MathJax.Node inline formula={`\\sigma^2`} />, which 
                         has been truncated at zero, retaining only positive values. 
                     </p>
                     

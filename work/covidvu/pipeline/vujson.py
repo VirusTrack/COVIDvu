@@ -25,7 +25,7 @@ JH_CSSE_PATH                       = os.path.join(os.path.join(os.getcwd(), JH_C
 JH_CSSE_FILE_CONFIRMED             = os.path.join(JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
 JH_CSSE_FILE_DEATHS                = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
 JH_CSSE_FILE_CONFIRMED_US          = os.path.join(JH_CSSE_PATH, 'time_series_covid19_confirmed_US.csv')
-JH_CSSE_FILE_DEATHS_US             = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_US')
+JH_CSSE_FILE_DEATHS_US             = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_US.csv')
 
 SITE_DATA                          = './site-data'
 
@@ -105,6 +105,7 @@ COUNTY_NAMES_US  = {
                     'Northern Mariana Islands': 'Marianas',
                 }
 
+LABELS_TO_DROP = ['UID', 'code3', 'FIPS', 'Lat', 'Long_', 'Combined_Key', 'iso2', 'iso3', 'Country_Region']
 
 # *** functions ***
 
@@ -208,23 +209,31 @@ def resolveReportFileName(siteDataDirectory, report, region):
     return os.path.join(siteDataDirectory, report+('%s.json' % region))
 
 
-def _getStateCounts(cases):
-    cases = cases.drop(labels=['UID','code3','FIPS', 'Lat', 'Long_','Combined_Key','iso2', 'iso3', 'Admin2', 'Country_Region'],
-             axis=1)
+def _getStateCounts(cases, target):
+    if target == 'deaths':
+        cases = cases.drop(labels=LABELS_TO_DROP + ['Admin2','Population'],
+                           axis=1)
+    elif target == 'confirmed':
+        cases = cases.drop(labels=LABELS_TO_DROP + ['Admin2'],
+                           axis=1)
     cases = cases.set_index('Province_State')
     cases = cases.T
-    cases.index = pd.to_datetime(cases.index, format='%m/%d/%Y')
+    cases.index = pd.to_datetime(cases.index, format='%m/%d/%y')
     cases = cases.groupby(axis=1, level=0).sum()
     cases = cases.sort_index()
     return cases
 
 
-def _getCountyCounts(cases):
-    cases = cases.drop(labels=['UID','code3','FIPS', 'Lat', 'Long_','Combined_Key','iso2', 'iso3','Country_Region'],
-             axis=1)
+def _getCountyCounts(cases, target):
+    if target == 'deaths':
+        cases = cases.drop(labels=LABELS_TO_DROP + ['Population'],
+                           axis=1)
+    elif target == 'confirmed':
+        cases = cases.drop(labels=LABELS_TO_DROP,
+                           axis=1)
     cases = cases.set_index(['Admin2','Province_State'])
     cases = cases.T
-    cases.index = pd.to_datetime(cases.index, format='%m/%d/%Y')
+    cases.index = pd.to_datetime(cases.index, format='%m/%d/%y')
     cases = cases.sort_index()
     return cases
 
@@ -260,11 +269,11 @@ def parseCSSE(target,
 
     casesBoats = casesUS[casesUS['Province_State'].isin(BOATS)]
     casesNoBoats = casesUS[~casesUS['Province_State'].isin(BOATS)]
-    casesBoats = _getStateCounts(casesBoats)
-    casesUSStates = _getStateCounts(casesNoBoats.copy())
+    casesBoats = _getStateCounts(casesBoats, target)
+    casesUSStates = _getStateCounts(casesNoBoats.copy(), target)
     casesUSStates[TOTAL_US_NAME] = casesUSStates.sum(axis=1)
     casesUSStates = casesUSStates.reindex(sorted(casesUSStates.columns), axis=1)
-    casesUSCounties = _getCountyCounts(casesNoBoats.copy())
+    casesUSCounties = _getCountyCounts(casesNoBoats.copy(), target)
     casesUSRegions = _resampleByRegionUS(casesUSStates.copy())
 
 
