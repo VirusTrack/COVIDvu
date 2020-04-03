@@ -67,6 +67,7 @@ resetpy: ALWAYS
 
 test: ALWAYS
 	[[ -d $(SITE_DATA) ]] || mkdir -p $(SITE_DATA)
+	pip install -r requirements.txt
 	pip install -e .
 	pytest -v ./test/covidvu/pipeline/test_jsonpack.py
 	pytest -v ./test/covidvu/pipeline/test_pyavka.py
@@ -77,6 +78,7 @@ test: ALWAYS
 	pytest -v ./test/covidvu/test_predict.py
 	pytest -v ./test/covidvu/test_utils.py
 	pytest -v ./test/covidvu/test_visualize.py
+	pytest -v ./test/covidvu/virustrack/test_countryinfo.py
 	pip uninstall -y $(MODULE)==$(VERSION) || true
 	rm -Rfv $$(find covidvu | awk '/__pycache__$$/')
 	rm -Rfv $$(find test | awk '/__pycache__$$/')

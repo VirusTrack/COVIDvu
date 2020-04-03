@@ -142,9 +142,11 @@ COUNTRIES_REGIONS = {
     # https://www.countries-ofthe-world.com/countries-of-europe.html
     'Albania': 'Europe',
     'Andorra': 'Europe',
+    'Austria': 'Europe',
     'Belarus': 'Europe',
     'Belgium': 'Europe',
     'Bosnia and Herzegovina': 'Europe',
+    'Bulgaria': 'Europe',
     'Croatia': 'Europe',
     'Cyprus': 'Europe',
     'Czechia': 'Europe',

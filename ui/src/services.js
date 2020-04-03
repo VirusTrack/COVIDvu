@@ -121,8 +121,7 @@ class DataService {
     async fetchUserCountry() {
         const response = await axios.get(`http://ip-api.com/json`)
 
-        console.dir(response.headers)
-        console.dir(response.data)
+        return response.data
     }
 }
 

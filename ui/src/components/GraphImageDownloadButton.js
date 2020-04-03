@@ -18,8 +18,6 @@ export const GraphImageDownloadButton = ({secondaryGraph, parentRegion, selected
       const graphScaleText = showLog ? 'logarithmic' : 'linear'
       const filename = `${secondaryGraph}-${selectedAsText}-${graphScaleText}-${today}.png`
 
-      console.log(`filename: ${filename}`)
-
       const button = ref.current
       const input = button.closest('.box').querySelector('.vt-graph')
       // Only works correctly when scrolled to top of page

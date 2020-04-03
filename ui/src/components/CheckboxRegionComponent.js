@@ -58,11 +58,32 @@ export const CheckboxRegionComponent = (
   const mounted = useRef()
 
   useEffect(() => {
+    if(showPredictions && Object.keys(predictions).length > 0) {
+        console.log(`showPredictions: ${showPredictions}`)
+        console.log(`secondaryGraph: ${secondaryGraph}`)
+        console.log(`alphaSort: ${alphaSort}`)
+        console.dir(predictions)
+
+        const countryByKey = groupByKey("region", data)
+        const predictionsList = Object.keys(predictions).map(region => ({ region: region, stats: countryByKey[region].stats}))
+
+        if(alphaSort) {
+          const sortedList = predictionsList.concat().sort((a, b) => a.region.localeCompare(b.region))
+          setRegionList(sortedList)
+        } else {
+          const sortedList = predictionsList.concat().sort((a, b) => b.stats - a.stats)
+          setRegionList(sortedList)
+        }
+    }
+  }, [predictions])
+
+  useEffect(() => {
     if(!mounted.current) {
       mounted.current = true
     } else {
       console.log(`showPredictions: ${showPredictions}`)
       console.log(`secondaryGraph: ${secondaryGraph}`)
+
       if(showPredictions && secondaryGraph === 'Cases') {
           const countryByKey = groupByKey("region", data)
           const predictionsList = Object.keys(predictions).map(region => ({ region: region, stats: countryByKey[region].stats}))
