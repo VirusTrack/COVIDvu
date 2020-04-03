@@ -1,4 +1,4 @@
-# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
 
@@ -20,7 +20,7 @@ services:
         environment:
             GRANT_SUDO             : 'yes'
             JUPYTER_LAB_ENABLE     : 'yes'
-        image: 'pr3d4t0r/covidvu:latest'
+        image: 'VirusTrack/covidvu:latest'
         ports:
             - '${COVIDVU_NIC_BIND}:${COVIDVU_PORT_BIND}:8888'
         privileged: true

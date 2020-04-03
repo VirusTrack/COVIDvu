@@ -40,7 +40,7 @@ instrutions are UNIX-specific.
 
 - Clone this repository
 
-  `git clone https://github.com/pr3d4t0r/COVIDvu.git covidvu`
+  `git clone https://github.com/VirusTrack/COVIDvu.git covidvu`
 
 - Go to the `covidvu` directory
 
@@ -75,7 +75,7 @@ instrutions are UNIX-specific.
   and the lab starts
 
   ```
-  Status: Downloaded newer image for pr3d4t0r/covidvu:latest
+  Status: Downloaded newer image for VirusTrack/covidvu:latest
   Creating covidvu_cime_dev ... done
   ```
 
