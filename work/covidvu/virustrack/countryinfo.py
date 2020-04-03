@@ -749,7 +749,12 @@ ISO_CODE_REF      = 'codeISO'
 def lambdaHandler(event, context):
     request     = event['Records'][0]['cf']['request']
     headers     = request['headers']
-    countryInfo = headers.get(CF_VIEWER_COUNTRY)[0]
+    countryCode = headers.get(CF_VIEWER_COUNTRY)[0]['value']
+
+    responseBody = {
+        ISO_CODE_REF: countryCode,
+        'name': CODES_COUNTRIES[countryCode],
+    }
     
     return {
          'status': '200',
@@ -774,6 +779,10 @@ def lambdaHandler(event, context):
                  }
              ],
          },
-         'body': json.dumps({ ISO_CODE_REF: countryInfo['value'], })
+         'body': json.dumps(responseBody)
      }
+
+
+def generateCodesAndCountriesTable():
+    return json.dumps(CODES_COUNTRIES)
 

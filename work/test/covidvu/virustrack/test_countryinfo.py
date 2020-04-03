@@ -4,12 +4,13 @@
 
 
 from covidvu.virustrack.countryinfo import ISO_CODE_REF
+from covidvu.virustrack.countryinfo import generateCodesAndCountriesTable
 from covidvu.virustrack.countryinfo import lambdaHandler
 
 import json
 
 
-COUNTRY_QUERY_TEST_COUNTRY = 'US'
+COUNTRY_QUERY_TEST_COUNTRY = 'GB'
 COUNTRY_QUERY_TEST_EVENT   = {
   'Records': [
     {
@@ -55,7 +56,7 @@ COUNTRY_QUERY_TEST_EVENT   = {
             ],
             'cloudfront-viewer-country': [
               {
-                'value': 'US',
+                'value': 'GB',
                 'key': 'cloudfront-viewer-country'
               }
             ]
@@ -101,4 +102,14 @@ def test_lambdaHandler():
     body = json.loads(body)
 
     assert body[ISO_CODE_REF] == COUNTRY_QUERY_TEST_COUNTRY
+
+
+def test_generateCodesAndCountriesTable():
+    result = generateCodesAndCountriesTable()
+
+    assert isinstance(result, str)
+
+    result = json.loads(result)
+    assert 'RU' in result
+    assert 'Russia' == result['RU']
 
