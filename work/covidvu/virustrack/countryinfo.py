@@ -742,6 +742,7 @@ COUNTRIES_INFO    = {'Afghanistan': {'capital': 'Kabul',
   'languages': 'en-GB,cy-GB,gd',
   'region': 'Europe'}
 }
+CODES_COUNTRIES = dict([(item[1]['codeISO'], item[0]) for item in COUNTRIES_INFO.items()])
 ISO_CODE_REF      = 'codeISO'
 
 
