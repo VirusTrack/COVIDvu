@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# See: https://github.com/COVIDvu/COVIDvu/blob/master/LICENSE 
+# See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
 from numpy import ndarray
