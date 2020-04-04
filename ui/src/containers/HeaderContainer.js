@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useHistory, useLocation } from "react-router-dom"
 import { useDispatch } from 'react-redux'
@@ -24,20 +24,17 @@ import usflagImg from '../images/fa-icon-usflag.svg'
 import chartImg from '../images/fa-icon-chart.svg'
 import infoImg from '../images/fa-icon-info.svg'
 
-const countryNav = require('../constants/countryNav.json')
-
 export const HeaderContainer = () => {
     const history = useHistory()
     const dispatch = useDispatch()
     const location = useLocation()
+    const clientCountry = useClientCountry()
 
     const selectedNav = location.pathname
 
     ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
     ReactGA.pageview(window.location.pathname + window.location.search)
 
-    const clientCountry = useClientCountry()
-    
     const changePage = (pageLocation) => {
         if(location.pathname !== pageLocation) {
             dispatch(actions.clearGraphs())
@@ -45,18 +42,9 @@ export const HeaderContainer = () => {
         }
     }
 
-    function localizedNavMenu() {
-
-        if(countryNav.hasOwnProperty(clientCountry)) {
-            return (
-                <Navbar.Item onClick={() => { changePage(countryNav[clientCountry].page)}}><img src={flagImg} alt=""/>{countryNav[clientCountry].name}</Navbar.Item>
-            )
-        } else {
-            return (
-                <Navbar.Item onClick={() => { changePage('/covid/us')}}><img src={flagImg} alt=""/>United States</Navbar.Item>
-            )
-        }
-    }
+    const LocalizedNavMenu = () => (
+        <Navbar.Item onClick={() => { clientCountry.countryISO === 'US' ? changePage("/covid/us") : changePage(`/covid/global?region=${clientCountry.country}`)}}><img src={flagImg} alt="Flag Icon"/>{clientCountry.countryISO === 'US' ? "United States" : clientCountry.country}</Navbar.Item>
+    )
 
     return (
         <>
@@ -98,7 +86,9 @@ export const HeaderContainer = () => {
                         </Navbar.Dropdown>
                     </Navbar.Item>
 
-                    {localizedNavMenu()}
+                    {clientCountry &&
+                        <LocalizedNavMenu />
+                    }
 
                     {/* <Navbar.Item hoverable dropdown>
                         <Navbar.Link arrowless onClick={() => { changePage('/covid/us')}}><img src={usflagImg} alt="United States Flag"/>United States</Navbar.Link>

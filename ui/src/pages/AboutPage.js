@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react'
 
-import { Box, Content, Title, Notification } from 'rbx'
+import { Box, Button, Content, Title, Notification } from 'rbx'
 
 import ContentLayout from '../layouts/ContentLayout'
 
-import { DEFAULT_DOCUMENT_TITLE, ENABLE_PREDICTIONS } from '../constants'
+import { DEFAULT_DOCUMENT_TITLE, ENABLE_PREDICTIONS, CLIENT_COUNTRY_KEY } from '../constants'
+
+import store from 'store2'
 
 export const AboutPage = () => {
 
@@ -59,6 +61,11 @@ export const AboutPage = () => {
                         Stay inside. Together (but 6 feet or more away) we can help flatten the curve. We're hoping that this website can help folks get
                         a good idea about why this is important, and the state of their country. These are tools that we hope you'll share with others. If you
                         can donate, please do so.
+                    </p>
+
+                    <Title size={4}>Debug</Title>
+                    <p>
+                        <Button onClick={() => { store.remove(CLIENT_COUNTRY_KEY) }}>Clear locale data cache</Button>
                     </p>
 
                 </Content>

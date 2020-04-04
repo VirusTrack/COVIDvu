@@ -1,15 +1,20 @@
 import { useLayoutEffect, useState, useEffect, useRef } from 'react'
 
 import { useLocation } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { actions } from '../ducks/services'
 
 import store from 'store2'
 
 import { 
     CLIENT_COUNTRY_KEY,
+    CLIENT_COUNTRY_CODE_KEY,
 } from '../constants'
 
 import queryString from 'query-string'
 
+const countryNav = require('../constants/countryNav.json')
 const isoCountries = require('../constants/iso-countries.json')
 
 export function useWindowSize() {
@@ -71,15 +76,20 @@ export const useMobileDetect = () => {
 export const useClientCountry = () => {
     const { search } = useLocation()
 
-    let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
+    const dispatch = useDispatch()
+    const clientCountry = useSelector(state => state.services.clientCountry)
 
-    if(query.clientCountry && isoCountries.hasOwnProperty(query.clientCountry)) {
-        store.set(CLIENT_COUNTRY_KEY, query.clientCountry)
-    }
+    console.log(clientCountry)
+    
+    // Fetch the clientCountry from API
+    useEffect(() => {
+        dispatch(actions.fetchClientCountry())
+    }, [dispatch])
 
-    if(!store.get(CLIENT_COUNTRY_KEY)) {
-        return "US"         // always default to the US
-    } else {
-        return store.get(CLIENT_COUNTRY_KEY)
-    }
+    // useEffect(() => {
+    //     console.log("new country grabbed")
+    // }, [clientCountry])
+
+    return clientCountry
+
 }

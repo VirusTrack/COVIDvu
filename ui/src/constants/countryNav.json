@@ -54,6 +54,11 @@
     "RU": {
         "page": "/covid/global?region=Russia",
         "name": "Russia"
+    },
+
+    "HK": {
+        "page": "/covid/global?region=Hong Kong",
+        "name": "Hong Kong"
     }
 
 }

@@ -15,8 +15,8 @@ const corsOptions = {
     },
 };
 
-const PRODUCTION_URL = 'https://virustrack.live/site-data'
-const STAGING_URL = 'http://staging.virustrack.live/site-data'
+const PRODUCTION_URL = 'https://virustrack.live'
+const STAGING_URL = 'http://staging.virustrack.live'
 const environment = process.env.NODE_ENVIRONMENT ? process.env.NODE_ENVIRONMENT : "production"
 
 const main = async (argv) => {
@@ -40,13 +40,14 @@ const main = async (argv) => {
 
         const content_url = environment === "production" ? PRODUCTION_URL : STAGING_URL
 
-        const global = await axios.get(`${content_url}/bundle-global.json`)
-        const predictions_global = await axios.get(`${content_url}/bundle-global-predictions.json`)
-        const predictions_us = await axios.get(`${content_url}/bundle-US-predictions.json`)
-        const continental_regions = await axios.get(`${content_url}/bundle-continental-regions.json`)
-        const us_states = await axios.get(`${content_url}/bundle-US.json`)
-        const us_regions = await axios.get(`${content_url}/bundle-US-Regions.json`)
-        const last_update = await axios.get(`${content_url}/last-update.txt`)
+        const global = await axios.get(`${content_url}/site-data/bundle-global.json`)
+        const predictions_global = await axios.get(`${content_url}/site-data/bundle-global-predictions.json`)
+        const predictions_us = await axios.get(`${content_url}/site-data/bundle-US-predictions.json`)
+        const continental_regions = await axios.get(`${content_url}/site-data/bundle-continental-regions.json`)
+        const us_states = await axios.get(`${content_url}/site-data/bundle-US.json`)
+        const us_regions = await axios.get(`${content_url}/site-data/bundle-US-Regions.json`)
+        const last_update = await axios.get(`${content_url}/site-data/last-update.txt`)
+        const country_info = await axios.get(`${content_url}/country_info`)
            
         fs.writeFileSync('./site-data/bundle-global.json', JSON.stringify(global.data))
         fs.writeFileSync('./site-data/bundle-global-predictions.json', JSON.stringify(predictions_global.data))
@@ -99,13 +100,14 @@ const main = async (argv) => {
 
         const content_url = environment === "production" ? PRODUCTION_URL : STAGING_URL
 
-        const global = await axios.get(`${content_url}/bundle-global.json`)
-        const predictions_global = await axios.get(`${content_url}/bundle-global-predictions.json`)
-        const predictions_us = await axios.get(`${content_url}/bundle-US-predictions.json`)
-        const continental_regions = await axios.get(`${content_url}/bundle-continental-regions.json`)
-        const us_states = await axios.get(`${content_url}/bundle-US.json`)
-        const us_regions = await axios.get(`${content_url}/bundle-US-Regions.json`)
-        const last_update = await axios.get(`${content_url}/last-update.txt`)
+        const global = await axios.get(`${content_url}/site-data/bundle-global.json`)
+        const predictions_global = await axios.get(`${content_url}/site-data/bundle-global-predictions.json`)
+        const predictions_us = await axios.get(`${content_url}/site-data/bundle-US-predictions.json`)
+        const continental_regions = await axios.get(`${content_url}/site-data/bundle-continental-regions.json`)
+        const us_states = await axios.get(`${content_url}/site-data/bundle-US.json`)
+        const us_regions = await axios.get(`${content_url}/site-data/bundle-US-Regions.json`)
+        const last_update = await axios.get(`${content_url}/site-data/last-update.txt`)
+        const country_info = await axios.get(`${content_url}/country_info`)
 
         app.use('/site-data/bundle-global.json', cors(corsOptions), (req, res) => {
             res.send(global.data)
@@ -133,6 +135,10 @@ const main = async (argv) => {
 
         app.use('/site-data/last-update.txt', cors(corsOptions), (req, res) => {
             res.send(last_update.data)
+        })
+
+        app.use('/country_info', cors(corsOptions), (req, res) => {
+            res.send(country_info.data)
         })
 
         console.log("Done grabbing data and now listening...")

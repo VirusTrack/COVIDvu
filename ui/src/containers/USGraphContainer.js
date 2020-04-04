@@ -82,11 +82,16 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
 
     useEffect(() => {
         if(confirmed) {
-            const totalStates = Object.values(confirmed['!Total US'])
-            const unassignedStates = Object.values(confirmed['Unassigned'])
+            if(confirmed.hasOwnProperty('!Total US')) {
+                const totalStates = Object.values(confirmed['!Total US'])
+                setConfirmedTotal(totalStates[totalStates.length - 1])
+            }
 
-            setConfirmedTotal(totalStates[totalStates.length - 1])
-            setUnassignedCases(unassignedStates[unassignedStates.length - 1])
+            if(confirmed.hasOwnProperty('Unassigned')) {
+                const unassignedStates = Object.values(confirmed['Unassigned'])
+                setUnassignedCases(unassignedStates[unassignedStates.length - 1])
+            }
+
         }
     }, [confirmed])
     

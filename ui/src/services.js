@@ -4,6 +4,10 @@ import {
     DATA_URL, 
     STAGING_DATA_URL, 
     TEST_DATA_URL,
+    GEO_URL,
+    STAGING_GEO_URL,
+    TEST_GEO_URL,    
+    LOCAL_GEO_URL,
     LOCAL_DATA_URL, 
     LAST_UPDATE_KEY,
 } from './constants'
@@ -13,10 +17,7 @@ import store from 'store2'
 import moment from 'moment'
 
 function dataUrl() {
-    const { REACT_APP_DEPLOY_ENV, REACT_APP_API_HOST } = process.env
-    if (REACT_APP_API_HOST) {
-        return REACT_APP_API_HOST
-    }
+    const { REACT_APP_DEPLOY_ENV } = process.env
 
     switch (REACT_APP_DEPLOY_ENV) {
         case "staging":
@@ -32,6 +33,21 @@ function dataUrl() {
     }
 }
 
+function geoUrl() {
+    const { REACT_APP_DEPLOY_ENV } = process.env
+
+    switch (REACT_APP_DEPLOY_ENV) {
+        case "local":
+            return LOCAL_GEO_URL
+        case "staging":
+            return STAGING_GEO_URL
+        case "test":
+            return TEST_GEO_URL
+        case "production":
+        default:
+            return GEO_URL
+    }
+}
 class DataService {
 
     async getGlobal() {
@@ -119,7 +135,7 @@ class DataService {
     }
 
     async fetchUserCountry() {
-        const response = await axios.get(`http://ip-api.com/json`)
+        const response = await axios.get(`${geoUrl()}`)
 
         return response.data
     }

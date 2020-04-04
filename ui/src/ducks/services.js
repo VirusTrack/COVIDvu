@@ -5,6 +5,8 @@ import DataService from '../services'
 import { 
     US_STATES_WITH_ABBREVIATION,
     LAST_UPDATE_KEY, 
+    CLIENT_COUNTRY_KEY,
+    CLIENT_COUNTRY_CODE_KEY,
 } from '../constants'
 
 import { createAction } from '@reduxjs/toolkit'
@@ -21,6 +23,10 @@ const countriesRegions = require('../constants/countries_regions.json');
 export const types = {
     CLEAR_GRAPHS: 'CLEAR_GRAPHS',
     CLEAR_STATS: 'CLEAR_STATS',
+
+    FETCH_CLIENT_COUNTRY: 'FETCH_CLIENT_COUNTRY',
+    FETCH_CLIENT_COUNTRY_SUCCESS: 'FETCH_CLIENT_COUNTRY_SUCCESS',
+    FETCH_CLIENT_COUNTRY_ERROR: 'FETCH_CLIENT_COUNTRY_ERROR',
 
     FETCH_GLOBAL: 'FETCH_GLOBAL',
     FETCH_GLOBAL_SUCCESS: 'FETCH_GLOBAL_SUCCESS',
@@ -91,6 +97,8 @@ export const actions = {
     clearGraphs: createAction(types.CLEAR_GRAPHS),
     clearStats: createAction(types.CLEAR_STATS),
 
+    fetchClientCountry: createAction(types.FETCH_CLIENT_COUNTRY),
+
     fetchGlobal: createAction(types.FETCH_GLOBAL),
     fetchGlobalPredictions: createAction(types.FETCH_GLOBAL_PREDICTIONS),
     fetchUSPredictions: createAction(types.FETCH_US_PREDICTIONS),
@@ -131,6 +139,7 @@ export const initialState = {
     usStatesTop10: {},
     usStateNamesTop10: [],
     usRegions: {},
+    clientCountry: undefined,
     lastUpdate: undefined
 }
 
@@ -153,13 +162,19 @@ export default function (state = initialState, action) {
                 totalUSStatesStats: {},
                 usStatesTop10: {},
                 usStateNamesTop10: [],
-                usRegions: {}
+                usRegions: {},
+                clientCountry: undefined,
             }
         case types.CLEAR_STATS:
             return {
                 ...state,
                 globalStats: undefined,
                 usStatesStats: undefined,
+            }
+        case types.FETCH_CLIENT_COUNTRY_SUCCESS:
+            return {
+                ...state,
+                clientCountry: action.payload,
             }
         case types.FETCH_TOP_10_COUNTRIES_SUCCESS:
             return {
@@ -370,6 +385,40 @@ const groupByKey = (key, array) => {
 // Sagas
 ///////////////////////////////////////////////////////////////////////////////
 
+
+export function* fetchClientCountry() {
+    console.time("fetchClientCountry")
+    const dataService = new DataService()
+
+    let countryISO = store.get(CLIENT_COUNTRY_CODE_KEY) || "US"
+    let country = store.get(CLIENT_COUNTRY_KEY) || "US"
+
+    if(!store.get(CLIENT_COUNTRY_CODE_KEY) || !store.get(CLIENT_COUNTRY_KEY)) {
+        console.log("No client country cached, grabbing fresh.")
+        try {
+            const countryObject = yield call(dataService.fetchUserCountry)
+            countryISO = countryObject.codeISO
+            country = countryObject.name
+
+            console.log(`Data grabbed, countryISO: ${countryISO} and country: ${country}`)
+        } catch(error) {
+            console.error("Unable to grab data from fetchUserCountry service, defaulting to US")
+            countryISO = "US"
+            country = "US"
+        }
+        store.set(CLIENT_COUNTRY_CODE_KEY, countryISO ? countryISO : 'US')
+        store.set(CLIENT_COUNTRY_KEY, country ? country : 'US')
+    }
+
+    yield put({ type: types.FETCH_CLIENT_COUNTRY_SUCCESS, payload: {
+            countryISO: countryISO,
+            country: country
+        }
+    })
+
+    console.timeEnd("fetchClientCountry")
+}
+
 /**
  * Fetch last update timestamp from server
  */
@@ -377,9 +426,7 @@ export function* fetchLastUpdate() {
     const dataService = new DataService()
     
     const lastUpdate = yield call(dataService.fetchLastUpdate)
-
     const lastUpdateAsNumeric = moment(lastUpdate).valueOf()
-
     const lastUpdateLocalStorage = store.session.get(LAST_UPDATE_KEY)
 
     if(!lastUpdateLocalStorage || lastUpdateLocalStorage < lastUpdateAsNumeric) {
@@ -1120,7 +1167,10 @@ export const sagas = [
     takeEvery(types.FETCH_REGION, fetchRegion),
     takeEvery(types.FETCH_CONTINENTAL, fetchContinental),
 
+    takeEvery(types.FETCH_CLIENT_COUNTRY, fetchClientCountry),
+
     takeEvery(types.FETCH_US_PREDICTIONS, fetchUSPredictions),
+
     takeEvery(types.FETCH_US_STATES, fetchUSStates),
     takeEvery(types.FETCH_US_REGIONS, fetchUSRegions),
     takeEvery(types.FETCH_LAST_UPDATE, fetchLastUpdate),

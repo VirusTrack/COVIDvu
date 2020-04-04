@@ -103,7 +103,7 @@ export const PredictionMethodologyPage = () => {
                     </p>
 
                     <MathJax.Node formula={`
-                        P(\log_{10}{K}) = \\mathrm{Unif}(0, 10)
+                        P(\\log_{10}{K}) = \\mathrm{Unif}(0, 10)
                     `} />
 
                     <MathJax.Node formula={`
@@ -115,7 +115,7 @@ export const PredictionMethodologyPage = () => {
                     `} />
 
                     <MathJax.Node formula={`
-                        P(\sigma) = \\mathrm{HalfNormal}(0, 100)
+                        P(\\sigma) = \\mathrm{HalfNormal}(0, 100)
                     `} />
 
                     <p>
