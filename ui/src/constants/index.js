@@ -1,6 +1,6 @@
 const DATA_URL = `/site-data`
-const STAGING_DATA_URL = `http://staging.virustrack.live/site-data`
-const TEST_DATA_URL = `http://test.virustrack.live/site-data`
+const STAGING_DATA_URL = `https://staging.virustrack.live/site-data`
+const TEST_DATA_URL = `https://test.virustrack.live/site-data`
 const LOCAL_DATA_URL = `http://localhost:3100/site-data`
 
 const GEO_URL = `https://virustrack.live/country_info`

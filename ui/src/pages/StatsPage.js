@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { useLocation } from 'react-router'
 
@@ -8,7 +8,7 @@ import MainLayout from '../layouts/MainLayout'
 
 import queryString from 'query-string'
 
-import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+import { usePageTitle } from '../hooks/ui'
 
 export const StatsPage = () => {
 
@@ -16,9 +16,7 @@ export const StatsPage = () => {
 
     let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
     
-    useEffect(() => {
-        document.title = `Stats | ${DEFAULT_DOCUMENT_TITLE}`        
-    }, [])
+    usePageTitle("Stats")
 
     return (
         <MainLayout>

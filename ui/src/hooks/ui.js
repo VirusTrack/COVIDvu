@@ -10,12 +10,19 @@ import store from 'store2'
 import { 
     CLIENT_COUNTRY_KEY,
     CLIENT_COUNTRY_CODE_KEY,
+    DEFAULT_DOCUMENT_TITLE,
 } from '../constants'
 
 import queryString from 'query-string'
 
 const countryNav = require('../constants/countryNav.json')
 const isoCountries = require('../constants/iso-countries.json')
+
+export function usePageTitle(pageTitle) {
+    useEffect(() => {
+        document.title = `${pageTitle} | ${DEFAULT_DOCUMENT_TITLE}`
+    }, [])
+}
 
 export function useWindowSize() {
     const [size, setSize] = useState([0, 0])
@@ -74,21 +81,12 @@ export const useMobileDetect = () => {
 }
 
 export const useClientCountry = () => {
-    const { search } = useLocation()
-
     const dispatch = useDispatch()
     const clientCountry = useSelector(state => state.services.clientCountry)
-
-    console.log(clientCountry)
     
-    // Fetch the clientCountry from API
     useEffect(() => {
         dispatch(actions.fetchClientCountry())
     }, [dispatch])
-
-    // useEffect(() => {
-    //     console.log("new country grabbed")
-    // }, [clientCountry])
 
     return clientCountry
 

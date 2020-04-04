@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+
+import { useChangePage } from '../hooks/nav'
 
 import { useHistory, useLocation } from "react-router-dom"
-import { useDispatch } from 'react-redux'
 
-import { actions } from '../ducks/services'
-
-import { Navbar, Notification, Button } from "rbx"
+import { Navbar, Button } from "rbx"
 import LogoElement from '../components/LogoElement'
 import SocialIcons from '../components/SocialIcons'
 
@@ -20,27 +19,20 @@ import ReactGA from 'react-ga'
 import compassImg from '../images/fa-icon-compass.svg'
 import globeImg from '../images/fa-icon-globe.svg'
 import flagImg from '../images/fa-icon-flag-regular.svg'
-import usflagImg from '../images/fa-icon-usflag.svg'
 import chartImg from '../images/fa-icon-chart.svg'
 import infoImg from '../images/fa-icon-info.svg'
 
 export const HeaderContainer = () => {
     const history = useHistory()
-    const dispatch = useDispatch()
     const location = useLocation()
     const clientCountry = useClientCountry()
+    const changePage = useChangePage()
 
     const selectedNav = location.pathname
 
     ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
     ReactGA.pageview(window.location.pathname + window.location.search)
 
-    const changePage = (pageLocation) => {
-        if(location.pathname !== pageLocation) {
-            dispatch(actions.clearGraphs())
-            history.push(pageLocation)
-        }
-    }
 
     const LocalizedNavMenu = () => (
         <Navbar.Item onClick={() => { clientCountry.countryISO === 'US' ? changePage("/covid/us") : changePage(`/covid/global?region=${clientCountry.country}`)}}><img src={flagImg} alt="Flag Icon"/>{clientCountry.countryISO === 'US' ? "United States" : clientCountry.country}</Navbar.Item>

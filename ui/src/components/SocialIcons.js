@@ -14,7 +14,7 @@ export const SocialIcons = ({donate, size, style}) => (
 
     {donate && 
     <div className="paypal-button">
-      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=52U5RTY2YY3WS&source=url" target="_blank" rel="noopener noreferrer">Donate</a>
+      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=52U5RTY2YY3WS&amp;source=url" target="_blank" rel="noopener noreferrer">Donate</a>
     </div> }
   
   </div>

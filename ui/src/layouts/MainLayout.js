@@ -11,13 +11,9 @@ export const MainLayout = ({ children, className }) => {
     return (
         <>
             <HeaderContainer />
-
-            <Content style={{ margin: '0.5rem' }} className={className}>
-
-                {nodes[0]}
-
-            </Content>
-
+                <Content style={{ margin: '0.5rem' }} className={className}>
+                    {nodes[0]}
+                </Content>
             <FooterContainer />
         </>
     )

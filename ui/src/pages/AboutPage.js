@@ -1,19 +1,18 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { Box, Button, Content, Title, Notification } from 'rbx'
 
 import ContentLayout from '../layouts/ContentLayout'
 
-import { DEFAULT_DOCUMENT_TITLE, ENABLE_PREDICTIONS, CLIENT_COUNTRY_KEY } from '../constants'
+import { usePageTitle } from '../hooks/ui'
+
+import { ENABLE_PREDICTIONS, CLIENT_COUNTRY_KEY, CLIENT_COUNTRY_CODE_KEY } from '../constants'
 
 import store from 'store2'
 
 export const AboutPage = () => {
 
-    useEffect(() => {
-        document.title = `About the Project | ${DEFAULT_DOCUMENT_TITLE}`        
-    }, [])
-    
+    usePageTitle("About the Project")
 
     return (
         
@@ -65,7 +64,7 @@ export const AboutPage = () => {
 
                     <Title size={4}>Debug</Title>
                     <p>
-                        <Button onClick={() => { store.remove(CLIENT_COUNTRY_KEY) }}>Clear locale data cache</Button>
+                        <Button onClick={() => { store.remove(CLIENT_COUNTRY_KEY); store.remove(CLIENT_COUNTRY_CODE_KEY) }}>Clear locale data cache</Button>
                     </p>
 
                 </Content>

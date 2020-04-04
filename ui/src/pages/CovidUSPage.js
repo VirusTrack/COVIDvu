@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { useLocation } from 'react-router'
 import queryString from 'query-string'
@@ -7,7 +7,7 @@ import ErrorBoundary from '../components/ErrorBoundary'
 import USGraphContainer from '../containers/USGraphContainer'
 import MainLayout from '../layouts/MainLayout'
 
-import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+import { usePageTitle } from '../hooks/ui'
 
 export const CovidUSPage = () => {
 
@@ -22,10 +22,7 @@ export const CovidUSPage = () => {
     let showLog = query.showLog === 'true' ? true : false
     let showPredictions = query.showPredictions === 'true' ? true : false
 
-    useEffect(() => {
-        document.title = `United States Graphs | ${DEFAULT_DOCUMENT_TITLE}`        
-    }, [])
-    
+    usePageTitle("United States Graphs")
 
     return (
         <MainLayout>

@@ -17,14 +17,11 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
 
     const detectMobile = useMobileDetect()
 
-    var colors = ['green', 'red', 'blue']
-
-    const today = moment()
-    // const today = moment().subtract(1, 'days')
-
     const [upper, setUpper] = useState(0)
     const [lower, setLower] = useState(0)
     
+    const today = moment()
+
     useEffect(() => {
 
         if(Object.keys(predictions).length > 0 && Object.keys(confirmed).length > 0) {
@@ -49,7 +46,7 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     name: normalizedRegion,
                     showlegend: true,
                     marker: {
-                        color: colors[0],
+                        color: 'green',
                         size: 5
                     }
                 }
@@ -112,7 +109,7 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     mode: 'lines',
                     name: "Mean",
                     line: {
-                        color: colors[0],
+                        color: 'green',
                         dash: 'dash'
                     },
                     marker: {

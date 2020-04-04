@@ -11,6 +11,8 @@ import {
 
 import { createAction } from '@reduxjs/toolkit'
 
+import { groupByKey, roughSizeOfObject } from '../utils'
+
 import store from 'store2'
 import moment from "moment"
 
@@ -163,7 +165,6 @@ export default function (state = initialState, action) {
                 usStatesTop10: {},
                 usStateNamesTop10: [],
                 usRegions: {},
-                clientCountry: undefined,
             }
         case types.CLEAR_STATS:
             return {
@@ -318,9 +319,6 @@ const calculateMortality = (deaths, confirmed) => {
 
 const extractLatestCounts = (stats, daysAgo = 0) => {
 
-    // const today = moment().subtract(0 + daysAgo, 'days').format("YYYY-MM-DD")
-    // const yesterday = moment().subtract(1 + daysAgo, 'days').format("YYYY-MM-DD")
-
     const regionWithLatestCounts = []
 
     for(const region of Object.keys(stats)) {
@@ -339,47 +337,6 @@ const extractLatestCounts = (stats, daysAgo = 0) => {
     return regionWithLatestCounts
 }
 
-function roughSizeOfObject( object ) {
-
-    var objectList = [];
-    var stack = [ object ];
-    var bytes = 0;
-
-    while ( stack.length ) {
-        var value = stack.pop();
-
-        if ( typeof value === 'boolean' ) {
-            bytes += 4;
-        }
-        else if ( typeof value === 'string' ) {
-            bytes += value.length * 2;
-        }
-        else if ( typeof value === 'number' ) {
-            bytes += 8;
-        }
-        else if
-        (
-            typeof value === 'object'
-            && objectList.indexOf( value ) === -1
-        )
-        {
-            objectList.push( value );
-
-            for( var i in value ) {
-                stack.push( value[ i ] );
-            }
-        }
-    }
-    return bytes;
-}
-
-const groupByKey = (key, array) => {
-    return array.reduce((obj, item) => {
-        const objKey = item[key]
-        obj[objKey] = item
-        return obj
-    }, {})
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Sagas

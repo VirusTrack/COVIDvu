@@ -1,18 +1,25 @@
 import React, { useEffect } from 'react'
 
-import { useHistory } from 'react-router'
+import { useDispatch } from 'react-redux'
+
+import { useHistory, useLocation } from 'react-router'
+
+import { actions } from '../ducks/services'
 
 import queryString from 'query-string'
 
-// export function changePage (pageLocation) {
-//     const history = useHistory()
+export function useChangePage() {
+    const history = useHistory()
+    const dispatch = useDispatch()
+    const location = useLocation()
 
-//     if(location.pathname !== pageLocation) {
-//         dispatch(actions.clearGraphs())
-//         history.push(pageLocation)
-//     }
-// }
-
+    return (pageLocation) => {
+        if(location.pathname !== pageLocation) {
+            dispatch(actions.clearGraphs())
+            history.push(pageLocation)
+        }    
+    }
+}
 
 export function useHandleHistory(urlFragment) {
     const history = useHistory()

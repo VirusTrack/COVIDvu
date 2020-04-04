@@ -5,6 +5,8 @@ import numeral from 'numeral'
 
 import ReactGA from 'react-ga';
 
+import { groupByKey } from '../utils'
+
 export const CheckboxRegionComponent = (
         {
           data, 
@@ -44,15 +46,6 @@ export const CheckboxRegionComponent = (
       category: `Region:${parentRegion}`,
       action: `Changed sorting of regions to ${selectedAlphaSort ? 'alphabetical' : 'confirmed'}`
     })
-
-  }
-
-  const groupByKey = (key, array) => {
-      return array.reduce((obj, item) => {
-          const objKey = item[key]
-          obj[objKey] = item
-          return obj
-      }, {})
   }
 
   const mounted = useRef()

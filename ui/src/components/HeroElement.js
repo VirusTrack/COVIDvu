@@ -1,24 +1,13 @@
 import React from 'react'
 
-import { useHistory, useLocation } from 'react-router'
-import { useDispatch } from 'react-redux'
-import { actions } from '../ducks/services'
+import { useChangePage } from '../hooks/nav'
 
 import { Hero, Container, Button, Title } from "rbx"
 
 export const HeroElement = ({title, subtitle, buttons, children}) => {
     const nodes = React.Children.toArray(children);
 
-    const dispatch = useDispatch()
-    const history = useHistory()
-    const location = useLocation()
-
-    const changePage = (pageLocation) => {
-        if(location.pathname !== pageLocation) {
-            dispatch(actions.clearGraphs())
-            history.push(pageLocation)
-        }
-    }
+    const changePage = useChangePage()
 
     return (
         <Hero size="medium">

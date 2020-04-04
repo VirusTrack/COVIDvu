@@ -50,6 +50,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
+        console.log("sortedConfirmed changed")
         if(sortedConfirmed && region.length === 0) {
             const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
             setSelectedCountries(newSelectedCountries)
@@ -60,14 +61,21 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                 handleHistory(['US'], secondaryGraph, showLog, showPredictions)
             }
         }
-    }, [sortedConfirmed])
+    }, [])
 
     useEffect(() => {
+        console.log("blank useEffect called")
         if(!search) {
             handleHistory(selectedCountries, secondaryGraph, showLog, showPredictions)
-        }
+        } 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+ 
+    // useEffect(() => {
+    //     dispatch(actions.fetchGlobal({showLog}))
+    //     dispatch(actions.fetchGlobalPredictions())
+    //     setSelectedCountries(region)
+    // }, [region])
 
     useEffect(() => {
         if(confirmed) {

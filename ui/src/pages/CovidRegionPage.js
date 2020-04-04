@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { useLocation } from 'react-router'
 import queryString from 'query-string'
@@ -8,7 +8,7 @@ import ErrorBoundary from '../components/ErrorBoundary'
 import RegionGraphContainer from '../containers/RegionGraphContainer'
 import MainLayout from '../layouts/MainLayout'
 
-import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+import { usePageTitle } from '../hooks/ui'
 
 export const CovidRegionPage = () => {
     let { region } = useParams()
@@ -22,9 +22,7 @@ export const CovidRegionPage = () => {
     let graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
     let showLog = query.showLog === 'true' ? true : false
 
-    useEffect(() => {
-        document.title = `${region} Graphs | ${DEFAULT_DOCUMENT_TITLE}`        
-    }, [])
+    usePageTitle(`${region} Graphs`)
     
     return (
         <MainLayout>
