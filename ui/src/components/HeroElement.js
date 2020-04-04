@@ -10,7 +10,7 @@ export const HeroElement = ({title, subtitle, buttons, children}) => {
     const changePage = useChangePage()
 
     return (
-        <Hero size="medium">
+        <Hero size="small">
             <Hero.Body>
             <Container>
                 {subtitle &&

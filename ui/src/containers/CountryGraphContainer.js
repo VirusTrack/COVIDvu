@@ -20,12 +20,12 @@ import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 import ReactGA from 'react-ga';
 
-export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
+export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
 
     const dispatch = useDispatch()
     const { search } = useLocation()
 
-    const handleHistory = useHandleHistory('/covid')
+    const handleHistory = useHandleHistory(`/covid/country/${region}`)
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
@@ -48,9 +48,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
-        console.log("sortedConfirmed changed")
-        console.dir(sortedConfirmed)
-        console.dir(region)
         if(sortedConfirmed && region.length === 0) {
             console.log("hey hey hey")
             const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
@@ -61,9 +58,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                 setSelectedCountries(['US'])
                 handleHistory(['US'], secondaryGraph, showLog, showPredictions)
             }
-        } else if(!sortedConfirmed) {
-            dispatch(actions.fetchGlobal({showLog}))
-            dispatch(actions.fetchGlobalPredictions())    
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortedConfirmed])
@@ -102,7 +96,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
         }
 
         ReactGA.event({
-            category: 'Region:Global',
+            category: 'Region:Country',
             action: actionDescription
         })
     }
@@ -112,7 +106,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
         handleHistory(selectedCountries, selectedGraph, showLog, showPredictions)
 
         ReactGA.event({
-            category: 'Region:Global',
+            category: 'Region:Country',
             action: `Changed selected graph to ${selectedGraph}`
         })
     }    
@@ -122,7 +116,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
         handleHistory(selectedCountries, secondaryGraph, logScale, showPredictions)
 
         ReactGA.event({
-            category: 'Region:Global',
+            category: 'Region:Country',
             action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`
         })
     }
@@ -142,14 +136,10 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     return (
         <>
         <HeroElement
-            subtitle="Global"
+            subtitle={region}
             title={
                 <>Coronavirus Cases by Country</>
             }
-            buttons={[
-                { title: 'Cases By Country', location: '/covid' },
-                { title: 'Cases By Continent', location: '/covid/continental' },
-            ]}
         />
 
         <BoxWithLoadingIndicator hasData={sortedConfirmed}>
@@ -205,4 +195,4 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     )    
 }
 
-export default GlobalGraphContainer
+export default CountryGraphContainer

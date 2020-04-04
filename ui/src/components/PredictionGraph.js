@@ -60,7 +60,6 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     mode: 'lines',
                     name: "Lower",
                     showlegend: false,
-                    // hoverinfo: 'skip',
                 }
                 plots_97_5[normalizedRegion] = {
                     x: [],
@@ -73,7 +72,6 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                     fill: 'tonexty',
                     name: "Upper",
                     showlegend: false,
-                    // hoverinfo: 'skip',
                 }
                 plots_25[normalizedRegion] = {
                     x: [],
@@ -179,6 +177,7 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
                 }
 
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selected, predictions])
 
     let mergeConfig = { 

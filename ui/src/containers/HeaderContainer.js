@@ -35,7 +35,7 @@ export const HeaderContainer = () => {
 
 
     const LocalizedNavMenu = () => (
-        <Navbar.Item onClick={() => { clientCountry.countryISO === 'US' ? changePage("/covid/us") : changePage(`/covid/global?region=${clientCountry.country}`)}}><img src={flagImg} alt="Flag Icon"/>{clientCountry.countryISO === 'US' ? "United States" : clientCountry.country}</Navbar.Item>
+        <Navbar.Item onClick={() => { clientCountry.countryISO === 'US' ? changePage("/covid/us") : changePage(`/covid/country/${clientCountry.country}`)}}><img src={flagImg} alt="Flag Icon"/>{clientCountry.countryISO === 'US' ? "United States" : clientCountry.country}</Navbar.Item>
     )
 
     return (
@@ -58,37 +58,11 @@ export const HeaderContainer = () => {
             <Navbar.Menu>
                 <Navbar.Segment align="start">
                     <Navbar.Item active={selectedNav === '/dashboard'} onClick={()=>{changePage('/dashboard')}}><img src={compassImg} alt="Compass"/>Dashboard</Navbar.Item>
+                    <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{changePage('/covid')}}><img src={globeImg} alt="Globe"/>Global</Navbar.Item>
                     
-                    <Navbar.Item hoverable dropdown>
-                        <Navbar.Link arrowless 
-                            onClick={()=>{changePage('/covid')}}
-                            active={(selectedNav === '/covid' || selectedNav === '/covid/continental').toString()}>
-                                <img src={globeImg} alt=""/>Global
-                        </Navbar.Link>
-                        <Navbar.Dropdown boxed>
-                            <Navbar.Item active={selectedNav === '/covid'} onClick={()=>{changePage('/covid')}}>Countries</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/continental'} onClick={()=>{changePage('/covid/continental')}}>Continental</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/region/Europe'} onClick={()=>{changePage('/covid/region/Europe')}}>Europe</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/region/Asia'} onClick={()=>{changePage('/covid/region/Asia')}}>Asia</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/region/Africa'} onClick={()=>{changePage('/covid/region/Africa')}}>Africa</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/region/South America'} onClick={()=>{changePage('/covid/region/South America')}}>South America</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/region/North America'} onClick={()=>{changePage('/covid/region/North America')}}>North America</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/region/Central America'} onClick={()=>{changePage('/covid/region/Central America')}}>Central America</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/region/Oceania'} onClick={()=>{changePage('/covid/region/Oceania')}}>Oceania</Navbar.Item>
-                        </Navbar.Dropdown>
-                    </Navbar.Item>
-
                     {clientCountry &&
                         <LocalizedNavMenu />
                     }
-
-                    {/* <Navbar.Item hoverable dropdown>
-                        <Navbar.Link arrowless onClick={() => { changePage('/covid/us')}}><img src={usflagImg} alt="United States Flag"/>United States</Navbar.Link>
-                        <Navbar.Dropdown boxed>
-                            <Navbar.Item active={selectedNav === '/covid/us'} onClick={() => {changePage('/covid/us')}}>US States</Navbar.Item>
-                            <Navbar.Item active={selectedNav === '/covid/us/regions'} onClick={()=>{changePage('/covid/us/regions')}}>US Regions</Navbar.Item>
-                        </Navbar.Dropdown>
-                    </Navbar.Item> */}
                     
                     <Navbar.Item active={selectedNav === '/stats'} onClick={()=>{changePage('/stats')}}><img src={chartImg} alt=""/>Stats</Navbar.Item>
                 </Navbar.Segment>

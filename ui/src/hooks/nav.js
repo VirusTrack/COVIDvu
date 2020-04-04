@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react'
-
 import { useDispatch } from 'react-redux'
-
 import { useHistory, useLocation } from 'react-router'
 
 import { actions } from '../ducks/services'
 
 import queryString from 'query-string'
 
+/**
+ * Change page navigation but clear the graph prior
+ */
 export function useChangePage() {
     const history = useHistory()
     const dispatch = useDispatch()
@@ -21,6 +21,11 @@ export function useChangePage() {
     }
 }
 
+/**
+ * Handle the history object for the compare graphs pages
+ * 
+ * @param {*} urlFragment 
+ */
 export function useHandleHistory(urlFragment) {
     const history = useHistory()
 

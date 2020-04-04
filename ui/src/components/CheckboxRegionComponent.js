@@ -68,6 +68,7 @@ export const CheckboxRegionComponent = (
           setRegionList(sortedList)
         }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [predictions])
 
   useEffect(() => {
@@ -96,6 +97,7 @@ export const CheckboxRegionComponent = (
         }
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alphaSort, showPredictions, secondaryGraph])
 
   const AlphaOrByConfirmedButton = () => (

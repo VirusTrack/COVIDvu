@@ -66,6 +66,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
                 handleHistory(['New York'], secondaryGraph, showLog, showPredictions)
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortedConfirmed])
 
     useEffect(() => {

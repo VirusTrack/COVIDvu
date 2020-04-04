@@ -1,29 +1,28 @@
 import { useLayoutEffect, useState, useEffect, useRef } from 'react'
 
-import { useLocation } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { actions } from '../ducks/services'
 
-import store from 'store2'
-
 import { 
-    CLIENT_COUNTRY_KEY,
-    CLIENT_COUNTRY_CODE_KEY,
     DEFAULT_DOCUMENT_TITLE,
 } from '../constants'
 
-import queryString from 'query-string'
-
-const countryNav = require('../constants/countryNav.json')
-const isoCountries = require('../constants/iso-countries.json')
-
+/**
+ * Change the document page title
+ * 
+ * @param {*} pageTitle 
+ */
 export function usePageTitle(pageTitle) {
     useEffect(() => {
         document.title = `${pageTitle} | ${DEFAULT_DOCUMENT_TITLE}`
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 }
 
+/**
+ * Introspect the window size
+ */
 export function useWindowSize() {
     const [size, setSize] = useState([0, 0])
     useLayoutEffect(() => {
@@ -37,6 +36,12 @@ export function useWindowSize() {
     return size
 }
 
+/**
+ * Use an interval with the useEffect hook to call something every N seconds
+ * 
+ * @param {*} callback 
+ * @param {*} delay 
+ */
 export function useInterval(callback, delay) {
   const savedCallback = useRef();
 
@@ -74,12 +79,18 @@ const getMobileDetect = userAgent => {
   }
 }
 
+/**
+ * Use the getMobileDetect on userAgent to find out if user is mobile or desktop
+ */
 export const useMobileDetect = () => {
   useEffect(() => {}, [])
     const userAgent = typeof navigator === 'undefined' ? 'SSR' : navigator.userAgent;
     return getMobileDetect(userAgent);
 }
 
+/**
+ * Grab our client country from /country_info
+ */
 export const useClientCountry = () => {
     const dispatch = useDispatch()
     const clientCountry = useSelector(state => state.services.clientCountry)

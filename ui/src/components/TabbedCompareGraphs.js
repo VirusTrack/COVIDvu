@@ -4,8 +4,6 @@ import { Tab } from 'rbx'
 
 import { TERMS } from '../constants/dictionary'
 
-import { ENABLE_PREDICTIONS } from '../constants'
-
 import GraphControls from '../components/GraphControls'
 import GraphWithLoader from '../components/GraphWithLoader'
 import PredictionGraph from '../components/PredictionGraph'

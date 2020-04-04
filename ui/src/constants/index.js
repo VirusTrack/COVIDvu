@@ -6,7 +6,7 @@ const LOCAL_DATA_URL = `http://localhost:3100/site-data`
 const GEO_URL = `https://virustrack.live/country_info`
 const STAGING_GEO_URL = `https://staging.virustrack.live/country_info`
 const TEST_GEO_URL = `https://test.virustrack.live/country_info`
-const LOCAL_GEO_URL = `http://localhost_3100/country_info`
+const LOCAL_GEO_URL = `http://localhost:3100/country_info`
 
 const LAST_UPDATE_KEY = 'covid-lastUpdated'
 

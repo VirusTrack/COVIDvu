@@ -43,6 +43,7 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Cases', showLogPa
         if(sortedConfirmed && region.length === 0) {
             setSelectedRegions(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortedConfirmed])
 
     useEffect(() => {

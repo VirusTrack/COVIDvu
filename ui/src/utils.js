@@ -1,3 +1,10 @@
+/**
+ * Group an array of objects into an object that is  
+ * grouped by key in object
+ * 
+ * @param {*} key  
+ * @param {*} array 
+ */
 export const groupByKey = (key, array) => {
     return array.reduce((obj, item) => {
         const objKey = item[key]
@@ -6,6 +13,11 @@ export const groupByKey = (key, array) => {
     }, {})
 }
 
+/**
+ * Calculate the rough size of object and return in bytes
+ * 
+ * @param {*} object 
+ */
 export function roughSizeOfObject( object ) {
 
     var objectList = [];
