@@ -40,7 +40,7 @@ instrutions are UNIX-specific.
 
 - Clone this repository
 
-  `git clone https://github.com/pr3d4t0r/COVIDvu.git covidvu`
+  `git clone https://github.com/VirusTrack/COVIDvu.git covidvu`
 
 - Go to the `covidvu` directory
 
