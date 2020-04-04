@@ -10,5 +10,6 @@ pudb
 pystan
 pytest
 python-lambda-local
+tinydb
 tqdm
 
