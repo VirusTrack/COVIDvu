@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+[[ -e "$REFRESHDATA_CONFIG" ]] || exit 250
+
+
+# *** functions ***
+
+function die {
+    echo "[Error $2] - $1" 
+    exit "$2"
+} # die
+
+
+function invalidateCloudFrontCache {
+    local vCloudFrontID="$1"
+
+    echo "CloudFront ID = $vCloudFrontID"
+    aws cloudfront create-invalidation --distribution-id "$vCloudFrontID" --paths "/*"
+    [[ "0" != "$?" ]] && die "invalidateCloudFrontCache failed" 1
+} # invalidateCloudFrontCache
+
+
+# --- main ---
+
+[[ "$#" < 1 ]] && die "Invalid number of arguments - must pass at least 1" 3
+
+case "$1" in
+    "noop")
+        ;;
+    "production")
+        invalidateCloudFrontCache "$VIRUSTRACK_CLOUDFRONT_ID"
+        ;;
+    "publish")
+        invalidateCloudFrontCache "$VIRUSTRACK_CLOUDFRONT_ID"
+        ;;
+    "staging")
+        # -- doubled because not sure if bash --version >= 4
+        invalidateCloudFrontCache "$VIRUSTRACK_STAGING_CLOUDFRONT_ID"
+        ;;
+    "stage")
+        invalidateCloudFrontCache "$VIRUSTRACK_STAGING_CLOUDFRONT_ID"
+        ;;
+    "testing")
+        invalidateCloudFrontCache "$VIRUSTRACK_TEST_CLOUDFRONT_ID"
+        ;;
+    "test")
+        invalidateCloudFrontCache "$VIRUSTRACK_TEST_CLOUDFRONT_ID"
+        ;;
+    *)
+        die "invalid command - use stage|test|publish|noop" 2
+        ;;
+esac
+
+exit 0
+
