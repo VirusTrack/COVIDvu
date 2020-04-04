@@ -198,12 +198,6 @@ function generateRegionsJSONBundle {
 } # generateRegionsJSONBundle
 
 
-function invalidateCloudFrontCache {
-    aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths "/*"
-    [[ "0" != "$?" ]] && die "invalidateCloudFrontCache failed" 24
-} # invalidateCloudFrontCache
-
-
 function deployVirusUpdateJSON {
     [[ -n "$1" ]] || die "deployment failed; target bucket not specified" 10
 
