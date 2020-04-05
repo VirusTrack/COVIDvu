@@ -1,17 +1,20 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
-import { Box, Content, Title, Notification } from 'rbx'
+import { Box, Button, Content, Title, Notification, Level, Select } from 'rbx'
 
 import ContentLayout from '../layouts/ContentLayout'
 
-import { DEFAULT_DOCUMENT_TITLE, ENABLE_PREDICTIONS } from '../constants'
+import { usePageTitle } from '../hooks/ui'
+
+import { ENABLE_PREDICTIONS, CLIENT_COUNTRY_KEY, CLIENT_COUNTRY_CODE_KEY } from '../constants'
+
+import store from 'store2'
+
+const isoCountries = require('../constants/iso-countries.json');
 
 export const AboutPage = () => {
 
-    useEffect(() => {
-        document.title = `About the Project | ${DEFAULT_DOCUMENT_TITLE}`        
-    }, [])
-    
+    usePageTitle("About the Project")
 
     return (
         
@@ -60,6 +63,28 @@ export const AboutPage = () => {
                         a good idea about why this is important, and the state of their country. These are tools that we hope you'll share with others. If you
                         can donate, please do so.
                     </p>
+
+                    <Title size={4}>Debug</Title>
+                    <Level>
+                    <Level.Item align="left">
+                            <Button onClick={() => { store.remove(CLIENT_COUNTRY_KEY); store.remove(CLIENT_COUNTRY_CODE_KEY) }}>Clear country cache</Button>
+                        </Level.Item>
+                    </Level>
+                    <Level>
+                        <Level.Item align="left">
+                            Change Country:&nbsp;
+                            <Select.Container>
+                                <Select defaultValue={store.get(CLIENT_COUNTRY_KEY)}>
+                                    {Object.keys(isoCountries).map(countryCode => (
+                                        <Select.Option onClick={() => {
+                                            store.set(CLIENT_COUNTRY_KEY, isoCountries[countryCode]);
+                                            store.set(CLIENT_COUNTRY_CODE_KEY, countryCode)
+                                        }} key={countryCode}>{isoCountries[countryCode]}</Select.Option>
+                                    ))}
+                                </Select>
+                            </Select.Container>
+                        </Level.Item>
+                    </Level>
 
                 </Content>
                 </Box>

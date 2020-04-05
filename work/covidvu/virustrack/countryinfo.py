@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
 
@@ -743,7 +743,72 @@ COUNTRIES_INFO    = {'Afghanistan': {'capital': 'Kabul',
   'region': 'Europe'}
 }
 CODES_COUNTRIES = dict([(item[1]['codeISO'], item[0]) for item in COUNTRIES_INFO.items()])
-ISO_CODE_REF      = 'codeISO'
+ISO_CODE_REF    = 'codeISO'
+TOTAL_US_NAME   = '!Total US'
+US_REGIONS      = {
+    TOTAL_US_NAME: TOTAL_US_NAME,
+    'Alabama': 'South',
+    'Alaska': 'West',
+    'American Samoa': 'Other',
+    'Arizona': 'West',
+    'Arkansas': 'South',
+    'California': 'West',
+    'Colorado': 'West',
+    'Connecticut': 'Northeast',
+    'Delaware': 'South',
+    'District of Columbia': 'South',
+    'Florida': 'South',
+    'Georgia': 'South',
+    'Hawaii': 'West',
+    'Idaho': 'West',
+    'Illinois': 'Midwest',
+    'Indiana': 'Midwest',
+    'Iowa': 'Midwest',
+    'Kansas': 'Midwest',
+    'Kentucky': 'South',
+    'Louisiana': 'South',
+    'Maine': 'Northeast',
+    'Maryland': 'Northeast',
+    'Massachusetts': 'Northeast',
+    'Michigan': 'Midwest',
+    'Minnesota': 'Midwest',
+    'Mississippi': 'Midwest',
+    'Missouri': 'South',
+    'Montana': 'Midwest',
+    'Nebraska': 'Midwest',
+    'Nevada': 'West',
+    'New Hampshire': 'Northeast',
+    'New Jersey': 'Northeast',
+    'New Mexico': 'West',
+    'New York': 'Northeast',
+    'North Carolina': 'South',
+    'North Dakota': 'Midwest',
+    'Ohio': 'Midwest',
+    'Oklahoma': 'Midwest',
+    'Oregon': 'West',
+    'Pennsylvania': 'Northeast',
+    'Rhode Island': 'Northeast',
+    'South Carolina': 'South',
+    'South Dakota': 'Midwest',
+    'Tennessee': 'South',
+    'Texas': 'South',
+    'Utah': 'West',
+    'Vermont': 'Northeast',
+    'Virginia': 'South',
+    'Washington': 'West',
+    'West Virginia': 'South',
+    'Wisconsin': 'Midwest',
+    'Wyoming': 'West',
+    'Guam': 'Other',
+    'Marshall Islands': 'Other',
+    'Micronesia': 'Other',
+    'Palau': 'Other',
+    'Puerto Rico': 'Other',
+    'Virgin Islands': 'Other',
+    'Marianas': 'Other',
+}
+
+
 
 
 def lambdaHandler(event, context):

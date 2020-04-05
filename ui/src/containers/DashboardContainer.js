@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useHistory } from 'react-router'
 import { useClientCountry } from '../hooks/ui'
+import { useChangePageTitle } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
@@ -30,10 +31,13 @@ export const DashboardContainer = ({showLogParam = false}) => {
     const dispatch = useDispatch()
     const history = useHistory()
 
-    const [showLog, setShowLog] = useState(showLogParam)
-    const graphControlsAlign = 'center'
+    const changePageTitle = useChangePageTitle()
 
-    const [tzGuess, setTzGuess] = useState(moment.tz.guess())
+    const clientCountry = useClientCountry()
+    const [showLog, setShowLog] = useState(showLogParam)
+    // const graphControlsAlign = 'center'
+
+    // const [tzGuess, setTzGuess] = useState(moment.tz.guess())
 
     useEffect(() => {
         dispatch(actions.fetchTop10Countries({
@@ -45,12 +49,13 @@ export const DashboardContainer = ({showLogParam = false}) => {
         dispatch(actions.fetchTotalUSStatesStats())
 
         dispatch(actions.fetchUSRegions())
-        dispatch(actions.fetchContinental())
+        // dispatch(actions.fetchContinental())
+
+        dispatch(actions.fetchGlobal())
 
     }, [dispatch])
 
     const lastUpdate = useSelector(state => state.services.lastUpdate)
-    const clientCountry = useClientCountry()
 
     useEffect(() => {
         dispatch(actions.fetchLastUpdate())
@@ -60,17 +65,22 @@ export const DashboardContainer = ({showLogParam = false}) => {
     const globalNamesTop10 = useSelector(state => state.services.globalNamesTop10)
     const globalStats = useSelector(state => state.services.totalGlobalStats)
     
+    const globalConfirmed = useSelector(state => state.services.global.confirmed)
+
     const usStatesTop10 = useSelector(state => state.services.usStatesTop10)
     const usStateNamesTop10 = useSelector(state => state.services.usStateNamesTop10)
     const usStatesStats = useSelector(state => state.services.totalUSStatesStats)
     
     const confirmedUSRegions = useSelector(state => state.services.usRegions.confirmed)
-    const confirmedContinental = useSelector(state => state.services.continental.confirmed)
 
-    const countryRef = React.createRef()
-    const continentRef = React.createRef()
-    const usStateRef = React.createRef()
-    const usRegionRef = React.createRef()
+
+    useEffect(() => {
+        if(globalStats) {
+            changePageTitle(`Coronavirus Update ${numeral(globalStats.confirmed).format('0,0')} Cases and ${numeral(globalStats.deaths).format('0,0')} Deaths from COVID-19 Virus Pandemic | VirusTrack.live`)
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [globalStats])
+
 
     const renderChangeDifference = (value) => {
         
@@ -95,11 +105,17 @@ export const DashboardContainer = ({showLogParam = false}) => {
 
     }
 
+    if(!clientCountry) {
+        return (
+            <h1>Loading</h1>
+        )
+    }
+
     return (
         <>
         <HeroElement
             title={
-                <>Coronavirus <br />COVID-19 Cases</>
+                <>Coronavirus COVID-19 Cases</>
             }
             buttons={[
                 { title: 'Global', location: '/covid' },
@@ -165,6 +181,34 @@ export const DashboardContainer = ({showLogParam = false}) => {
             <Column>
                 <Container className="chart">
                     <Title size={2} align="center">
+                        <Heading align="center">Confirmed Cases</Heading>
+                        {clientCountry.country === 'US' ? "United States" : clientCountry.country}
+                    </Title>
+                    
+                    <Generic style={{marginBottom: '1rem'}}>
+                    <GraphControls 
+                            scale
+                            showLog={showLog} 
+                            handleGraphScale={handleGraphScale} 
+                            secondaryGraph={globalConfirmed} 
+                            centered                            
+                            />
+                    </Generic>
+                    <GraphWithLoader 
+                        graphName="Cases"
+                        secondaryGraph="Cases"
+                        graph={globalConfirmed}
+                        showLog={showLog}
+                        selected={[clientCountry.country]}
+                        style={{width: '100%', height: '100%'}}
+                    />
+                    
+                </Container>
+            </Column>
+
+            <Column>
+                <Container className="chart">
+                    <Title size={2} align="center">
                         <Heading align="center">Top 10 Confirmed</Heading>
                         Cases by Country
                     </Title>
@@ -181,41 +225,11 @@ export const DashboardContainer = ({showLogParam = false}) => {
                             />
                     </Generic>
                     <GraphWithLoader 
-                        graphName="Top 10 Confirmed Cases"
-                        secondaryGraph="Top 10 Confirmed Cases"
+                        graphName="Cases"
+                        secondaryGraph="Cases"
                         graph={globalTop10}
                         showLog={showLog}
                         selected={globalNamesTop10}
-                    />
-                    
-                </Container>
-            </Column>
-
-            <Column>
-                <Container className="chart">
-                    <Title size={2} align="center">
-                        <Heading align="center">Top 10 Confirmed</Heading>
-                        Cases by Continent
-                    </Title>
-                    
-                    <Generic style={{marginBottom: '1rem'}}>
-                    <GraphControls 
-                            scale
-                            showLog={showLog} 
-                            handleGraphScale={handleGraphScale} 
-                            secondaryGraph={confirmedContinental} 
-                            centered
-
-                            
-                            />
-                    </Generic>
-                    <GraphWithLoader 
-                        graphName="continental_graph"
-                        secondaryGraph="continental_graph"
-                        graph={confirmedContinental}
-                        showLog={showLog}
-                        selected={['North America', 'Asia', 'Europe', 'South America']}
-                        style={{width: '100%', height: '100%'}}
                     />
                     
                 </Container>
@@ -300,8 +314,8 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         />
                 </Generic>
                 <GraphWithLoader 
-                    graphName="Top 10 Confirmed Cases"
-                    secondaryGraph="Top 10 Confirmed Cases"
+                    graphName="Cases"
+                    secondaryGraph="Cases"
                     graph={usStatesTop10}
                     showLog={showLog}
                     selected={usStateNamesTop10}
@@ -323,8 +337,8 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         />
                 </Generic>
                 <GraphWithLoader 
-                    graphName="Top Regions Cases"
-                    secondaryGraph="Top Regions Cases"
+                    graphName="Cases"
+                    secondaryGraph="Cases"
                     graph={confirmedUSRegions}
                     showLog={showLog}
                     selected={['Midwest', 'Northeast', 'South', 'West']}

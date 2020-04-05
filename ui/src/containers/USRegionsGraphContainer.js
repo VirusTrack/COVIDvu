@@ -32,7 +32,6 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Cases', showLogPa
     const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("usRegions")
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
-    const [unassignedCases, setUnassignedCases] = useState(0)
 
     useEffect(() => {
         dispatch(actions.fetchUSRegions())
@@ -43,6 +42,7 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Cases', showLogPa
         if(sortedConfirmed && region.length === 0) {
             setSelectedRegions(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortedConfirmed])
 
     useEffect(() => {
@@ -57,10 +57,6 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Cases', showLogPa
             const totalRegions = Object.values(confirmed['!Total US'])
             setConfirmedTotal(totalRegions[totalRegions.length - 1])
 
-            if(confirmed.hasOwnProperty('Unassigned')) {
-                const unassignedRegions = Object.values(confirmed['Unassigned'])
-                setUnassignedCases(unassignedRegions[unassignedRegions.length - 1])
-            }
         }
     }, [confirmed])    
 
@@ -100,7 +96,7 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Cases', showLogPa
         <HeroElement
             subtitle="United States"
             title={
-                <>Coronavirus Cases <br />by Region</>
+                <>Coronavirus Cases by Region</>
             }
             buttons={[
                 { title: 'Cases By State', location: '/covid/us' },
@@ -142,10 +138,6 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Cases', showLogPa
                     }
                 </Level.Item>
             </Level>
-
-            <Notification color="warning">
-                The sum of all regions may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
-            </Notification>
                              
             <Notification style={{fontSize: '1.4rem'}}>
                     <p>

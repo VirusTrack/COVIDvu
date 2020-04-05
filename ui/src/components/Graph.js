@@ -7,7 +7,7 @@ import { useMobileDetect } from '../hooks/ui'
 import { Generic } from 'rbx'
 import LogoElement from './LogoElement'
 
-export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected, config, showLog = false, ref=null}) => {
+export const Graph = ({data, y_type='numeric', y_title, x_title, selected, config, showLog = false, start=null, ref=null}) => {
 
     const [plotsAsValues, setPlotsAsValues] = useState([])
 
@@ -36,6 +36,8 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
             
             for(const key of Object.keys(regionData).sort()) {
                 if((showLog && regionData[key] > 100) || !showLog) {
+                    if(start && regionData[key] < start) continue
+
                     plots[normalizedRegion].x.push(key)
                     plots[normalizedRegion].y.push(regionData[key])
                 }
@@ -43,7 +45,7 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
         }
     
         setPlotsAsValues(Object.values(plots))
-    }, [selected, data, y_type, showLog])
+    }, [selected, data, y_type, showLog, start])
 
     let mergeConfig = { ...config,
         displayModeBar: false,
@@ -51,7 +53,6 @@ export const Graph = ({title, data, y_type='numeric', y_title, x_title, selected
     }
 
     let layout = {
-        title: title,
         autosize: true,
         width: undefined,
         height: undefined,
