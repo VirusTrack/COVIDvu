@@ -179,7 +179,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
             </Column>
                 
             <Column>
-                <Container className="chart">
+                <Container className="chart" id="clientCountry">
                     <Title size={2} align="center">
                         <Heading align="center">Confirmed Cases</Heading>
                         {clientCountry.country === 'US' ? "United States" : clientCountry.country}
@@ -191,7 +191,8 @@ export const DashboardContainer = ({showLogParam = false}) => {
                             showLog={showLog} 
                             handleGraphScale={handleGraphScale} 
                             secondaryGraph={globalConfirmed} 
-                            centered                            
+                            centered      
+                            htmlId="clientCountry"
                             />
                     </Generic>
                     <GraphWithLoader 
@@ -207,7 +208,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
             </Column>
 
             <Column>
-                <Container className="chart">
+                <Container className="chart" id="top10Country">
                     <Title size={2} align="center">
                         <Heading align="center">Top 10 Confirmed</Heading>
                         Cases by Country
@@ -220,8 +221,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                             handleGraphScale={handleGraphScale} 
                             secondaryGraph={globalTop10} 
                             centered
-
-                            
+                            htmlId="top10Country"
                             />
                     </Generic>
                     <GraphWithLoader 
@@ -299,7 +299,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
             </Container>
             </Column>
 
-            <Column className="chart">
+            <Column className="chart" id="top10USState">
                 <Title size={2} align="center"><Heading>Top 10 Confirmed</Heading>Cases by State</Title>
                 
                 <Generic style={{marginBottom: '1rem'}}>
@@ -309,7 +309,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         handleGraphScale={handleGraphScale} 
                         secondaryGraph={usStateNamesTop10} 
                         centered
-
+                        htmlId="top10USState"
                         
                         />
                 </Generic>
@@ -322,7 +322,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                 />
             </Column>
 
-            <Column className="chart">
+            <Column className="chart" id="topUSRegion">
                 <Title size={2} align="center"><Heading>Top Coronavirus Cases</Heading>By U.S. Region</Title>
                 
                 <Generic style={{marginBottom: '1rem'}}>
@@ -332,7 +332,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         handleGraphScale={handleGraphScale} 
                         secondaryGraph={confirmedUSRegions} 
                         centered
-
+                        htmlId="topUSRegion"
                         
                         />
                 </Generic>
