@@ -33,6 +33,7 @@ export const FooterContainer = () =>{
 
     useEffect(() => {
         dispatch(actions.fetchLastUpdate())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch])
 
     useEffect(() => {
@@ -53,6 +54,7 @@ export const FooterContainer = () =>{
         } else {
             setCurrentLastUpdate(lastUpdate)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lastUpdate])
 
     return (

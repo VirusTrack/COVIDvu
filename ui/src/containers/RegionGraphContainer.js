@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useLocation } from 'react-router'
+// import { useLocation } from 'react-router'
 
 import { useHandleHistory } from '../hooks/nav'
 
@@ -24,7 +24,7 @@ const countriesRegions = require('../constants/countries_regions.json');
 export const RegionGraphContainer = ({region, uniqueRegion = [], graph = 'Cases', showLogParam = false}) => {
 
     const dispatch = useDispatch()
-    const { search } = useLocation()
+    // const { search } = useLocation()
     const handleHistory = useHandleHistory(`/covid/region/${region}`)
 
     const [showLog, setShowLog] = useState(showLogParam)
@@ -50,6 +50,7 @@ export const RegionGraphContainer = ({region, uniqueRegion = [], graph = 'Cases'
         } else {
             setRegionNotFound(true)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, region, showLog])
 
     // Select the Top 3 confirmed from list if nothing is selected
@@ -57,6 +58,7 @@ export const RegionGraphContainer = ({region, uniqueRegion = [], graph = 'Cases'
         if(sortedConfirmed && uniqueRegion.length === 0) {
             setSelectedRegions(sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region))
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortedConfirmed])
 
     const handleSelectedRegion = (regionList) => {

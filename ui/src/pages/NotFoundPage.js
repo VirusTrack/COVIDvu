@@ -1,16 +1,14 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import ContentLayout from '../layouts/ContentLayout'
 
 import { Message } from 'rbx'
 
-import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+import { usePageTitle } from '../hooks/ui'
 
 export const NotFoundPage = () => {
 
-    useEffect(() => {
-        document.title = `Location Not Found | ${DEFAULT_DOCUMENT_TITLE}`        
-    }, [])
+    usePageTitle("Location Not Found")
 
     return (
         <ContentLayout>

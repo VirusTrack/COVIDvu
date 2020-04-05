@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
-# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
 
 from covidvu.pipeline.vujson import SITE_DATA
-from covidvu.pipeline.vujson import US_REGIONS
-
-# Confirm that US_REGIONS has the same behavior as the old US_REGIONS_LONG. Thx!
-# from covidvu.pipeline.vujson import US_REGIONS_LONG
-# TODO: Eugene - that is correct.
 from covidvu.pipeline.vujson import resolveReportFileName
+from covidvu.virustrack.countryinfo import US_REGIONS
 
 import csv
 import datetime

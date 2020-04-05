@@ -4,7 +4,6 @@ import Graph from './Graph'
 
 export const GraphWithLoader = ({
         graphName, 
-        title, 
         secondaryGraph, 
         x_title, 
         y_type, 
@@ -16,12 +15,14 @@ export const GraphWithLoader = ({
         ref
     }) => {
     
+    console.log(graphName)
+
     return (
         <>
         { secondaryGraph === graphName &&
         <React.Fragment>
             { graph ? (
-            <Graph title={title}
+            <Graph 
                 data={graph}
                 selected={selected} 
                 config={config}
@@ -29,6 +30,7 @@ export const GraphWithLoader = ({
                 x_title={x_title}
                 y_title={y_title}
                 showLog={showLog}
+                start={(graphName === 'Cases' || graphName === 'Deaths') ? 100 : null}
                 ref={ref}
             />
 

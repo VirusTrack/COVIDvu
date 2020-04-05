@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE 
+# See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
 
 # crontab compliant :)
@@ -196,12 +196,6 @@ function generateRegionsJSONBundle {
     [[ "0" != "$?" ]] && die "vuregions failed" 23
     ls -Alrt "$SITE_DATA_DIR"/bundle*json
 } # generateRegionsJSONBundle
-
-
-function invalidateCloudFrontCache {
-    aws cloudfront create-invalidation --distribution-id "$VIRUSTRACK_CLOUDFRONT_ID" --paths "/*"
-    [[ "0" != "$?" ]] && die "invalidateCloudFrontCache failed" 24
-} # invalidateCloudFrontCache
 
 
 function deployVirusUpdateJSON {

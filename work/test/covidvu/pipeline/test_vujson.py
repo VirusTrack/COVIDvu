@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-# See: https://github.com/pr3d4t0r/COVIDvu/blob/master/LICENSE
+# See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE
 # vim: set fileencoding=utf-8:
 
 
 from covidvu.pipeline.vujson import BOATS
-from covidvu.pipeline.vujson import US_REGIONS
-from covidvu.pipeline.vujson import parseCSSE
+from covidvu.pipeline.vujson import _getCountyCounts
+from covidvu.pipeline.vujson import _getStateCounts
 from covidvu.pipeline.vujson import _parseGlobal
+from covidvu.pipeline.vujson import _renameCounties
 from covidvu.pipeline.vujson import _resampleByRegionUS
-from covidvu.pipeline.vujson import dumpJSON
 from covidvu.pipeline.vujson import dumpGlobalCasesAsJSONFor
+from covidvu.pipeline.vujson import dumpJSON
 from covidvu.pipeline.vujson import dumpUSCasesAsJSONFor
 from covidvu.pipeline.vujson import dumpUSCountiesAsJSONFor
-from covidvu.pipeline.vujson import _getStateCounts
-from covidvu.pipeline.vujson import _getCountyCounts
-from covidvu.pipeline.vujson import _renameCounties
+from covidvu.pipeline.vujson import parseCSSE
+from covidvu.virustrack.countryinfo import US_REGIONS
 
 from pandas.core.frame import DataFrame
 from datetime import date
