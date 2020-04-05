@@ -13,7 +13,7 @@ import { actions } from '../ducks/services'
 
 import { Tag, Generic, Title } from "rbx"
 
-import { REGION_URLS } from '../constants'
+import { REGION_URLS, US_REGION_SELECT_KEY, US_GRAPH_SCALE_KEY } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -22,7 +22,8 @@ import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga'
+import store from 'store2'
 
 export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
 
@@ -67,7 +68,14 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
         if(sortedConfirmed && region.length === 0) {
-            const newSelectedStates = sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region)
+            let newSelectedStates = []
+
+            if(store.get(US_REGION_SELECT_KEY)) {
+                newSelectedStates = store.get(US_REGION_SELECT_KEY)
+            } else {
+                newSelectedStates = sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region)
+            }
+
             setSelectedStates(newSelectedStates)
             handleHistory(newSelectedStates, secondaryGraph, showLog, showPredictions)
         } else if(showPredictions) {
@@ -83,6 +91,11 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
         dispatch(actions.fetchUSStates())
         dispatch(actions.fetchUSPredictions())
         dispatch(actions.fetchTotalUSStatesStats())
+
+        if(store.get(US_GRAPH_SCALE_KEY)) {
+            setShowLog(store.get(US_GRAPH_SCALE_KEY))
+        }
+
     }, [dispatch])
 
     useEffect(() => {
@@ -106,9 +119,18 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
         setSelectedStates(regionList)
         handleHistory(regionList, graph, showLog, showPredictions)
 
+        let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
+
+        if(regionList.length === 0) {
+            store.remove(US_REGION_SELECT_KEY)
+            actionDescription = 'Deselected All Regions'
+        } else {
+            store.set(US_REGION_SELECT_KEY, regionList)
+        }
+        
         ReactGA.event({
             category: 'Region:United States',
-            action: `Changed selected regions to ${regionList.join(', ')}`
+            action: actionDescription
         })
 
     }
@@ -125,6 +147,8 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
+        store.set(US_GRAPH_SCALE_KEY, logScale)
+
         handleHistory(selectedStates, secondaryGraph, logScale, showPredictions)
 
         ReactGA.event({

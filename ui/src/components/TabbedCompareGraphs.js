@@ -22,6 +22,7 @@ export const TabbedCompareGraphs = (
         showLog,
         showPredictions,
         parentRegion,
+        htmlId,
     }) => {
     
     const activeData = () => {
@@ -101,6 +102,7 @@ export const TabbedCompareGraphs = (
                 downloadCSV
                 data={activeData()}
                 downloadImage
+                htmlId={htmlId}
                 />
 
             { (showPredictions && secondaryGraph === 'Cases') &&
