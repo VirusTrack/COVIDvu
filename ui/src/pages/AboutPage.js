@@ -75,9 +75,9 @@ export const AboutPage = () => {
                             Change Country:&nbsp;
                             <Select.Container>
                                 <Select defaultValue={store.get(CLIENT_COUNTRY_KEY)}>
-                                    {Object.keys(isoCountries).map(countryCode => (
+                                    {Object.keys(isoCountries).sort().map(countryCode => (
                                         <Select.Option onClick={() => {
-                                            store.set(CLIENT_COUNTRY_KEY, isoCountries[countryCode]);
+                                            store.set(CLIENT_COUNTRY_KEY, countryCode === 'US' ? 'US' : isoCountries[countryCode]);
                                             store.set(CLIENT_COUNTRY_CODE_KEY, countryCode)
                                         }} key={countryCode}>{isoCountries[countryCode]}</Select.Option>
                                     ))}

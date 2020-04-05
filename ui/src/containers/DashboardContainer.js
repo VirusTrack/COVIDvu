@@ -15,6 +15,7 @@ import HeroElement from '../components/HeroElement'
 import LogoElement from '../components/LogoElement'
 
 import { TERMS } from '../constants/dictionary'
+import { DASHBOARD_GRAPH_SCALE_KEY } from '../constants'
 
 import GraphControls from '../components/GraphControls'
 
@@ -25,7 +26,8 @@ import moment from 'moment-timezone'
 import globeImg from '../images/fa-icon-globe.svg'
 import usflagImg from '../images/fa-icon-usflag.svg'
 
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga'
+import store from 'store2'
 
 export const DashboardContainer = ({showLogParam = false}) => {
     const dispatch = useDispatch()
@@ -53,6 +55,9 @@ export const DashboardContainer = ({showLogParam = false}) => {
 
         dispatch(actions.fetchGlobal())
 
+        if(store.get(DASHBOARD_GRAPH_SCALE_KEY)) {
+            setShowLog(store.get(DASHBOARD_GRAPH_SCALE_KEY))
+        }
     }, [dispatch])
 
     const lastUpdate = useSelector(state => state.services.lastUpdate)
@@ -98,6 +103,8 @@ export const DashboardContainer = ({showLogParam = false}) => {
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
+        store.set(DASHBOARD_GRAPH_SCALE_KEY, logScale)
+
         ReactGA.event({
             category: 'Dashboard',
             action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`
@@ -110,6 +117,10 @@ export const DashboardContainer = ({showLogParam = false}) => {
             <h1>Loading</h1>
         )
     }
+
+    console.dir(globalConfirmed)
+    
+    console.dir([clientCountry])
 
     return (
         <>
