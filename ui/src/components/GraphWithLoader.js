@@ -15,8 +15,6 @@ export const GraphWithLoader = ({
         ref
     }) => {
     
-    console.log(graphName)
-
     return (
         <>
         { secondaryGraph === graphName &&
