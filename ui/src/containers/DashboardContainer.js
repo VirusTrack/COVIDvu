@@ -15,6 +15,7 @@ import HeroElement from '../components/HeroElement'
 import LogoElement from '../components/LogoElement'
 
 import { TERMS } from '../constants/dictionary'
+import { DASHBOARD_GRAPH_SCALE_KEY } from '../constants'
 
 import GraphControls from '../components/GraphControls'
 
@@ -25,7 +26,8 @@ import moment from 'moment-timezone'
 import globeImg from '../images/fa-icon-globe.svg'
 import usflagImg from '../images/fa-icon-usflag.svg'
 
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga'
+import store from 'store2'
 
 export const DashboardContainer = ({showLogParam = false}) => {
     const dispatch = useDispatch()
@@ -53,6 +55,9 @@ export const DashboardContainer = ({showLogParam = false}) => {
 
         dispatch(actions.fetchGlobal())
 
+        if(store.get(DASHBOARD_GRAPH_SCALE_KEY)) {
+            setShowLog(store.get(DASHBOARD_GRAPH_SCALE_KEY))
+        }
     }, [dispatch])
 
     const lastUpdate = useSelector(state => state.services.lastUpdate)
@@ -98,6 +103,8 @@ export const DashboardContainer = ({showLogParam = false}) => {
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
+        store.set(DASHBOARD_GRAPH_SCALE_KEY, logScale)
+
         ReactGA.event({
             category: 'Dashboard',
             action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`
@@ -110,6 +117,10 @@ export const DashboardContainer = ({showLogParam = false}) => {
             <h1>Loading</h1>
         )
     }
+
+    console.dir(globalConfirmed)
+    
+    console.dir([clientCountry])
 
     return (
         <>
@@ -179,7 +190,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
             </Column>
                 
             <Column>
-                <Container className="chart">
+                <Container className="chart" id="clientCountry">
                     <Title size={2} align="center">
                         <Heading align="center">Confirmed Cases</Heading>
                         {clientCountry.country === 'US' ? "United States" : clientCountry.country}
@@ -191,7 +202,8 @@ export const DashboardContainer = ({showLogParam = false}) => {
                             showLog={showLog} 
                             handleGraphScale={handleGraphScale} 
                             secondaryGraph={globalConfirmed} 
-                            centered                            
+                            centered      
+                            htmlId="clientCountry"
                             />
                     </Generic>
                     <GraphWithLoader 
@@ -207,7 +219,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
             </Column>
 
             <Column>
-                <Container className="chart">
+                <Container className="chart" id="top10Country">
                     <Title size={2} align="center">
                         <Heading align="center">Top 10 Confirmed</Heading>
                         Cases by Country
@@ -220,8 +232,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                             handleGraphScale={handleGraphScale} 
                             secondaryGraph={globalTop10} 
                             centered
-
-                            
+                            htmlId="top10Country"
                             />
                     </Generic>
                     <GraphWithLoader 
@@ -299,7 +310,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
             </Container>
             </Column>
 
-            <Column className="chart">
+            <Column className="chart" id="top10USState">
                 <Title size={2} align="center"><Heading>Top 10 Confirmed</Heading>Cases by State</Title>
                 
                 <Generic style={{marginBottom: '1rem'}}>
@@ -309,7 +320,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         handleGraphScale={handleGraphScale} 
                         secondaryGraph={usStateNamesTop10} 
                         centered
-
+                        htmlId="top10USState"
                         
                         />
                 </Generic>
@@ -322,7 +333,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                 />
             </Column>
 
-            <Column className="chart">
+            <Column className="chart" id="topUSRegion">
                 <Title size={2} align="center"><Heading>Top Coronavirus Cases</Heading>By U.S. Region</Title>
                 
                 <Generic style={{marginBottom: '1rem'}}>
@@ -332,7 +343,7 @@ export const DashboardContainer = ({showLogParam = false}) => {
                         handleGraphScale={handleGraphScale} 
                         secondaryGraph={confirmedUSRegions} 
                         centered
-
+                        htmlId="topUSRegion"
                         
                         />
                 </Generic>

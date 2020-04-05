@@ -9,9 +9,14 @@ const TEST_GEO_URL = `https://test.virustrack.live/country_info`
 const LOCAL_GEO_URL = `http://localhost:3100/country_info`
 
 const LAST_UPDATE_KEY = 'covid-lastUpdated'
-
 const CLIENT_COUNTRY_KEY = 'covid-clientCountry'
 const CLIENT_COUNTRY_CODE_KEY = 'covid-clientCountryCode'
+
+const GLOBAL_REGION_SELECT_KEY = 'covid-globalRegionSelect'
+const US_REGION_SELECT_KEY = 'covid-usRegionSelect'
+const DASHBOARD_GRAPH_SCALE_KEY = 'covid-dashboardGraphScale'
+const GLOBAL_GRAPH_SCALE_KEY = 'covid-globalGraphScale'
+const US_GRAPH_SCALE_KEY = 'covid-usGraphScale'
 
 const ONE_MINUTE = 1 * 60 * 1000
 const CACHE_TIMER = ONE_MINUTE
@@ -592,4 +597,9 @@ const COUNTRIES = [
     LAST_UPDATE_KEY,
     CLIENT_COUNTRY_KEY,
     CLIENT_COUNTRY_CODE_KEY,
+    GLOBAL_REGION_SELECT_KEY,
+    US_REGION_SELECT_KEY,
+    DASHBOARD_GRAPH_SCALE_KEY,
+    GLOBAL_GRAPH_SCALE_KEY,
+    US_GRAPH_SCALE_KEY,
   }

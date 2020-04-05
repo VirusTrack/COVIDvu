@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { useHistory } from 'react-router'
+import { useHistory, useLocation } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions } from '../ducks/services'
 
@@ -17,10 +17,23 @@ import USStatsTable from '../components/USStatsTable'
 
 import ReactGA from 'react-ga';
 
+import {
+    FacebookShareButton,
+    RedditShareButton,
+    TwitterShareButton,
+    WhatsappShareButton,
+    FacebookIcon,
+    TwitterIcon,
+    RedditIcon,
+    WhatsappIcon,
+  } from "react-share";
+  
 export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
 
     const dispatch = useDispatch()
     const history = useHistory()
+
+    const location = useLocation()
 
     const [selectedTab, setSelectedTab] = useState(filter)
     const [filterRegion, setFilterRegion] = useState('NY')
@@ -120,6 +133,9 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
         })
     }
 
+
+    const shareUrl = `https://virustrack.live${location.pathname}${location.search}`
+
     return (
         <>
         <HeroElement
@@ -146,6 +162,28 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
                 </Level>
             </Notification>
 
+            <Level brekapoint="mobile">
+                <Level.Item>
+                    <FacebookShareButton url={shareUrl}>
+                        <FacebookIcon size={26} />
+                    </FacebookShareButton>
+                    &nbsp;
+                    <TwitterShareButton 
+                            url={shareUrl} 
+                            title={document.title}
+                    >
+                        <TwitterIcon size={26} />
+                    </TwitterShareButton> 
+                    &nbsp;
+                    <RedditShareButton url={shareUrl} title={document.title}>
+                        <RedditIcon size={26} />
+                    </RedditShareButton>
+                    &nbsp;
+                    <WhatsappShareButton url={shareUrl} title={document.title}>
+                        <WhatsappIcon size={26} />
+                    </WhatsappShareButton>
+                </Level.Item>
+            </Level>
             <Tab.Group size="large">
                 <Tab active={selectedTab === 'Global'} onClick={() => { changeStatsTab('Global') }}>Global</Tab>
                 <Tab active={selectedTab === 'US'} onClick={() => { changeStatsTab('US') }}>United States</Tab>

@@ -19,7 +19,10 @@ import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga'
+
+import store from 'store2'
+import { GLOBAL_REGION_SELECT_KEY, GLOBAL_GRAPH_SCALE_KEY } from '../constants'
 
 export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
 
@@ -55,13 +58,23 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
         dispatch(actions.fetchGlobal({showLog}))
         dispatch(actions.fetchGlobalPredictions())
         dispatch(actions.fetchTotalGlobalStats())
+
+        if(store.get(GLOBAL_GRAPH_SCALE_KEY)) {
+            setShowLog(store.get(GLOBAL_GRAPH_SCALE_KEY))
+        }
+
     }, [dispatch, showLog])
 
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
         if(sortedConfirmed && region.length === 0) {
-            console.log("hey hey hey")
-            const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
+            let newSelectedCountries = []
+            if(store.get(GLOBAL_REGION_SELECT_KEY)) {
+                newSelectedCountries = store.get(GLOBAL_REGION_SELECT_KEY)
+            } else {
+                newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
+            }
+
             setSelectedCountries(newSelectedCountries)
             handleHistory(newSelectedCountries, secondaryGraph, showLog, showPredictions)
         } else if(showPredictions) {
@@ -106,7 +119,10 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
         let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
 
         if(regionList.length === 0) {
+            store.remove(GLOBAL_REGION_SELECT_KEY)
             actionDescription = 'Deselected All Regions'
+        } else {
+            store.set(GLOBAL_REGION_SELECT_KEY, regionList)
         }
 
         ReactGA.event({
@@ -127,6 +143,8 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
+        store.set(GLOBAL_GRAPH_SCALE_KEY, logScale)
+
         handleHistory(selectedCountries, secondaryGraph, logScale, showPredictions)
 
         ReactGA.event({
