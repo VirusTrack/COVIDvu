@@ -48,7 +48,7 @@ class Cryostation(object):
         result = self._storage.get(Record.key == index)
 
         if not result:
-            if not default:
+            if default == None:
                 raise IndexError
             else:
                 result = default
