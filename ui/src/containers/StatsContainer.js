@@ -86,15 +86,6 @@ export const StatsContainer = ({filter='Global', daysAgoParam = 0}) => {
         }
     }, [dispatch, daysAgo, selectedTab, filterRegion, sort])
 
-    // useInterval(() => {
-    //     if(store.session.get(CACHE_INVALIDATE_GLOBAL_KEY)) {
-    //         dispatch(actions.fetchGlobalStats({daysAgo: daysAgo}))
-    //     }
-    //     if(store.session.get(CACHE_INVALIDATE_US_STATES_KEY)) {
-    //         dispatch(actions.fetchUSStatesStats({daysAgo: daysAgo}))
-    //     }
-    // }, ONE_MINUTE)
-
     useEffect(() => {
 
         if(selectedTab === 'Global' && statsTotals) {

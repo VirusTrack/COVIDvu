@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { useLocation } from 'react-router'
 import queryString from 'query-string'
@@ -7,7 +7,7 @@ import ErrorBoundary from '../components/ErrorBoundary'
 import ContinentalGraphContainer from '../containers/ContinentalGraphContainer'
 import MainLayout from '../layouts/MainLayout'
 
-import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+import { usePageTitle } from '../hooks/ui'
 
 export const CovidContinentalPage = () => {
     
@@ -21,9 +21,7 @@ export const CovidContinentalPage = () => {
     let graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
     let showLog = query.showLog === 'true' ? true : false
 
-    useEffect(() => {
-        document.title = `Continental Graphs | ${DEFAULT_DOCUMENT_TITLE}`
-    }, [])
+    usePageTitle("Continental Graphs")
 
     return (
         <MainLayout>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { useLocation } from 'react-router'
 import queryString from 'query-string'
@@ -8,7 +8,7 @@ import MainLayout from '../layouts/MainLayout'
 
 import DashboardContainer from '../containers/DashboardContainer'
 
-import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+import { usePageTitle } from '../hooks/ui'
 
 export const DashboardPage = () => {
  
@@ -18,10 +18,8 @@ export const DashboardPage = () => {
 
     let showLog = query.showLog === 'true' ? true : false
 
-    useEffect(() => {
-        document.title = `Dashboard | ${DEFAULT_DOCUMENT_TITLE}`        
-    }, [])
-    
+    usePageTitle("Dashboard")
+     
     return (
         <MainLayout className="dashboard">
             <ErrorBoundary>
