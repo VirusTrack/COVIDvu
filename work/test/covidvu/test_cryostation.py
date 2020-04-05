@@ -59,6 +59,17 @@ def test_Cryostation_get():
     assert result['value'] == '4269-text'
 
 
+def test_Cryostation___getitem__():
+    key = 'unitTest'
+
+    with pytest.raises(IndexError):
+        cryostation['bogus']
+
+    result = cryostation[key]
+
+    assert result['value'] == '4269-text'
+
+
 #--------------------------------------------------
 # At the end always!
 #--------------------------------------------------

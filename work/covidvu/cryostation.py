@@ -8,7 +8,7 @@ from tinydb import TinyDB, Query
 
 # --- constants ---
 
-DEFAULT_TABLE = '_virustrack'
+DEFAULT_TABLE = 'virustrack'
 
 
 # *** classes and objects ***
@@ -44,7 +44,6 @@ class Cryostation(object):
 
     def get(self, index, default = None):
         Record = Query()
-
         result = self._storage.get(Record.key == index)
 
         if not result:
@@ -54,6 +53,10 @@ class Cryostation(object):
                 result = default
 
         return result
+
+
+    def __getitem__(self, index):
+        return self.get(index)
 
 
     def __contains__(self, key):
