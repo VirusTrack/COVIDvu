@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
+import { useChangePageTitle } from '../hooks/ui'
 
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
@@ -10,9 +11,9 @@ import numeral from 'numeral'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Notification, Generic, Title } from "rbx"
+import { Tag, Generic, Title } from "rbx"
 
-import { REGION_URLS } from '../constants'
+import { REGION_URLS, US_REGION_SELECT_KEY, US_GRAPH_SCALE_KEY } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -21,13 +22,15 @@ import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga'
+import store from 'store2'
 
 export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
 
     const dispatch = useDispatch()
     const { search } = useLocation()
     const handleHistory = useHandleHistory('/covid/us')
+    const changePageTitle = useChangePageTitle()
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
@@ -35,11 +38,11 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
     const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
     const { confirmed, sortedConfirmed, deaths, mortality } = useGraphData("usStates")
+    const usStatesStats = useSelector(state => state.services.totalUSStatesStats)
 
     const usPredictions = useSelector(state => state.services.usPredictions)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
-    const [unassignedCases, setUnassignedCases] = useState(0)
 
     const renderDisplay = (value) => {
         return value.startsWith('!') ? value.substring(1) : value            
@@ -54,10 +57,25 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
             window.open(REGION_URLS[key], "_blank")
     }
 
+    useEffect(() => {
+        if(usStatesStats) {
+            changePageTitle(`United States Coronavirus ${numeral(usStatesStats.confirmed).format('0,0')} Cases and ${numeral(usStatesStats.deaths).format('0,0')} Deaths from COVID-19 Virus Pandemic | VirusTrack.live`)
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [usStatesStats])
+
+
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
         if(sortedConfirmed && region.length === 0) {
-            const newSelectedStates = sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region)
+            let newSelectedStates = []
+
+            if(store.get(US_REGION_SELECT_KEY)) {
+                newSelectedStates = store.get(US_REGION_SELECT_KEY)
+            } else {
+                newSelectedStates = sortedConfirmed.slice(0, 3).map(confirmed => confirmed.region)
+            }
+
             setSelectedStates(newSelectedStates)
             handleHistory(newSelectedStates, secondaryGraph, showLog, showPredictions)
         } else if(showPredictions) {
@@ -66,11 +84,18 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
                 handleHistory(['New York'], secondaryGraph, showLog, showPredictions)
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortedConfirmed])
 
     useEffect(() => {
         dispatch(actions.fetchUSStates())
         dispatch(actions.fetchUSPredictions())
+        dispatch(actions.fetchTotalUSStatesStats())
+
+        if(store.get(US_GRAPH_SCALE_KEY)) {
+            setShowLog(store.get(US_GRAPH_SCALE_KEY))
+        }
+
     }, [dispatch])
 
     useEffect(() => {
@@ -82,11 +107,11 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
 
     useEffect(() => {
         if(confirmed) {
-            const totalStates = Object.values(confirmed['!Total US'])
-            const unassignedStates = Object.values(confirmed['Unassigned'])
+            if(confirmed.hasOwnProperty('!Total US')) {
+                const totalStates = Object.values(confirmed['!Total US'])
+                setConfirmedTotal(totalStates[totalStates.length - 1])
+            }
 
-            setConfirmedTotal(totalStates[totalStates.length - 1])
-            setUnassignedCases(unassignedStates[unassignedStates.length - 1])
         }
     }, [confirmed])
     
@@ -94,9 +119,18 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
         setSelectedStates(regionList)
         handleHistory(regionList, graph, showLog, showPredictions)
 
+        let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
+
+        if(regionList.length === 0) {
+            store.remove(US_REGION_SELECT_KEY)
+            actionDescription = 'Deselected All Regions'
+        } else {
+            store.set(US_REGION_SELECT_KEY, regionList)
+        }
+        
         ReactGA.event({
             category: 'Region:United States',
-            action: `Changed selected regions to ${regionList.join(', ')}`
+            action: actionDescription
         })
 
     }
@@ -113,6 +147,8 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
+        store.set(US_GRAPH_SCALE_KEY, logScale)
+
         handleHistory(selectedStates, secondaryGraph, logScale, showPredictions)
 
         ReactGA.event({
@@ -138,7 +174,7 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
         <HeroElement
             subtitle="United States"
             title={
-                <>Coronavirus Cases <br />by State</>
+                <>Coronavirus Cases by State</>
             }
             buttons={[
                 { title: 'Cases By State', location: '/covid/us' },
@@ -195,10 +231,6 @@ export const USGraphContainer = ({region = [], graph = 'Cases', showLogParam = f
                     </React.Fragment>
                 ))}
                 </ul>
-
-                <Notification color="warning" size="small" style={{margin: '1.5rem'}}>
-                    The sum of all states and territories may differ from the total because of delays in CDC and individual states reports consolidation. Unassigned cases today = {unassignedCases}
-                </Notification>
                 </>
             </TwoGraphLayout>
         </BoxWithLoadingIndicator>

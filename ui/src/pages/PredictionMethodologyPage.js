@@ -1,18 +1,16 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { Box, Content, Title } from 'rbx'
 
 import ContentLayout from '../layouts/ContentLayout'
 
-import { DEFAULT_DOCUMENT_TITLE } from '../constants'
+import { usePageTitle } from '../hooks/ui'
 
 import MathJax from 'react-mathjax'
 
 export const PredictionMethodologyPage = () => {
 
-    useEffect(() => {
-        document.title = `Prediction Methdology | ${DEFAULT_DOCUMENT_TITLE}`        
-    }, [])
+    usePageTitle("Prediction Methdology")
 
     return (
         
@@ -103,7 +101,7 @@ export const PredictionMethodologyPage = () => {
                     </p>
 
                     <MathJax.Node formula={`
-                        P(\log_{10}{K}) = \\mathrm{Unif}(0, 10)
+                        P(\\log_{10}{K}) = \\mathrm{Unif}(0, 10)
                     `} />
 
                     <MathJax.Node formula={`
@@ -115,7 +113,7 @@ export const PredictionMethodologyPage = () => {
                     `} />
 
                     <MathJax.Node formula={`
-                        P(\sigma) = \\mathrm{HalfNormal}(0, 100)
+                        P(\\sigma) = \\mathrm{HalfNormal}(0, 100)
                     `} />
 
                     <p>

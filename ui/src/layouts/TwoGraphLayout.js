@@ -27,9 +27,6 @@ export const TwoGraphLayout = ({ children }) => {
                     {children.slice(3)}
                 </Column>
             </Column.Group>
-
-            
-
         </>
     )
 }

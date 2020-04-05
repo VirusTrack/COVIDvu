@@ -1,11 +1,22 @@
 const DATA_URL = `/site-data`
-const STAGING_DATA_URL = `http://staging.virustrack.live/site-data`
-const TEST_DATA_URL = `http://test.virustrack.live/site-data`
+const STAGING_DATA_URL = `https://staging.virustrack.live/site-data`
+const TEST_DATA_URL = `https://test.virustrack.live/site-data`
 const LOCAL_DATA_URL = `http://localhost:3100/site-data`
 
-const LAST_UPDATE_KEY = 'covid-lastUpdated'
+const GEO_URL = `https://virustrack.live/country_info`
+const STAGING_GEO_URL = `https://staging.virustrack.live/country_info`
+const TEST_GEO_URL = `https://test.virustrack.live/country_info`
+const LOCAL_GEO_URL = `http://localhost:3100/country_info`
 
+const LAST_UPDATE_KEY = 'covid-lastUpdated'
 const CLIENT_COUNTRY_KEY = 'covid-clientCountry'
+const CLIENT_COUNTRY_CODE_KEY = 'covid-clientCountryCode'
+
+const GLOBAL_REGION_SELECT_KEY = 'covid-globalRegionSelect'
+const US_REGION_SELECT_KEY = 'covid-usRegionSelect'
+const DASHBOARD_GRAPH_SCALE_KEY = 'covid-dashboardGraphScale'
+const GLOBAL_GRAPH_SCALE_KEY = 'covid-globalGraphScale'
+const US_GRAPH_SCALE_KEY = 'covid-usGraphScale'
 
 const ONE_MINUTE = 1 * 60 * 1000
 const CACHE_TIMER = ONE_MINUTE
@@ -576,9 +587,19 @@ const COUNTRIES = [
     STAGING_DATA_URL,
     LOCAL_DATA_URL,
     TEST_DATA_URL,
+    GEO_URL,
+    STAGING_GEO_URL,
+    TEST_GEO_URL,    
+    LOCAL_GEO_URL,
     REGION_URLS,
     CACHE_TIMER,
     ONE_MINUTE,
     LAST_UPDATE_KEY,
     CLIENT_COUNTRY_KEY,
+    CLIENT_COUNTRY_CODE_KEY,
+    GLOBAL_REGION_SELECT_KEY,
+    US_REGION_SELECT_KEY,
+    DASHBOARD_GRAPH_SCALE_KEY,
+    GLOBAL_GRAPH_SCALE_KEY,
+    US_GRAPH_SCALE_KEY,
   }

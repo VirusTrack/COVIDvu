@@ -28,6 +28,7 @@
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
+    "react-share": "^4.1.0",
     "redux": "^4.0.5",
     "redux-saga": "^1.1.3",
     "reimg": "^1.0.0",
@@ -43,6 +44,8 @@
     "deploy": "REACT_APP_DEPLOY_ENV=production npm run build && aws s3 sync build/ s3://virustrack.live --exclude site-data/** --delete --acl public-read",
     "deploy:staging": "REACT_APP_DEPLOY_ENV=staging npm run build && aws s3 sync build/ s3://staging.virustrack.live --exclude site-data/** --delete --acl public-read",
     "deploy:test": "REACT_APP_DEPLOY_ENV=test npm run build && aws s3 sync build/ s3://test.virustrack.live --exclude site-data/** --delete --acl public-read",
+    "invalidate-test-cache": "aws cloudfront create-invalidation --distribution-id \"$VIRUSTRACK_TEST_CLOUDFRONT_ID\" --paths \"/*\" --profile \"$AWS_PROFILE\"",
+    "echo-aws-profile": "echo $AWS_PROFILE",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "upgrade-interactive": "npm-check --update"

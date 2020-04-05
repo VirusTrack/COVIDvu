@@ -4,33 +4,24 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
-import { useChangePageTitle } from '../hooks/ui'
+// import { useChangePageTitle } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Level } from "rbx"
-
-import numeral from 'numeral'
-
-import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
-import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
-import ReactGA from 'react-ga'
+import ReactGA from 'react-ga';
 
-import store from 'store2'
-import { GLOBAL_REGION_SELECT_KEY, GLOBAL_GRAPH_SCALE_KEY } from '../constants'
-
-export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
+export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogParam = false, showPredictionsParam = false}) => {
 
     const dispatch = useDispatch()
     const { search } = useLocation()
-    const changePageTitle = useChangePageTitle()
 
-    const handleHistory = useHandleHistory('/covid')
+    const handleHistory = useHandleHistory(`/covid/country/${region}`)
+    // const changePageTitle = useChangePageTitle()
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
@@ -40,16 +31,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     const {confirmed, sortedConfirmed, deaths, mortality} = useGraphData("global")
 
     const globalPredictions = useSelector(state => state.services.globalPredictions)
-    const globalStats = useSelector(state => state.services.totalGlobalStats)
-
-    const [confirmedTotal, setConfirmedTotal] = useState(0)
-
-    useEffect(() => {
-        if(globalStats) {
-            changePageTitle(`Coronavirus Update ${numeral(globalStats.confirmed).format('0,0')} Cases and ${numeral(globalStats.deaths).format('0,0')} Deaths from COVID-19 Virus Pandemic | VirusTrack.live`)
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [globalStats])
 
     /**
      * Fetch all the data
@@ -57,24 +38,13 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     useEffect(() => {
         dispatch(actions.fetchGlobal({showLog}))
         dispatch(actions.fetchGlobalPredictions())
-        dispatch(actions.fetchTotalGlobalStats())
-
-        if(store.get(GLOBAL_GRAPH_SCALE_KEY)) {
-            setShowLog(store.get(GLOBAL_GRAPH_SCALE_KEY))
-        }
-
     }, [dispatch, showLog])
 
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
         if(sortedConfirmed && region.length === 0) {
-            let newSelectedCountries = []
-            if(store.get(GLOBAL_REGION_SELECT_KEY)) {
-                newSelectedCountries = store.get(GLOBAL_REGION_SELECT_KEY)
-            } else {
-                newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
-            }
-
+            console.log("hey hey hey")
+            const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
             setSelectedCountries(newSelectedCountries)
             handleHistory(newSelectedCountries, secondaryGraph, showLog, showPredictions)
         } else if(showPredictions) {
@@ -82,9 +52,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                 setSelectedCountries(['US'])
                 handleHistory(['US'], secondaryGraph, showLog, showPredictions)
             }
-        } else if(!sortedConfirmed) {
-            dispatch(actions.fetchGlobal({showLog}))
-            dispatch(actions.fetchGlobalPredictions())    
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortedConfirmed])
@@ -97,58 +64,22 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
  
-    useEffect(() => {
-        if(confirmed) {
-
-            let theConfirmedTotal = 0
-
-            for(let confirm of sortedConfirmed) {
-                if(confirm.region === '!Global') {
-                    theConfirmedTotal += confirm.stats
-                }
-            }
-            setConfirmedTotal(theConfirmedTotal)
-
-        }
-    }, [confirmed, selectedCountries, sortedConfirmed])
-
-    const handleSelectedRegion = (regionList) => {
-        setSelectedCountries(regionList)
-        handleHistory(regionList, secondaryGraph, showLog, showPredictions)
-
-        let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
-
-        if(regionList.length === 0) {
-            store.remove(GLOBAL_REGION_SELECT_KEY)
-            actionDescription = 'Deselected All Regions'
-        } else {
-            store.set(GLOBAL_REGION_SELECT_KEY, regionList)
-        }
-
-        ReactGA.event({
-            category: 'Region:Global',
-            action: actionDescription
-        })
-    }
-
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
         handleHistory(selectedCountries, selectedGraph, showLog, showPredictions)
 
         ReactGA.event({
-            category: 'Region:Global',
+            category: 'Region:Country',
             action: `Changed selected graph to ${selectedGraph}`
         })
     }    
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
-        store.set(GLOBAL_GRAPH_SCALE_KEY, logScale)
-
         handleHistory(selectedCountries, secondaryGraph, logScale, showPredictions)
 
         ReactGA.event({
-            category: 'Region:Global',
+            category: 'Region:Country',
             action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`
         })
     }
@@ -168,20 +99,15 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     return (
         <>
         <HeroElement
-            subtitle="Global"
             title={
-                <>Coronavirus Cases by Country</>
+                <>Coronavirus Cases in {region}</>
             }
-            buttons={[
-                { title: 'Cases By Country', location: '/covid' },
-                { title: 'Cases By Continent', location: '/covid/continental' },
-            ]}
         />
 
         <BoxWithLoadingIndicator hasData={sortedConfirmed}>
-            <TwoGraphLayout>
+            <>
 
-                <>
+                {/* <>
                     <CheckboxRegionComponent
                         data={sortedConfirmed}
                         selected={selectedCountries}
@@ -194,7 +120,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                         parentRegion="Global"
                     />
 
-                </>
+                </> */}
 
                 <TabbedCompareGraphs
                     secondaryGraph={secondaryGraph}
@@ -211,24 +137,11 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
                     parentRegion="Global"
                 />
 
-                <>
-                    <Level>
-                        <Level.Item>
-                            {!showLog && 
-                            
-                                <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
-
-                            }
-                        </Level.Item>
-                    </Level>
-
-                </>
-
-            </TwoGraphLayout>
+            </>
         </BoxWithLoadingIndicator>
 
         </>
     )    
 }
 
-export default GlobalGraphContainer
+export default CountryGraphContainer

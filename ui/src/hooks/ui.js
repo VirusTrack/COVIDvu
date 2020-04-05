@@ -1,17 +1,38 @@
 import { useLayoutEffect, useState, useEffect, useRef } from 'react'
 
-import { useLocation } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
 
-import store from 'store2'
+import { actions } from '../ducks/services'
 
 import { 
-    CLIENT_COUNTRY_KEY,
+    DEFAULT_DOCUMENT_TITLE,
 } from '../constants'
 
-import queryString from 'query-string'
+/**
+ * Change the document page title
+ * 
+ * @param {*} pageTitle 
+ */
+export function usePageTitle(pageTitle) {
+    useEffect(() => {
+        document.title = `${pageTitle} | ${DEFAULT_DOCUMENT_TITLE}`
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+}
 
-const isoCountries = require('../constants/iso-countries.json')
+export function useChangePageTitle() {
+  return (pageTitle, includeDefault = false) => {
+      let title = `${pageTitle}`
+      if(includeDefault) {
+        title += ` | ${DEFAULT_DOCUMENT_TITLE}`
+      }
+      document.title = title
+  }  
+}
 
+/**
+ * Introspect the window size
+ */
 export function useWindowSize() {
     const [size, setSize] = useState([0, 0])
     useLayoutEffect(() => {
@@ -25,6 +46,12 @@ export function useWindowSize() {
     return size
 }
 
+/**
+ * Use an interval with the useEffect hook to call something every N seconds
+ * 
+ * @param {*} callback 
+ * @param {*} delay 
+ */
 export function useInterval(callback, delay) {
   const savedCallback = useRef();
 
@@ -62,24 +89,26 @@ const getMobileDetect = userAgent => {
   }
 }
 
+/**
+ * Use the getMobileDetect on userAgent to find out if user is mobile or desktop
+ */
 export const useMobileDetect = () => {
   useEffect(() => {}, [])
     const userAgent = typeof navigator === 'undefined' ? 'SSR' : navigator.userAgent;
     return getMobileDetect(userAgent);
 }
 
+/**
+ * Grab our client country from /country_info
+ */
 export const useClientCountry = () => {
-    const { search } = useLocation()
+    const dispatch = useDispatch()
+    const clientCountry = useSelector(state => state.services.clientCountry)
+    
+    useEffect(() => {
+        dispatch(actions.fetchClientCountry())
+    }, [dispatch])
 
-    let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
+    return clientCountry
 
-    if(query.clientCountry && isoCountries.hasOwnProperty(query.clientCountry)) {
-        store.set(CLIENT_COUNTRY_KEY, query.clientCountry)
-    }
-
-    if(!store.get(CLIENT_COUNTRY_KEY)) {
-        return "US"         // always default to the US
-    } else {
-        return store.get(CLIENT_COUNTRY_KEY)
-    }
 }
