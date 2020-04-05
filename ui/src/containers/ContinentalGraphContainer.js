@@ -88,7 +88,7 @@ export const ContinentalGraphContainer = ({region = [], graph = 'Cases', showLog
         <HeroElement
             subtitle="Global"
             title={
-                <>Coronavirus Cases <br />by Continent</>
+                <>Coronavirus Cases by Continent</>
             }
             buttons={[
                 { title: 'Cases By Country', location: '/covid' },

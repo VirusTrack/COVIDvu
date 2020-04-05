@@ -20,6 +20,16 @@ export function usePageTitle(pageTitle) {
     }, [])
 }
 
+export function useChangePageTitle() {
+  return (pageTitle, includeDefault = false) => {
+      let title = `${pageTitle}`
+      if(includeDefault) {
+        title += ` | ${DEFAULT_DOCUMENT_TITLE}`
+      }
+      document.title = title
+  }  
+}
+
 /**
  * Introspect the window size
  */

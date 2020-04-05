@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
+import { useChangePageTitle } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
@@ -24,6 +25,7 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
 
     const dispatch = useDispatch()
     const { search } = useLocation()
+    const changePageTitle = useChangePageTitle()
 
     const handleHistory = useHandleHistory('/covid')
 
@@ -35,8 +37,16 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     const {confirmed, sortedConfirmed, deaths, mortality} = useGraphData("global")
 
     const globalPredictions = useSelector(state => state.services.globalPredictions)
+    const globalStats = useSelector(state => state.services.totalGlobalStats)
 
     const [confirmedTotal, setConfirmedTotal] = useState(0)
+
+    useEffect(() => {
+        if(globalStats) {
+            changePageTitle(`Coronavirus Update ${numeral(globalStats.confirmed).format('0,0')} Cases and ${numeral(globalStats.deaths).format('0,0')} Deaths from COVID-19 Virus Pandemic | VirusTrack.live`)
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [globalStats])
 
     /**
      * Fetch all the data
@@ -44,13 +54,11 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     useEffect(() => {
         dispatch(actions.fetchGlobal({showLog}))
         dispatch(actions.fetchGlobalPredictions())
+        dispatch(actions.fetchTotalGlobalStats())
     }, [dispatch, showLog])
 
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
-        console.log("sortedConfirmed changed")
-        console.dir(sortedConfirmed)
-        console.dir(region)
         if(sortedConfirmed && region.length === 0) {
             console.log("hey hey hey")
             const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)

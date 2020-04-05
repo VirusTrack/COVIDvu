@@ -4,17 +4,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
+// import { useChangePageTitle } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
 
-import { Tag, Level } from "rbx"
-
-import numeral from 'numeral'
-
-import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
-import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
@@ -26,6 +21,7 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
     const { search } = useLocation()
 
     const handleHistory = useHandleHistory(`/covid/country/${region}`)
+    // const changePageTitle = useChangePageTitle()
 
     const [showLog, setShowLog] = useState(showLogParam)
     const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
@@ -35,8 +31,6 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
     const {confirmed, sortedConfirmed, deaths, mortality} = useGraphData("global")
 
     const globalPredictions = useSelector(state => state.services.globalPredictions)
-
-    const [confirmedTotal, setConfirmedTotal] = useState(0)
 
     /**
      * Fetch all the data
@@ -70,37 +64,6 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
  
-    useEffect(() => {
-        if(confirmed) {
-
-            let theConfirmedTotal = 0
-
-            for(let confirm of sortedConfirmed) {
-                if(confirm.region === '!Global') {
-                    theConfirmedTotal += confirm.stats
-                }
-            }
-            setConfirmedTotal(theConfirmedTotal)
-
-        }
-    }, [confirmed, selectedCountries, sortedConfirmed])
-
-    const handleSelectedRegion = (regionList) => {
-        setSelectedCountries(regionList)
-        handleHistory(regionList, secondaryGraph, showLog, showPredictions)
-
-        let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
-
-        if(regionList.length === 0) {
-            actionDescription = 'Deselected All Regions'
-        }
-
-        ReactGA.event({
-            category: 'Region:Country',
-            action: actionDescription
-        })
-    }
-
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
         handleHistory(selectedCountries, selectedGraph, showLog, showPredictions)
@@ -136,16 +99,15 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
     return (
         <>
         <HeroElement
-            subtitle={region}
             title={
-                <>Coronavirus Cases by Country</>
+                <>Coronavirus Cases in {region}</>
             }
         />
 
         <BoxWithLoadingIndicator hasData={sortedConfirmed}>
-            <TwoGraphLayout>
+            <>
 
-                <>
+                {/* <>
                     <CheckboxRegionComponent
                         data={sortedConfirmed}
                         selected={selectedCountries}
@@ -158,7 +120,7 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
                         parentRegion="Global"
                     />
 
-                </>
+                </> */}
 
                 <TabbedCompareGraphs
                     secondaryGraph={secondaryGraph}
@@ -175,20 +137,7 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
                     parentRegion="Global"
                 />
 
-                <>
-                    <Level>
-                        <Level.Item>
-                            {!showLog && 
-                            
-                                <Tag size="large" color="danger">Total Cases: {numeral(confirmedTotal).format('0,0')}</Tag>
-
-                            }
-                        </Level.Item>
-                    </Level>
-
-                </>
-
-            </TwoGraphLayout>
+            </>
         </BoxWithLoadingIndicator>
 
         </>

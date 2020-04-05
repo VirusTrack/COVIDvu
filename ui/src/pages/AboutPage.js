@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Box, Button, Content, Title, Notification } from 'rbx'
+import { Box, Button, Content, Title, Notification, Level, Select } from 'rbx'
 
 import ContentLayout from '../layouts/ContentLayout'
 
@@ -9,6 +9,8 @@ import { usePageTitle } from '../hooks/ui'
 import { ENABLE_PREDICTIONS, CLIENT_COUNTRY_KEY, CLIENT_COUNTRY_CODE_KEY } from '../constants'
 
 import store from 'store2'
+
+const isoCountries = require('../constants/iso-countries.json');
 
 export const AboutPage = () => {
 
@@ -63,9 +65,26 @@ export const AboutPage = () => {
                     </p>
 
                     <Title size={4}>Debug</Title>
-                    <p>
-                        <Button onClick={() => { store.remove(CLIENT_COUNTRY_KEY); store.remove(CLIENT_COUNTRY_CODE_KEY) }}>Clear locale data cache</Button>
-                    </p>
+                    <Level>
+                    <Level.Item align="left">
+                            <Button onClick={() => { store.remove(CLIENT_COUNTRY_KEY); store.remove(CLIENT_COUNTRY_CODE_KEY) }}>Clear country cache</Button>
+                        </Level.Item>
+                    </Level>
+                    <Level>
+                        <Level.Item align="left">
+                            Change Country:&nbsp;
+                            <Select.Container>
+                                <Select defaultValue={store.get(CLIENT_COUNTRY_KEY)}>
+                                    {Object.keys(isoCountries).map(countryCode => (
+                                        <Select.Option onClick={() => {
+                                            store.set(CLIENT_COUNTRY_KEY, isoCountries[countryCode]);
+                                            store.set(CLIENT_COUNTRY_CODE_KEY, countryCode)
+                                        }} key={countryCode}>{isoCountries[countryCode]}</Select.Option>
+                                    ))}
+                                </Select>
+                            </Select.Container>
+                        </Level.Item>
+                    </Level>
 
                 </Content>
                 </Box>

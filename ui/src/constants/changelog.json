@@ -1,5 +1,13 @@
 [
     {
+        "date": "2020-04-04",
+        "changes": [
+          "Your country now shown in the navigation and on dashboard",
+          "Normalized all graphs to show plots > 100 for cases and deaths",
+          "Page title on dashboard, Global and Regional pages now shows totals"
+        ]
+    },
+    {
         "date": "2020-04-01",
         "changes": [
             "Added predictions to Global and U.S.A. compare graphs",
