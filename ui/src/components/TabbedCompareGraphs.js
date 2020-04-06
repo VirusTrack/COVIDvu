@@ -84,7 +84,7 @@ export const TabbedCompareGraphs = (
 
     return (
         <>
-            <Tab.Group size="large" kind="boxed">
+            <Tab.Group size="large" kind="boxed" id="graphTabs">
                 <Tab active={secondaryGraph === 'Cases'} onClick={() => { handleSelectedGraph('Cases')}}>Cases</Tab>
                 <Tab active={secondaryGraph === 'Deaths'} onClick={() => { handleSelectedGraph('Deaths')}}>Deaths</Tab>
                 <Tab tooltipPosition="right" tooltip={TERMS['CFR_DEFINITION']} active={secondaryGraph === 'Mortality'} onClick={() => { handleSelectedGraph('Mortality')}}>Case Fatality Rate</Tab>
