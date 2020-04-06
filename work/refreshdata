@@ -202,17 +202,13 @@ function deployVirusUpdateJSON {
     [[ -n "$1" ]] || die "deployment failed; target bucket not specified" 10
 
     local targetBucket="$1"
+    local targetEnvironment="$2"
 
     echo "cloning $SITE_DATA_DIR to the $targetBucket website"
     rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$targetBucket/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
     [[ "0" != "$?" ]] && die "rclone failed" 25
 
-    case "$targetBucket" in
-        "$SITE_BUCKET")
-            # Staging doesn't use CloudFront
-            invalidateCloudFrontCache
-            ;;
-    esac
+    ./flushcf "$targetEnvironment"
 } # deployVirusUpdateJSON
 
 
@@ -255,8 +251,9 @@ assertCloudFrontConfig
 assert_rcloneConfig
 
 [[ "$#" < 1 ]] && exit 0 
+environment="$1"
 
-case "$1" in
+case "$environment" in
     "local")
         ;&
     "noop")
@@ -264,18 +261,20 @@ case "$1" in
     "nuke")
         nukeDeploymentSite
         ;;
+    "production")
+        ;&
     "publish")
-        deployVirusUpdateJSON "$SITE_BUCKET"
+        deployVirusUpdateJSON "$SITE_BUCKET" "$environment"
         ;;
     "staging")
         ;&
     "stage")
-        deployVirusUpdateJSON "$STAGE_BUCKET"
+        deployVirusUpdateJSON "$STAGE_BUCKET" "$environment"
         ;;
     "testing")
         ;&
     "test")
-        deployVirusUpdateJSON "$TEST_BUCKET"
+        deployVirusUpdateJSON "$TEST_BUCKET" "$environment"
         ;;
     *)
         die "invalid command - use stage|publish|nuke|noop" 11
