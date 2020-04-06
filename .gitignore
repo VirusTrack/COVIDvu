@@ -156,6 +156,7 @@ dmypy.json
 .viminfo
 work/*.json
 **/snapshots/*
+**/database/*
 
 # Python virtual environment
 
