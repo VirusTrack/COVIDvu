@@ -59,7 +59,9 @@ SCRAPED_TODAY      = pytz.utc.localize(datetime.datetime.today()).astimezone(pyt
 
 # *** functions ***
 
-def _fetchCurrentUpdates(columnRef, index = 'WORLD'):
+# TODO:  Eugene - Remove this later, if BNO made it permanent? - REMOVE IF YOU WORK ON THIS FILE
+# def _fetchCurrentUpdates(columnRef, index = 'WORLD'):
+def _fetchCurrentUpdates(columnRef, index = 'LOCATION'):
     updatesDataset = dict()
     with open(SCRAPED_WORLD_DATA, 'r') as inputFile:
         rawData = csv.DictReader(inputFile, delimiter = '\t')

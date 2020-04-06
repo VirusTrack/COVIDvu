@@ -2,6 +2,9 @@
 
 Listed in the order in which they joined this development effort.
 
+
+## Core team
+
 |  GitHub  | Name              |
 |----------|-------------------|
 |[pr3d4t0r](https://www.linkedin.com/in/ciurana/)|Eugene Ciurana|
@@ -9,8 +12,15 @@ Listed in the order in which they joined this development effort.
 |[kinabalu](https://www.linkedin.com/in/andrewlombardi/)| Andrew Lombardi|
 |[goodwolf](https://www.linkedin.com/in/connorgoodwolf/)| Connor Goodwolf |
 |n/a/d|[Evon Onusic](https://www.linkedin.com/in/onusic/)|
-|[StriderWilson](https://www.linkedin.com/in/strider-wilson/)|Strider Wilson|
 |n/a/d*|[Alice Bonasio](https://www.linkedin.com/in/alicebonasio/)|
+
+
+## Contributors
+
+
+|  GitHub  | Name              |
+|----------|-------------------|
+|[StriderWilson](https://www.linkedin.com/in/strider-wilson/)|Strider Wilson|
 |[dermidgen](https://www.linkedin.com/in/dermidgen/)|Danny Graham|
 |[mangosense](https://www.linkedin.com/in/jaggs83/)|Jagdish Repaswal|
 |[lukemarohn](https://www.linkedin.com/in/lucasmarohn/)|Lucas Marohn|
