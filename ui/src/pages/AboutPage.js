@@ -74,12 +74,13 @@ export const AboutPage = () => {
                         <Level.Item align="left">
                             Change Country:&nbsp;
                             <Select.Container>
-                                <Select defaultValue={store.get(CLIENT_COUNTRY_KEY)}>
+                                <Select defaultValue={store.get(CLIENT_COUNTRY_CODE_KEY)} onChange={(event)=>{ 
+                                    const selectedCountryCode = event.target.value ;
+                                    store.set(CLIENT_COUNTRY_KEY, selectedCountryCode === 'US' ? 'US' : isoCountries[selectedCountryCode]);
+                                    store.set(CLIENT_COUNTRY_CODE_KEY, selectedCountryCode)                                    
+                                    }}>
                                     {Object.keys(isoCountries).sort().map(countryCode => (
-                                        <Select.Option onClick={() => {
-                                            store.set(CLIENT_COUNTRY_KEY, countryCode === 'US' ? 'US' : isoCountries[countryCode]);
-                                            store.set(CLIENT_COUNTRY_CODE_KEY, countryCode)
-                                        }} key={countryCode}>{isoCountries[countryCode]}</Select.Option>
+                                        <Select.Option key={countryCode} value={countryCode}>{isoCountries[countryCode]}</Select.Option>
                                     ))}
                                 </Select>
                             </Select.Container>

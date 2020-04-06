@@ -373,8 +373,8 @@ hr
 
 .CheckboxRegionComponent
   background: #{$offwhite}
-  max-width: 28rem
-  margin: 1.5rem auto
+  width: calc(100% - 3rem)
+  margin: 1.5rem
   border-radius: 1rem
   overflow: hidden
   &:after 
@@ -394,7 +394,6 @@ hr
   padding: 0 
   height: 100%
   overflow-y: scroll
-  max-width: 28rem
   max-height: 80vh
   min-height: 100%
   flex-basis: 100%
@@ -417,18 +416,14 @@ hr
     
 
 .CheckboxRegionOptions
-  padding: 1rem .5rem .5rem 1rem
+  padding: 1rem 1rem .5rem 1rem
   margin-top: 0 !important
   @media screen and (min-width: #{$tablet})
     padding: 2rem 1.5rem .5rem 1.5rem
     &.buttons
       text-align: left
   .button 
-    background: white
     box-shadow: #{$drop-shadow-small}
-    min-height: 4rem
-    &:not(:last-child)
-      margin-right: 1rem !important
 
 .CheckboxRegionCheckbox
   display: none
@@ -575,6 +570,7 @@ label
       flex-direction: column
       align-content: center
       justify-content: center
+      justify-self: flex-start
       @media screen and (min-width: #{450px})
         margin-left: var(--spacing)
       > a
@@ -588,6 +584,7 @@ label
         box-shadow: $drop-shadow-small
         border: .1rem solid $secondary
         border-radius: .5rem
+        align-self: flex-start
         &:hover
           background: $secondary
           color: white
@@ -639,3 +636,7 @@ label
     
 
     
+.comma-separated 
+  > li + li
+    &:before
+      content: ', '
