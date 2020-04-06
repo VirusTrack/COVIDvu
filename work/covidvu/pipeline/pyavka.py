@@ -17,12 +17,19 @@ import os
 # --- constants ---
 
 TABLES_FILES     = {
-                    'WORLD': { 
+                    'LOCATION': { 
                         'fileCSV' : SCRAPED_WORLD_DATA, 
                         'fileHTML': None,
                         'ignoreRows': 6,
                         'tableHTML' : None,
                     },
+# TODO:  Eugene - Remove this later, if BNO made it permanent? - REMOVE IF YOU WORK ON THIS FILE
+#                     'WORLD': { 
+#                         'fileCSV' : SCRAPED_WORLD_DATA, 
+#                         'fileHTML': None,
+#                         'ignoreRows': 6,
+#                         'tableHTML' : None,
+#                     },
                     'UNITED STATES': { 
                         'fileCSV' : SCRAPED_US_DATA, 
                         'fileHTML': None,
