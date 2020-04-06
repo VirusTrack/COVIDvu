@@ -134,7 +134,7 @@ export const CheckboxRegionComponent = (
         <div style={{display: 'flex', alignItems:'center', justifyContent: 'space-between', marginBottom: '.5rem'}}>
         Sort By: <Button size="small" outlined onClick={() => { handleSelected([]) }}>Deselect All</Button>
         </div>
-      <Button.Group size="large" fullwidth hasAddons style={{paddingBottom: '1rem'}}>
+      <Button.Group size="large" hasAddons style={{paddingBottom: '1rem'}}>
         
           {/* <Button size="medium" onClick={() => { handleSelected(defaultSelected)}}>Select Default</Button> */}
             <Button style={{flexGrow: '1', background: alphaSort ? 'rgba(0,25,50,.075)' : null, borderColor: alphaSort ? 'rgba(0,25,50,.1)' : null}} selected={alphaSort} onClick={() => { changeAlphaSort(false) }}>Confirmed</Button>

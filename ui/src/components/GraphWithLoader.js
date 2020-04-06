@@ -28,7 +28,7 @@ export const GraphWithLoader = ({
                 x_title={x_title}
                 y_title={y_title}
                 showLog={showLog}
-                start={(graphName === 'Cases' || graphName === 'Deaths') ? 100 : null}
+                start={(graphName === 'Cases') ? 100 : null}
                 ref={ref}
             />
 
