@@ -5,6 +5,8 @@ import numeral from 'numeral'
 
 import ReactGA from 'react-ga';
 
+import { useMobileDetect, useWindowSize } from '../hooks/ui'
+
 import { groupByKey } from '../utils'
 
 export const CheckboxRegionComponent = (
@@ -21,6 +23,14 @@ export const CheckboxRegionComponent = (
 
   const [regionList, setRegionList] = useState(data)
   const [alphaSort, setAlphaSort] = useState(false)
+
+  const [toggledOpen, setToggledOpen] = useState(false)
+
+  const detectMobile = useMobileDetect()
+
+  const handleToggledOpen = () => {
+    setToggledOpen(!toggledOpen)
+  }
 
   const renderDisplay = (value) => {
     return value.startsWith('!') ? value.substring(1) : value            
@@ -100,20 +110,44 @@ export const CheckboxRegionComponent = (
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alphaSort, showPredictions, secondaryGraph])
 
-  const AlphaOrByConfirmedButton = () => (
-    <>
-    { alphaSort && <Button size="medium" onClick={() => { changeAlphaSort(false) }}>Sort By Confirmed</Button> }
-    { !alphaSort && <Button size="medium" onClick={() => { changeAlphaSort(true) }}>Sort Alphabetical</Button> }
-    </>
-  )
-
   return (
     <div className="CheckboxRegionComponent">
-      <Button.Group className="CheckboxRegionOptions">
+      {detectMobile.isMobile() &&
+
+      <div style={{padding: '1rem'}}>
+      <Button fullwidth onClick={handleToggledOpen} size="large">{toggledOpen ? 'Hide' : 'Show'} Region Options</Button>
+      
+      {!toggledOpen && 
+        <div style={{textAlign: 'center', marginTop: '1rem', fontSize: "1.4rem"}}>
+          {selected.length > 0 ? <span style={{textAlign: 'center'}}>{!toggledOpen && <span>Selected: </span>}</span> : <>{!toggledOpen && <span>Please select a region using the button above.</span>}</>}
+          {!toggledOpen && 
+          <ul className="comma-separated" style={{display: 'inline', 'padding': 0, 'margin': 0}}>
+            {regionList.map((element, idx) => (
+              selected.indexOf(element.region) !== -1 && 
+              <li key={idx} style={{display: 'inline', padding: 0, margin: 0}}>
+                <span>{renderDisplay(`${element.region}`)}</span>
+              </li>)
+              )}
+          </ul>}
+        </div> }
+
+      </div> 
+      }
+      {toggledOpen || !detectMobile.isMobile() ?
+      <>
+      <div className="CheckboxRegionOptions">
+        <div style={{display: 'flex', alignItems:'center', justifyContent: 'space-between', marginBottom: '.5rem'}}>
+        Sort By: <Button size="small" outlined onClick={() => { handleSelected([]) }}>Deselect All</Button>
+        </div>
+      <Button.Group size="large" fullwidth hasAddons style={{paddingBottom: '1rem'}}>
+        
           {/* <Button size="medium" onClick={() => { handleSelected(defaultSelected)}}>Select Default</Button> */}
-          <AlphaOrByConfirmedButton />
-          <Button size="medium" onClick={() => { handleSelected([]) }}>Deselect All</Button>
-        </Button.Group>
+            <Button style={{flexGrow: '1', background: alphaSort ? 'rgba(0,25,50,.075)' : null, borderColor: alphaSort ? 'rgba(0,25,50,.1)' : null}} selected={alphaSort} onClick={() => { changeAlphaSort(false) }}>Confirmed</Button>
+            <Button style={{flexGrow: '1', background: !alphaSort ? 'rgba(0,25,50,.075)' : null, borderColor: !alphaSort ? 'rgba(0,25,50,.1)' : null}} selected={!alphaSort} onClick={() => { changeAlphaSort(true) }}>Alphabetical</Button>
+            </Button.Group>
+          
+        
+        </div>
       <div>{/* fixes form overflow bug in firefox */}
         <form className="CheckboxRegionForm">
                 {regionList.map((element, idx) => (
@@ -126,7 +160,9 @@ export const CheckboxRegionComponent = (
                     </React.Fragment>
                 ))}
         </form>
-      </div>
+      </div> 
+      </>
+      : null}
     </div>
   )
 }
