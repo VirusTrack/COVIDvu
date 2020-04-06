@@ -90,7 +90,6 @@ export const GlobalGraphContainer = ({region = [], graph = 'Cases', showLogParam
     }, [sortedConfirmed])
 
     useEffect(() => {
-        console.log("blank useEffect called")
         if(!search) {
             handleHistory(selectedCountries, secondaryGraph, showLog, showPredictions)
         } 

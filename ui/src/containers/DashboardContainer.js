@@ -118,10 +118,6 @@ export const DashboardContainer = ({showLogParam = false}) => {
         )
     }
 
-    console.dir(globalConfirmed)
-    
-    console.dir([clientCountry])
-
     return (
         <>
         <HeroElement
