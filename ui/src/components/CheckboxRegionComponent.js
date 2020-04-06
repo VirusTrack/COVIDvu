@@ -5,7 +5,7 @@ import numeral from 'numeral'
 
 import ReactGA from 'react-ga';
 
-import { useMobileDetect, useWindowSize } from '../hooks/ui'
+import { useMobileDetect } from '../hooks/ui'
 
 import { groupByKey } from '../utils'
 
@@ -62,11 +62,6 @@ export const CheckboxRegionComponent = (
 
   useEffect(() => {
     if(showPredictions && Object.keys(predictions).length > 0) {
-        console.log(`showPredictions: ${showPredictions}`)
-        console.log(`secondaryGraph: ${secondaryGraph}`)
-        console.log(`alphaSort: ${alphaSort}`)
-        console.dir(predictions)
-
         const countryByKey = groupByKey("region", data)
         const predictionsList = Object.keys(predictions).map(region => ({ region: region, stats: countryByKey[region].stats}))
 

@@ -43,7 +43,6 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
     // Select the Top 3 confirmed from list if nothing is selected
     useEffect(() => {
         if(sortedConfirmed && region.length === 0) {
-            console.log("hey hey hey")
             const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
             setSelectedCountries(newSelectedCountries)
             handleHistory(newSelectedCountries, secondaryGraph, showLog, showPredictions)
@@ -57,7 +56,6 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
     }, [sortedConfirmed])
 
     useEffect(() => {
-        console.log("blank useEffect called")
         if(!search) {
             handleHistory(selectedCountries, secondaryGraph, showLog, showPredictions)
         } 
