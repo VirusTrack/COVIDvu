@@ -3,7 +3,9 @@ import { Button } from 'rbx'
 
 import NewsletterModal from './NewsletterModal'
 
-export const NewsletterModalButton = ({buttonCopy, size, color, style}) => {
+export const NewsletterModalButton = ({
+  buttonCopy, size, color, style,
+}) => {
   const [newsletterModal, setNewsletterModal] = useState(false)
 
   const handleModalClose = () => {
@@ -15,8 +17,8 @@ export const NewsletterModalButton = ({buttonCopy, size, color, style}) => {
 
   return (
     <>
-    <Button style={style} size={size ? size : 'medium'} color={color ? color : 'primary'} onClick={handleModalOpen}>{buttonCopy ? buttonCopy : 'Newsletter Signup'}</Button>
-    {newsletterModal && <NewsletterModal handleModalClose={handleModalClose} />}
+      <Button style={style} size={size || 'medium'} color={color || 'primary'} onClick={handleModalOpen}>{buttonCopy || 'Newsletter Signup'}</Button>
+      {newsletterModal && <NewsletterModal handleModalClose={handleModalClose} />}
     </>
   )
 }

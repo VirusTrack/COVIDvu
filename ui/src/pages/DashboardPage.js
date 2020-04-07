@@ -11,23 +11,21 @@ import DashboardContainer from '../containers/DashboardContainer'
 import { usePageTitle } from '../hooks/ui'
 
 export const DashboardPage = () => {
- 
-    const { search } = useLocation()
+  const { search } = useLocation()
 
-    let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
+  const query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
 
-    let showLog = query.showLog === 'true' ? true : false
+  const showLog = query.showLog === 'true'
 
-    usePageTitle("Dashboard")
-     
-    return (
-        <MainLayout className="dashboard">
-            <ErrorBoundary>
-                <DashboardContainer showLogParam={showLog} />
-            </ErrorBoundary>
-        </MainLayout>
-    )
+  usePageTitle('Dashboard')
 
+  return (
+    <MainLayout className="dashboard">
+      <ErrorBoundary>
+        <DashboardContainer showLogParam={showLog} />
+      </ErrorBoundary>
+    </MainLayout>
+  )
 }
 
 export default DashboardPage

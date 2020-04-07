@@ -36,6 +36,13 @@
     "zlib": "^1.0.5"
   },
   "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^2.5.1",
+    "husky": "^4.2.3",
     "npm-check": "^5.9.2"
   },
   "scripts": {
@@ -44,12 +51,18 @@
     "deploy": "REACT_APP_DEPLOY_ENV=production npm run build && aws s3 sync build/ s3://virustrack.live --exclude site-data/** --delete --acl public-read",
     "deploy:staging": "REACT_APP_DEPLOY_ENV=staging npm run build && aws s3 sync build/ s3://staging.virustrack.live --exclude site-data/** --delete --acl public-read",
     "deploy:test": "REACT_APP_DEPLOY_ENV=test npm run build && aws s3 sync build/ s3://test.virustrack.live --exclude site-data/** --delete --acl public-read",
-    "invalidate-test-cache": "aws cloudfront create-invalidation --distribution-id \"$VIRUSTRACK_TEST_CLOUDFRONT_ID\" --paths \"/*\" --profile \"$AWS_PROFILE\"",
-    "echo-aws-profile": "echo $AWS_PROFILE",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint --fix src/**/*.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "upgrade-interactive": "npm-check --update"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint:fix",
+      "pre-push": "npm run lint"
+    }
+  },  
   "eslintConfig": {
     "extends": "react-app"
   },
