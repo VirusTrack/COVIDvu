@@ -1,42 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import Plot from 'react-plotly.js';
-
-
-import { Generic, Notification, Title } from 'rbx';
+import Plot from 'react-plotly.js'
 
 
-import numeral from 'numeral';
-import moment from 'moment';
-import LogoElement from './LogoElement';
-import { useMobileDetect } from '../hooks/ui';
+import { Generic, Notification, Title } from 'rbx'
+
+
+import numeral from 'numeral'
+import moment from 'moment'
+import LogoElement from './LogoElement'
+import { useMobileDetect } from '../hooks/ui'
 
 export const PredictionGraph = ({
   title, predictions, confirmed, selected, showLog = false,
 }) => {
-  const [plotsAsValues, setPlotsAsValues] = useState([]);
+  const [plotsAsValues, setPlotsAsValues] = useState([])
 
-  const detectMobile = useMobileDetect();
+  const detectMobile = useMobileDetect()
 
-  const [upper, setUpper] = useState(0);
-  const [lower, setLower] = useState(0);
+  const [upper, setUpper] = useState(0)
+  const [lower, setLower] = useState(0)
 
-  const today = moment();
+  const today = moment()
 
   useEffect(() => {
     if (Object.keys(predictions).length > 0 && Object.keys(confirmed).length > 0) {
-      const plots = {};
-      const plots_2_5 = {};
-      const plots_25 = {};
-      const plots_97_5 = {};
-      const plots_75 = {};
-      const plots_mean = {};
+      const plots = {}
+      const plots_2_5 = {}
+      const plots_25 = {}
+      const plots_97_5 = {}
+      const plots_75 = {}
+      const plots_mean = {}
 
-      const selectedData = Object.keys(confirmed).filter((entry) => selected.indexOf(entry) !== -1);
+      const selectedData = Object.keys(confirmed).filter((entry) => selected.indexOf(entry) !== -1)
 
-      let plotList = [];
+      let plotList = []
       for (const region of selectedData) {
-        const normalizedRegion = region.startsWith('!') ? region.substring(1) : region;
+        const normalizedRegion = region.startsWith('!') ? region.substring(1) : region
         plots[normalizedRegion] = {
           x: [],
           y: [],
@@ -48,7 +48,7 @@ export const PredictionGraph = ({
             color: 'green',
             size: 5,
           },
-        };
+        }
         plots_2_5[normalizedRegion] = {
           x: [],
           y: [],
@@ -59,7 +59,7 @@ export const PredictionGraph = ({
           mode: 'lines',
           name: 'Lower',
           showlegend: false,
-        };
+        }
         plots_97_5[normalizedRegion] = {
           x: [],
           y: [],
@@ -71,7 +71,7 @@ export const PredictionGraph = ({
           fill: 'tonexty',
           name: 'Upper',
           showlegend: false,
-        };
+        }
         plots_25[normalizedRegion] = {
           x: [],
           y: [],
@@ -84,7 +84,7 @@ export const PredictionGraph = ({
           fill: null,
           showlegend: false,
           hoverinfo: 'skip',
-        };
+        }
         plots_75[normalizedRegion] = {
           x: [],
           y: [],
@@ -98,7 +98,7 @@ export const PredictionGraph = ({
           showlegend: false,
           hoverinfo: 'skip',
 
-        };
+        }
         plots_mean[normalizedRegion] = {
           x: [],
           y: [],
@@ -113,13 +113,13 @@ export const PredictionGraph = ({
             size: 5,
           },
           showlegend: true,
-        };
+        }
 
-        const regionData = confirmed[region];
+        const regionData = confirmed[region]
         for (const key of Object.keys(regionData).sort()) {
           if ((showLog && regionData[key] > 100) || !showLog) {
-            plots[normalizedRegion].x.push(key);
-            plots[normalizedRegion].y.push(regionData[key]);
+            plots[normalizedRegion].x.push(key)
+            plots[normalizedRegion].y.push(regionData[key])
           }
         }
 
@@ -127,38 +127,38 @@ export const PredictionGraph = ({
           for (const key of Object.keys(predictions[region].confidenceInterval['2.5'])) {
             if (moment(key).isSameOrAfter(today, 'day')) {
               if (moment(key).isSame(today, 'day')) {
-                setLower(predictions[region].confidenceInterval['2.5'][key]);
+                setLower(predictions[region].confidenceInterval['2.5'][key])
               }
 
-              plots_2_5[normalizedRegion].x.push(key);
-              plots_2_5[normalizedRegion].y.push(predictions[region].confidenceInterval['2.5'][key]);
+              plots_2_5[normalizedRegion].x.push(key)
+              plots_2_5[normalizedRegion].y.push(predictions[region].confidenceInterval['2.5'][key])
             }
           }
           for (const key of Object.keys(predictions[region].confidenceInterval['97.5'])) {
             if (moment(key).isSameOrAfter(today, 'day')) {
               if (moment(key).isSame(today, 'day')) {
-                setUpper(predictions[region].confidenceInterval['97.5'][key]);
+                setUpper(predictions[region].confidenceInterval['97.5'][key])
               }
-              plots_97_5[normalizedRegion].x.push(key);
-              plots_97_5[normalizedRegion].y.push(predictions[region].confidenceInterval['97.5'][key]);
+              plots_97_5[normalizedRegion].x.push(key)
+              plots_97_5[normalizedRegion].y.push(predictions[region].confidenceInterval['97.5'][key])
             }
           }
           for (const key of Object.keys(predictions[region].confidenceInterval['25'])) {
             if (moment(key).isSameOrAfter(today, 'day')) {
-              plots_25[normalizedRegion].x.push(key);
-              plots_25[normalizedRegion].y.push(predictions[region].confidenceInterval['25'][key]);
+              plots_25[normalizedRegion].x.push(key)
+              plots_25[normalizedRegion].y.push(predictions[region].confidenceInterval['25'][key])
             }
           }
           for (const key of Object.keys(predictions[region].confidenceInterval['75'])) {
             if (moment(key).isSameOrAfter(today, 'day')) {
-              plots_75[normalizedRegion].x.push(key);
-              plots_75[normalizedRegion].y.push(predictions[region].confidenceInterval['75'][key]);
+              plots_75[normalizedRegion].x.push(key)
+              plots_75[normalizedRegion].y.push(predictions[region].confidenceInterval['75'][key])
             }
           }
           for (const key of Object.keys(predictions[region].mean)) {
             if (moment(key).isSameOrAfter(today, 'day')) {
-              plots_mean[normalizedRegion].x.push(key);
-              plots_mean[normalizedRegion].y.push(predictions[region].mean[key]);
+              plots_mean[normalizedRegion].x.push(key)
+              plots_mean[normalizedRegion].y.push(predictions[region].mean[key])
             }
           }
 
@@ -168,19 +168,19 @@ export const PredictionGraph = ({
             ...Object.values(plots_97_5),
             ...Object.values(plots_25),
             ...Object.values(plots_75),
-            ...Object.values(plots_mean)];
+            ...Object.values(plots_mean)]
         }
 
-        setPlotsAsValues(plotList);
+        setPlotsAsValues(plotList)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected, predictions]);
+  }, [selected, predictions])
 
   const mergeConfig = {
     displayModeBar: false,
     responsive: true,
-  };
+  }
 
   let layout = {
     autosize: true,
@@ -191,13 +191,13 @@ export const PredictionGraph = ({
       t: 5,
       r: 10,
     },
-  };
+  }
 
   if (showLog) {
     layout.yaxis = {
       type: 'log',
       autorange: true,
-    };
+    }
   }
 
   if (detectMobile.isMobile()) {
@@ -206,7 +206,7 @@ export const PredictionGraph = ({
       xaxis: {
         fixedrange: true,
       },
-    };
+    }
 
     if (!showLog) {
       layout = {
@@ -214,7 +214,7 @@ export const PredictionGraph = ({
         yaxis: {
           fixedrange: true,
         },
-      };
+      }
     }
   }
 
@@ -223,7 +223,7 @@ export const PredictionGraph = ({
     yanchor: 'top',
     y: -0.1,
     x: 0.5,
-  };
+  }
 
   return (
     <>
@@ -231,21 +231,22 @@ export const PredictionGraph = ({
         <Title size={4}>
           Predictions for Today
           {today.format('YYYY-MM-DD')}
-          {' '}
+          &nbsp;
           in
           {title}
         </Title>
         Between
-        {' '}
+        &nbsp;
         <em>{numeral(lower).format('0,0')}</em>
-        {' '}
+        &nbsp;
         and
+        &nbsp;
         <em>{numeral(upper).format('0,0')}</em>
         .
         <br />
         <br />
         For a detailed explanation of how predictions work, please visit our
-        {' '}
+        &nbsp;
         <a href="/about/methodology/predictions">methodology page</a>
         .
       </Notification>
@@ -261,7 +262,7 @@ export const PredictionGraph = ({
         />
       </Generic>
     </>
-  );
-};
+  )
+}
 
-export default PredictionGraph;
+export default PredictionGraph

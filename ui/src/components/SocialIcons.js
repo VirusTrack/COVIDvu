@@ -1,8 +1,8 @@
-import React from 'react';
+import React from 'react'
 
-import faTwitter from '../images/fa-icon-twitter.svg';
-import faFacebook from '../images/fa-icon-facebook.svg';
-import faLinkedin from '../images/fa-icon-linkedin.svg';
+import faTwitter from '../images/fa-icon-twitter.svg'
+import faFacebook from '../images/fa-icon-facebook.svg'
+import faLinkedin from '../images/fa-icon-linkedin.svg'
 
 export const SocialIcons = ({ donate, size, style }) => (
   <div className={`social-icons ${size || ''}`} style={style}>
@@ -28,6 +28,6 @@ export const SocialIcons = ({ donate, size, style }) => (
       && <a className="button is-primary is-outlined" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=52U5RTY2YY3WS&amp;source=url" target="_blank" rel="noopener noreferrer">Donate</a>}
 
   </div>
-);
+)
 
-export default SocialIcons;
+export default SocialIcons

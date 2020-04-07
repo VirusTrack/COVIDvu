@@ -1,24 +1,24 @@
-import { useDispatch } from 'react-redux';
-import { useHistory, useLocation } from 'react-router';
+import { useDispatch } from 'react-redux'
+import { useHistory, useLocation } from 'react-router'
 
-import queryString from 'query-string';
-import { actions } from '../ducks/services';
+import queryString from 'query-string'
+import { actions } from '../ducks/services'
 
 
 /**
  * Change page navigation but clear the graph prior
  */
 export function useChangePage() {
-  const history = useHistory();
-  const dispatch = useDispatch();
-  const location = useLocation();
+  const history = useHistory()
+  const dispatch = useDispatch()
+  const location = useLocation()
 
   return (pageLocation) => {
     if (location.pathname !== pageLocation) {
-      dispatch(actions.clearGraphs());
-      history.push(pageLocation);
+      dispatch(actions.clearGraphs())
+      history.push(pageLocation)
     }
-  };
+  }
 }
 
 /**
@@ -27,7 +27,7 @@ export function useChangePage() {
  * @param {*} urlFragment
  */
 export function useHandleHistory(urlFragment) {
-  const history = useHistory();
+  const history = useHistory()
 
   return (region, graph, showLog, showPredictions) => {
     const query = queryString.stringify({
@@ -35,8 +35,8 @@ export function useHandleHistory(urlFragment) {
       graph,
       showLog,
       showPredictions,
-    });
+    })
 
-    history.replace(`${urlFragment}?${query}`);
-  };
+    history.replace(`${urlFragment}?${query}`)
+  }
 }

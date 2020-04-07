@@ -1,15 +1,15 @@
-import React from 'react';
+import React from 'react'
 
-import { Box, Content, Title } from 'rbx';
+import { Box, Content, Title } from 'rbx'
 
-import MathJax from 'react-mathjax';
-import ContentLayout from '../layouts/ContentLayout';
+import MathJax from 'react-mathjax'
+import ContentLayout from '../layouts/ContentLayout'
 
-import { usePageTitle } from '../hooks/ui';
+import { usePageTitle } from '../hooks/ui'
 
 
 export const PredictionMethodologyPage = () => {
-  usePageTitle('Prediction Methdology');
+  usePageTitle('Prediction Methdology')
 
   return (
 
@@ -270,7 +270,7 @@ export const PredictionMethodologyPage = () => {
       </MathJax.Provider>
     </ContentLayout>
 
-  );
-};
+  )
+}
 
-export default PredictionMethodologyPage;
+export default PredictionMethodologyPage

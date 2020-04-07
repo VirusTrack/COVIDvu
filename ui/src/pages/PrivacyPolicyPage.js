@@ -1,13 +1,13 @@
-import React from 'react';
+import React from 'react'
 
-import { Title, Box, Content } from 'rbx';
+import { Title, Box, Content } from 'rbx'
 
-import ContentLayout from '../layouts/ContentLayout';
+import ContentLayout from '../layouts/ContentLayout'
 
-import { usePageTitle } from '../hooks/ui';
+import { usePageTitle } from '../hooks/ui'
 
 export const PrivacyPolicyPage = () => {
-  usePageTitle('Privacy Policy');
+  usePageTitle('Privacy Policy')
 
   return (
     <ContentLayout>
@@ -426,7 +426,7 @@ export const PrivacyPolicyPage = () => {
         </Content>
       </Box>
     </ContentLayout>
-  );
-};
+  )
+}
 
-export default PrivacyPolicyPage;
+export default PrivacyPolicyPage

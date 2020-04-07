@@ -1,16 +1,16 @@
-import React from 'react';
+import React from 'react'
 
-import { Box, Content, Title } from 'rbx';
-import moment from 'moment';
-import { usePageTitle } from '../hooks/ui';
+import { Box, Content, Title } from 'rbx'
+import moment from 'moment'
+import { usePageTitle } from '../hooks/ui'
 
 
-import ContentLayout from '../layouts/ContentLayout';
+import ContentLayout from '../layouts/ContentLayout'
 
-const changelog = require('../constants/changelog.json');
+const changelog = require('../constants/changelog.json')
 
 export const WhatsNewPage = () => {
-  usePageTitle("What's New");
+  usePageTitle("What's New")
 
   return (
     <ContentLayout>
@@ -34,7 +34,7 @@ export const WhatsNewPage = () => {
         </Content>
       </Box>
     </ContentLayout>
-  );
-};
+  )
+}
 
-export default WhatsNewPage;
+export default WhatsNewPage

@@ -1,11 +1,11 @@
-import React from 'react';
+import React from 'react'
 
-import numeral from 'numeral';
-import { Title, Generic, Table } from 'rbx';
-import { TERMS } from '../constants/dictionary';
+import numeral from 'numeral'
+import { Title, Generic, Table } from 'rbx'
+import { TERMS } from '../constants/dictionary'
 
 
-import { ColumnSortIcon } from './ColumnSortIcon';
+import { ColumnSortIcon } from './ColumnSortIcon'
 
 export const USStatsTable = ({
   statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, sort, onSort,
@@ -18,7 +18,7 @@ export const USStatsTable = ({
           <Table.Heading>
             Region
           </Table.Heading>
-          <Table.Heading onClick={() => { onSort('confirmed'); }} style={{ cursor: 'pointer' }}>
+          <Table.Heading onClick={() => { onSort('confirmed') }} style={{ cursor: 'pointer' }}>
             Total Cases
             {sort === 'confirmed'
                             && <ColumnSortIcon direction="desc" />}
@@ -29,7 +29,7 @@ export const USStatsTable = ({
           <Table.Heading tooltipPosition="bottom" tooltip="Total not-for-profit beds in each state">
             Total Hospital Beds
           </Table.Heading>
-          <Table.Heading onClick={() => { onSort('deaths'); }} style={{ cursor: 'pointer' }}>
+          <Table.Heading onClick={() => { onSort('deaths') }} style={{ cursor: 'pointer' }}>
             Deaths
             {sort === 'deaths'
                             && <ColumnSortIcon direction="desc" />}
@@ -37,7 +37,7 @@ export const USStatsTable = ({
           <Table.Heading>
             New Deaths
           </Table.Heading>
-          <Table.Heading tooltipPosition="left" tooltip={TERMS.CFR_DEFINITION} onClick={() => { onSort('mortality'); }} style={{ cursor: 'pointer' }}>
+          <Table.Heading tooltipPosition="left" tooltip={TERMS.CFR_DEFINITION} onClick={() => { onSort('mortality') }} style={{ cursor: 'pointer' }}>
             Case Fatality Rate
             {sort === 'mortality'
                             && <ColumnSortIcon direction="desc" />}
@@ -48,7 +48,7 @@ export const USStatsTable = ({
         { statsForGraph ? statsForGraph.map((stat, idx) => (
           <Table.Row key={idx}>
             <Table.Cell>
-              <Generic as="a" tooltipPosition="right" onClick={() => { redirectToExternalLink(stat.region); }} tooltip={isExternalLinkAvailable(stat.region) ? null : 'No external link for region yet'} textColor={isExternalLinkAvailable(stat.region) ? 'link' : 'black'}>{renderDisplay(stat.region)}</Generic>
+              <Generic as="a" tooltipPosition="right" onClick={() => { redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : 'No external link for region yet'} textColor={isExternalLinkAvailable(stat.region) ? 'link' : 'black'}>{renderDisplay(stat.region)}</Generic>
             </Table.Cell>
             <Table.Cell>
               <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
@@ -91,6 +91,6 @@ export const USStatsTable = ({
       </Table.Body>
     </Table>
   </div>
-);
+)
 
-export default USStatsTable;
+export default USStatsTable

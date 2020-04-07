@@ -1,16 +1,16 @@
-import React from 'react';
+import React from 'react'
 
 import {
   Hero, Button, Title, Column,
-} from 'rbx';
-import { useChangePage } from '../hooks/nav';
+} from 'rbx'
+import { useChangePage } from '../hooks/nav'
 
 
 export const HeroElement = ({
   title, subtitle, buttons, children, updated,
 }) => {
-  const nodes = React.Children.toArray(children);
-  const changePage = useChangePage();
+  const nodes = React.Children.toArray(children)
+  const changePage = useChangePage()
 
   return (
     <>
@@ -32,7 +32,7 @@ export const HeroElement = ({
                 && (
                 <Button.Group size="large">
                   {buttons.map((button, idx) => (
-                    <Button key={idx} color="primary" onClick={() => { changePage(button.location); }}>{button.title}</Button>
+                    <Button key={idx} color="primary" onClick={() => { changePage(button.location) }}>{button.title}</Button>
                   ))}
                 </Button.Group>
                 )}
@@ -51,7 +51,7 @@ export const HeroElement = ({
         </Hero.Body>
       </Hero>
     </>
-  );
-};
+  )
+}
 
-export default HeroElement;
+export default HeroElement

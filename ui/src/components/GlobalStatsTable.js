@@ -1,12 +1,12 @@
-import React from 'react';
+import React from 'react'
 
-import numeral from 'numeral';
+import numeral from 'numeral'
 
-import { Title, Generic, Table } from 'rbx';
+import { Title, Generic, Table } from 'rbx'
 
-import { ColumnSortIcon } from './ColumnSortIcon';
+import { ColumnSortIcon } from './ColumnSortIcon'
 
-import { TERMS } from '../constants/dictionary';
+import { TERMS } from '../constants/dictionary'
 
 export const GlobalStatsTable = ({
   statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, sort, onSort,
@@ -19,7 +19,7 @@ export const GlobalStatsTable = ({
           <Table.Heading>
             Region
           </Table.Heading>
-          <Table.Heading onClick={() => { onSort('confirmed'); }} style={{ cursor: 'pointer' }}>
+          <Table.Heading onClick={() => { onSort('confirmed') }} style={{ cursor: 'pointer' }}>
             Total Cases
             {sort === 'confirmed'
                                 && <ColumnSortIcon direction="desc" />}
@@ -27,7 +27,7 @@ export const GlobalStatsTable = ({
           <Table.Heading>
             New Cases
           </Table.Heading>
-          <Table.Heading onClick={() => { onSort('deaths'); }} style={{ cursor: 'pointer' }}>
+          <Table.Heading onClick={() => { onSort('deaths') }} style={{ cursor: 'pointer' }}>
             Deaths
             {sort === 'deaths'
                                 && <ColumnSortIcon direction="desc" />}
@@ -35,7 +35,7 @@ export const GlobalStatsTable = ({
           <Table.Heading>
             New Deaths
           </Table.Heading>
-          <Table.Heading tooltipPosition="bottom" tooltip={TERMS.CFR_DEFINITION} onClick={() => { onSort('mortality'); }} style={{ cursor: 'pointer' }}>
+          <Table.Heading tooltipPosition="bottom" tooltip={TERMS.CFR_DEFINITION} onClick={() => { onSort('mortality') }} style={{ cursor: 'pointer' }}>
             Case Fatality Rate
             {sort === 'mortality'
                                 && <ColumnSortIcon direction="desc" />}
@@ -49,7 +49,7 @@ export const GlobalStatsTable = ({
               <Generic
                 as="a"
 tooltipPosition="right"
-                onClick={() => { redirectToExternalLink(stat.region); }}
+                onClick={() => { redirectToExternalLink(stat.region) }}
                 tooltip={isExternalLinkAvailable(stat.region) ? null : 'No external link for region yet'}
                 textColor={isExternalLinkAvailable(stat.region) ? 'link' : 'black'}
               >
@@ -94,6 +94,6 @@ tooltipPosition="right"
       </Table.Body>
     </Table>
   </div>
-);
+)
 
-export default GlobalStatsTable;
+export default GlobalStatsTable

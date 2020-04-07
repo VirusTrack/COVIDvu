@@ -1,33 +1,33 @@
-const DATA_URL = '/site-data';
-const STAGING_DATA_URL = 'https://staging.virustrack.live/site-data';
-const TEST_DATA_URL = 'https://test.virustrack.live/site-data';
-const LOCAL_DATA_URL = 'http://localhost:3100/site-data';
+const DATA_URL = '/site-data'
+const STAGING_DATA_URL = 'https://staging.virustrack.live/site-data'
+const TEST_DATA_URL = 'https://test.virustrack.live/site-data'
+const LOCAL_DATA_URL = 'http://localhost:3100/site-data'
 
-const GEO_URL = 'https://virustrack.live/country_info';
-const STAGING_GEO_URL = 'https://staging.virustrack.live/country_info';
-const TEST_GEO_URL = 'https://test.virustrack.live/country_info';
-const LOCAL_GEO_URL = 'http://localhost:3100/country_info';
+const GEO_URL = 'https://virustrack.live/country_info'
+const STAGING_GEO_URL = 'https://staging.virustrack.live/country_info'
+const TEST_GEO_URL = 'https://test.virustrack.live/country_info'
+const LOCAL_GEO_URL = 'http://localhost:3100/country_info'
 
-const LAST_UPDATE_KEY = 'covid-lastUpdated';
-const CLIENT_COUNTRY_KEY = 'covid-clientCountry';
-const CLIENT_COUNTRY_CODE_KEY = 'covid-clientCountryCode';
+const LAST_UPDATE_KEY = 'covid-lastUpdated'
+const CLIENT_COUNTRY_KEY = 'covid-clientCountry'
+const CLIENT_COUNTRY_CODE_KEY = 'covid-clientCountryCode'
 
-const NEWSLETTER_SIGNUP_KEY = 'covid-newsletterSignup';
+const NEWSLETTER_SIGNUP_KEY = 'covid-newsletterSignup'
 
-const GLOBAL_REGION_SELECT_KEY = 'covid-globalRegionSelect';
-const US_REGION_SELECT_KEY = 'covid-usRegionSelect';
-const DASHBOARD_GRAPH_SCALE_KEY = 'covid-dashboardGraphScale';
-const GLOBAL_GRAPH_SCALE_KEY = 'covid-globalGraphScale';
-const US_GRAPH_SCALE_KEY = 'covid-usGraphScale';
+const GLOBAL_REGION_SELECT_KEY = 'covid-globalRegionSelect'
+const US_REGION_SELECT_KEY = 'covid-usRegionSelect'
+const DASHBOARD_GRAPH_SCALE_KEY = 'covid-dashboardGraphScale'
+const GLOBAL_GRAPH_SCALE_KEY = 'covid-globalGraphScale'
+const US_GRAPH_SCALE_KEY = 'covid-usGraphScale'
 
-const ONE_MINUTE = 1 * 60 * 1000;
-const CACHE_TIMER = ONE_MINUTE;
+const ONE_MINUTE = 1 * 60 * 1000
+const CACHE_TIMER = ONE_MINUTE
 
-const GOOGLE_ANALYTICS_KEY = 'UA-574325-5';
+const GOOGLE_ANALYTICS_KEY = 'UA-574325-5'
 
-const DEFAULT_DOCUMENT_TITLE = 'COVID-19 Novel Coronavirus Data Visualization and Statistics';
+const DEFAULT_DOCUMENT_TITLE = 'COVID-19 Novel Coronavirus Data Visualization and Statistics'
 
-const ENABLE_PREDICTIONS = true;
+const ENABLE_PREDICTIONS = true
 
 const COUNTRIES = [
   '!Global',
@@ -227,7 +227,7 @@ const COUNTRIES = [
   'Yemen',
   'Zambia',
   'Zimbabwe',
-];
+]
 
 const US_REGIONS = [
   '!Total US',
@@ -237,7 +237,7 @@ const US_REGIONS = [
   'South',
   'Unassigned',
   'West',
-];
+]
 
 const US_STATES = [
   '!Total US',
@@ -299,7 +299,7 @@ const US_STATES = [
   'Washington',
   'West Virginia',
   'Wisconsin',
-  'Wyoming'];
+  'Wyoming']
 
 const US_STATES_WITH_ABBREVIATION = {
   Alabama: 'AL',
@@ -353,7 +353,7 @@ const US_STATES_WITH_ABBREVIATION = {
   'West Virginia': 'WV',
   Wisconsin: 'WI',
   Wyoming: 'WY',
-};
+}
 
 const REGION_URLS = {
   '!Total US': 'https://www.cdc.gov/coronavirus/2019-ncov/index.html',
@@ -575,7 +575,7 @@ const REGION_URLS = {
   'Papua New Guinea': 'http://www.health.gov.pg/',
   'Sierra Leone': 'https://www.facebook.com/Ministry-of-Health-and-Sanitation-Sierra-Leone-281064805403702/',
 
-};
+}
 
 export {
   GOOGLE_ANALYTICS_KEY,
@@ -605,4 +605,4 @@ export {
   DASHBOARD_GRAPH_SCALE_KEY,
   GLOBAL_GRAPH_SCALE_KEY,
   US_GRAPH_SCALE_KEY,
-};
+}

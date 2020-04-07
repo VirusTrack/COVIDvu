@@ -1,21 +1,21 @@
-import React from 'react';
+import React from 'react'
 
 import {
   Box, Button, Content, Title, Notification, Level, Select,
-} from 'rbx';
+} from 'rbx'
 
-import store from 'store2';
-import ContentLayout from '../layouts/ContentLayout';
+import store from 'store2'
+import ContentLayout from '../layouts/ContentLayout'
 
-import { usePageTitle } from '../hooks/ui';
+import { usePageTitle } from '../hooks/ui'
 
-import { ENABLE_PREDICTIONS, CLIENT_COUNTRY_KEY, CLIENT_COUNTRY_CODE_KEY } from '../constants';
+import { ENABLE_PREDICTIONS, CLIENT_COUNTRY_KEY, CLIENT_COUNTRY_CODE_KEY } from '../constants'
 
 
-const isoCountries = require('../constants/iso-countries.json');
+const isoCountries = require('../constants/iso-countries.json')
 
 export const AboutPage = () => {
-  usePageTitle('About the Project');
+  usePageTitle('About the Project')
 
   return (
 
@@ -80,7 +80,7 @@ export const AboutPage = () => {
           <Title size={4}>Debug</Title>
           <Level>
             <Level.Item align="left">
-              <Button onClick={() => { store.remove(CLIENT_COUNTRY_KEY); store.remove(CLIENT_COUNTRY_CODE_KEY); }}>Clear country cache</Button>
+              <Button onClick={() => { store.remove(CLIENT_COUNTRY_KEY); store.remove(CLIENT_COUNTRY_CODE_KEY) }}>Clear country cache</Button>
             </Level.Item>
           </Level>
           <Level>
@@ -90,9 +90,9 @@ export const AboutPage = () => {
                 <Select
                   defaultValue={store.get(CLIENT_COUNTRY_CODE_KEY)}
                   onChange={(event) => {
-                                  const selectedCountryCode = event.target.value;
-                                  store.set(CLIENT_COUNTRY_KEY, selectedCountryCode === 'US' ? 'US' : isoCountries[selectedCountryCode]);
-                                  store.set(CLIENT_COUNTRY_CODE_KEY, selectedCountryCode);
+                                  const selectedCountryCode = event.target.value
+                                  store.set(CLIENT_COUNTRY_KEY, selectedCountryCode === 'US' ? 'US' : isoCountries[selectedCountryCode])
+                                  store.set(CLIENT_COUNTRY_CODE_KEY, selectedCountryCode)
                                 }}
                 >
                   {Object.keys(isoCountries).sort().map((countryCode) => (
@@ -107,7 +107,7 @@ export const AboutPage = () => {
       </Box>
     </ContentLayout>
 
-  );
-};
+  )
+}
 
-export default AboutPage;
+export default AboutPage

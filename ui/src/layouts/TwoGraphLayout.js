@@ -1,10 +1,10 @@
-import React from 'react';
+import React from 'react'
 
-import { Column, Level, Title } from 'rbx';
-import LogoElement from '../components/LogoElement';
+import { Column, Level, Title } from 'rbx'
+import LogoElement from '../components/LogoElement'
 
 export const TwoGraphLayout = ({ children }) => {
-  const nodes = React.Children.toArray(children);
+  const nodes = React.Children.toArray(children)
 
   return (
     <>
@@ -28,7 +28,7 @@ export const TwoGraphLayout = ({ children }) => {
         </Column>
       </Column.Group>
     </>
-  );
-};
+  )
+}
 
-export default TwoGraphLayout;
+export default TwoGraphLayout

@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import numeral from 'numeral';
+import numeral from 'numeral'
 
 import {
   Select, Level, Title, Generic, Table, Tab,
-} from 'rbx';
+} from 'rbx'
 
-import { ColumnSortIcon } from './ColumnSortIcon';
+import { ColumnSortIcon } from './ColumnSortIcon'
 
-import { CountyBarGraph } from './CountyBarGraph';
+import { CountyBarGraph } from './CountyBarGraph'
 
-import { US_STATES_WITH_ABBREVIATION } from '../constants';
+import { US_STATES_WITH_ABBREVIATION } from '../constants'
 
 export const USCountiesStatsTable = ({
   filterRegion = 'NY', statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, onSelectedFilter, sort, onSort,
 }) => {
-  const [selectedState, setSelectedState] = useState(filterRegion);
+  const [selectedState, setSelectedState] = useState(filterRegion)
 
   const handleChange = (event) => {
-    const newRegion = event.target.value;
+    const newRegion = event.target.value
 
-    setSelectedState(newRegion);
-    onSelectedFilter(newRegion);
-  };
+    setSelectedState(newRegion)
+    onSelectedFilter(newRegion)
+  }
 
-  const [selectedView, setSelectedView] = useState('Graph');
+  const [selectedView, setSelectedView] = useState('Graph')
 
   return (
     <>
@@ -46,8 +46,8 @@ export const USCountiesStatsTable = ({
       </Level>
 
       <Tab.Group size="large" kind="boxed">
-        <Tab active={selectedView === 'Table'} onClick={() => { setSelectedView('Table'); }}>Table</Tab>
-        <Tab active={selectedView === 'Graph'} onClick={() => { setSelectedView('Graph'); }}>Graph</Tab>
+        <Tab active={selectedView === 'Table'} onClick={() => { setSelectedView('Table') }}>Table</Tab>
+        <Tab active={selectedView === 'Graph'} onClick={() => { setSelectedView('Graph') }}>Graph</Tab>
       </Tab.Group>
 
       {selectedView === 'Table'
@@ -59,12 +59,12 @@ export const USCountiesStatsTable = ({
                     <Table.Heading>
                       Region
                     </Table.Heading>
-                    <Table.Heading onClick={() => { onSort('confirmed'); }} style={{ cursor: 'pointer' }}>
+                    <Table.Heading onClick={() => { onSort('confirmed') }} style={{ cursor: 'pointer' }}>
                       Total Cases
                       {sort === 'confirmed'
                                     && <ColumnSortIcon direction="desc" />}
                     </Table.Heading>
-                    <Table.Heading onClick={() => { onSort('deaths'); }} style={{ cursor: 'pointer' }}>
+                    <Table.Heading onClick={() => { onSort('deaths') }} style={{ cursor: 'pointer' }}>
                       Deaths
                       {sort === 'deaths'
                                     && <ColumnSortIcon direction="desc" />}
@@ -75,7 +75,7 @@ export const USCountiesStatsTable = ({
                   { statsForGraph ? statsForGraph.map((stat, idx) => (
                     <Table.Row key={idx}>
                       <Table.Cell>
-                        <Generic as="a" tooltipPosition="right" onClick={() => { redirectToExternalLink(stat.region); }} tooltip={isExternalLinkAvailable(stat.region) ? null : 'No external link for region yet'} textColor={isExternalLinkAvailable(stat.region) ? 'link' : 'black'}>{renderDisplay(stat.region)}</Generic>
+                        <Generic as="a" tooltipPosition="right" onClick={() => { redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : 'No external link for region yet'} textColor={isExternalLinkAvailable(stat.region) ? 'link' : 'black'}>{renderDisplay(stat.region)}</Generic>
                       </Table.Cell>
                       <Table.Cell>
                         <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
@@ -100,7 +100,7 @@ export const USCountiesStatsTable = ({
                 && <CountyBarGraph filterRegion={filterRegion} statsForGraph={statsForGraph} />}
       </>
     </>
-  );
-};
+  )
+}
 
-export default USCountiesStatsTable;
+export default USCountiesStatsTable

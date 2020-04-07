@@ -1,13 +1,13 @@
-import React from 'react';
+import React from 'react'
 
-import { Message } from 'rbx';
-import ContentLayout from '../layouts/ContentLayout';
+import { Message } from 'rbx'
+import ContentLayout from '../layouts/ContentLayout'
 
 
-import { usePageTitle } from '../hooks/ui';
+import { usePageTitle } from '../hooks/ui'
 
 export const NotFoundPage = () => {
-  usePageTitle('Location Not Found');
+  usePageTitle('Location Not Found')
 
   return (
     <ContentLayout>
@@ -20,5 +20,5 @@ export const NotFoundPage = () => {
         </Message.Body>
       </Message>
     </ContentLayout>
-  );
-};
+  )
+}

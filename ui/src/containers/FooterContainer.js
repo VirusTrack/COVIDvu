@@ -1,61 +1,61 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux'
 import {
   Container, Footer, Tag, Column,
-} from 'rbx';
-import CookieConsent from 'react-cookie-consent';
-import moment from 'moment';
-import { useInterval } from '../hooks/ui';
+} from 'rbx'
+import CookieConsent from 'react-cookie-consent'
+import moment from 'moment'
+import { useInterval } from '../hooks/ui'
 
-import { actions } from '../ducks/services';
-
-
-import { CACHE_TIMER } from '../constants';
-
-import ccBy from '../images/cc-by.svg';
-import ccSa from '../images/cc-sa.svg';
+import { actions } from '../ducks/services'
 
 
-import SocialIcons from '../components/SocialIcons';
+import { CACHE_TIMER } from '../constants'
+
+import ccBy from '../images/cc-by.svg'
+import ccSa from '../images/cc-sa.svg'
+
+
+import SocialIcons from '../components/SocialIcons'
 
 export const FooterContainer = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
-  const lastUpdate = useSelector((state) => state.services.lastUpdate);
+  const lastUpdate = useSelector((state) => state.services.lastUpdate)
 
-  const [currentLastUpdate, setCurrentLastUpdate] = useState(lastUpdate);
+  const [currentLastUpdate, setCurrentLastUpdate] = useState(lastUpdate)
 
   useInterval(() => {
-    console.log(`Fetching latest update... ${new Date().getTime()}`);
-    dispatch(actions.fetchLastUpdate());
-  }, CACHE_TIMER);
+    console.log(`Fetching latest update... ${new Date().getTime()}`)
+    dispatch(actions.fetchLastUpdate())
+  }, CACHE_TIMER)
 
   useEffect(() => {
-    dispatch(actions.fetchLastUpdate());
+    dispatch(actions.fetchLastUpdate())
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+  }, [dispatch])
 
   useEffect(() => {
     if (currentLastUpdate && lastUpdate !== currentLastUpdate) {
-      dispatch(actions.clearGraphs());
-      dispatch(actions.clearGraphs());
-      dispatch(actions.fetchGlobal());
-      dispatch(actions.fetchUSStates());
-      dispatch(actions.fetchUSRegions());
-      dispatch(actions.fetchContinental());
+      dispatch(actions.clearGraphs())
+      dispatch(actions.clearGraphs())
+      dispatch(actions.fetchGlobal())
+      dispatch(actions.fetchUSStates())
+      dispatch(actions.fetchUSRegions())
+      dispatch(actions.fetchContinental())
       dispatch(actions.fetchTop10Countries({
         excludeChina: true,
-      }));
-      dispatch(actions.fetchTotalGlobalStats());
-      dispatch(actions.fetchGlobalPredictions());
-      dispatch(actions.fetchTop10USStates());
-      dispatch(actions.fetchTotalUSStatesStats());
+      }))
+      dispatch(actions.fetchTotalGlobalStats())
+      dispatch(actions.fetchGlobalPredictions())
+      dispatch(actions.fetchTop10USStates())
+      dispatch(actions.fetchTotalUSStatesStats())
     } else {
-      setCurrentLastUpdate(lastUpdate);
+      setCurrentLastUpdate(lastUpdate)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastUpdate]);
+  }, [lastUpdate])
 
   return (
     <>
@@ -150,7 +150,7 @@ export const FooterContainer = () => {
         {' '}
       </CookieConsent>
     </>
-  );
-};
+  )
+}
 
-export default FooterContainer;
+export default FooterContainer

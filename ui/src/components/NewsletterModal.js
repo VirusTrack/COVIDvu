@@ -1,14 +1,14 @@
-import React from 'react';
+import React from 'react'
 import {
   Box, Title, Tag, Column,
-} from 'rbx';
+} from 'rbx'
 
-import NewsletterForm from './NewsletterForm';
+import NewsletterForm from './NewsletterForm'
 
 export const NewsletterModal = ({ className, style, handleModalClose = false }) => {
   const handleClose = () => {
-    if (handleModalClose) handleModalClose(false);
-  };
+    if (handleModalClose) handleModalClose(false)
+  }
 
   return (
     <>
@@ -75,6 +75,6 @@ export const NewsletterModal = ({ className, style, handleModalClose = false }) 
         <NewsletterForm />
       </Box>
     </>
-  );
-};
-export default NewsletterModal;
+  )
+}
+export default NewsletterModal

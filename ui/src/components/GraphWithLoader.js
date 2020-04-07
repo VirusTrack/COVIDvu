@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'react'
 
-import Graph from './Graph';
+import Graph from './Graph'
 
 export const GraphWithLoader = ({
   graphName,
@@ -39,6 +39,6 @@ export const GraphWithLoader = ({
         </>
         )}
   </>
-);
+)
 
-export default GraphWithLoader;
+export default GraphWithLoader

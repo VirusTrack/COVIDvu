@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 
-import { Column } from 'rbx';
+import { Column } from 'rbx'
 
 export const ThreeGraphLayout = ({ children }) => {
-  const nodes = React.Children.toArray(children);
+  const nodes = React.Children.toArray(children)
 
   return (
     <>
@@ -22,7 +22,7 @@ export const ThreeGraphLayout = ({ children }) => {
 
       {children.slice(3)}
     </>
-  );
-};
+  )
+}
 
-export default ThreeGraphLayout;
+export default ThreeGraphLayout

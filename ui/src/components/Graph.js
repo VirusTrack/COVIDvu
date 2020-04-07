@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import Plot from 'react-plotly.js';
+import Plot from 'react-plotly.js'
 
-import { Generic } from 'rbx';
-import { useMobileDetect } from '../hooks/ui';
+import { Generic } from 'rbx'
+import { useMobileDetect } from '../hooks/ui'
 
-import LogoElement from './LogoElement';
+import LogoElement from './LogoElement'
 
 export const Graph = ({
   data, y_type = 'numeric', y_title, x_title, selected, config, showLog = false, start = null, ref = null,
 }) => {
-  const [plotsAsValues, setPlotsAsValues] = useState([]);
+  const [plotsAsValues, setPlotsAsValues] = useState([])
 
-  const detectMobile = useMobileDetect();
+  const detectMobile = useMobileDetect()
 
   useEffect(() => {
-    const plots = {};
+    const plots = {}
 
-    const selectedData = Object.keys(data).filter((entry) => selected.indexOf(entry) !== -1);
+    const selectedData = Object.keys(data).filter((entry) => selected.indexOf(entry) !== -1)
 
     for (const region of selectedData) {
-      const normalizedRegion = region.startsWith('!') ? region.substring(1) : region;
+      const normalizedRegion = region.startsWith('!') ? region.substring(1) : region
       plots[normalizedRegion] = {
         x: [],
         y: [],
@@ -31,28 +31,28 @@ export const Graph = ({
         marker: {
           size: 5,
         },
-      };
+      }
 
-      const regionData = data[region];
+      const regionData = data[region]
 
       for (const key of Object.keys(regionData).sort()) {
         if ((showLog && regionData[key] > 100) || !showLog) {
-          if (start && regionData[key] < start) continue;
+          if (start && regionData[key] < start) continue
 
-          plots[normalizedRegion].x.push(key);
-          plots[normalizedRegion].y.push(regionData[key]);
+          plots[normalizedRegion].x.push(key)
+          plots[normalizedRegion].y.push(regionData[key])
         }
       }
     }
 
-    setPlotsAsValues(Object.values(plots));
-  }, [selected, data, y_type, showLog, start]);
+    setPlotsAsValues(Object.values(plots))
+  }, [selected, data, y_type, showLog, start])
 
   const mergeConfig = {
     ...config,
     displayModeBar: false,
     responsive: true,
-  };
+  }
 
   let layout = {
     autosize: true,
@@ -63,13 +63,13 @@ export const Graph = ({
       t: 5,
       r: 10,
     },
-  };
+  }
 
   if (showLog) {
     layout.yaxis = {
       type: 'log',
       autorange: true,
-    };
+    }
   }
 
   if (detectMobile.isMobile()) {
@@ -78,7 +78,7 @@ export const Graph = ({
       xaxis: {
         fixedrange: true,
       },
-    };
+    }
 
     if (!showLog) {
       layout = {
@@ -86,7 +86,7 @@ export const Graph = ({
         yaxis: {
           fixedrange: true,
         },
-      };
+      }
     }
   }
 
@@ -94,15 +94,15 @@ export const Graph = ({
     layout = {
       ...layout,
       yaxis: { ...layout.yaxis, title: y_title },
-    };
+    }
   }
 
   if (y_title === 'Case Fatality Rate Percentage') {
-    layout.yaxis = { ...layout.yaxis, tickformat: '.1%' };
+    layout.yaxis = { ...layout.yaxis, tickformat: '.1%' }
   }
 
   if (x_title) {
-    layout.xaxis.title = x_title;
+    layout.xaxis.title = x_title
   }
 
   layout.legend = {
@@ -110,7 +110,7 @@ export const Graph = ({
     yanchor: 'top',
     y: -0.1,
     x: 0.5,
-  };
+  }
 
 
   return (
@@ -126,7 +126,7 @@ export const Graph = ({
         />
       </Generic>
     </>
-  );
-};
+  )
+}
 
-export default Graph;
+export default Graph

@@ -1,7 +1,7 @@
-import React from 'react';
+import React from 'react'
 
-import { Column } from 'rbx';
-import { useLocation } from 'react-router';
+import { Column } from 'rbx'
+import { useLocation } from 'react-router'
 import {
   FacebookShareButton,
   RedditShareButton,
@@ -11,13 +11,13 @@ import {
   TwitterIcon,
   RedditIcon,
   WhatsappIcon,
-} from 'react-share';
-import { useMobileDetect } from '../hooks/ui';
+} from 'react-share'
+import { useMobileDetect } from '../hooks/ui'
 
 
-import GraphImageDownloadButton from './GraphImageDownloadButton';
-import GraphScaleControl from './GraphScaleControl';
-import GraphDownloadButton from './GraphDownloadButton';
+import GraphImageDownloadButton from './GraphImageDownloadButton'
+import GraphScaleControl from './GraphScaleControl'
+import GraphDownloadButton from './GraphDownloadButton'
 
 
 export const GraphControls = ({
@@ -35,11 +35,11 @@ export const GraphControls = ({
   centered = false,
   htmlId = null,
 }) => {
-  const detectMobile = useMobileDetect();
+  const detectMobile = useMobileDetect()
 
-  const location = useLocation();
+  const location = useLocation()
 
-  const shareUrl = `https://virustrack.live${location.pathname}${location.search}${htmlId ? `#${htmlId}` : ''}`;
+  const shareUrl = `https://virustrack.live${location.pathname}${location.search}${htmlId ? `#${htmlId}` : ''}`
   return (
     <Column.Group className="graph-controls" multiline>
 
@@ -86,6 +86,6 @@ export const GraphControls = ({
         {downloadCSV && <Column narrow><GraphDownloadButton data={data} /></Column>}
       </Column.Group>
     </Column.Group>
-  );
-};
-export default GraphControls;
+  )
+}
+export default GraphControls

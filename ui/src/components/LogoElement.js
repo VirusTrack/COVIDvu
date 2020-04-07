@@ -1,5 +1,5 @@
-import React from 'react';
-import VirusTrackLogo from '../images/virus-pngrepo-icon.png';
+import React from 'react'
+import VirusTrackLogo from '../images/virus-pngrepo-icon.png'
 
 export const LogoElement = ({ size, url = false }) => (
   <div className={`${size} LogoElement`}>
@@ -10,6 +10,6 @@ export const LogoElement = ({ size, url = false }) => (
       {url && <span className="live">.LIVE</span> }
     </div>
   </div>
-);
+)
 
-export default LogoElement;
+export default LogoElement

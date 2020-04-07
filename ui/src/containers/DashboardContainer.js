@@ -1,45 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux'
 
-import { useHistory } from 'react-router';
+import { useHistory } from 'react-router'
 import {
   Generic, Tag, Title, Level, Heading, Container, Button, Box, Column,
-} from 'rbx';
-import numeral from 'numeral';
-import moment from 'moment-timezone';
-import ReactGA from 'react-ga';
-import store from 'store2';
-import { useClientCountry, useChangePageTitle } from '../hooks/ui';
+} from 'rbx'
+import numeral from 'numeral'
+import moment from 'moment-timezone'
+import ReactGA from 'react-ga'
+import store from 'store2'
+import { useClientCountry, useChangePageTitle } from '../hooks/ui'
 
 
-import { actions } from '../ducks/services';
+import { actions } from '../ducks/services'
 
 
-import GraphWithLoader from '../components/GraphWithLoader';
-import HeroElement from '../components/HeroElement';
-import LogoElement from '../components/LogoElement';
+import GraphWithLoader from '../components/GraphWithLoader'
+import HeroElement from '../components/HeroElement'
+import LogoElement from '../components/LogoElement'
 
-import NewsletterModal from '../components/NewsletterModal';
+import NewsletterModal from '../components/NewsletterModal'
 
-import { TERMS } from '../constants/dictionary';
-import { DASHBOARD_GRAPH_SCALE_KEY, NEWSLETTER_SIGNUP_KEY } from '../constants';
+import { TERMS } from '../constants/dictionary'
+import { DASHBOARD_GRAPH_SCALE_KEY, NEWSLETTER_SIGNUP_KEY } from '../constants'
 
-import GraphControls from '../components/GraphControls';
+import GraphControls from '../components/GraphControls'
 
 
-import globeImg from '../images/fa-icon-globe.svg';
-import usflagImg from '../images/fa-icon-usflag.svg';
+import globeImg from '../images/fa-icon-globe.svg'
+import usflagImg from '../images/fa-icon-usflag.svg'
 
 
 export const DashboardContainer = ({ showLogParam = false }) => {
-  const dispatch = useDispatch();
-  const history = useHistory();
+  const dispatch = useDispatch()
+  const history = useHistory()
 
-  const changePageTitle = useChangePageTitle();
+  const changePageTitle = useChangePageTitle()
 
-  const clientCountry = useClientCountry();
-  const [showLog, setShowLog] = useState(showLogParam);
+  const clientCountry = useClientCountry()
+  const [showLog, setShowLog] = useState(showLogParam)
   // const graphControlsAlign = 'center'
 
   // const [tzGuess, setTzGuess] = useState(moment.tz.guess())
@@ -47,76 +47,76 @@ export const DashboardContainer = ({ showLogParam = false }) => {
   useEffect(() => {
     dispatch(actions.fetchTop10Countries({
       excludeChina: true,
-    }));
-    dispatch(actions.fetchTotalGlobalStats());
+    }))
+    dispatch(actions.fetchTotalGlobalStats())
 
-    dispatch(actions.fetchTop10USStates());
-    dispatch(actions.fetchTotalUSStatesStats());
+    dispatch(actions.fetchTop10USStates())
+    dispatch(actions.fetchTotalUSStatesStats())
 
-    dispatch(actions.fetchUSRegions());
+    dispatch(actions.fetchUSRegions())
     // dispatch(actions.fetchContinental())
 
-    dispatch(actions.fetchGlobal());
+    dispatch(actions.fetchGlobal())
 
     if (store.get(DASHBOARD_GRAPH_SCALE_KEY)) {
-      setShowLog(store.get(DASHBOARD_GRAPH_SCALE_KEY));
+      setShowLog(store.get(DASHBOARD_GRAPH_SCALE_KEY))
     }
-  }, [dispatch]);
+  }, [dispatch])
 
-  const lastUpdate = useSelector((state) => state.services.lastUpdate);
+  const lastUpdate = useSelector((state) => state.services.lastUpdate)
 
   useEffect(() => {
-    dispatch(actions.fetchLastUpdate());
-  }, [dispatch]);
+    dispatch(actions.fetchLastUpdate())
+  }, [dispatch])
 
-  const globalTop10 = useSelector((state) => state.services.globalTop10);
-  const globalNamesTop10 = useSelector((state) => state.services.globalNamesTop10);
-  const globalStats = useSelector((state) => state.services.totalGlobalStats);
+  const globalTop10 = useSelector((state) => state.services.globalTop10)
+  const globalNamesTop10 = useSelector((state) => state.services.globalNamesTop10)
+  const globalStats = useSelector((state) => state.services.totalGlobalStats)
 
-  const globalConfirmed = useSelector((state) => state.services.global.confirmed);
+  const globalConfirmed = useSelector((state) => state.services.global.confirmed)
 
-  const usStatesTop10 = useSelector((state) => state.services.usStatesTop10);
-  const usStateNamesTop10 = useSelector((state) => state.services.usStateNamesTop10);
-  const usStatesStats = useSelector((state) => state.services.totalUSStatesStats);
+  const usStatesTop10 = useSelector((state) => state.services.usStatesTop10)
+  const usStateNamesTop10 = useSelector((state) => state.services.usStateNamesTop10)
+  const usStatesStats = useSelector((state) => state.services.totalUSStatesStats)
 
-  const confirmedUSRegions = useSelector((state) => state.services.usRegions.confirmed);
+  const confirmedUSRegions = useSelector((state) => state.services.usRegions.confirmed)
 
 
   useEffect(() => {
     if (globalStats) {
-      changePageTitle(`Coronavirus Update ${numeral(globalStats.confirmed).format('0,0')} Cases and ${numeral(globalStats.deaths).format('0,0')} Deaths from COVID-19 Virus Pandemic | VirusTrack.live`);
+      changePageTitle(`Coronavirus Update ${numeral(globalStats.confirmed).format('0,0')} Cases and ${numeral(globalStats.deaths).format('0,0')} Deaths from COVID-19 Virus Pandemic | VirusTrack.live`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalStats]);
+  }, [globalStats])
 
 
   const renderChangeDifference = (value) => {
-    const greenColor = { color: 'hsl(188, 80%, 38%)' };
-    const redColor = { color: 'hsl(5, 87%, 70%)' };
+    const greenColor = { color: 'hsl(188, 80%, 38%)' }
+    const redColor = { color: 'hsl(5, 87%, 70%)' }
 
-    const colorBasedOnChange = value >= 0 ? redColor : greenColor;
+    const colorBasedOnChange = value >= 0 ? redColor : greenColor
 
-    const renderedValue = value >= 0 ? numeral(value).format('+0,0') : '-';
+    const renderedValue = value >= 0 ? numeral(value).format('+0,0') : '-'
 
     return (
       <Title as="p" style={colorBasedOnChange}>{renderedValue}</Title>
-    );
-  };
+    )
+  }
 
   const handleGraphScale = (logScale) => {
-    setShowLog(logScale);
-    store.set(DASHBOARD_GRAPH_SCALE_KEY, logScale);
+    setShowLog(logScale)
+    store.set(DASHBOARD_GRAPH_SCALE_KEY, logScale)
 
     ReactGA.event({
       category: 'Dashboard',
       action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`,
-    });
-  };
+    })
+  }
 
   if (!clientCountry) {
     return (
       <h1>Loading</h1>
-    );
+    )
   }
 
   return (
@@ -260,8 +260,8 @@ export const DashboardContainer = ({ showLogParam = false }) => {
         </Column.Group>
 
         <Button.Group align="center">
-          <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid'); }}>Compare Country Stats</Button>
-          <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/continental'); }}>Compare Continental Stats</Button>
+          <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid') }}>Compare Country Stats</Button>
+          <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/continental') }}>Compare Continental Stats</Button>
         </Button.Group>
       </Box>
 
@@ -376,13 +376,13 @@ export const DashboardContainer = ({ showLogParam = false }) => {
         </Column.Group>
 
         <Button.Group align="center">
-          <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us'); }}>Compare U.S. States</Button>
-          <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us/regions'); }}>Compare U.S. Regions</Button>
+          <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us') }}>Compare U.S. States</Button>
+          <Button size="large" color="primary" onClick={() => { dispatch(actions.clearGraphs()); history.push('/covid/us/regions') }}>Compare U.S. Regions</Button>
         </Button.Group>
       </Box>
 
     </>
-  );
-};
+  )
+}
 
-export default DashboardContainer;
+export default DashboardContainer

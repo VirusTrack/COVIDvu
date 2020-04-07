@@ -1,101 +1,101 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router';
-import ReactGA from 'react-ga';
-import { useHandleHistory } from '../hooks/nav';
-import { useGraphData } from '../hooks/graphData';
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router'
+import ReactGA from 'react-ga'
+import { useHandleHistory } from '../hooks/nav'
+import { useGraphData } from '../hooks/graphData'
 // import { useChangePageTitle } from '../hooks/ui'
 
-import { actions } from '../ducks/services';
+import { actions } from '../ducks/services'
 
-import TabbedCompareGraphs from '../components/TabbedCompareGraphs';
+import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 
-import HeroElement from '../components/HeroElement';
-import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator';
+import HeroElement from '../components/HeroElement'
+import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 
 export const CountryGraphContainer = ({
   region = 'US', graph = 'Cases', showLogParam = false, showPredictionsParam = false,
 }) => {
-  const dispatch = useDispatch();
-  const { search } = useLocation();
+  const dispatch = useDispatch()
+  const { search } = useLocation()
 
-  const handleHistory = useHandleHistory(`/covid/country/${region}`);
+  const handleHistory = useHandleHistory(`/covid/country/${region}`)
   // const changePageTitle = useChangePageTitle()
 
-  const [showLog, setShowLog] = useState(showLogParam);
-  const [showPredictions, setShowPredictions] = useState(showPredictionsParam);
-  const [selectedCountries, setSelectedCountries] = useState(region);
-  const [secondaryGraph, setSecondaryGraph] = useState(graph);
+  const [showLog, setShowLog] = useState(showLogParam)
+  const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
+  const [selectedCountries, setSelectedCountries] = useState(region)
+  const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
   const {
     confirmed, sortedConfirmed, deaths, mortality,
-  } = useGraphData('global');
+  } = useGraphData('global')
 
-  const globalPredictions = useSelector((state) => state.services.globalPredictions);
+  const globalPredictions = useSelector((state) => state.services.globalPredictions)
 
   /**
      * Fetch all the data
      */
   useEffect(() => {
-    dispatch(actions.fetchGlobal({ showLog }));
-    dispatch(actions.fetchGlobalPredictions());
-  }, [dispatch, showLog]);
+    dispatch(actions.fetchGlobal({ showLog }))
+    dispatch(actions.fetchGlobalPredictions())
+  }, [dispatch, showLog])
 
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
     if (sortedConfirmed && region.length === 0) {
-      const newSelectedCountries = sortedConfirmed.slice(1, 4).map((confirmed) => confirmed.region);
-      setSelectedCountries(newSelectedCountries);
-      handleHistory(undefined, secondaryGraph, showLog, showPredictions);
+      const newSelectedCountries = sortedConfirmed.slice(1, 4).map((confirmed) => confirmed.region)
+      setSelectedCountries(newSelectedCountries)
+      handleHistory(undefined, secondaryGraph, showLog, showPredictions)
     } else if (showPredictions && Object.keys(globalPredictions).length > 0) {
       if ((region.length === 1 && !Object.prototype.hasOwnProperty.call(globalPredictions, region))) {
-        setSelectedCountries(['US']);
-        handleHistory(['US'], secondaryGraph, showLog, showPredictions);
+        setSelectedCountries(['US'])
+        handleHistory(['US'], secondaryGraph, showLog, showPredictions)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortedConfirmed, globalPredictions]);
+  }, [sortedConfirmed, globalPredictions])
 
   useEffect(() => {
     if (!search) {
-      handleHistory(undefined, secondaryGraph, showLog, showPredictions);
+      handleHistory(undefined, secondaryGraph, showLog, showPredictions)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const handleSelectedGraph = (selectedGraph) => {
-    setSecondaryGraph(selectedGraph);
-    handleHistory(undefined, selectedGraph, showLog, showPredictions);
+    setSecondaryGraph(selectedGraph)
+    handleHistory(undefined, selectedGraph, showLog, showPredictions)
 
     ReactGA.event({
       category: 'Region:Country',
       action: `Changed selected graph to ${selectedGraph}`,
-    });
-  };
+    })
+  }
 
   const handleGraphScale = (logScale) => {
-    setShowLog(logScale);
-    handleHistory(undefined, secondaryGraph, logScale, showPredictions);
+    setShowLog(logScale)
+    handleHistory(undefined, secondaryGraph, logScale, showPredictions)
 
     ReactGA.event({
       category: 'Region:Country',
       action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`,
-    });
-  };
+    })
+  }
 
   const handleShowPredictions = () => {
-    let historicSelectedCountries = selectedCountries;
+    let historicSelectedCountries = selectedCountries
 
     if (Array.isArray(selectedCountries) && selectedCountries.length > 1) {
-      historicSelectedCountries = ['US'];
-      setSelectedCountries(historicSelectedCountries);
+      historicSelectedCountries = ['US']
+      setSelectedCountries(historicSelectedCountries)
     }
-    setShowPredictions(!showPredictions);
+    setShowPredictions(!showPredictions)
 
-    handleHistory(undefined, secondaryGraph, showLog, !showPredictions);
-  };
+    handleHistory(undefined, secondaryGraph, showLog, !showPredictions)
+  }
 
   return (
     <>
@@ -129,7 +129,7 @@ export const CountryGraphContainer = ({
       </BoxWithLoadingIndicator>
 
     </>
-  );
-};
+  )
+}
 
-export default CountryGraphContainer;
+export default CountryGraphContainer

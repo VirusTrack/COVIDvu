@@ -1,8 +1,8 @@
-import React from 'react';
+import React from 'react'
 
-import { Button, Column } from 'rbx';
+import { Button, Column } from 'rbx'
 
-import { ENABLE_PREDICTIONS } from '../constants';
+import { ENABLE_PREDICTIONS } from '../constants'
 
 export const GraphScaleControl = ({
   showLog = false,
@@ -14,7 +14,7 @@ export const GraphScaleControl = ({
   parentRegion,
 }) => {
   if (secondaryGraph === 'Mortality') {
-    return null;
+    return null
   }
 
   return (
@@ -26,8 +26,8 @@ export const GraphScaleControl = ({
 
         <Column narrow>
           <Button.Group hasAddons>
-            <Button size="medium" selected={!showLog ? true : null} color={!showLog ? 'default' : 'light'} onClick={() => { if (showLog) { handleGraphScale(false); } }}>Linear</Button>
-            <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" color={showLog ? 'default' : 'light'} onClick={() => { if (!showLog) { handleGraphScale(true); } }}>Logarithmic</Button>
+            <Button size="medium" selected={!showLog ? true : null} color={!showLog ? 'default' : 'light'} onClick={() => { if (showLog) { handleGraphScale(false) } }}>Linear</Button>
+            <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" color={showLog ? 'default' : 'light'} onClick={() => { if (!showLog) { handleGraphScale(true) } }}>Logarithmic</Button>
           </Button.Group>
         </Column>
 
@@ -42,7 +42,7 @@ export const GraphScaleControl = ({
 
       </Column.Group>
     </>
-  );
-};
+  )
+}
 
-export default GraphScaleControl;
+export default GraphScaleControl

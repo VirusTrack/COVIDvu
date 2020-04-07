@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
-import Plot from 'react-plotly.js';
+import Plot from 'react-plotly.js'
 
-import { Generic, Level, Button } from 'rbx';
+import { Generic, Level, Button } from 'rbx'
 
-import { US_STATES_WITH_ABBREVIATION } from '../constants';
+import { US_STATES_WITH_ABBREVIATION } from '../constants'
 
 export const CountyBarGraph = ({ statsForGraph, filterRegion }) => {
-  const [alphaSort, setAlphaSort] = useState(false);
+  const [alphaSort, setAlphaSort] = useState(false)
 
-  const [plotsAsValues, setPlotsAsValues] = useState([]);
+  const [plotsAsValues, setPlotsAsValues] = useState([])
 
-  const [minHeight, setMinHeight] = useState(0);
+  const [minHeight, setMinHeight] = useState(0)
 
   const stateFromAbbreviation = (abbreviation) => {
-    let fullStateName;
+    let fullStateName
     for (const stateName of Object.keys(US_STATES_WITH_ABBREVIATION)) {
       if (US_STATES_WITH_ABBREVIATION[stateName] === abbreviation) {
-        fullStateName = stateName;
+        fullStateName = stateName
       }
     }
-    return fullStateName;
-  };
+    return fullStateName
+  }
 
   const config = {
     displayModeBar: false,
     responsive: true,
-  };
+  }
   const layout = {
     title: stateFromAbbreviation(filterRegion),
     autosize: true,
@@ -48,14 +48,14 @@ export const CountyBarGraph = ({ statsForGraph, filterRegion }) => {
       xanchor: 'center',
       yanchor: 'top',
     },
-  };
+  }
 
   useEffect(() => {
     if (statsForGraph) {
-      setMinHeight(statsForGraph.length * 5);
+      setMinHeight(statsForGraph.length * 5)
       const sortedData = alphaSort
         ? statsForGraph.concat().sort((a, b) => b.region.localeCompare(a.region))
-        : statsForGraph.concat().sort((a, b) => a.confirmed - b.confirmed);
+        : statsForGraph.concat().sort((a, b) => a.confirmed - b.confirmed)
 
       const confirmedPlot = {
         x: sortedData.map(((stat) => stat.confirmed)),
@@ -69,7 +69,7 @@ export const CountyBarGraph = ({ statsForGraph, filterRegion }) => {
           color: 'rgba(20, 40, 180, 0.6)',
           width: 1,
         },
-      };
+      }
 
       const deathsPlot = {
         x: sortedData.map(((stat) => stat.deaths)),
@@ -83,22 +83,22 @@ export const CountyBarGraph = ({ statsForGraph, filterRegion }) => {
           color: 'rgba(255, 4, 30, 0.8)',
           width: 1,
         },
-      };
+      }
 
-      setPlotsAsValues([deathsPlot, confirmedPlot]);
+      setPlotsAsValues([deathsPlot, confirmedPlot])
     }
-  }, [statsForGraph, alphaSort]);
+  }, [statsForGraph, alphaSort])
 
   const changeAlphaSort = (selectedAlphaSort) => {
-    setAlphaSort(selectedAlphaSort);
-  };
+    setAlphaSort(selectedAlphaSort)
+  }
 
   const AlphaOrByConfirmedButton = () => (
     <>
-      { alphaSort && <Button size="medium" onClick={() => { changeAlphaSort(false); }}>Sort By Confirmed</Button> }
-      { !alphaSort && <Button size="medium" onClick={() => { changeAlphaSort(true); }}>Sort Alphabetical</Button> }
+      { alphaSort && <Button size="medium" onClick={() => { changeAlphaSort(false) }}>Sort By Confirmed</Button> }
+      { !alphaSort && <Button size="medium" onClick={() => { changeAlphaSort(true) }}>Sort Alphabetical</Button> }
     </>
-  );
+  )
 
   return (
     <>
@@ -121,7 +121,7 @@ export const CountyBarGraph = ({ statsForGraph, filterRegion }) => {
         />
       </Generic>
     </>
-  );
-};
+  )
+}
 
-export default CountyBarGraph;
+export default CountyBarGraph
