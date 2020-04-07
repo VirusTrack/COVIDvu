@@ -36,7 +36,6 @@ export const HeaderContainer = () => {
     ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
     ReactGA.pageview(window.location.pathname + window.location.search)
 
-
     const LocalizedNavMenu = () => (
         <Navbar.Item onClick={() => { clientCountry.countryISO === 'US' ? changePage("/covid/us") : changePage(`/covid/country/${clientCountry.country}`)}}><img src={flagImg} alt="Flag Icon"/>{clientCountry.countryISO === 'US' ? "United States" : clientCountry.country}</Navbar.Item>
     )
