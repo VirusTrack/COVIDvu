@@ -232,7 +232,7 @@ export const PredictionGraph = ({title, predictions, confirmed, selected, showLo
     return (
         <>
         <Notification>
-            <Title size={4}>Predictions for Today {today.format('YYYY-MM-DD')} in {title[0]}</Title>
+            <Title size={4}>Predictions for Today {today.format('YYYY-MM-DD')} in {title}</Title>
             Between <em>{numeral(lower).format('0,0')}</em> and <em>{numeral(upper).format('0,0')}</em>.<br/><br />
             For a detailed explanation of how predictions work, please visit our <a href="/about/methodology/predictions">methodology page</a>.
         </Notification>
