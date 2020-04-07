@@ -45,7 +45,7 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
         if(sortedConfirmed && region.length === 0) {
             const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
             setSelectedCountries(newSelectedCountries)
-            handleHistory(newSelectedCountries, secondaryGraph, showLog, showPredictions)
+            handleHistory(undefined, secondaryGraph, showLog, showPredictions)
         } else if(showPredictions && Object.keys(globalPredictions).length > 0) {
             if((region.length === 1 && !globalPredictions.hasOwnProperty(region))) {
                 setSelectedCountries(['US'])
@@ -57,14 +57,14 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
 
     useEffect(() => {
         if(!search) {
-            handleHistory(selectedCountries, secondaryGraph, showLog, showPredictions)
+            handleHistory(undefined, secondaryGraph, showLog, showPredictions)
         } 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
  
     const handleSelectedGraph = (selectedGraph) => {
         setSecondaryGraph(selectedGraph)
-        handleHistory(selectedCountries, selectedGraph, showLog, showPredictions)
+        handleHistory(undefined, selectedGraph, showLog, showPredictions)
 
         ReactGA.event({
             category: 'Region:Country',
@@ -74,7 +74,7 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
 
     const handleGraphScale = (logScale) => {
         setShowLog(logScale)
-        handleHistory(selectedCountries, secondaryGraph, logScale, showPredictions)
+        handleHistory(undefined, secondaryGraph, logScale, showPredictions)
 
         ReactGA.event({
             category: 'Region:Country',
@@ -91,7 +91,7 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
         }
         setShowPredictions(!showPredictions)
         
-        handleHistory(historicSelectedCountries, secondaryGraph, showLog, !showPredictions)
+        handleHistory(undefined, secondaryGraph, showLog, !showPredictions)
     }
 
     return (
