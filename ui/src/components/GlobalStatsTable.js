@@ -8,80 +8,92 @@ import { ColumnSortIcon } from './ColumnSortIcon'
 
 import { TERMS } from '../constants/dictionary'
 
-export const GlobalStatsTable = ({statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, sort, onSort}) => {
-    return (
+export const GlobalStatsTable = ({
+  statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, sort, onSort,
+}) => (
 
-        <div className="table-container">
-            <Table fullwidth hoverable>
-                <Table.Head>
-                    <Table.Row>
-                        <Table.Heading>
-                            Region
-                        </Table.Heading>
-                        <Table.Heading onClick={() => { onSort('confirmed') }} style={{ cursor: 'pointer'}}>
-                            Total Cases
-                            {sort === 'confirmed' &&
-                                <ColumnSortIcon direction='desc' />
-                            }
-                        </Table.Heading>
-                        <Table.Heading>
-                            New Cases
-                        </Table.Heading>
-                        <Table.Heading onClick={() => { onSort('deaths')}} style={{ cursor: 'pointer'}}>
-                            Deaths
-                            {sort === 'deaths' &&
-                                <ColumnSortIcon direction='desc' />
-                            }
-                        </Table.Heading>
-                        <Table.Heading>
-                            New Deaths
-                        </Table.Heading>
-                        <Table.Heading tooltipPosition="bottom" tooltip={TERMS['CFR_DEFINITION']} onClick={() => { onSort('mortality')}} style={{ cursor: 'pointer'}}>
-                            Case Fatality Rate
-                            {sort === 'mortality' &&
-                                <ColumnSortIcon direction='desc' />
-                            }
-                        </Table.Heading>
-                    </Table.Row>
-                </Table.Head>
-                <Table.Body>
-                    { statsForGraph ? statsForGraph.map((stat, idx) => (
-                    <Table.Row key={idx}>
-                        <Table.Cell>                        
-                            <Generic as="a" tooltipPosition="right" 
-                                onClick={()=>{ redirectToExternalLink(stat.region) }} 
-                                tooltip={isExternalLinkAvailable(stat.region) ? null : "No external link for region yet"} 
-                                textColor={isExternalLinkAvailable(stat.region) ? "link": "black"}>
-                                    {renderDisplay(stat.region)}
-                            </Generic>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <Title size={5}>{numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')} ({stat.confirmedDayChange < 0 ? "0%" : numeral(stat.confirmedDayChange / stat.confirmed).format('0%')})</Title>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <Title size={5}>{numeral(stat.deaths).format('0,0')}</Title>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <Title size={5}>{numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')} ({stat.deathsDayChange < 0 ? "0%" : numeral(stat.deathsDayChange / stat.deaths).format('0%')})</Title>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
-                        </Table.Cell>
-                    </Table.Row>
-                    )) : (
-                        <Table.Row>
-                            <Table.Cell>
-                                Loading...
-                            </Table.Cell>
-                        </Table.Row>
-                    )}
-                </Table.Body>
-            </Table>
-        </div>        
-    )
-}
+  <div className="table-container">
+    <Table fullwidth hoverable>
+      <Table.Head>
+        <Table.Row>
+          <Table.Heading>
+            Region
+          </Table.Heading>
+          <Table.Heading onClick={() => { onSort('confirmed') }} style={{ cursor: 'pointer' }}>
+            Total Cases
+            {sort === 'confirmed'
+                                && <ColumnSortIcon direction="desc" />}
+          </Table.Heading>
+          <Table.Heading>
+            New Cases
+          </Table.Heading>
+          <Table.Heading onClick={() => { onSort('deaths') }} style={{ cursor: 'pointer' }}>
+            Deaths
+            {sort === 'deaths'
+                                && <ColumnSortIcon direction="desc" />}
+          </Table.Heading>
+          <Table.Heading>
+            New Deaths
+          </Table.Heading>
+          <Table.Heading tooltipPosition="bottom" tooltip={TERMS.CFR_DEFINITION} onClick={() => { onSort('mortality') }} style={{ cursor: 'pointer' }}>
+            Case Fatality Rate
+            {sort === 'mortality'
+                                && <ColumnSortIcon direction="desc" />}
+          </Table.Heading>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>
+        { statsForGraph ? statsForGraph.map((stat, idx) => (
+          <Table.Row key={idx}>
+            <Table.Cell>
+              <Generic
+                as="a"
+tooltipPosition="right"
+                onClick={() => { redirectToExternalLink(stat.region) }}
+                tooltip={isExternalLinkAvailable(stat.region) ? null : 'No external link for region yet'}
+                textColor={isExternalLinkAvailable(stat.region) ? 'link' : 'black'}
+              >
+                {renderDisplay(stat.region)}
+              </Generic>
+            </Table.Cell>
+            <Table.Cell>
+              <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
+            </Table.Cell>
+            <Table.Cell>
+              <Title size={5}>
+                {numeral(stat.confirmedDayChange < 0 ? 0 : stat.confirmedDayChange).format('+0,0')}
+                {' '}
+                (
+                {stat.confirmedDayChange < 0 ? '0%' : numeral(stat.confirmedDayChange / stat.confirmed).format('0%')}
+                )
+              </Title>
+            </Table.Cell>
+            <Table.Cell>
+              <Title size={5}>{numeral(stat.deaths).format('0,0')}</Title>
+            </Table.Cell>
+            <Table.Cell>
+              <Title size={5}>
+                {numeral(stat.deathsDayChange < 0 ? 0 : stat.deathsDayChange).format('+0,0')}
+                {' '}
+                (
+                {stat.deathsDayChange < 0 ? '0%' : numeral(stat.deathsDayChange / stat.deaths).format('0%')}
+                )
+              </Title>
+            </Table.Cell>
+            <Table.Cell>
+              <Title size={6}>{numeral(stat.mortality).format('0.0 %')}</Title>
+            </Table.Cell>
+          </Table.Row>
+        )) : (
+          <Table.Row>
+            <Table.Cell>
+              Loading...
+            </Table.Cell>
+          </Table.Row>
+        )}
+      </Table.Body>
+    </Table>
+  </div>
+)
 
 export default GlobalStatsTable

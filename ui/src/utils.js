@@ -1,53 +1,46 @@
 /**
- * Group an array of objects into an object that is  
+ * Group an array of objects into an object that is
  * grouped by key in object
- * 
- * @param {*} key  
- * @param {*} array 
+ *
+ * @param {*} key
+ * @param {*} array
  */
-export const groupByKey = (key, array) => {
-    return array.reduce((obj, item) => {
-        const objKey = item[key]
-        obj[objKey] = item
-        return obj
-    }, {})
-}
+export const groupByKey = (key, array) => array.reduce((obj, item) => {
+  const objKey = item[key];
+  obj[objKey] = item;
+  return obj;
+}, {});
 
 /**
  * Calculate the rough size of object and return in bytes
- * 
- * @param {*} object 
+ *
+ * @param {*} object
  */
-export function roughSizeOfObject( object ) {
+export function roughSizeOfObject(object) {
+  const objectList = [];
+  const stack = [object];
+  let bytes = 0;
 
-    var objectList = [];
-    var stack = [ object ];
-    var bytes = 0;
+  while (stack.length) {
+    const value = stack.pop();
 
-    while ( stack.length ) {
-        var value = stack.pop();
+    if (typeof value === 'boolean') {
+      bytes += 4;
+    } else if (typeof value === 'string') {
+      bytes += value.length * 2;
+    } else if (typeof value === 'number') {
+      bytes += 8;
+    } else if
+    (
+      typeof value === 'object'
+            && objectList.indexOf(value) === -1
+    ) {
+      objectList.push(value);
 
-        if ( typeof value === 'boolean' ) {
-            bytes += 4;
-        }
-        else if ( typeof value === 'string' ) {
-            bytes += value.length * 2;
-        }
-        else if ( typeof value === 'number' ) {
-            bytes += 8;
-        }
-        else if
-        (
-            typeof value === 'object'
-            && objectList.indexOf( value ) === -1
-        )
-        {
-            objectList.push( value );
-
-            for( var i in value ) {
-                stack.push( value[ i ] );
-            }
-        }
+      for (const i in value) {
+        stack.push(value[i]);
+      }
     }
-    return bytes;
+  }
+  return bytes;
 }
