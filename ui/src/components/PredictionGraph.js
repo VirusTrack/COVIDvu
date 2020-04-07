@@ -183,7 +183,6 @@ export const PredictionGraph = ({
   };
 
   let layout = {
-    title,
     autosize: true,
     width: undefined,
     height: undefined,
