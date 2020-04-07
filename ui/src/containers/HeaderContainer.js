@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import { useChangePage } from '../hooks/nav'
 
@@ -25,7 +25,7 @@ import chartImg from '../images/fa-icon-chart.svg'
 import infoImg from '../images/fa-icon-info.svg'
 
 export const HeaderContainer = () => {
-    const [newsletterModal, setNewsletterModal] = useState(false)
+
     const history = useHistory()
     const location = useLocation()
     const clientCountry = useClientCountry()
@@ -40,10 +40,6 @@ export const HeaderContainer = () => {
     const LocalizedNavMenu = () => (
         <Navbar.Item onClick={() => { clientCountry.countryISO === 'US' ? changePage("/covid/us") : changePage(`/covid/country/${clientCountry.country}`)}}><img src={flagImg} alt="Flag Icon"/>{clientCountry.countryISO === 'US' ? "United States" : clientCountry.country}</Navbar.Item>
     )
-
-    const openNewsletterModal = () => {
-        setNewsletterModal(true)
-    }
 
     return (
         <>

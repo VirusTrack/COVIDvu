@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Box, Title, Tag, Column, Button } from 'rbx'
+import { Button } from 'rbx'
 
 import NewsletterModal from './NewsletterModal'
 

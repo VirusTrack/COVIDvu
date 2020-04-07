@@ -17,7 +17,7 @@ import LogoElement from '../components/LogoElement'
 import NewsletterModal from '../components/NewsletterModal'
 
 import { TERMS } from '../constants/dictionary'
-import { DASHBOARD_GRAPH_SCALE_KEY } from '../constants'
+import { DASHBOARD_GRAPH_SCALE_KEY, NEWSLETTER_SIGNUP_KEY } from '../constants'
 
 import GraphControls from '../components/GraphControls'
 
@@ -134,7 +134,9 @@ export const DashboardContainer = ({showLogParam = false}) => {
                 <Tag as="p">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
             }
         >
-           <NewsletterModal style={{marginLeft: 'auto', maxWidth: '40rem'}} className="hide-on-mobile" />
+            { !store.get(NEWSLETTER_SIGNUP_KEY) &&
+                <NewsletterModal style={{marginLeft: 'auto', maxWidth: '40rem'}} className="hide-on-mobile" />
+            }
         </HeroElement>
 
         <Box>

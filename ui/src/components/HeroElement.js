@@ -1,19 +1,18 @@
-import React, {useState} from 'react'
+import React from 'react'
 
 import { useChangePage } from '../hooks/nav'
 
-import { Hero, Container, Button, Title, Column } from "rbx"
+import { Hero, Button, Title, Column } from "rbx"
 
 export const HeroElement = ({title, subtitle, buttons, children, updated, columns}) => {
     const nodes = React.Children.toArray(children);
-    const [newsletterModal, setNewsletterModal] = useState(false)
     const changePage = useChangePage()
 
     return (
         <>
         <Hero size="small">
             <Hero.Body>
-                <Column.Group vcentered centered={nodes.length} gapSize={5}>
+                <Column.Group vcentered gapSize={5}>
                 {nodes[0] ? <Column narrow>
                     {nodes[0]}
                 </Column> : null}

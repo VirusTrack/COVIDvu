@@ -12,6 +12,8 @@ const LAST_UPDATE_KEY = 'covid-lastUpdated'
 const CLIENT_COUNTRY_KEY = 'covid-clientCountry'
 const CLIENT_COUNTRY_CODE_KEY = 'covid-clientCountryCode'
 
+const NEWSLETTER_SIGNUP_KEY = 'covid-newsletterSignup'
+
 const GLOBAL_REGION_SELECT_KEY = 'covid-globalRegionSelect'
 const US_REGION_SELECT_KEY = 'covid-usRegionSelect'
 const DASHBOARD_GRAPH_SCALE_KEY = 'covid-dashboardGraphScale'
@@ -597,6 +599,7 @@ const COUNTRIES = [
     LAST_UPDATE_KEY,
     CLIENT_COUNTRY_KEY,
     CLIENT_COUNTRY_CODE_KEY,
+    NEWSLETTER_SIGNUP_KEY,
     GLOBAL_REGION_SELECT_KEY,
     US_REGION_SELECT_KEY,
     DASHBOARD_GRAPH_SCALE_KEY,
