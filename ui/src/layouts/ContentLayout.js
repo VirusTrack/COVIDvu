@@ -1,28 +1,28 @@
-import React from 'react'
+import React from 'react';
 
-import { Section, Column } from "rbx"
+import { Section, Column } from 'rbx';
 
-import { HeaderContainer } from '../containers/HeaderContainer'
-import { FooterContainer } from '../containers/FooterContainer'
+import { HeaderContainer } from '../containers/HeaderContainer';
+import { FooterContainer } from '../containers/FooterContainer';
 
 export const ContentLayout = ({ children }) => {
-    const nodes = React.Children.toArray(children);
+  const nodes = React.Children.toArray(children);
 
-    return (
-        <>
-            <HeaderContainer />
+  return (
+    <>
+      <HeaderContainer />
 
-            <Section>
-                <Column.Group centered={true}>
-                    <Column size="half">
-                        {nodes[0]}
-                    </Column>
-                </Column.Group>
-            </Section>
+      <Section>
+        <Column.Group centered>
+          <Column size="half">
+            {nodes[0]}
+          </Column>
+        </Column.Group>
+      </Section>
 
-            <FooterContainer />
-        </>
-    )
-}
+      <FooterContainer />
+    </>
+  );
+};
 
-export default ContentLayout
+export default ContentLayout;

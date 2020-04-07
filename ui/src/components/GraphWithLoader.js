@@ -1,46 +1,44 @@
-import React from 'react'
+import React from 'react';
 
-import Graph from './Graph'
+import Graph from './Graph';
 
 export const GraphWithLoader = ({
-        graphName, 
-        secondaryGraph, 
-        x_title, 
-        y_type, 
-        y_title, 
-        graph, 
-        selected, 
-        config, 
-        showLog,
-        ref
-    }) => {
-    
-    return (
+  graphName,
+  secondaryGraph,
+  x_title,
+  y_type,
+  y_title,
+  graph,
+  selected,
+  config,
+  showLog,
+  ref,
+}) => (
+  <>
+    { secondaryGraph === graphName
+        && (
         <>
-        { secondaryGraph === graphName &&
-        <React.Fragment>
-            { graph ? (
-            <Graph 
-                data={graph}
-                selected={selected} 
-                config={config}
-                y_type={y_type}
-                x_title={x_title}
-                y_title={y_title}
-                showLog={showLog}
-                start={(graphName === 'Cases') ? 100 : null}
-                ref={ref}
+          { graph ? (
+            <Graph
+              data={graph}
+              selected={selected}
+              config={config}
+              y_type={y_type}
+              x_title={x_title}
+              y_title={y_title}
+              showLog={showLog}
+              start={(graphName === 'Cases') ? 100 : null}
+              ref={ref}
             />
 
-            ) : (
-                <div>
-                    Loading...
-                </div>
-            )}
-        </React.Fragment>  
-        }
+          ) : (
+            <div>
+              Loading...
+            </div>
+          )}
         </>
-    )
-}
+        )}
+  </>
+);
 
-export default GraphWithLoader
+export default GraphWithLoader;

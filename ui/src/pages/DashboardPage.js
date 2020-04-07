@@ -1,33 +1,31 @@
-import React from 'react'
+import React from 'react';
 
-import { useLocation } from 'react-router'
-import queryString from 'query-string'
+import { useLocation } from 'react-router';
+import queryString from 'query-string';
 
-import ErrorBoundary from '../components/ErrorBoundary'
-import MainLayout from '../layouts/MainLayout'
+import ErrorBoundary from '../components/ErrorBoundary';
+import MainLayout from '../layouts/MainLayout';
 
-import DashboardContainer from '../containers/DashboardContainer'
+import DashboardContainer from '../containers/DashboardContainer';
 
-import { usePageTitle } from '../hooks/ui'
+import { usePageTitle } from '../hooks/ui';
 
 export const DashboardPage = () => {
- 
-    const { search } = useLocation()
+  const { search } = useLocation();
 
-    let query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
+  const query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search);
 
-    let showLog = query.showLog === 'true' ? true : false
+  const showLog = query.showLog === 'true';
 
-    usePageTitle("Dashboard")
-     
-    return (
-        <MainLayout className="dashboard">
-            <ErrorBoundary>
-                <DashboardContainer showLogParam={showLog} />
-            </ErrorBoundary>
-        </MainLayout>
-    )
+  usePageTitle('Dashboard');
 
-}
+  return (
+    <MainLayout className="dashboard">
+      <ErrorBoundary>
+        <DashboardContainer showLogParam={showLog} />
+      </ErrorBoundary>
+    </MainLayout>
+  );
+};
 
-export default DashboardPage
+export default DashboardPage;
