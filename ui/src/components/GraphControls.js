@@ -23,20 +23,20 @@ import {
 
 
 export const GraphControls = ({
-                                scale, 
-                                downloadImage, 
-                                downloadCSV, 
-                                secondaryGraph, 
-                                showLog, 
-                                showPredictions,
-                                parentRegion, 
-                                handleGraphScale, 
-                                handleShowPredictions,
-                                selected, 
-                                data, 
-                                centered = false,
-                                htmlId = null
-                              }) => {
+  scale, 
+  downloadImage, 
+  downloadCSV, 
+  secondaryGraph, 
+  showLog, 
+  showPredictions,
+  parentRegion, 
+  handleGraphScale, 
+  handleShowPredictions,
+  selected, 
+  data, 
+  centered = false,
+  htmlId = null
+}) => {
 
   const detectMobile = useMobileDetect()
 
@@ -44,7 +44,7 @@ export const GraphControls = ({
 
   const shareUrl = `https://virustrack.live${location.pathname}${location.search}${htmlId ? '#' + htmlId : ''}`
   return (
-      <Column.Group className="graph-controls" breakpoint="desktop"> 
+      <Column.Group className="graph-controls" multiline> 
       
           {scale && 
             <GraphScaleControl 
@@ -54,38 +54,36 @@ export const GraphControls = ({
               handleShowPredictions={handleShowPredictions}
               secondaryGraph={secondaryGraph}
               parentRegion={parentRegion}
-              centered={centered} />
+              align={centered ? 'center' : null} />
             }
-            
-          <Column.Group breakpoint="mobile" >
+          <Column.Group breakpoint="mobile" multiline >
+            <Column style={{textAlign: centered ? 'center' : null}}>
+                <FacebookShareButton url={shareUrl}>
+                  <FacebookIcon size={26} style={{borderRadius: '.4rem'}}/>
+                </FacebookShareButton>
+                &nbsp;
+                <TwitterShareButton 
+                      url={shareUrl} 
+                      title={document.title}
+                >
+                  <TwitterIcon size={26} style={{borderRadius: '.4rem'}}/>
+                </TwitterShareButton> 
+                &nbsp;
+                <RedditShareButton url={shareUrl} title={document.title}>
+                  <RedditIcon size={26} style={{borderRadius: '.4rem'}}/>
+                </RedditShareButton>
+                &nbsp;
+                <WhatsappShareButton url={shareUrl} title={document.title}>
+                  <WhatsappIcon size={26} style={{borderRadius: '.4rem'}}/>
+                </WhatsappShareButton>
+            </Column>
 
-          <Column narrow>
-              <FacebookShareButton url={shareUrl}>
-                <FacebookIcon size={26} />
-              </FacebookShareButton>
-              &nbsp;
-              <TwitterShareButton 
-                    url={shareUrl} 
-                    title={document.title}
-              >
-                <TwitterIcon size={26} />
-              </TwitterShareButton> 
-              &nbsp;
-              <RedditShareButton url={shareUrl} title={document.title}>
-                <RedditIcon size={26} />
-              </RedditShareButton>
-              &nbsp;
-              <WhatsappShareButton url={shareUrl} title={document.title}>
-                <WhatsappIcon size={26} />
-              </WhatsappShareButton>
-          </Column>
-
-          {(!detectMobile.isMobile() && downloadImage) && 
+            {(!detectMobile.isMobile() && downloadImage) && 
               <Column narrow>
                 <GraphImageDownloadButton secondaryGraph={secondaryGraph} parentRegion={parentRegion} selected={selected} showLog={showLog} />
               </Column>
-          }
-          {downloadCSV && <Column narrow><GraphDownloadButton data={data} /></Column>}
+            }
+            {downloadCSV && <Column narrow><GraphDownloadButton data={data} /></Column>}
           </Column.Group>
       </Column.Group>
   )
