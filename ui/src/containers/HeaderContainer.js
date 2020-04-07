@@ -8,6 +8,8 @@ import { Navbar, Button } from "rbx"
 import LogoElement from '../components/LogoElement'
 import SocialIcons from '../components/SocialIcons'
 
+import NewsletterModalButton from '../components/NewsletterModalButton'
+
 import { useClientCountry } from '../hooks/ui'
 
 import { 
@@ -23,6 +25,7 @@ import chartImg from '../images/fa-icon-chart.svg'
 import infoImg from '../images/fa-icon-info.svg'
 
 export const HeaderContainer = () => {
+
     const history = useHistory()
     const location = useLocation()
     const clientCountry = useClientCountry()
@@ -40,13 +43,13 @@ export const HeaderContainer = () => {
 
     return (
         <>
-
-            <div className="meta-nav">
-                <p>{ false && `Due to problems with one of our data sources, all data on the site at the moment is for yesterday 03/25. Our amazing volunteer team is in the middle of fixing this linkage and
-                it will be resolved shortly. Thank you for your patience!`}</p>
-                
-                <SocialIcons size="small" donate />
-            </div>
+        <div className="meta-nav">
+            <NewsletterModalButton buttonCopy="Newsletter Sign Up" size="small" color="primary" style={{fontSize: '1.0rem', lineHeight: '1rem'}} />
+            <p>{ false && `Due to problems with one of our data sources, all data on the site at the moment is for yesterday 03/25. Our amazing volunteer team is in the middle of fixing this linkage and
+            it will be resolved shortly. Thank you for your patience!`}</p>
+            
+            <SocialIcons size="small" donate />
+        </div>
         
         <Navbar>
             <Navbar.Brand>
