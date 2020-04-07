@@ -46,14 +46,14 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
             const newSelectedCountries = sortedConfirmed.slice(1, 4).map(confirmed => confirmed.region)
             setSelectedCountries(newSelectedCountries)
             handleHistory(newSelectedCountries, secondaryGraph, showLog, showPredictions)
-        } else if(showPredictions) {
-            if((region.length === 1 && !globalPredictions.hasOwnProperty(region)) || region.length > 1) {
+        } else if(showPredictions && Object.keys(globalPredictions).length > 0) {
+            if((region.length === 1 && !globalPredictions.hasOwnProperty(region))) {
                 setSelectedCountries(['US'])
                 handleHistory(['US'], secondaryGraph, showLog, showPredictions)
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sortedConfirmed])
+    }, [sortedConfirmed, globalPredictions])
 
     useEffect(() => {
         if(!search) {
@@ -85,7 +85,7 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
     const handleShowPredictions = () => {
         let historicSelectedCountries = selectedCountries
 
-        if(selectedCountries.length > 1) {
+        if(Array.isArray(selectedCountries) && selectedCountries.length > 1) {
             historicSelectedCountries = ['US']
             setSelectedCountries(historicSelectedCountries)
         }
@@ -104,22 +104,6 @@ export const CountryGraphContainer = ({region = "US", graph = 'Cases', showLogPa
 
         <BoxWithLoadingIndicator hasData={sortedConfirmed}>
             <>
-
-                {/* <>
-                    <CheckboxRegionComponent
-                        data={sortedConfirmed}
-                        selected={selectedCountries}
-                        handleSelected={dataList => handleSelectedRegion(dataList)} 
-                        defaultSelected={region}
-                        showPredictions={showPredictions}
-                        predictions={globalPredictions}
-                        secondaryGraph={secondaryGraph}
-                        showLog={showLog}
-                        parentRegion="Global"
-                    />
-
-                </> */}
-
                 <TabbedCompareGraphs
                     secondaryGraph={secondaryGraph}
                     confirmed={confirmed}
