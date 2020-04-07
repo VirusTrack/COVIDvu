@@ -101,6 +101,7 @@ export const USRegionsGraphContainer = ({region = [], graph = 'Cases', showLogPa
             buttons={[
                 { title: 'Cases By State', location: '/covid/us' },
                 { title: 'Cases By Region', location: '/covid/us/regions' },
+                { title: 'Cases By County', location: '/stats?filter=US_Counties' },
             ]}
         />
 
