@@ -14,8 +14,10 @@ import GraphWithLoader from '../components/GraphWithLoader'
 import HeroElement from '../components/HeroElement'
 import LogoElement from '../components/LogoElement'
 
+import NewsletterModal from '../components/NewsletterModal'
+
 import { TERMS } from '../constants/dictionary'
-import { DASHBOARD_GRAPH_SCALE_KEY } from '../constants'
+import { DASHBOARD_GRAPH_SCALE_KEY, NEWSLETTER_SIGNUP_KEY } from '../constants'
 
 import GraphControls from '../components/GraphControls'
 
@@ -118,23 +120,22 @@ export const DashboardContainer = ({showLogParam = false}) => {
         )
     }
 
-    console.dir(globalConfirmed)
-    
-    console.dir([clientCountry])
-
     return (
         <>
         <HeroElement
             title={
-                <>Coronavirus COVID-19 Cases</>
+                <>Coronavirus<br/> COVID-19 Cases</>
             }
             buttons={[
                 { title: 'Global', location: '/covid' },
                 { title: 'United States', location: '/covid/us' },
             ]}
-        >
-            { lastUpdate && 
+            updated={lastUpdate && 
                 <Tag as="p">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
+            }
+        >
+            { !store.get(NEWSLETTER_SIGNUP_KEY) &&
+                <NewsletterModal style={{marginLeft: 'auto', maxWidth: '40rem'}} className="hide-on-mobile" />
             }
         </HeroElement>
 

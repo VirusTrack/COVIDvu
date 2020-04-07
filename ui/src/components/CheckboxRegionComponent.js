@@ -5,7 +5,7 @@ import numeral from 'numeral'
 
 import ReactGA from 'react-ga';
 
-import { useMobileDetect, useWindowSize } from '../hooks/ui'
+import { useMobileDetect } from '../hooks/ui'
 
 import { groupByKey } from '../utils'
 
@@ -62,11 +62,6 @@ export const CheckboxRegionComponent = (
 
   useEffect(() => {
     if(showPredictions && Object.keys(predictions).length > 0) {
-        console.log(`showPredictions: ${showPredictions}`)
-        console.log(`secondaryGraph: ${secondaryGraph}`)
-        console.log(`alphaSort: ${alphaSort}`)
-        console.dir(predictions)
-
         const countryByKey = groupByKey("region", data)
         const predictionsList = Object.keys(predictions).map(region => ({ region: region, stats: countryByKey[region].stats}))
 
@@ -139,7 +134,7 @@ export const CheckboxRegionComponent = (
         <div style={{display: 'flex', alignItems:'center', justifyContent: 'space-between', marginBottom: '.5rem'}}>
         Sort By: <Button size="small" outlined onClick={() => { handleSelected([]) }}>Deselect All</Button>
         </div>
-      <Button.Group size="large" fullwidth hasAddons style={{paddingBottom: '1rem'}}>
+      <Button.Group size="large" hasAddons style={{paddingBottom: '1rem'}}>
         
           {/* <Button size="medium" onClick={() => { handleSelected(defaultSelected)}}>Select Default</Button> */}
             <Button style={{flexGrow: '1', background: alphaSort ? 'rgba(0,25,50,.075)' : null, borderColor: alphaSort ? 'rgba(0,25,50,.1)' : null}} selected={alphaSort} onClick={() => { changeAlphaSort(false) }}>Confirmed</Button>
