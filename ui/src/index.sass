@@ -32,7 +32,7 @@ body
   @media screen and (max-width: 901px)
     background-size: 155vw
   @media screen and (max-width: 700px)
-    background-size: 240vw
+    background-size: 150rem
   @media screen and (min-width: 900px)
     background-size: 120vw
   @media screen and (min-width: 1400px)
@@ -73,31 +73,40 @@ code
       margin: -1rem 1rem -1rem 0
       max-height: none
 
+.hide-on-mobile
+  @media screen and (max-width: $tablet - 1)
+    display: none
 
 .hero
-  @media screen and (min-width: 1024px)
-    .buttons .button:not(:last-child)
-        margin-right: 2rem
-  @media screen and (max-width: 1025px)
-    text-align: center
-    align-content: center
-    .buttons
-      justify-content: center
-      .button:not(:last-child)
-        margin-right: 1rem
+  text-align: center
+  align-content: center
+  .buttons
+    justify-content: center
+    .button:not(:last-child)
+      margin-right: 1rem
   .subtitle 
     color: #{$secondary}
   .title 
     color: white
     font-family: 'Archivo', var(--font-stack)
-    font-size: 3.6rem
-    @media screen and (min-width: 1024px)
-      font-size: 6.4rem
+    font-size: 3.2rem
   .tag 
     font-size: 1.2rem
     background-color: transparent
     color: white
-  
+  @media screen and (min-width: $tablet)
+    text-align: left
+    .title
+      font-size: 4rem
+    .buttons 
+      justify-content: flex-start
+  @media screen and (min-width: $desktop)
+    padding: 2.5rem 0
+    text-align: left
+    .title 
+      font-size: 6.4rem
+    .buttons .button:not(:last-child)
+        margin-right: 2rem  
 
 .meta-nav
   background: #EEEEEE
@@ -333,8 +342,6 @@ hr
       color: #{$primary}
       border-color: #{$primary}
   &.is-large
-    padding: 0rem 4rem
-    min-height: 4rem 
     box-shadow: #{$drop-shadow-large}
 
 .chart > .title:first-of-type 
@@ -591,9 +598,11 @@ label
 
   &.small
     .social-icons__icons
-      margin-top: .1rem
+      margin-top: .05rem
       > a 
-        padding: .1rem
+        img 
+          height: 2.05rem
+          width: 2.05rem
         .network-title
           display: none
     .paypal-button

@@ -14,6 +14,8 @@ import GraphWithLoader from '../components/GraphWithLoader'
 import HeroElement from '../components/HeroElement'
 import LogoElement from '../components/LogoElement'
 
+import NewsletterModal from '../components/NewsletterModal'
+
 import { TERMS } from '../constants/dictionary'
 import { DASHBOARD_GRAPH_SCALE_KEY } from '../constants'
 
@@ -122,16 +124,17 @@ export const DashboardContainer = ({showLogParam = false}) => {
         <>
         <HeroElement
             title={
-                <>Coronavirus COVID-19 Cases</>
+                <>Coronavirus<br/> COVID-19 Cases</>
             }
             buttons={[
                 { title: 'Global', location: '/covid' },
                 { title: 'United States', location: '/covid/us' },
             ]}
-        >
-            { lastUpdate && 
+            updated={lastUpdate && 
                 <Tag as="p">Last updated: {moment(lastUpdate).format('YYYY-MM-DD HH:mm:ss')}</Tag>
             }
+        >
+           <NewsletterModal style={{marginLeft: 'auto', maxWidth: '40rem'}} className="hide-on-mobile" />
         </HeroElement>
 
         <Box>

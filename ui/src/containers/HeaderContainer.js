@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { useChangePage } from '../hooks/nav'
 
@@ -7,6 +7,8 @@ import { useHistory, useLocation } from "react-router-dom"
 import { Navbar, Button } from "rbx"
 import LogoElement from '../components/LogoElement'
 import SocialIcons from '../components/SocialIcons'
+
+import NewsletterModalButton from '../components/NewsletterModalButton'
 
 import { useClientCountry } from '../hooks/ui'
 
@@ -23,6 +25,7 @@ import chartImg from '../images/fa-icon-chart.svg'
 import infoImg from '../images/fa-icon-info.svg'
 
 export const HeaderContainer = () => {
+    const [newsletterModal, setNewsletterModal] = useState(false)
     const history = useHistory()
     const location = useLocation()
     const clientCountry = useClientCountry()
@@ -38,15 +41,19 @@ export const HeaderContainer = () => {
         <Navbar.Item onClick={() => { clientCountry.countryISO === 'US' ? changePage("/covid/us") : changePage(`/covid/country/${clientCountry.country}`)}}><img src={flagImg} alt="Flag Icon"/>{clientCountry.countryISO === 'US' ? "United States" : clientCountry.country}</Navbar.Item>
     )
 
+    const openNewsletterModal = () => {
+        setNewsletterModal(true)
+    }
+
     return (
         <>
-
-            <div className="meta-nav">
-                <p>{ false && `Due to problems with one of our data sources, all data on the site at the moment is for yesterday 03/25. Our amazing volunteer team is in the middle of fixing this linkage and
-                it will be resolved shortly. Thank you for your patience!`}</p>
-                
-                <SocialIcons size="small" donate />
-            </div>
+        <div className="meta-nav">
+            <NewsletterModalButton buttonCopy="Newsletter Sign Up" size="small" color="primary" style={{fontSize: '1.0rem', lineHeight: '1rem'}} />
+            <p>{ false && `Due to problems with one of our data sources, all data on the site at the moment is for yesterday 03/25. Our amazing volunteer team is in the middle of fixing this linkage and
+            it will be resolved shortly. Thank you for your patience!`}</p>
+            
+            <SocialIcons size="small" donate />
+        </div>
         
         <Navbar>
             <Navbar.Brand>
