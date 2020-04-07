@@ -1,23 +1,25 @@
-import React, { useState } from 'react'
-import { Button } from 'rbx'
+import React, { useState } from 'react';
+import { Button } from 'rbx';
 
-import NewsletterModal from './NewsletterModal'
+import NewsletterModal from './NewsletterModal';
 
-export const NewsletterModalButton = ({buttonCopy, size, color, style}) => {
-  const [newsletterModal, setNewsletterModal] = useState(false)
+export const NewsletterModalButton = ({
+  buttonCopy, size, color, style,
+}) => {
+  const [newsletterModal, setNewsletterModal] = useState(false);
 
   const handleModalClose = () => {
-    setNewsletterModal(false)
-  }
+    setNewsletterModal(false);
+  };
   const handleModalOpen = () => {
-    setNewsletterModal(true)
-  }
+    setNewsletterModal(true);
+  };
 
   return (
     <>
-    <Button style={style} size={size ? size : 'medium'} color={color ? color : 'primary'} onClick={handleModalOpen}>{buttonCopy ? buttonCopy : 'Newsletter Signup'}</Button>
-    {newsletterModal && <NewsletterModal handleModalClose={handleModalClose} />}
+      <Button style={style} size={size || 'medium'} color={color || 'primary'} onClick={handleModalOpen}>{buttonCopy || 'Newsletter Signup'}</Button>
+      {newsletterModal && <NewsletterModal handleModalClose={handleModalClose} />}
     </>
-  )
-}
-export default NewsletterModalButton
+  );
+};
+export default NewsletterModalButton;

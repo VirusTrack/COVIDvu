@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -7,12 +7,15 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true };
+    return { 
+      hasError: true,
+      error: error,
+    };
   }
 
   componentDidCatch(error, errorInfo) {
-    // You can also log the error to an error reporting service
-    // logErrorToMyService(error, errorInfo);
+    console.error(error)
+    console.dir(errorInfo)
   }
 
   render() {
@@ -20,8 +23,8 @@ class ErrorBoundary extends React.Component {
       return <h1>Something went wrong.</h1>;
     }
 
-    return this.props.children; 
+    return this.props.children;
   }
 }
 
-export default ErrorBoundary
+export default ErrorBoundary;

@@ -1,22 +1,22 @@
-import React from 'react'
+import React from 'react';
 
-import { Box } from 'rbx'
+import { Box } from 'rbx';
 
-export const BoxWithLoadingIndicator = ({hasData, children}) => {
-    const nodes = React.Children.toArray(children);
+export const BoxWithLoadingIndicator = ({ hasData, children }) => {
+  const nodes = React.Children.toArray(children);
 
-    return (
-        <Box>
-            {!hasData &&       
-            <h1>Loading...</h1>
-            }
-            {hasData &&
+  return (
+    <Box>
+      {!hasData
+            && <h1>Loading...</h1>}
+      {hasData
+                && (
                 <>
-                {nodes}
+                  {nodes}
                 </>
-            }
-        </Box>
-    )
-}
+                )}
+    </Box>
+  );
+};
 
-export default BoxWithLoadingIndicator
+export default BoxWithLoadingIndicator;
