@@ -45,5 +45,10 @@ export function roughSizeOfObject(object) {
   return bytes;
 }
 
-
+/**
+ * Remove the exclamation point prior to region label which is used on backend data
+ * to ensure it shows at top of list
+ * 
+ * @param {*} value 
+ */
 export const renderDisplay = (value) => (value.startsWith('!') ? value.substring(1) : value)
