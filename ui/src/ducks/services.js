@@ -15,6 +15,7 @@ import {
 
 import { groupByKey, roughSizeOfObject } from '../utils'
 
+import { extractLatestCounts, calculateMortality } from './utils'
 
 const countriesRegions = require('../constants/countries_regions.json')
 
@@ -292,48 +293,6 @@ export default function (state = initialState, action) {
   }
 }
 
-const calculateMortality = (deaths, confirmed) => {
-  const mortality = {}
-
-  if (deaths !== null && confirmed !== null) {
-    for (const country of Object.keys(deaths)) {
-      for (const date of Object.keys(deaths[country])) {
-        const deathAtDate = deaths[country][date]
-
-        if (!Object.prototype.hasOwnProperty.call(confirmed, country)) {
-          continue
-        }
-        const confirmedAtDate = confirmed[country][date]
-
-        if (!Object.prototype.hasOwnProperty.call(mortality, country)) {
-          mortality[country] = {}
-        }
-        mortality[country][date] = (deathAtDate / confirmedAtDate)
-      }
-    }
-  }
-
-  return { mortality }
-}
-
-const extractLatestCounts = (stats, daysAgo = 0) => {
-  const regionWithLatestCounts = []
-
-  for (const region of Object.keys(stats)) {
-    const dates = Object.keys(stats[region]).sort()
-
-    const lastDate = dates[dates.length - daysAgo - 1]
-
-    const yesterDate = dates[dates.length - daysAgo - 2]
-
-    const currentNumbers = stats[region][lastDate]
-    const yesterdayNumbers = stats[region][yesterDate]
-
-    regionWithLatestCounts.push({ region, stats: currentNumbers, dayChange: (currentNumbers - yesterdayNumbers) })
-  }
-
-  return regionWithLatestCounts
-}
 
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -571,6 +530,7 @@ export function* fetchUSStatesStats({ payload }) {
       sorted = mortalityCounts.sort((a, b) => b.stats - a.stats)
     }
 
+    const confirmedByRegionKey = groupByKey('region', confirmedCounts)
     const deathByRegionKey = groupByKey('region', deathsCounts)
     const mortalityByRegionKey = groupByKey('region', mortalityCounts)
 
@@ -582,8 +542,8 @@ export function* fetchUSStatesStats({ payload }) {
       if (Object.prototype.hasOwnProperty.call(deathByRegionKey, region)) {
         statsTotals.push({
           region,
-          confirmed: data.stats,
-          confirmedDayChange: data.dayChange,
+          confirmed: confirmedByRegionKey[region].stats,
+          confirmedDayChange: confirmedByRegionKey[region].dayChange,
           deaths: deathByRegionKey[region].stats,
           deathsDayChange: deathByRegionKey[region].dayChange,
           mortality: mortalityByRegionKey[region].stats,
@@ -644,6 +604,7 @@ export function* fetchGlobalStats({ payload }) {
       sorted = mortalityCounts.sort((a, b) => b.stats - a.stats)
     }
 
+    const confirmedByCountryKey = groupByKey('region', confirmedCounts)
     const deathByCountryKey = groupByKey('region', deathsCounts)
     const mortalityByCountryKey = groupByKey('region', mortalityCounts)
 
@@ -654,8 +615,8 @@ export function* fetchGlobalStats({ payload }) {
       if (Object.prototype.hasOwnProperty.call(deathByCountryKey, region)) {
         statsTotals.push({
           region,
-          confirmed: data.stats,
-          confirmedDayChange: data.dayChange,
+          confirmed: confirmedByCountryKey[region].stats,
+          confirmedDayChange: confirmedByCountryKey[region].dayChange,
           deaths: deathByCountryKey[region].stats,
           deathsDayChange: deathByCountryKey[region].dayChange,
           mortality: mortalityByCountryKey[region].stats,
