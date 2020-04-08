@@ -226,9 +226,10 @@ export const USGraphContainer = ({
                           key={region} 
                           externalKey={region}
                           category="Graph:US" 
-                          linkText={renderDisplay(region)} 
                           tooltipText="No external link for region yet" 
-                      />
+                      >
+                          {renderDisplay(region)}
+                      </ExternalLink>
                   </li>
                 </React.Fragment>
               ))}

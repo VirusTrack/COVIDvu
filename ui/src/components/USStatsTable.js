@@ -57,9 +57,10 @@ export const USStatsTable = ({
                 <ExternalLink 
                     externalKey={stat.region}
                     category="Stats:US" 
-                    linkText={renderDisplay(stat.region)} 
                     tooltipText="No external link for region yet" 
-                />
+                >
+                    {renderDisplay(stat.region)}
+                </ExternalLink>
             </Table.Cell>
             <Table.Cell>
               <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>

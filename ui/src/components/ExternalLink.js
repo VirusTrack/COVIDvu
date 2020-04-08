@@ -16,15 +16,14 @@ const redirectToExternalLink = (externalKey, category) => {
   }
 }
 
-export const ExternalLink = ({externalKey, category, linkText, tooltipText, tooltipPosition='right'}) => (
+export const ExternalLink = ({externalKey, category, tooltipText, tooltipPosition='right', children}) => (
 
     <Generic as="a" tooltipPosition={tooltipPosition}
         tooltip={isExternalLinkAvailable(externalKey) ? null : tooltipText} 
         onClick={() => { redirectToExternalLink(externalKey, category) }} 
         textColor={isExternalLinkAvailable(externalKey) ? 'link' : 'black'}>
 
-                {linkText}
-
+                {children}
     </Generic>
 
 )
