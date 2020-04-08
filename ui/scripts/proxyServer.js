@@ -146,11 +146,8 @@ const main = async (argv) => {
 
     } else {
         app.use('/', cors(corsOptions), (req, res) => {
-            console.log(req.url)
-
             const request_url = `https://virustrack.live${req.url}`
 
-            console.log(`request_url: ${request_url}`)
             req.pipe(request(request_url)).pipe(res)
         });
 

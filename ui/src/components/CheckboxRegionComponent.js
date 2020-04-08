@@ -75,9 +75,6 @@ export const CheckboxRegionComponent = (
     if (!mounted.current) {
       mounted.current = true
     } else {
-      console.log(`showPredictions: ${showPredictions}`)
-      console.log(`secondaryGraph: ${secondaryGraph}`)
-
       if (showPredictions && secondaryGraph === 'Cases') {
         const countryByKey = groupByKey('region', data)
         const predictionsList = Object.keys(predictions).map((region) => ({ region, stats: countryByKey[region].stats }))

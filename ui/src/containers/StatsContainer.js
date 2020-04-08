@@ -123,15 +123,14 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
             <Level.Item align="left">
               <LogoElement size="small" />
             </Level.Item>
-            { selectedTab !== 'US_Counties'
-                        && (
-                        <Level.Item align="right">
-                          <Button.Group>
-                            <Button size="medium" onClick={() => { if (daysAgo !== 0) { changeDayView(0) } }} color={daysAgo === 0 ? 'primary' : 'default'}>Today</Button>
-                            <Button size="medium" onClick={() => { if (daysAgo !== 1) { changeDayView(1) } }} color={daysAgo === 1 ? 'primary ' : 'default'}>Yesterday</Button>
-                          </Button.Group>
-                        </Level.Item>
-                        )}
+            { selectedTab !== 'US_Counties' && (
+                <Level.Item align="right">
+                  <Button.Group>
+                    <Button size="medium" tooltipPosition="bottom" tooltip="Calculated from beginning of day GMT+0" onClick={() => { if (daysAgo !== 0) { changeDayView(0) } }} color={daysAgo === 0 ? 'primary' : 'default'}>Today</Button>
+                    <Button size="medium" onClick={() => { if (daysAgo !== 1) { changeDayView(1) } }} color={daysAgo === 1 ? 'primary ' : 'default'}>Yesterday</Button>
+                  </Button.Group>
+                </Level.Item>
+            )}
           </Level>
         </Notification>
 

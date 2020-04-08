@@ -313,8 +313,6 @@ export function* fetchClientCountry() {
       const countryObject = yield call(dataService.fetchUserCountry)
       countryISO = countryObject.codeISO
       country = countryObject.name
-
-      console.log(`Data grabbed, countryISO: ${countryISO} and country: ${country}`)
     } catch (error) {
       console.error('Unable to grab data from fetchUserCountry service, defaulting to US')
       countryISO = 'US'
