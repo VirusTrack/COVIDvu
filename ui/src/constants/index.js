@@ -355,7 +355,7 @@ const US_STATES_WITH_ABBREVIATION = {
   Wyoming: 'WY',
 }
 
-const REGION_URLS = {
+const EXTERNAL_URLS = {
   '!Total US': 'https://www.cdc.gov/coronavirus/2019-ncov/index.html',
   Washington: 'https://www.doh.wa.gov/Emergencies/Coronavirus',
   'New York': 'https://coronavirus.health.ny.gov/home',
@@ -593,7 +593,7 @@ export {
   STAGING_GEO_URL,
   TEST_GEO_URL,
   LOCAL_GEO_URL,
-  REGION_URLS,
+  EXTERNAL_URLS,
   CACHE_TIMER,
   ONE_MINUTE,
   LAST_UPDATE_KEY,

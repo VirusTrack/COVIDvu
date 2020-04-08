@@ -2,32 +2,19 @@ import React, { useEffect, useState } from 'react'
 
 import { useHistory, useLocation } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  Tab, Button, Level, Notification,
-} from 'rbx'
-import ReactGA from 'react-ga'
-import {
-  FacebookShareButton,
-  RedditShareButton,
-  TwitterShareButton,
-  WhatsappShareButton,
-  FacebookIcon,
-  TwitterIcon,
-  RedditIcon,
-  WhatsappIcon,
-} from 'react-share'
 import { actions } from '../ducks/services'
 
+import { Tab, Button, Level, Notification } from 'rbx'
+
+import ReactGA from 'react-ga'
+
 import LogoElement from '../components/LogoElement'
-
-import { REGION_URLS } from '../constants'
-
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 import GlobalStatsTable from '../components/GlobalStatsTable'
 import USCountiesStatsTable from '../components/USCountiesStatsTable'
 import USStatsTable from '../components/USStatsTable'
-
+import ShareButtons from '../components/ShareButtons'
 
 export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
   const dispatch = useDispatch()
@@ -47,18 +34,6 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
   const [statsForGraph, setStatsForGraph] = useState(undefined)
 
   const renderDisplay = (value) => (value.startsWith('!') ? value.substring(1) : value)
-
-  const isExternalLinkAvailable = (key) => Object.prototype.hasOwnProperty.call(REGION_URLS, key)
-
-  const redirectToExternalLink = (key) => {
-    if (Object.prototype.hasOwnProperty.call(REGION_URLS, key)) {
-      window.open(REGION_URLS[key], '_blank')
-      ReactGA.event({
-        category: 'Stats',
-        action: `Redirecting to external link to ${REGION_URLS[key]}`,
-      })
-    }
-  }
 
   const handleSelectedFilter = (selectedFilter) => {
     setFilterRegion(selectedFilter)
@@ -162,26 +137,12 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
           </Level>
         </Notification>
 
-        <Level brekapoint="mobile">
+        <Level breakpoint="mobile">
           <Level.Item>
-            <FacebookShareButton url={shareUrl}>
-              <FacebookIcon size={26} />
-            </FacebookShareButton>
-                    &nbsp;
-            <TwitterShareButton
-              url={shareUrl}
-              title={document.title}
-            >
-              <TwitterIcon size={26} />
-            </TwitterShareButton>
-                    &nbsp;
-            <RedditShareButton url={shareUrl} title={document.title}>
-              <RedditIcon size={26} />
-            </RedditShareButton>
-                    &nbsp;
-            <WhatsappShareButton url={shareUrl} title={document.title}>
-              <WhatsappIcon size={26} />
-            </WhatsappShareButton>
+            <ShareButtons 
+                title={document.title}
+                shareUrl={shareUrl}
+            />
           </Level.Item>
         </Level>
         <Tab.Group size="large">
@@ -191,44 +152,32 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
         </Tab.Group>
 
 
-        { selectedTab === 'Global'
-
-                && (
-                <GlobalStatsTable
-                  statsForGraph={statsForGraph}
-                  redirectToExternalLink={redirectToExternalLink}
-                  isExternalLinkAvailable={isExternalLinkAvailable}
-                  renderDisplay={renderDisplay}
-                  sort={sort}
-                  onSort={handleSort}
-                />
-                )}
-        { selectedTab === 'US'
-
-                && (
-                <USStatsTable
-                  statsForGraph={statsForGraph}
-                  redirectToExternalLink={redirectToExternalLink}
-                  isExternalLinkAvailable={isExternalLinkAvailable}
-                  renderDisplay={renderDisplay}
-                  sort={sort}
-                  onSort={handleSort}
-                />
-                )}
-        { selectedTab === 'US_Counties'
-
-                && (
-                <USCountiesStatsTable
-                  statsForGraph={statsForGraph}
-                  redirectToExternalLink={redirectToExternalLink}
-                  isExternalLinkAvailable={isExternalLinkAvailable}
-                  renderDisplay={renderDisplay}
-                  filterRegion={filterRegion}
-                  onSelectedFilter={handleSelectedFilter}
-                  sort={sort}
-                  onSort={handleSort}
-                />
-                )}
+        { selectedTab === 'Global' && (
+              <GlobalStatsTable
+                statsForGraph={statsForGraph}
+                renderDisplay={renderDisplay}
+                sort={sort}
+                onSort={handleSort}
+              />
+          )}
+        { selectedTab === 'US' && (
+              <USStatsTable
+                statsForGraph={statsForGraph}
+                renderDisplay={renderDisplay}
+                sort={sort}
+                onSort={handleSort}
+              />
+            )}
+        { selectedTab === 'US_Counties' && (
+              <USCountiesStatsTable
+                statsForGraph={statsForGraph}
+                renderDisplay={renderDisplay}
+                filterRegion={filterRegion}
+                onSelectedFilter={handleSelectedFilter}
+                sort={sort}
+                onSort={handleSort}
+              />
+            )}
       </BoxWithLoadingIndicator>
     </>
   )
