@@ -10,11 +10,12 @@ import { CountyBarGraph } from './CountyBarGraph'
 
 import { US_STATES_WITH_ABBREVIATION } from '../constants'
 
+import { renderDisplay } from '../utils'
 import { SortedTableHeading } from './SortedTableHeading'
 import ExternalLink from '../components/ExternalLink'
 
 export const USCountiesStatsTable = ({
-  filterRegion = 'NY', statsForGraph, renderDisplay, onSelectedFilter, sort, onSort,
+  filterRegion = 'NY', statsForGraph, onSelectedFilter, sort, onSort,
 }) => {
   const [selectedState, setSelectedState] = useState(filterRegion)
 

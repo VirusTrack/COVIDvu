@@ -44,3 +44,6 @@ export function roughSizeOfObject(object) {
   }
   return bytes;
 }
+
+
+export const renderDisplay = (value) => (value.startsWith('!') ? value.substring(1) : value)

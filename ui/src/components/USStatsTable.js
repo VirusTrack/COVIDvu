@@ -6,9 +6,10 @@ import { TERMS } from '../constants/dictionary'
 
 import { SortedTableHeading } from './SortedTableHeading'
 import ExternalLink from '../components/ExternalLink'
+import { renderDisplay } from '../utils'
 
 export const USStatsTable = ({
-  statsForGraph, renderDisplay, sort, onSort,
+  statsForGraph, sort, onSort,
 }) => (
 
   <div className="table-container">

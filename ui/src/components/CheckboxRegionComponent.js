@@ -8,6 +8,7 @@ import ReactGA from 'react-ga'
 import { useMobileDetect } from '../hooks/ui'
 
 import { groupByKey } from '../utils'
+import { renderDisplay } from '../utils'
 
 export const CheckboxRegionComponent = (
   {
@@ -30,8 +31,6 @@ export const CheckboxRegionComponent = (
   const handleToggledOpen = () => {
     setToggledOpen(!toggledOpen)
   }
-
-  const renderDisplay = (value) => (value.startsWith('!') ? value.substring(1) : value)
 
   const onChange = (region) => {
     if (showPredictions) {

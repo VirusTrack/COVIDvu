@@ -7,9 +7,10 @@ import { Title, Table } from 'rbx'
 
 import { SortedTableHeading } from './SortedTableHeading'
 import ExternalLink from '../components/ExternalLink'
+import { renderDisplay } from '../utils'
 
 export const GlobalStatsTable = ({
-  statsForGraph, renderDisplay, sort, onSort,
+  statsForGraph, sort, onSort,
 }) => (
 
   <div className="table-container">

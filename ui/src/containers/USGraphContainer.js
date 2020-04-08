@@ -14,6 +14,7 @@ import { useGraphData } from '../hooks/graphData'
 
 import { actions } from '../ducks/services'
 
+import { renderDisplay } from '../utils'
 
 import { US_REGION_SELECT_KEY, US_GRAPH_SCALE_KEY } from '../constants'
 
@@ -46,8 +47,6 @@ export const USGraphContainer = ({
   const usPredictions = useSelector((state) => state.services.usPredictions)
 
   const [confirmedTotal, setConfirmedTotal] = useState(0)
-
-  const renderDisplay = (value) => (value.startsWith('!') ? value.substring(1) : value)
 
   useEffect(() => {
     if (usStatesStats) {

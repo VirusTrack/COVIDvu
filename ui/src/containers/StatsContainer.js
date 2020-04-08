@@ -33,8 +33,6 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
 
   const [statsForGraph, setStatsForGraph] = useState(undefined)
 
-  const renderDisplay = (value) => (value.startsWith('!') ? value.substring(1) : value)
-
   const handleSelectedFilter = (selectedFilter) => {
     setFilterRegion(selectedFilter)
     ReactGA.event({
@@ -155,7 +153,6 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
         { selectedTab === 'Global' && (
               <GlobalStatsTable
                 statsForGraph={statsForGraph}
-                renderDisplay={renderDisplay}
                 sort={sort}
                 onSort={handleSort}
               />
@@ -163,7 +160,6 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
         { selectedTab === 'US' && (
               <USStatsTable
                 statsForGraph={statsForGraph}
-                renderDisplay={renderDisplay}
                 sort={sort}
                 onSort={handleSort}
               />
@@ -171,7 +167,6 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
         { selectedTab === 'US_Counties' && (
               <USCountiesStatsTable
                 statsForGraph={statsForGraph}
-                renderDisplay={renderDisplay}
                 filterRegion={filterRegion}
                 onSelectedFilter={handleSelectedFilter}
                 sort={sort}
