@@ -18,9 +18,9 @@ def test_detectHTMLTablesRegions():
 
     assert result
     assert len(result) > 0
-    assert 'WORLD' in result
-    assert 'fileHTML' in result['WORLD']
-    assert 'table-' in result['WORLD']['fileHTML']
+    assert 'LOCATION' in result
+    assert 'fileHTML' in result['LOCATION']
+    assert 'table-' in result['LOCATION']['fileHTML']
 
 
 def test__generateCSVTo():
@@ -31,4 +31,7 @@ def test__generateCSVTo():
 def test_processHTML2CSV():
     # TODO:  Implement - subject to change soon, OK as technical debt
     pass
+
+
+test_detectHTMLTablesRegions()
 
