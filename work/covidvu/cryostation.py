@@ -66,3 +66,11 @@ class Cryostation(object):
 
         return result
 
+
+    def items(self):
+        return ( (item['key'], item) for item in self._storage.all() )
+
+
+    def keys(self):
+        return (key for (key, value) in self.items())
+

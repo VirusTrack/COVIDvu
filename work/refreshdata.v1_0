@@ -2,7 +2,6 @@
 
 # See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
-# Version 2.0
 
 # crontab compliant :)
 
@@ -55,6 +54,12 @@ function resetErrorNotification {
 } # resetErrorNotification
 
 
+function assertCOVID19DirExists {
+    echo "assert $COVID_19_DIR directory exists"
+    [[ -d "./COVID-19" ]] || die "" 1 # nothing to do; silent fail
+} # assertCOVID19DirExists
+
+
 function assertCloudFrontConfig {
     [[ -n "$AWS_ACCESS_KEY_ID" ]] || die "AWS_ACCESS_KEY_ID is not set" 4
     [[ -n "$AWS_SECRET_ACCESS_KEY" ]] || die "AWS_SECRET_ACCESS_KEY is not set" 5
@@ -97,6 +102,31 @@ function nukeDeploymentSite {
 } # nukeDeploymentSite
 
 
+function updateCOVID19DataSources {
+    echo "refreshing COVID-19 JS CSSE dataset from GitHub" 
+
+    pushd "$COVID_19_DIR"
+    git checkout master
+    git fetch
+    git pull
+    [[ "0" != "$?" ]] && die "COVID-19 repository failed to update" 16
+    popd
+
+    timeStamp=$(TZ=":Etc/UTC" date +"%Y-%m-%dT%H:%M:%SZ")
+    printf "\nCompleted on %s\n" "$timeStamp" >> "$UPDATE_NOTICE"
+} # updateCOVID19DataSources
+
+
+function generateVirusUpdateJSONFiles {
+    echo "vujson - generating virus update JSON files"
+
+    env | awk '/VIRT/' | sort
+    python3 -m covidvu.pipeline.vujson confirmed deaths
+    [[ "0" != "$?" ]] && die "generateVirusUpdateJSONFiles - failed" 17
+    ls -Alrt "$SITE_DATA_DIR" | awk '!/conf-int/ && !/mean-/'
+} # generateVirusUpdateJSONFiles
+
+
 function generateHospitalBedsJSONFiles {
     local hospitalBedsTargetFile="$SITE_DATA_DIR/hospital-beds-count-US.json"
 
@@ -115,35 +145,40 @@ function generateCountiesUSJSONFile {
 } # generateCountiesUSJSONFile
 
 
-function fetchJITDataSource {
+function fetchBNODataSource {
     echo "+++++"
     curl -A "$PYAVKA_USER_AGENT" -vi -o "$RAW_DATA_FILE" --connect-timeout 20 "$RAW_DATA_SOURCE" | 
-    [[ "0" != "$?" ]] && die "fetchJITDataSource unable to fetch $RAW_DATA_SOURCE" 20
+    [[ "0" != "$?" ]] && die "fetchBNODataSource unable to fetch $RAW_DATA_SOURCE" 20
 
     cat "$RAW_DATA_FILE" | awk '/<table/ { gsub("<table", "\n<table"); gsub("/table>", "/table>\n"); print; }' | \
     awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
-    [[ "0" != "$?" ]] && die "fetchJITDataSource invalid $RAW_DATA_FILE HTML scraping issue" 21
+    [[ "0" != "$?" ]] && die "fetchBNODataSource invalid $RAW_DATA_FILE HTML scraping issue" 21
     echo "+++++"
-} # fetchJITDataSource
+} # fetchBNODataSource
 
 
-function updateLatest {
+function patchJSONFiles {
+    local subCommand="$1"
     # TODO: Document the command line arguments in the README.md page:
     #
-    #       ./refreshdata publish
+    #       ./refreshdata publish patch
     #
-    #       ./refreshdata noop
+    #       ./refreshdata noop patch
     #
     #       ./refreshdata
-    echo "pyavka - grabbing the spreadsheet"
-    fetchJITDataSource
-    python3 -m covidvu.pipeline.pyavka
-    ls -Alrt "$SITE_DATA_DIR"/*html
+    if [[ "patch" = "$subCommand" ]]
+    then
+        now=$(date)
+        echo "pyavka - grabbing the spreadsheet"
+        fetchBNODataSource
+        python3 -m covidvu.pipeline.pyavka
+        ls -Alrt "$SITE_DATA_DIR"/*html
 
-    echo "vuupdate - updating system with latest calculated updates"
-    python -m covidvu.pipeline.vuupdate confirmed deaths
-    ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
-} # updateLatest
+        echo "vudpatch - patching stale JH CSSE data with latest, calculated updates"
+        python -m covidvu.pipeline.vudpatch confirmed deaths
+        ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
+    fi
+} # patchJSONFiles
 
 
 function packJSONFiles {
@@ -204,9 +239,12 @@ echo "*** COVIDvu - website refresh tool ***"
 assertSiteDataExists
 resetErrorNotification
 resetSiteData "$1"
+assertCOVID19DirExists
+updateCOVID19DataSources
+generateVirusUpdateJSONFiles
 generateHospitalBedsJSONFiles
 generateCountiesUSJSONFile
-updateLatest
+patchJSONFiles "$2"
 packJSONFiles
 generateRegionsJSONBundle
 assertCloudFrontConfig

@@ -70,6 +70,28 @@ def test_Cryostation___getitem__():
     assert result['value'] == '4269-text'
 
 
+def test_Cryostation_items():
+    result = None
+
+    for item in cryostation.items():
+        result = item
+        break
+
+    assert 'unitTest' == result[0]
+    assert 'unitTest' == result[1]['key']
+
+
+def test_Cryostation_keys():
+    result = None
+
+    for key in cryostation.keys():
+        result = key
+        break
+
+    assert isinstance(result, str)
+    assert 'unitTest' == result
+
+
 #--------------------------------------------------
 # At the end always!
 #--------------------------------------------------
@@ -83,4 +105,10 @@ def test_Cryostation___del__():
 
     os.unlink(TEST_DATABASE_FILE_NAME)
 #--------------------------------------------------
+
+
+# test_Cryostation_creation()
+# test_Cryostation___setitem__n__contains__()
+# test_Cryostation_items()
+# test_Cryostation_keys()
 
