@@ -60,7 +60,7 @@ def main(database = MASTER_DATABASE, siteData = SITE_DATA, bundleOutputFileName 
     with open(bundleFileName, 'w') as outputStream:
         json.dump(bundle, outputStream)
 
-    return bundle, bundleOutputFileName
+    return bundle, bundleFileName
 
 
 if '__main__' == __name__:

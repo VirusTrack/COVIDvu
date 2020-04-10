@@ -35,3 +35,6 @@ def test_main():
 
     os.unlink(bundleFileName)
 
+
+test_main()
+

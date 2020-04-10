@@ -6,7 +6,6 @@
 from covidvu.config import MASTER_DATABASE
 from covidvu.config import SITE_DATA
 from covidvu.cryostation import Cryostation
-from covidvu.pipeline.vudpatch import fetchJSONData
 from covidvu.pipeline.vuhospitals import loadUSHospitalBedsCount
 
 import collections

@@ -6,8 +6,8 @@
 from bs4 import BeautifulSoup
 
 from covidvu.pipeline.vujson import SITE_DATA
-from covidvu.pipeline.vudpatch import SCRAPED_US_DATA
-from covidvu.pipeline.vudpatch import SCRAPED_WORLD_DATA
+from covidvu.pipeline.vuupdate import SCRAPED_US_DATA
+from covidvu.pipeline.vuupdate import SCRAPED_WORLD_DATA
 
 import copy
 import csv
