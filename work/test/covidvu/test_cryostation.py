@@ -107,6 +107,18 @@ def test_Cryostation___del__():
 #--------------------------------------------------
 
 
+def test_Cryostation__with():
+    result = None
+
+    with storage.Cryostation(TEST_DATABASE_FILE_NAME) as c:
+        result = c.keys()
+
+    if os.path.exists(TEST_DATABASE_FILE_NAME):
+        os.unlink(TEST_DATABASE_FILE_NAME)
+
+    assert result
+
+
 # test_Cryostation_creation()
 # test_Cryostation___setitem__n__contains__()
 # test_Cryostation_items()
