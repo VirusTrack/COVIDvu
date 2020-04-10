@@ -188,18 +188,16 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
     """
     maxTreeDepth = kwargs.get('maxTreedepth', MAX_TREEDEPTH)
 
-    storage = Cryostation(databasePath)
-    try:
-        if regionType == 'country':
-            regionTS = pd.Series(storage[regionName][target])
-        elif regionType == 'stateUS':
-            regionTS = storage['US']['provinces'][regionName][target]
-        else:
-            raise NotImplementedError
-    except Exception as e:
-        raise e
-    finally:
-        storage.close()
+    with Cryostation(databasePath) as storage:
+        try:
+            if regionType == 'country':
+                regionTS = pd.Series(storage[regionName][target])
+            elif regionType == 'stateUS':
+                regionTS = storage['US']['provinces'][regionName][target]
+            else:
+                raise NotImplementedError
+        except Exception as e:
+            raise e
 
     regionTS.index = pd.to_datetime(regionTS.index)
 
@@ -296,37 +294,38 @@ def _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
                            meanFilename=PREDICTION_MEAN_JSON_FILENAME_WORLD,
                            confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD,
                            ):
-    regionNameSimple = ''.join(e for e in prediction['regionName'] if e.isalnum())
-    prediction['predictionsMeanTS'].name = prediction['regionName']
-    _dumpTimeSeriesAsJSON(prediction['predictionsMeanTS'],
-                          join(siteData, meanFilename % regionNameSimple),
-                          )
+    if prediction is None:
+        return
+    else:
+        regionNameSimple = ''.join(e for e in prediction['regionName'] if e.isalnum())
+        prediction['predictionsMeanTS'].name = prediction['regionName']
+        _dumpTimeSeriesAsJSON(prediction['predictionsMeanTS'],
+                              join(siteData, meanFilename % regionNameSimple),
+                              )
 
-    _dumpPredictionCollectionAsJSON(prediction['predictionsPercentilesTS'],
-                                    prediction['predictionsMeanTS'].name,
-                                    predictionsPercentiles,
-                                    join(siteData,
-                                         confIntFilename % regionNameSimple),
-                                    )
+        _dumpPredictionCollectionAsJSON(prediction['predictionsPercentilesTS'],
+                                        prediction['predictionsMeanTS'].name,
+                                        predictionsPercentiles,
+                                        join(siteData,
+                                             confIntFilename % regionNameSimple),
+                                        )
 
 
 def _getCountries(databasePath):
-    storage = Cryostation(databasePath)
-    countries = []
-    for c in [k for k in storage.keys()]:
-        if c[0] != '!':
-            countries.append(c)
-    storage.close()
+    with Cryostation(databasePath) as storage:
+        countries = []
+        for c in [k for k in storage.keys()]:
+            if c[0] != '!':
+                countries.append(c)
     return countries
 
 
 def _getStatesUS(databasePath):
-    storage = Cryostation(databasePath)
-    statesUS = []
-    for s in [p for p in storage['US']['provinces'].keys()]:
-        if s[0] != '!':
-            statesUS.append(s)
-    storage.close()
+    with Cryostation(databasePath) as storage:
+        statesUS = []
+        for s in [p for p in storage['US']['provinces'].keys()]:
+            if s[0] != '!':
+                statesUS.append(s)
     return statesUS
 
 
@@ -380,6 +379,7 @@ def predictRegions(regionName,
         if regionType == 'country':
             countries = _getCountries(databasePath)
             for i, country in enumerate(countries):
+                print(f'Training {country}')
                 if nLimitRegions:
                     if i > nLimitRegions:
                         break
@@ -394,14 +394,14 @@ def predictRegions(regionName,
                 _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
                                       meanFilename=PREDICTION_MEAN_JSON_FILENAME_WORLD,
                                       confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD, )
-
+                print('Done.')
         elif regionType == 'stateUS':
             statesUS = _getStatesUS(databasePath)
             for i, state in enumerate(statesUS):
                 if nLimitRegions:
                     if i > nLimitRegions:
                         break
-
+                print(f'Training {state}')
                 prediction = predictLogisticGrowth(logGrowthModel,
                                                    state,
                                                    regionType=regionType,
@@ -412,10 +412,11 @@ def predictRegions(regionName,
                 _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
                                       meanFilename=PREDICTION_MEAN_JSON_FILENAME_US,
                                       confIntFilename=PREDICTION_CI_JSON_FILENAME_US, )
-
+                print('Done.')
         else:
             raise ValueError(f'regionType = {regionType} not understood')
     else:
+        print(f'Training {regionName}')
         prediction = predictLogisticGrowth(logGrowthModel,
                                            regionName,
                                            regionType=regionType,

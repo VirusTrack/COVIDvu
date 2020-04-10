@@ -23,6 +23,7 @@ from covidvu.predict import _dumpPredictionCollectionAsJSON
 from covidvu.predict import _dumpTimeSeriesAsJSON
 from covidvu.predict import _getPredictionsFromPosteriorSamples
 from covidvu.predict import buildLogisticModel
+from covidvu.predict import _getCountries
 from covidvu.predict import getSavedShortCountryNames
 from covidvu.predict import load
 from covidvu.predict import loadAll
@@ -194,30 +195,25 @@ def test__dumpPredictionCollectionAsJSON():
 
 def test_predictCountries():
     try:
-        predictRegions('US',
-                       nDaysPredict=10,
-                       siteData=TEST_SITE_DATA,
-                       logGrowthModel=logGrowthModel,
-                       nSamples=TEST_N_SAMPLES,
-                       nChains=TEST_N_CHAINS,
-                       databasePath=TEST_DATABASE_PATH,
-                       )
-        _assertValidJSON(join(TEST_SITE_DATA,'prediction-world-mean-US.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
+        # predictRegions('US',
+        #                nDaysPredict=10,
+        #                siteData=TEST_SITE_DATA,
+        #                logGrowthModel=logGrowthModel,
+        #                nSamples=TEST_N_SAMPLES,
+        #                nChains=TEST_N_CHAINS,
+        #                databasePath=TEST_DATABASE_PATH,
+        #                )
+        # _assertValidJSON(join(TEST_SITE_DATA,'prediction-world-mean-US.json'))
+        # _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
 
         nLimitRegions=3
-        storage = Cryostation(TEST_DATABASE_PATH)
-        countries = []
-        for c in [k for k in storage.keys()]:
-            if c[0] != '!':
-                countries.append(c)
-        storage.close()
+        countries = _getCountries(TEST_DATABASE_PATH)
 
         predictRegions('all',
                        regionType='country',
                        nDaysPredict=10,
                        siteData=TEST_SITE_DATA,
-                       logGrowthModel=logGrowthModel,
+                       #logGrowthModel=logGrowthModel,
                        nSamples=TEST_N_SAMPLES,
                        nChains=TEST_N_CHAINS,
                        limitRegions=nLimitRegions,
