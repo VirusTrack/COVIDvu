@@ -97,22 +97,22 @@ function nukeDeploymentSite {
 } # nukeDeploymentSite
 
 
-function generateHospitalBedsJSONFiles {
+function generateHospitalBedsData {
     local hospitalBedsTargetFile="$SITE_DATA_DIR/hospital-beds-count-US.json"
 
     printf "fetching current US hospital beds count\n  "
     cp -vf "$HOSPITAL_BEDS_US_FILE" "$hospitalBedsTargetFile"
-    [[ "0" != "$?" ]] && die "generateHospitalBedsJSONFiles - failed" 18
-} # generateHospitalBedsJSONFiles
+    [[ "0" != "$?" ]] && die "generateHospitalBedsData - failed" 18
+} # generateHospitalBedsData
 
 
-function generateCountiesUSJSONFile {
+function generateUSCountiesData {
     local countiesUSTargetFile="$SITE_DATA_DIR/counties-US-all.json"
 
     printf "fetching current US counties report\n  "
     cp -vf "$COUNTY_CASES_US_FILE" "$countiesUSTargetFile"
-    [[ "0" != "$?" ]] && die "generateCountiesUSJSONFile - failed" 19
-} # generateCountiesUSJSONFile
+    [[ "0" != "$?" ]] && die "generateUSCountiesData - failed" 19
+} # generateUSCountiesData
 
 
 function fetchJITDataSource {
@@ -127,7 +127,7 @@ function fetchJITDataSource {
 } # fetchJITDataSource
 
 
-function updateLatest {
+function generateJITData {
     # TODO: Document the command line arguments in the README.md page:
     #
     #       ./refreshdata publish
@@ -143,27 +143,33 @@ function updateLatest {
     echo "vuupdate - updating system with latest calculated updates"
     python -m covidvu.pipeline.vuupdate confirmed deaths
     ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
-} # updateLatest
+} # generateJITData
 
 
-function packJSONFiles {
+function packDataFiles {
     echo "jsonpack - combine individual JSON files into a single blob"
     python3 -m covidvu.pipeline.jsonpack
     [[ "0" != "$?" ]] && die "jsonpack failed" 22
     ls -Alrt "$SITE_DATA_DIR"/*json | awk '!/conf-int/ && !/mean-/'
-} # packJSONFiles
+} # packDataFiles
 
 
-function generateRegionsJSONBundle {
+function generateContinentalRegionsData {
     echo "vuregions - generate continental region summaries"
     env | awk '/VIRT/' | sort
     python3 -m covidvu.pipeline.vuregions
     [[ "0" != "$?" ]] && die "vuregions failed" 23
     ls -Alrt "$SITE_DATA_DIR"/bundle*json
-} # generateRegionsJSONBundle
+} # generateContinentalRegionsData
 
 
-function deployVirusUpdateJSON {
+function setLatestUpdateNotice {
+    timeStamp=$(TZ=":Etc/UTC" date +"%Y-%m-%dT%H:%M:%SZ")
+    printf "\nCompleted on %s\n" "$timeStamp" | tee "$UPDATE_NOTICE"
+} # setLatestUpdateNotice
+
+
+function deployVirusDataUpdate {
     [[ -n "$1" ]] || die "deployment failed; target bucket not specified" 10
 
     local targetBucket="$1"
@@ -174,7 +180,7 @@ function deployVirusUpdateJSON {
     [[ "0" != "$?" ]] && die "rclone failed" 25
 
     ./flushcf "$targetEnvironment"
-} # deployVirusUpdateJSON
+} # deployVirusDataUpdate
 
 
 function makeDataSnapshot {
@@ -204,11 +210,12 @@ echo "*** COVIDvu - website refresh tool ***"
 assertSiteDataExists
 resetErrorNotification
 resetSiteData "$1"
-generateHospitalBedsJSONFiles
-generateCountiesUSJSONFile
-updateLatest
-packJSONFiles
-generateRegionsJSONBundle
+generateHospitalBedsData
+generateUSCountiesData
+generateJITData
+packDataFiles
+generateContinentalRegionsData
+setLatestUpdateNotice
 assertCloudFrontConfig
 assert_rcloneConfig
 
@@ -226,17 +233,17 @@ case "$environment" in
     "production")
         ;&
     "publish")
-        deployVirusUpdateJSON "$SITE_BUCKET" "$environment"
+        deployVirusDataUpdate "$SITE_BUCKET" "$environment"
         ;;
     "staging")
         ;&
     "stage")
-        deployVirusUpdateJSON "$STAGE_BUCKET" "$environment"
+        deployVirusDataUpdate "$STAGE_BUCKET" "$environment"
         ;;
     "testing")
         ;&
     "test")
-        deployVirusUpdateJSON "$TEST_BUCKET" "$environment"
+        deployVirusDataUpdate "$TEST_BUCKET" "$environment"
         ;;
     *)
         die "invalid command - use stage|publish|nuke|noop" 11

@@ -74,3 +74,11 @@ class Cryostation(object):
     def keys(self):
         return (key for (key, value) in self.items())
 
+
+    def __enter__(self):
+        return self
+
+
+    def __exit__(self, exceptionType, exceptionValue, traceback):
+        self.close()
+
