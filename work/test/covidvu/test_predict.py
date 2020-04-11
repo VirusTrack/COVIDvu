@@ -3,37 +3,39 @@
 # vim: set fileencoding=utf-8:
 
 import json
-import numpy as np
 import os
-import pandas as pd
 import re
+
+import numpy as np
+import pandas as pd
 
 from numpy import ndarray
 from os.path import join
+
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.datetimes import DatetimeIndex
 from pandas.core.series import Series
 from pystan.model import StanModel
 
-from covidvu.predict import _castPredictionsAsTS
-from covidvu.predict import _dumpRegionPrediction
-from covidvu.predict import _dumpPredictionCollectionAsJSON
-from covidvu.predict import _dumpTimeSeriesAsJSON
-from covidvu.predict import _getPredictionsFromPosteriorSamples
-from covidvu.predict import buildLogisticModel
-from covidvu.predict import castPercentilesAsDF
-from covidvu.predict import getCountries
-from covidvu.predict import getSavedPredictionRegionNames
-from covidvu.predict import load
-from covidvu.predict import loadAll
+from covidvu.cryostation import Cryostation
 from covidvu.predict import MIN_CASES_FILTER
-from covidvu.predict import predictRegions
-from covidvu.predict import predictLogisticGrowth
 from covidvu.predict import PREDICTIONS_PERCENTILES
 from covidvu.predict import PRIOR_GROWTH_RATE
 from covidvu.predict import PRIOR_LOG_CARRYING_CAPACITY
 from covidvu.predict import PRIOR_MID_POINT
 from covidvu.predict import PRIOR_SIGMA
+from covidvu.predict import _castPredictionsAsTS
+from covidvu.predict import _dumpPredictionCollectionAsJSON
+from covidvu.predict import _dumpRegionPrediction
+from covidvu.predict import _dumpTimeSeriesAsJSON
+from covidvu.predict import _getPredictionsFromPosteriorSamples
+from covidvu.predict import buildLogisticModel
+from covidvu.predict import castPercentilesAsDF
+from covidvu.predict import getSavedPredictionRegionNames
+from covidvu.predict import load
+from covidvu.predict import loadAll
+from covidvu.predict import predictLogisticGrowth
+from covidvu.predict import predictRegions
 
 
 # *** constants ***
@@ -226,7 +228,9 @@ def test_predictCountries():
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
 
         nLimitRegions=2
-        countries = getCountries(TEST_DATABASE_PATH)
+
+        with Cryostation(TEST_DATABASE_PATH) as cs:
+            countries = cs.allCountryNames()
 
         predictRegions('all',
                        regionType='country',

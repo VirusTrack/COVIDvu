@@ -10,8 +10,6 @@ from pandas.core.indexes.datetimes import DatetimeIndex
 from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import dumpJSON
 from covidvu.cryostation import Cryostation
-from covidvu.cryostation import getCountries
-from covidvu.cryostation import getProvinces
 
 import sys
 import re
@@ -377,7 +375,8 @@ def predictRegions(regionName,
 
     if regionName == 'all':
         if regionType == 'country':
-            countries = getCountries(databasePath)
+            with Cryostation(databasePath) as cs:
+                countries = cs.allCountryNames()
             for i, country in enumerate(countries):
                 print(f'Training {country}')
                 if nLimitRegions:
@@ -396,7 +395,8 @@ def predictRegions(regionName,
                                       confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD, )
                 print('Done.')
         elif regionType == 'stateUS':
-            statesUS = getProvinces(databasePath, country='US')
+            with Cryostation(databasePath) as cs:
+                statesUS = cs.allProvincesOf('US')
             for i, state in enumerate(statesUS):
                 if nLimitRegions:
                     if i > nLimitRegions:

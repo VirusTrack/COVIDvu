@@ -3,16 +3,15 @@
 # vim: set fileencoding=utf-8:
 
 
-import os
-
-import pytest
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.datetimes import DatetimeIndex
 
+import os
+
+import pytest
+
 import covidvu.cryostation as storage
-from covidvu.cryostation import getCountries
-from covidvu.cryostation import getProvinces
-from covidvu.cryostation import getAllTimeSeriesAsDataFrame
+
 
 # --- constants---
 
@@ -20,6 +19,7 @@ TEST_DATABASE_FILE      = 'test.db'
 TEST_DATABASE_PATH      = './resources/test_databases'
 TEST_DATABASE_FILE_NAME = os.path.join(TEST_DATABASE_PATH, TEST_DATABASE_FILE)
 
+# TODO:  https://github.com/VirusTrack/COVIDvu/issues/537
 REAL_DATABASE_FILE      = 'virustrack.db'
 REAL_DATABASE_PATH      = './database'
 REAL_DATABASE_FILE_NAME = os.path.join(REAL_DATABASE_PATH, REAL_DATABASE_FILE)
@@ -29,43 +29,56 @@ REAL_DATABASE_FILE_NAME = os.path.join(REAL_DATABASE_PATH, REAL_DATABASE_FILE)
 cryostation = None
 
 
-def test_getCountries():
-    countries = getCountries(REAL_DATABASE_FILE_NAME)
+# --------------------------------------------------
+# BEGIN - Semantic object tests 
+# --------------------------------------------------
+def test_Cryostation_allCountryNames():
+    with storage.Cryostation(REAL_DATABASE_FILE_NAME) as cs:
+        countries = cs.allCountryNames()
+
     assert isinstance(countries, list)
+
     with storage.Cryostation(REAL_DATABASE_FILE_NAME) as c:
         assert all([country in c.keys() for country in countries])
 
 
-
-def test_getProvinces():
+def test_Cryostation_allProvincesOf():
     country = 'US'
-    provinces = getProvinces(REAL_DATABASE_FILE_NAME, country=country)
+
+    with storage.Cryostation(REAL_DATABASE_FILE_NAME) as cs:
+        provinces = cs.allProvincesOf(country)
+
     assert isinstance(provinces, list)
+
     with storage.Cryostation(REAL_DATABASE_FILE_NAME) as c:
         assert all([province in c[country]['provinces'].keys() for province in provinces])
 
 
-def assertTimeSeriesDataFrameIsValid(df, expectedColumns):
+def _assertTimeSeriesDataFrameIsValid(df, expectedColumns):
     assert isinstance(df, DataFrame)
     assert (df.columns.isin(expectedColumns)).all()
     assert isinstance(df.index, DatetimeIndex)
     assert df.isnull().values.ravel().sum() == 0
 
-def test_getAllTimeSeriesAsDataFrame():
-    countries = getCountries(REAL_DATABASE_FILE_NAME)
-    allCountries = getAllTimeSeriesAsDataFrame(REAL_DATABASE_FILE_NAME)
-    assertTimeSeriesDataFrameIsValid(allCountries, countries)
 
-    states = getProvinces(REAL_DATABASE_FILE_NAME, country = 'US')
-    allUSStates = getAllTimeSeriesAsDataFrame(REAL_DATABASE_FILE_NAME,
-                                              regionType='province',
-                                              provinceCountry='US'
-                                              )
-    assertTimeSeriesDataFrameIsValid(allUSStates, states)
+def test_Cryostation_timeSeriesFor():
+    with storage.Cryostation(REAL_DATABASE_FILE_NAME) as cs:
+        countryNames = cs.allCountryNames()
+        allCountries = cs.timeSeriesFor() # takes defaults
+        stateNames   = cs.allProvincesOf('US')
+        allUSStates  = cs.timeSeriesFor('province', 'confirmed', 'US')
+
+    _assertTimeSeriesDataFrameIsValid(allCountries, countryNames)
+    _assertTimeSeriesDataFrameIsValid(allUSStates, stateNames)
+# --------------------------------------------------
+# END - Semantic object tests 
+# --------------------------------------------------
 
 
 #--------------------------------------------------
-# At the end always!
+# DON'T change the order of items in this section;
+# this one ALWAYS should go first because subsequent
+# tests use it.  Thanks!
 #--------------------------------------------------
 def test_Cryostation_creation():
     global cryostation
@@ -166,4 +179,7 @@ def test_Cryostation__with():
 # test_Cryostation___setitem__n__contains__()
 # test_Cryostation_items()
 # test_Cryostation_keys()
+
+# test_Cryostation_allCountryNames()
+test_Cryostation_timeSeriesFor()
 

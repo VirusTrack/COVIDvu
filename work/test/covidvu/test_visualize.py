@@ -2,24 +2,30 @@
 # See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE
 # vim: set fileencoding=utf-8:
 
-from covidvu.visualize import plotTimeSeries
-from covidvu.visualize import plotTimeSeriesInteractive
-from covidvu.visualize import plotPrediction
-from covidvu.visualize import plotDataAndPredictionsWithCI
+
+from os.path import join
+
+from covidvu.cryostation import Cryostation
+from covidvu.predict import loadAll
 from covidvu.visualize import castHexToRGBA_string
 from covidvu.visualize import hexToRGB
-from covidvu.predict import loadAll
-from covidvu.cryostation import getAllTimeSeriesAsDataFrame
+from covidvu.visualize import plotDataAndPredictionsWithCI
+from covidvu.visualize import plotPrediction
+from covidvu.visualize import plotTimeSeries
+from covidvu.visualize import plotTimeSeriesInteractive
 
-import pandas as pd
-import numpy as np
-from os.path import join
 import os
 import re
 
+import pandas as pd
+import numpy as np
+
+
 # *** constants ***
+
 TEST_SITE_DATA = os.path.join(os.getcwd(), 'resources', 'test_site_data')
 
+# TODO:  https://github.com/VirusTrack/COVIDvu/issues/537
 REAL_DATABASE_FILE      = 'virustrack.db'
 REAL_DATABASE_PATH      = './database'
 REAL_DATABASE_FILE_NAME = os.path.join(REAL_DATABASE_PATH, REAL_DATABASE_FILE)
@@ -44,6 +50,7 @@ def _purge(purgeDirectory, pattern):
     for f in os.listdir(purgeDirectory):
         if re.search(pattern, f):
             os.remove(join(purgeDirectory, f))
+
 
 # *** tests ***
 def test_plotTimeSeries():
@@ -90,9 +97,9 @@ def test_plotPrediction():
 
 def test_plotDataAndPredictionsWithCI():
     meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA, 'test-predictions'))
-    confirmedCasesAll = getAllTimeSeriesAsDataFrame(REAL_DATABASE_FILE_NAME,
-                                                    regionType='country',
-                                                    target='confirmed')
+
+    with Cryostation(REAL_DATABASE_FILE_NAME) as cs:
+        confirmedCasesAll = cs.timeSeriesFor() # take defaults
 
     _ = plotDataAndPredictionsWithCI(meanPredictionTSAll,
                                  confirmedCasesAll,
