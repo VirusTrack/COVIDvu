@@ -158,19 +158,16 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
                           predictionsPercentiles = PREDICTIONS_PERCENTILES,
                           randomSeed             = 2020,
                           databasePath           = DATABASE_PATH,
-                          **kwargs
+                          maxTreeDepth           = MAX_TREEDEPTH,
                           ):
     """Predict the region with the nth highest number of cases
 
     Parameters
     ----------
     logGrowthModel: A compiled pystan model
-    regionTrainIndex: Order countries from highest to lowest, and train the ith region
-    regionName: Overwrites regionTrainIndex as the region to train
-    confirmedCases: A dataframe of countries as columns, and total number of cases as a time series
-        (see covidvu.vujson.parseCSSE)
-    target: string in ['confirmed', 'deaths', 'recovered']
-    subGroup: A key in the output of covidvu.pipeline.vujson.parseCSSE
+    regionName: Name of the region to train, which must be a country or US state in Cryostation
+    target: 'confirmed' or 'deaths'
+    regionType: 'country' or 'stateUS
     nSamples: Number of samples per chain of MCMC
     nChains: Number of independent chains MCMC
     nDaysPredict: Number of days ahead to predict
@@ -178,7 +175,8 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
     minNumberDaysWithCases: Minimum number of days with at least minCasesFilter
     predictionsPercentiles: Bayesian confidence intervals to evaluate
     randomSeed: Seed for stan sampler
-    kwargs: Optional named arguments passed to covidvu.pipeline.vujson.parseCSSE
+    databasePath: Path to virustrack.db
+    maxTreeDepth: max_treedepth for pystan
 
     Returns
     -------
@@ -188,14 +186,13 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
     trace: pymc3 trace object
     regionTSClean: Data used for training
     """
-    maxTreeDepth = kwargs.get('maxTreedepth', MAX_TREEDEPTH)
 
     with Cryostation(databasePath) as storage:
         try:
             if regionType == 'country':
                 regionTS = pd.Series(storage[regionName][target])
             elif regionType == 'stateUS':
-                regionTS = storage['US']['provinces'][regionName][target]
+                regionTS = pd.Series(storage['US']['provinces'][regionName][target])
             else:
                 raise NotImplementedError
         except Exception as e:
@@ -349,17 +346,18 @@ def predictRegions(regionName,
 
     Parameters
     ----------
-    regionName: If an integer, trains the region ranked i+1 in order of total number of cases. If 'all',
-        predicts all regions
-    target: A string in ['confirmed', 'deaths', 'recovered']
+    regionName: A country key of Cryostation, or 'all'
+    target: 'confirmed' or 'deaths'
     predictionsPercentiles: The posterior percentiles to compute
     siteData: The directory for output data
-    regionType:
+    regionType: 'country' or 'stateUS'
     priorLogCarryingCapacity
     priorMidPoint
     priorGrowthRate
     priorSigma
-    logGrowthModel
+    logGrowthModel: A compiled pystan model
+    databasePath: Path to virustrack.db
+    nLimitRegions: Maximum number of regions to train in alphabetical order
     kwargs: Optional named arguments for covidvu.predictLogisticGrowth
 
     Returns
@@ -424,7 +422,6 @@ def predictRegions(regionName,
                                            regionType=regionType,
                                            predictionsPercentiles=predictionsPercentiles,
                                            target=target,
-                                           siteData=siteData,
                                            **kwargs,
                                            )
         if regionType == 'country':
@@ -510,6 +507,9 @@ def loadAll(confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD, siteData=SITE_DAT
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
         logGrowthModel = buildLogisticModel()
+        print('Training all countries...')
         predictRegions(argument, logGrowthModel=logGrowthModel, regionType='country')
+
+        print('Training all US States...')
         predictRegions(argument, logGrowthModel=logGrowthModel, regionType='stateUS')
 

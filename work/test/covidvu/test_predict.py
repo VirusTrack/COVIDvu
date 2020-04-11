@@ -15,8 +15,6 @@ from pandas.core.indexes.datetimes import DatetimeIndex
 from pandas.core.series import Series
 from pystan.model import StanModel
 
-from covidvu.cryostation import Cryostation
-
 from covidvu.predict import _castPredictionsAsTS
 from covidvu.predict import _dumpRegionPrediction
 from covidvu.predict import _dumpPredictionCollectionAsJSON
@@ -98,7 +96,6 @@ def test_predictLogisticGrowth():
     nDaysPredict = 10
     prediction = predictLogisticGrowth(logGrowthModel,
                                        'US',
-                                       siteData                      = TEST_SITE_DATA,
                                        nSamples                      = TEST_N_SAMPLES,
                                        nChains                       = TEST_N_CHAINS,
                                        nDaysPredict                  = nDaysPredict,
@@ -204,6 +201,18 @@ def test_predictCountries():
                        databasePath=TEST_DATABASE_PATH,
                        )
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-world-mean-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
+
+        predictRegions('Alabama',
+                       regionType='stateUS',
+                       nDaysPredict=10,
+                       siteData=TEST_SITE_DATA,
+                       logGrowthModel=logGrowthModel,
+                       nSamples=TEST_N_SAMPLES,
+                       nChains=TEST_N_CHAINS,
+                       databasePath=TEST_DATABASE_PATH,
+                       )
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-mean-US.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
 
         nLimitRegions=2
