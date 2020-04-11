@@ -195,28 +195,28 @@ def test__dumpPredictionCollectionAsJSON():
 
 def test_predictCountries():
     try:
-        # predictRegions('US',
-        #                nDaysPredict=10,
-        #                siteData=TEST_SITE_DATA,
-        #                logGrowthModel=logGrowthModel,
-        #                nSamples=TEST_N_SAMPLES,
-        #                nChains=TEST_N_CHAINS,
-        #                databasePath=TEST_DATABASE_PATH,
-        #                )
-        # _assertValidJSON(join(TEST_SITE_DATA,'prediction-world-mean-US.json'))
-        # _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
+        predictRegions('US',
+                       nDaysPredict=10,
+                       siteData=TEST_SITE_DATA,
+                       logGrowthModel=logGrowthModel,
+                       nSamples=TEST_N_SAMPLES,
+                       nChains=TEST_N_CHAINS,
+                       databasePath=TEST_DATABASE_PATH,
+                       )
+        _assertValidJSON(join(TEST_SITE_DATA,'prediction-world-mean-US.json'))
+        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
 
-        nLimitRegions=3
+        nLimitRegions=2
         countries = _getCountries(TEST_DATABASE_PATH)
 
         predictRegions('all',
                        regionType='country',
                        nDaysPredict=10,
                        siteData=TEST_SITE_DATA,
-                       #logGrowthModel=logGrowthModel,
+                       logGrowthModel=logGrowthModel,
                        nSamples=TEST_N_SAMPLES,
                        nChains=TEST_N_CHAINS,
-                       limitRegions=nLimitRegions,
+                       nLimitRegions=nLimitRegions,
                        databasePath=TEST_DATABASE_PATH,
                        )
 
@@ -228,68 +228,64 @@ def test_predictCountries():
     finally:
         _purge(TEST_SITE_DATA, '.json')
 
-#
-# def test_load():
-#     try:
-#         predictRegions('all',
-#                        nDaysPredict=10,
-#                        siteData=TEST_SITE_DATA,
-#                        logGrowthModel=logGrowthModel,
-#                        nSamples=TEST_N_SAMPLES,
-#                        nChains=TEST_N_CHAINS,
-#                        )
-#
-#
-#         meanPredictionTS, percentilesTS, regionName = load(0, siteData=TEST_SITE_DATA)
-#         assert isinstance(meanPredictionTS, Series)
-#         assert isinstance(percentilesTS, DataFrame)
-#         assert isinstance(regionName, str)
-#         assert (percentilesTS.columns.isin(['97.5', '2.5', '25', '75'])).all()
-#     except Exception as e:
-#         raise e
-#     finally:
-#         _purge(TEST_SITE_DATA, '.json')
-# #
-#
-#
-# def test_getSavedShortCountryNames():
-#     try:
-#         predictRegions('all',
-#                        nDaysPredict=10,
-#                        siteData=TEST_SITE_DATA,
-#                        jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-#                        jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
-#                        jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
-#                        jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
-#                        logGrowthModel=logGrowthModel,
-#                        nSamples=TEST_N_SAMPLES,
-#                        nChains=TEST_N_CHAINS,
-#                        )
-#         regionNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
-#         assert isinstance(regionNameShortAll, list)
-#         assert len(regionNameShortAll) == 3
-#     except Exception as e:
-#         raise e
-#     finally:
-#         _purge(TEST_SITE_DATA, '.json')
-#
-#
-#
-# def test_loadAll():
-#     try:
-#         confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(
-#             siteData=join(TEST_SITE_DATA, 'test-predictions'),
-#             jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
-#             jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
-#             jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
-#             jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
-#             )
-#         assert isinstance(confirmedCasesAll, DataFrame)
-#         assert isinstance(meanPredictionTSAll, DataFrame)
-#         assert isinstance(percentilesTSAll, DataFrame)
-#     except Exception as e:
-#         raise e
-#     finally:
-#         _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed.*\w?.json')
-#
-#
+
+def test_load():
+    try:
+        nLimitRegions = 2
+
+        predictRegions('all',
+                       regionType='country',
+                       nDaysPredict=10,
+                       siteData=TEST_SITE_DATA,
+                       logGrowthModel=logGrowthModel,
+                       nSamples=TEST_N_SAMPLES,
+                       nChains=TEST_N_CHAINS,
+                       nLimitRegions=nLimitRegions,
+                       databasePath=TEST_DATABASE_PATH,
+                       )
+
+
+        meanPredictionTS, percentilesTS, regionName = load(0, siteData=TEST_SITE_DATA)
+        assert isinstance(meanPredictionTS, Series)
+        assert isinstance(percentilesTS, DataFrame)
+        assert isinstance(regionName, str)
+        assert (percentilesTS.columns.isin(['97.5', '2.5', '25', '75'])).all()
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')
+
+
+def test_getSavedShortCountryNames():
+    try:
+        nLimitRegions = 2
+        predictRegions('all',
+                       regionType='country',
+                       nDaysPredict=10,
+                       siteData=TEST_SITE_DATA,
+                       logGrowthModel=logGrowthModel,
+                       nSamples=TEST_N_SAMPLES,
+                       nChains=TEST_N_CHAINS,
+                       nLimitRegions=nLimitRegions,
+                       databasePath=TEST_DATABASE_PATH,
+                       )
+
+        regionNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
+        assert isinstance(regionNameShortAll, list)
+        assert len(regionNameShortAll) == 2
+    except Exception as e:
+        raise e
+    finally:
+        _purge(TEST_SITE_DATA, '.json')
+
+
+def test_loadAll():
+    meanPredictionTSAll, percentilesTSAll, = loadAll(
+        siteData=join(TEST_SITE_DATA, 'test-predictions'),
+
+        )
+    assert isinstance(meanPredictionTSAll, DataFrame)
+    assert isinstance(percentilesTSAll, DataFrame)
+
+
+

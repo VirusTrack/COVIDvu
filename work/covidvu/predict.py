@@ -11,6 +11,7 @@ from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import dumpJSON
 from covidvu.cryostation import Cryostation
 
+import sys
 import re
 import os
 import json
@@ -42,6 +43,7 @@ PREDICTION_CI_JSON_FILENAME_WORLD   = 'prediction-world-conf-int-%s.json'
 PREDICTION_MEAN_JSON_FILENAME_US    = 'prediction-US-mean-%s.json'
 PREDICTION_CI_JSON_FILENAME_US      = 'prediction-US-conf-int-%s.json'
 
+DATABASE_PATH = 'database/virustrack.db'
 
 
 def buildLogisticModel(priorLogCarryingCapacity = PRIOR_LOG_CARRYING_CAPACITY,
@@ -155,7 +157,7 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
                           minNumberDaysWithCases = MIN_NUMBER_DAYS_WITH_CASES,
                           predictionsPercentiles = PREDICTIONS_PERCENTILES,
                           randomSeed             = 2020,
-                          databasePath           = 'database/virustrack.db',
+                          databasePath           = DATABASE_PATH,
                           **kwargs
                           ):
     """Predict the region with the nth highest number of cases
@@ -339,7 +341,7 @@ def predictRegions(regionName,
                    priorGrowthRate=PRIOR_GROWTH_RATE,
                    priorSigma=PRIOR_SIGMA,
                    logGrowthModel=None,
-                   databasePath='database/virustrack.db',
+                   databasePath=DATABASE_PATH,
                    nLimitRegions=None,
                    **kwargs
                    ):
@@ -381,7 +383,7 @@ def predictRegions(regionName,
             for i, country in enumerate(countries):
                 print(f'Training {country}')
                 if nLimitRegions:
-                    if i > nLimitRegions:
+                    if i > nLimitRegions-1:
                         break
 
                 prediction = predictLogisticGrowth(logGrowthModel,
@@ -481,17 +483,16 @@ def load(regionIndex = None,
     return meanPredictionTS, percentilesTS, regionName
 
 
-def loadAll(target='confirmed', subGroup='casesGlobal', confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD, **kwargs):
-    confirmedCasesAll = parseCSSE(target, **kwargs)[subGroup]
-    trainedRegions = getSavedShortCountryNames(siteData = kwargs.get('siteData', SITE_DATA),
-                                                      confIntFilename = confIntFilename,
-                                                      )
+def loadAll(confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD, siteData=SITE_DATA,):
+    trainedRegions = getSavedShortCountryNames(siteData = siteData,
+                                               confIntFilename = confIntFilename,
+                                               )
     assert len(trainedRegions) > 0
     meanPredictionTSAll = pd.DataFrame()
     percentilesTSAll = pd.DataFrame()
     for regionNameShort in trainedRegions:
         meanPredictionTS, percentilesTS, regionName = load(regionNameShort=regionNameShort,
-                                                            siteData=kwargs.get('siteData', SITE_DATA),
+                                                            siteData=siteData,
                                                             confIntFilename=confIntFilename,
                                                             )
         meanPredictionTS.name = 'meanPrediction'
@@ -503,12 +504,12 @@ def loadAll(target='confirmed', subGroup='casesGlobal', confIntFilename=PREDICTI
     percentilesTSAll = percentilesTSAll.pivot(columns='regionName')
     meanPredictionTSAll = meanPredictionTSAll.pivot(columns='regionName')
     meanPredictionTSAll.columns = meanPredictionTSAll.columns.droplevel(level=0)
-    return confirmedCasesAll, meanPredictionTSAll, percentilesTSAll
+    return meanPredictionTSAll, percentilesTSAll
 
 
 if '__main__' == __name__:
     for argument in sys.argv[1:]:
         logGrowthModel = buildLogisticModel()
-        predictRegions(argument, logGrowthModel=logGrowthModel)
-        predictRegions(argument, logGrowthModel=logGrowthModel, subGroup='casesUSStates')
+        predictRegions(argument, logGrowthModel=logGrowthModel, regionType='country')
+        predictRegions(argument, logGrowthModel=logGrowthModel, regionType='stateUS')
 
