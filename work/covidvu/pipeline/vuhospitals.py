@@ -6,16 +6,16 @@
 from os.path import join
 from time import sleep
 
+from tqdm.auto import tqdm
+
+from covidvu.config import MASTER_DATABASE
+from covidvu.config import SITE_DATA
+from covidvu.cryostation import Cryostation
 from covidvu.pipeline.vucounty import SITE_RESOURCES
-from covidvu.pipeline.vujson import SITE_DATA
-from covidvu.pipeline.vujson import dumpJSON
 
 import json
 import os
 import urllib
-
-import pandas as pd
-from tqdm.auto import tqdm
 
 
 # *** constants ***
@@ -43,15 +43,6 @@ def _getTotalBedsForPostalCode(postalCode):
     return totalBeds
 
 
-def _getTotalBedCount(postCodes, nStateLimit = None):
-    if nStateLimit:
-        postCodes = postCodes.iloc[:nStateLimit, :]
-    bedCount = {}
-    for n, row in tqdm(postCodes.iterrows(), total=postCodes.shape[0]):
-        bedCount[row['state']] = _getTotalBedsForPostalCode(row['postalCode'])
-    return bedCount
-
-
 def loadUSHospitalBedsCount(siteDataDirectory = SITE_DATA, inputFileName = HOSPITAL_BEDS_FILE_NAME):
     with open(resolveFileName(siteDataDirectory, inputFileName), 'r') as inputFile:
         payload = json.load(inputFile)
@@ -60,20 +51,29 @@ def loadUSHospitalBedsCount(siteDataDirectory = SITE_DATA, inputFileName = HOSPI
     
 
 def _main(siteDataDirectory = SITE_RESOURCES,
-          outFileName = HOSPITAL_BEDS_FILE_NAME,
-          nStateLimit = None,
+          database = MASTER_DATABASE,
+          nStateLimit = 1000, # unreachable "infinite" limit
           ):
-    # TODO: Juvid - https://github.com/VirusTrack/COVIDvu/issues/445
-    #       This file was deprecated, but the vuhospitals module uses
-    #       it.  Revive the file (fastest) or implement a dictionary
-    #       of state codes.
-    # TODO: Eugene - I'm confused -- ./work/stateCodesUS.csv is there
-    postCodes = pd.read_csv(STATE_CODES_PATH)
-
+    
     print('vuhospitals - getting the total hospital beds count per state')
-    bedCount = _getTotalBedCount(postCodes, nStateLimit=nStateLimit)
 
-    dumpJSON(bedCount, resolveFileName(siteDataDirectory, outFileName))
+    with Cryostation(database) as cryostation:
+        country   = cryostation['US']
+        postCodes = country['provinceCodes']
+
+        count = 0
+        for state in tqdm(postCodes.keys()):
+            if state in country['provinces']:
+                country['provinces'][state]['hospitalBedsCount'] = _getTotalBedsForPostalCode(postCodes[state]['postalCode'])
+
+                # Artificial break for unit tests
+                count += 1
+                if count == nStateLimit:
+                    break
+
+        cryostation['US'] = country
+        
+        return country
 
 
 # *** main ***
