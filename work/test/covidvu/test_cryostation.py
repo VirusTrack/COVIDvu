@@ -6,6 +6,8 @@
 import os
 
 import pytest
+from pandas.core.frame import DataFrame
+from pandas.core.indexes.datetimes import DatetimeIndex
 
 import covidvu.cryostation as storage
 from covidvu.cryostation import getCountries
@@ -18,6 +20,9 @@ TEST_DATABASE_FILE      = 'test.db'
 TEST_DATABASE_PATH      = './resources/test_databases'
 TEST_DATABASE_FILE_NAME = os.path.join(TEST_DATABASE_PATH, TEST_DATABASE_FILE)
 
+REAL_DATABASE_FILE      = 'virustrack.db'
+REAL_DATABASE_PATH      = './database'
+REAL_DATABASE_FILE_NAME = os.path.join(REAL_DATABASE_PATH, REAL_DATABASE_FILE)
 
 # --- tests ----
 
@@ -25,15 +30,39 @@ cryostation = None
 
 
 def test_getCountries():
-    raise NotImplementedError
+    countries = getCountries(REAL_DATABASE_FILE_NAME)
+    assert isinstance(countries, list)
+    with storage.Cryostation(REAL_DATABASE_FILE_NAME) as c:
+        assert all([country in c.keys() for country in countries])
+
 
 
 def test_getProvinces():
-    raise NotImplementedError
+    country = 'US'
+    provinces = getProvinces(REAL_DATABASE_FILE_NAME, country=country)
+    assert isinstance(provinces, list)
+    with storage.Cryostation(REAL_DATABASE_FILE_NAME) as c:
+        assert all([province in c[country]['provinces'].keys() for province in provinces])
 
+
+def assertTimeSeriesDataFrameIsValid(df, expectedColumns):
+    assert isinstance(df, DataFrame)
+    assert (df.columns.isin(expectedColumns)).all()
+    assert isinstance(df.index, DatetimeIndex)
+    assert df.isnull().values.ravel().sum() == 0
 
 def test_getAllTimeSeriesAsDataFrame():
-    raise NotImplementedError
+    countries = getCountries(REAL_DATABASE_FILE_NAME)
+    allCountries = getAllTimeSeriesAsDataFrame(REAL_DATABASE_FILE_NAME)
+    assertTimeSeriesDataFrameIsValid(allCountries, countries)
+
+    states = getProvinces(REAL_DATABASE_FILE_NAME, country = 'US')
+    allUSStates = getAllTimeSeriesAsDataFrame(REAL_DATABASE_FILE_NAME,
+                                              regionType='province',
+                                              provinceCountry='US'
+                                              )
+    assertTimeSeriesDataFrameIsValid(allUSStates, states)
+
 
 #--------------------------------------------------
 # At the end always!

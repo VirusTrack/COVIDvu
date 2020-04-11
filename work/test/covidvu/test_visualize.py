@@ -9,6 +9,8 @@ from covidvu.visualize import plotDataAndPredictionsWithCI
 from covidvu.visualize import castHexToRGBA_string
 from covidvu.visualize import hexToRGB
 from covidvu.predict import loadAll
+from covidvu.cryostation import getAllTimeSeriesAsDataFrame
+
 import pandas as pd
 import numpy as np
 from os.path import join
@@ -17,13 +19,11 @@ import re
 
 # *** constants ***
 TEST_SITE_DATA = os.path.join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19','csse_covid_19_data','csse_covid_19_time_series')
-TEST_JH_CSSE_FILE_CONFIRMED    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
-TEST_JH_CSSE_FILE_DEATHS       = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
-TEST_JH_CSSE_FILE_CONFIRMED_US = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_US.csv')
-TEST_JH_CSSE_FILE_DEATHS_US    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_US')
 
-TEST_JH_CSSE_FILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH,  'time_series_covid19_confirmed_global_small.csv')
+REAL_DATABASE_FILE      = 'virustrack.db'
+REAL_DATABASE_PATH      = './database'
+REAL_DATABASE_FILE_NAME = os.path.join(REAL_DATABASE_PATH, REAL_DATABASE_FILE)
+
 
 # *** functions ***
 def _makeTimeSeries():
@@ -89,22 +89,17 @@ def test_plotPrediction():
 
 
 def test_plotDataAndPredictionsWithCI():
-    try:
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA, 'test-predictions'),
-                                                                            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
-                                                                            jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
-                                                                            jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
-                                                                            jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
-                                                                            )
-        _ = plotDataAndPredictionsWithCI(meanPredictionTSAll,
-                                     confirmedCasesAll,
-                                     percentilesTSAll,
-                                     ['Albania', 'Algeria'],
-                                     )
-    except Exception as e:
-        raise e
-    finally:
-        _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed.*\w?.json')
+    meanPredictionTSAll, percentilesTSAll, = loadAll(siteData=join(TEST_SITE_DATA, 'test-predictions'))
+    confirmedCasesAll = getAllTimeSeriesAsDataFrame(REAL_DATABASE_FILE_NAME,
+                                                    regionType='country',
+                                                    target='confirmed')
+
+    _ = plotDataAndPredictionsWithCI(meanPredictionTSAll,
+                                 confirmedCasesAll,
+                                 percentilesTSAll,
+                                 ['Albania', 'Algeria'],
+                                 )
+
 
 
 
