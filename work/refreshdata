@@ -68,18 +68,6 @@ function assert_rcloneConfig {
 } # assert_rcloneConfig
 
 
-function assertHospitalBedsJSONFiles {
-    [[ -n "$HOSPITAL_BEDS_US_FILE" ]] || die "HOSPITAL_BEDS_US_FILE not defined" 12
-    [[ -e "$HOSPITAL_BEDS_US_FILE" ]] || die "HOSPITAL_BEDS_US_FILE $HOSPITAL_BEDS_US_FILE does not exist" 13
-} # assertHospitalBedsJSONFiles
-
-
-function assertCountiesUSJSONFiles {
-    [[ -n "$COUNTY_CASES_US_FILE" ]] || die "COUNTY_CASES_US_FILE not defined" 14
-    [[ -e "$COUNTY_CASES_US_FILE" ]] || die "COUNTY_CASES_US_FILE $COUNTY_CASES_US_FILE does not exist" 15
-} # assertCountiesUSJSONFiles
-
-
 function resetSiteData {
     echo "resetting $SITE_DATA_DIR"
     for fileNamePrefix in bundle confirmed counties deaths hospital last raw scraped table

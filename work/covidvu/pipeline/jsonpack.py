@@ -6,9 +6,7 @@
 from covidvu.config import MASTER_DATABASE
 from covidvu.config import SITE_DATA
 from covidvu.cryostation import Cryostation
-from covidvu.pipeline.vuhospitals import loadUSHospitalBedsCount
 
-import collections
 import json
 import os
 
@@ -22,9 +20,9 @@ BUNDLE_GLOBAL_JSON     = 'bundle-global.json'
 BUNDLE_US_JSON         = 'bundle-US.json'
 BUNDLE_US_REGIONS_JSON = 'bundle-US-Regions.json'
 COUNTIES_US_FILE_NAME  ='counties-US-all.json'
+
 PREDICT_FILE_US_PREFIX        = 'prediction-US'
 PREDICT_FILE_WORLD_PREFIX     = 'prediction-world'
-# TODO:  Make these configurable or template
 PREDICTIONS_GLOBAL_FILE_NAME  = 'bundle-global-predictions.json'
 PREDICTIONS_US_FILE_NAME      = 'bundle-US-predictions.json' 
 
@@ -48,7 +46,19 @@ def packGlobal(siteData = SITE_DATA):
         json.dump(bundle, outputStream)
 
 
+def _bundleHospitalBeds(countryName = 'US'):
+    bundle = dict()
+
+    with Cryostation(MASTER_DATABASE) as cryostation:
+        for state in tqdm.tqdm(cryostation[countryName]['provinces'].keys()):
+            if 'hospitalBedsCount' in cryostation[countryName]['provinces'][state]:
+                bundle[state] = cryostation[countryName]['provinces'][state]['hospitalBedsCount']
+
+    return bundle
+
+
 def packCountry(countryName = 'US', siteData = SITE_DATA):
+    print('  processing states')
     bundle = { 'confirmed': dict(), 'deaths': dict(), 'allCounties': dict(), }
     cryostation = Cryostation(MASTER_DATABASE)
 
@@ -63,7 +73,8 @@ def packCountry(countryName = 'US', siteData = SITE_DATA):
 
     cryostation.close()
 
-    bundle['hospitalBeds'] = loadUSHospitalBedsCount(siteData)
+    print('  processing hospital beds counts by state')
+    bundle['hospitalBeds'] = _bundleHospitalBeds(countryName)
 
     fileName = os.path.join(siteData, BUNDLE_US_JSON)
     with open(fileName, 'w') as outputStream:
