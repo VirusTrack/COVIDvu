@@ -16,7 +16,9 @@ const corsOptions = {
 };
 
 const PRODUCTION_URL = 'https://virustrack.live'
-const STAGING_URL = 'http://staging.virustrack.live'
+const STAGING_URL = 'https://staging.virustrack.live'
+const TEST_URL = 'https://test.virustrack.live'
+
 const environment = process.env.NODE_ENVIRONMENT ? process.env.NODE_ENVIRONMENT : "production"
 
 const main = async (argv) => {
@@ -145,12 +147,12 @@ const main = async (argv) => {
         app.listen(process.env.PORT || 3100)
 
     } else {
+
+        const content_url = environment === "production" ? PRODUCTION_URL : environment === "staging" ? STAGING_URL : TEST_URL
+
         app.use('/', cors(corsOptions), (req, res) => {
-            console.log(req.url)
+            const request_url = `${content_url}${req.url}`
 
-            const request_url = `https://virustrack.live${req.url}`
-
-            console.log(`request_url: ${request_url}`)
             req.pipe(request(request_url)).pipe(res)
         });
 

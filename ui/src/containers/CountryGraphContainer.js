@@ -102,8 +102,7 @@ export const CountryGraphContainer = ({
       <HeroElement
         title={(
           <>
-            Coronavirus Cases in
-            {region}
+            Coronavirus Cases in&nbsp;{region}
           </>
             )}
       />
