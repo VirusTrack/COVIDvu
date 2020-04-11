@@ -7,7 +7,6 @@ from os.path import join
 
 from covidvu.pipeline.vuhospitals import _getTotalBedsForPostalCode
 from covidvu.pipeline.vuhospitals import _main
-from covidvu.pipeline.vuhospitals import loadUSHospitalBedsCount
 
 import os
 import re
@@ -33,13 +32,6 @@ def test__getTotalBedsForPostalCode():
     totalBeds = _getTotalBedsForPostalCode('NC')
     assert totalBeds > 0
 
-
-def test_loadUSHospitalBedsCount():
-    payload = loadUSHospitalBedsCount(TEST_SITE_DATA)
-
-    assert isinstance(payload, dict)
-    assert payload['Alabama'] > 0
-    
 
 def test__main():
     result = _main(TEST_SITE_DATA, nStateLimit=2)

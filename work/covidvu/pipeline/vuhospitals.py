@@ -9,7 +9,6 @@ from time import sleep
 from tqdm.auto import tqdm
 
 from covidvu.config import MASTER_DATABASE
-from covidvu.config import SITE_DATA
 from covidvu.cryostation import Cryostation
 from covidvu.pipeline.vucounty import SITE_RESOURCES
 
@@ -30,25 +29,20 @@ def resolveFileName(siteDataDirectory, outFileName):
 
 
 def _getTotalBedsForPostalCode(postalCode):
-    # TODO: This looks a bit meh...  not a good practice for RESTful web services, I'll 
     url = f"http://www.communitybenefitinsight.org/api/get_hospitals.php?state={postalCode}"
     response = urllib.request.urlopen(url)
     assert response
+
     data = json.loads(response.read())
     totalBeds = 0
+
     for i in range(len(data)):
         totalBeds += int(data[i]['hospital_bed_count'])
+
     sleep(ENDPOINT_REQUEST_DELAY)
 
     return totalBeds
 
-
-def loadUSHospitalBedsCount(siteDataDirectory = SITE_DATA, inputFileName = HOSPITAL_BEDS_FILE_NAME):
-    with open(resolveFileName(siteDataDirectory, inputFileName), 'r') as inputFile:
-        payload = json.load(inputFile)
-
-    return payload
-    
 
 def _main(siteDataDirectory = SITE_RESOURCES,
           database = MASTER_DATABASE,
