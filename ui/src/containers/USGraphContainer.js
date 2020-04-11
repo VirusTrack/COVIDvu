@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import numeral from 'numeral'
-import { Tag, Generic, Title } from 'rbx'
+import { Tag, Title } from 'rbx'
 import ReactGA from 'react-ga'
 import store from 'store2'
 import { useChangePageTitle } from '../hooks/ui'
@@ -14,8 +14,9 @@ import { useGraphData } from '../hooks/graphData'
 
 import { actions } from '../ducks/services'
 
+import { renderDisplay } from '../utils'
 
-import { REGION_URLS, US_REGION_SELECT_KEY, US_GRAPH_SCALE_KEY } from '../constants'
+import { US_REGION_SELECT_KEY, US_GRAPH_SCALE_KEY } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -23,7 +24,7 @@ import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
-
+import ExternalLink from '../components/ExternalLink'
 
 export const USGraphContainer = ({
   region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false,
@@ -46,14 +47,6 @@ export const USGraphContainer = ({
   const usPredictions = useSelector((state) => state.services.usPredictions)
 
   const [confirmedTotal, setConfirmedTotal] = useState(0)
-
-  const renderDisplay = (value) => (value.startsWith('!') ? value.substring(1) : value)
-
-  const isExternalLinkAvailable = (key) => Object.prototype.hasOwnProperty.call(REGION_URLS, key)
-
-  const redirectToExternalLink = (key) => {
-    if (Object.prototype.hasOwnProperty.call(REGION_URLS, key)) window.open(REGION_URLS[key], '_blank')
-  }
 
   useEffect(() => {
     if (usStatesStats) {
@@ -228,7 +221,16 @@ export const USGraphContainer = ({
             <ul>
               {selectedStates.map((region, idx) => (
                 <React.Fragment key={idx}>
-                  <li><Generic as="a" tooltipPosition="left" onClick={() => { redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : 'No external link for region yet'}>{renderDisplay(region)}</Generic></li>
+                  <li>
+                      <ExternalLink 
+                          key={region} 
+                          externalKey={region}
+                          category="Graph:US" 
+                          tooltipText="No external link for region yet" 
+                      >
+                          {renderDisplay(region)}
+                      </ExternalLink>
+                  </li>
                 </React.Fragment>
               ))}
             </ul>

@@ -8,6 +8,7 @@ import ReactGA from 'react-ga'
 import { useMobileDetect } from '../hooks/ui'
 
 import { groupByKey } from '../utils'
+import { renderDisplay } from '../utils'
 
 export const CheckboxRegionComponent = (
   {
@@ -30,8 +31,6 @@ export const CheckboxRegionComponent = (
   const handleToggledOpen = () => {
     setToggledOpen(!toggledOpen)
   }
-
-  const renderDisplay = (value) => (value.startsWith('!') ? value.substring(1) : value)
 
   const onChange = (region) => {
     if (showPredictions) {
@@ -76,9 +75,6 @@ export const CheckboxRegionComponent = (
     if (!mounted.current) {
       mounted.current = true
     } else {
-      console.log(`showPredictions: ${showPredictions}`)
-      console.log(`secondaryGraph: ${secondaryGraph}`)
-
       if (showPredictions && secondaryGraph === 'Cases') {
         const countryByKey = groupByKey('region', data)
         const predictionsList = Object.keys(predictions).map((region) => ({ region, stats: countryByKey[region].stats }))

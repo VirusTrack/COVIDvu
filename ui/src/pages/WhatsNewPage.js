@@ -4,7 +4,6 @@ import { Box, Content, Title } from 'rbx'
 import moment from 'moment'
 import { usePageTitle } from '../hooks/ui'
 
-
 import ContentLayout from '../layouts/ContentLayout'
 
 const changelog = require('../constants/changelog.json')
@@ -34,6 +33,7 @@ export const WhatsNewPage = () => {
         </Content>
       </Box>
     </ContentLayout>
+
   )
 }
 

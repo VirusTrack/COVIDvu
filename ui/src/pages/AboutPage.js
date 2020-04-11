@@ -1,20 +1,23 @@
 import React from 'react'
 
 import {
-  Box, Button, Content, Title, Notification, Level, Select,
+  Box, Button, Content, Title, Notification, Level, Select, Generic
 } from 'rbx'
 
 import store from 'store2'
 import ContentLayout from '../layouts/ContentLayout'
 
+import { useHistory } from 'react-router'
+
 import { usePageTitle } from '../hooks/ui'
 
-import { ENABLE_PREDICTIONS, CLIENT_COUNTRY_KEY, CLIENT_COUNTRY_CODE_KEY } from '../constants'
-
+import { CLIENT_COUNTRY_KEY, CLIENT_COUNTRY_CODE_KEY } from '../constants'
 
 const isoCountries = require('../constants/iso-countries.json')
 
 export const AboutPage = () => {
+  const history = useHistory()
+
   usePageTitle('About the Project')
 
   return (
@@ -27,7 +30,7 @@ export const AboutPage = () => {
           <Notification color="info">
             Check out our
             {' '}
-            <a href="/whatsnew">What&apos;s New</a>
+            <Generic as="a" onClick={() => { history.push('/whatsnew')}}>What&apos;s New</Generic>
             {' '}
             page for more details on the latest features on the site.
           </Notification>
@@ -36,19 +39,14 @@ export const AboutPage = () => {
             Volunteers building and sharing current, accurate, near real-time COVID-19 tracking and prediction tools.
           </p>
 
-          { ENABLE_PREDICTIONS
-                        && (
-                        <>
-                          <Title size={4}>Methodology</Title>
-                          <p>
-                            Check out
-                            {' '}
-                            <a href="/about/methodology/prediction">how we model predictions</a>
-                            {' '}
-                            and how we arrived at the numbers seen after clicking &quot;Show Predictions&quot;.
-                          </p>
-                        </>
-                        )}
+          <Title size={4}>Methodology</Title>
+          <p>
+            Check out
+            {' '}
+            <Generic as="a" onClick={() => { history.push('/about/methodology/prediction')}}>how we model predictions</Generic>
+            {' '}
+            and how we arrived at the numbers seen after clicking &quot;Show Predictions&quot;.
+          </p>
           <Title size={4}>How can you help?</Title>
           <p>
             If you are a backend developer we need your help with getting at more data so we can fill the graphs on the frontend. Frontend
@@ -106,7 +104,6 @@ export const AboutPage = () => {
         </Content>
       </Box>
     </ContentLayout>
-
   )
 }
 

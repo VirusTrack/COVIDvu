@@ -27,7 +27,7 @@ const GOOGLE_ANALYTICS_KEY = 'UA-574325-5'
 
 const DEFAULT_DOCUMENT_TITLE = 'COVID-19 Novel Coronavirus Data Visualization and Statistics'
 
-const ENABLE_PREDICTIONS = true
+const DEBUG = false
 
 const COUNTRIES = [
   '!Global',
@@ -355,7 +355,7 @@ const US_STATES_WITH_ABBREVIATION = {
   Wyoming: 'WY',
 }
 
-const REGION_URLS = {
+const EXTERNAL_URLS = {
   '!Total US': 'https://www.cdc.gov/coronavirus/2019-ncov/index.html',
   Washington: 'https://www.doh.wa.gov/Emergencies/Coronavirus',
   'New York': 'https://coronavirus.health.ny.gov/home',
@@ -579,7 +579,7 @@ const REGION_URLS = {
 
 export {
   GOOGLE_ANALYTICS_KEY,
-  ENABLE_PREDICTIONS,
+  DEBUG,
   DEFAULT_DOCUMENT_TITLE,
   COUNTRIES,
   US_REGIONS,
@@ -593,7 +593,7 @@ export {
   STAGING_GEO_URL,
   TEST_GEO_URL,
   LOCAL_GEO_URL,
-  REGION_URLS,
+  EXTERNAL_URLS,
   CACHE_TIMER,
   ONE_MINUTE,
   LAST_UPDATE_KEY,
