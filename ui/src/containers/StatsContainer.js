@@ -66,6 +66,10 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
     } else if (selectedTab === 'US_Counties') {
       dispatch(actions.fetchUSCountiesStats({ daysAgo, filterRegion, sort }))
     }
+
+    // return () => {
+    //     setStatsForGraph(undefined)
+    // }
   }, [dispatch, daysAgo, selectedTab, filterRegion, sort])
 
   useEffect(() => {
@@ -79,6 +83,7 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
       setStatsForGraph(usCountiesStatsTotals)
       history.replace('/stats?filter=US_Counties')
     }
+
   }, [selectedTab, statsTotals, usStatsTotals, usCountiesStatsTotals, history])
 
   const changeDayView = (daysAgo) => {
@@ -91,7 +96,7 @@ export const StatsContainer = ({ filter = 'Global', daysAgoParam = 0 }) => {
   }
 
   const changeStatsTab = (newSelectedTab) => {
-    setStatsForGraph([])
+    // setStatsForGraph([])
     setSelectedTab(newSelectedTab)
     setSort('confirmed')
 
