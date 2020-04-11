@@ -190,9 +190,15 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
     with Cryostation(databasePath) as storage:
         try:
             if regionType == 'country':
-                regionTS = pd.Series(storage[regionName][target])
+                if target in storage[regionName].keys():
+                    regionTS = pd.Series(storage[regionName][target])
+                else:
+                    return None
             elif regionType == 'stateUS':
-                regionTS = pd.Series(storage['US']['provinces'][regionName][target])
+                if target in storage['US']['provinces'][regionName].keys():
+                    regionTS = pd.Series(storage['US']['provinces'][regionName][target])
+                else:
+                    return None
             else:
                 raise NotImplementedError
         except Exception as e:
