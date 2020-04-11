@@ -128,7 +128,11 @@ def _updateWorldData(target, columnRef):
     for countryName in tqdm.tqdm(sorted(updateWorld.keys())):
         if countryName in cryostation:
             country = cryostation[countryName]
-            country[target][SCRAPED_TODAY] = updateWorld[countryName][SCRAPED_TODAY]
+            try:
+                country[target][SCRAPED_TODAY] = updateWorld[countryName][SCRAPED_TODAY]
+            except KeyError:
+                # TODO: Eugene - Define a mechanism to add new countries reporting to the database
+                pass
             cryostation[countryName] = country
         else:
             print(  '## country %s not found in database' % countryName)
