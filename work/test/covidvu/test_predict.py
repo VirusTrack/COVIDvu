@@ -21,8 +21,9 @@ from covidvu.predict import _dumpPredictionCollectionAsJSON
 from covidvu.predict import _dumpTimeSeriesAsJSON
 from covidvu.predict import _getPredictionsFromPosteriorSamples
 from covidvu.predict import buildLogisticModel
-from covidvu.predict import _getCountries
-from covidvu.predict import getSavedShortCountryNames
+from covidvu.predict import castPercentilesAsDF
+from covidvu.predict import getCountries
+from covidvu.predict import getSavedPredictionRegionNames
 from covidvu.predict import load
 from covidvu.predict import loadAll
 from covidvu.predict import MIN_CASES_FILTER
@@ -115,6 +116,15 @@ def test_predictLogisticGrowth():
     assert (prediction['regionTSClean'] > MIN_CASES_FILTER).all()
     return prediction
 
+
+def test_castPercentilesAsDF():
+    prediction = test_predictLogisticGrowth()
+    percentiles = castPercentilesAsDF(prediction['predictionsPercentilesTS'], PREDICTIONS_PERCENTILES)
+    assert isinstance(percentiles, DataFrame)
+    assert '2.5' in percentiles.columns
+    assert '25' in percentiles.columns
+    assert '75' in percentiles.columns
+    assert '97.5' in percentiles.columns
 
 
 def test__dumpCountryPrediction():
@@ -216,7 +226,7 @@ def test_predictCountries():
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
 
         nLimitRegions=2
-        countries = _getCountries(TEST_DATABASE_PATH)
+        countries = getCountries(TEST_DATABASE_PATH)
 
         predictRegions('all',
                        regionType='country',
@@ -279,7 +289,7 @@ def test_getSavedShortCountryNames():
                        databasePath=TEST_DATABASE_PATH,
                        )
 
-        regionNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
+        regionNameShortAll = getSavedPredictionRegionNames(siteData=TEST_SITE_DATA)
         assert isinstance(regionNameShortAll, list)
         assert len(regionNameShortAll) == 2
     except Exception as e:

@@ -10,6 +10,8 @@ from pandas.core.indexes.datetimes import DatetimeIndex
 from covidvu.pipeline.vujson import SITE_DATA
 from covidvu.pipeline.vujson import dumpJSON
 from covidvu.cryostation import Cryostation
+from covidvu.cryostation import getCountries
+from covidvu.cryostation import getProvinces
 
 import sys
 import re
@@ -310,22 +312,20 @@ def _dumpRegionPrediction(prediction, siteData, predictionsPercentiles,
                                         )
 
 
-def _getCountries(databasePath):
-    with Cryostation(databasePath) as storage:
-        countries = []
-        for c in [k for k in storage.keys()]:
-            if c[0] != '!':
-                countries.append(c)
-    return countries
+
+def castPercentilesAsDF(predictionsPercentilesTS, predictionsPercentiles):
+    percentiles = pd.DataFrame()
+    predictionsPercentilesTS = predictionsPercentilesTS
+    for i, (qLow, qHigh) in enumerate(predictionsPercentiles):
+        tsLow = predictionsPercentilesTS[i][0]
+        tsHigh = predictionsPercentilesTS[i][1]
+
+        percentiles[str(qLow)] = tsLow
+        percentiles[str(qHigh)] = tsHigh
+    return percentiles
 
 
-def _getStatesUS(databasePath):
-    with Cryostation(databasePath) as storage:
-        statesUS = []
-        for s in [p for p in storage['US']['provinces'].keys()]:
-            if s[0] != '!':
-                statesUS.append(s)
-    return statesUS
+
 
 
 def predictRegions(regionName,
@@ -377,7 +377,7 @@ def predictRegions(regionName,
 
     if regionName == 'all':
         if regionType == 'country':
-            countries = _getCountries(databasePath)
+            countries = getCountries(databasePath)
             for i, country in enumerate(countries):
                 print(f'Training {country}')
                 if nLimitRegions:
@@ -396,7 +396,7 @@ def predictRegions(regionName,
                                       confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD, )
                 print('Done.')
         elif regionType == 'stateUS':
-            statesUS = _getStatesUS(databasePath)
+            statesUS = getProvinces(databasePath, country='US')
             for i, state in enumerate(statesUS):
                 if nLimitRegions:
                     if i > nLimitRegions:
@@ -436,7 +436,7 @@ def predictRegions(regionName,
     print('Done.')
 
 
-def getSavedShortCountryNames(siteData = SITE_DATA,
+def getSavedPredictionRegionNames(siteData = SITE_DATA,
                               confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD,
                               ):
     regionNameShortAll = []
@@ -457,7 +457,7 @@ def load(regionIndex = None,
 
     if regionNameShort is None:
         assert isinstance(regionIndex, int)
-        regionNameShortAll = getSavedShortCountryNames(siteData=siteData)
+        regionNameShortAll = getSavedPredictionRegionNames(siteData=siteData)
         regionNameShort = regionNameShortAll[regionIndex]
         assert abs(regionIndex) < len(regionNameShortAll)
     else:
@@ -481,7 +481,7 @@ def load(regionIndex = None,
 
 
 def loadAll(confIntFilename=PREDICTION_CI_JSON_FILENAME_WORLD, siteData=SITE_DATA,):
-    trainedRegions = getSavedShortCountryNames(siteData = siteData,
+    trainedRegions = getSavedPredictionRegionNames(siteData = siteData,
                                                confIntFilename = confIntFilename,
                                                )
     assert len(trainedRegions) > 0

@@ -8,7 +8,9 @@ import os
 import pytest
 
 import covidvu.cryostation as storage
-
+from covidvu.cryostation import getCountries
+from covidvu.cryostation import getProvinces
+from covidvu.cryostation import getAllTimeSeriesAsDataFrame
 
 # --- constants---
 
@@ -20,6 +22,18 @@ TEST_DATABASE_FILE_NAME = os.path.join(TEST_DATABASE_PATH, TEST_DATABASE_FILE)
 # --- tests ----
 
 cryostation = None
+
+
+def test_getCountries():
+    raise NotImplementedError
+
+
+def test_getProvinces():
+    raise NotImplementedError
+
+
+def test_getAllTimeSeriesAsDataFrame():
+    raise NotImplementedError
 
 #--------------------------------------------------
 # At the end always!

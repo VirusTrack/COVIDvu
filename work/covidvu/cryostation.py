@@ -3,13 +3,69 @@
 # vim: set fileencoding=utf-8:
 
 
+import pandas as pd
 from tinydb import TinyDB, Query
+from tqdm.auto import tqdm
 
 
 # --- constants ---
 
 DEFAULT_TABLE = 'virustrack'
 
+# *** functions ***
+def getCountries(databasePath):
+    with Cryostation(databasePath) as storage:
+        countries = []
+        for c in [k for k in storage.keys()]:
+            if c[0] != '!':
+                countries.append(c)
+    return countries
+
+
+def getProvinces(databasePath, country = 'US'):
+    with Cryostation(databasePath) as storage:
+        provinces = []
+        for s in [p for p in storage[country]['provinces'].keys()]:
+            if s[0] != '!':
+                provinces.append(s)
+    return provinces
+
+
+def getAllTimeSeriesAsDataFrame(databasePath, regionType = 'country', target = 'confirmed', provinceCountry = None):
+    """Get all time series of a given region type and return as dataframe
+
+    Parameters
+    ----------
+    databasePath: Path to database
+    regionType: 'country' or 'province'
+    target: 'confirmed' or 'deaths'
+    provinceCountry: if regionType == 'province', the country for which to get all provinces
+
+    Returns
+    -------
+    Time series for all regions of type regionType, as a pandas dataframe
+    """
+    if regionType == 'country':
+        regions = getCountries(databasePath)
+    elif regionType == 'province':
+        assert provinceCountry
+        regions = getProvinces(databasePath, country = provinceCountry)
+    else:
+        raise ValueError(f'regionType = {regionType} not understood')
+
+    df = {}
+    with Cryostation(databasePath) as storage:
+        for region in tqdm(regions):
+            if regionType == 'country':
+                if target in storage[region]:
+                    df[region] = pd.Series(storage[region][target])
+            elif regionType == 'province':
+                if target in storage[provinceCountry]['provinces'][region]:
+                    df[region] = pd.Series(storage[provinceCountry]['provinces'][region][target])
+    df = pd.DataFrame(df)
+    df.index = pd.to_datetime(df.index)
+    df.fillna(0, inplace=True)
+    return df
 
 # *** classes and objects ***
 
