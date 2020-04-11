@@ -3,17 +3,19 @@ import React, { useState } from 'react'
 import numeral from 'numeral'
 
 import {
-  Select, Level, Title, Generic, Table, Tab,
+  Select, Level, Title, Table, Tab,
 } from 'rbx'
-
-import { ColumnSortIcon } from './ColumnSortIcon'
 
 import { CountyBarGraph } from './CountyBarGraph'
 
 import { US_STATES_WITH_ABBREVIATION } from '../constants'
 
+import { renderDisplay } from '../utils'
+import { SortedTableHeading } from './SortedTableHeading'
+import ExternalLink from '../components/ExternalLink'
+
 export const USCountiesStatsTable = ({
-  filterRegion = 'NY', statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, onSelectedFilter, sort, onSort,
+  filterRegion = 'NY', statsForGraph, onSelectedFilter, sort, onSort,
 }) => {
   const [selectedState, setSelectedState] = useState(filterRegion)
 
@@ -59,23 +61,31 @@ export const USCountiesStatsTable = ({
                     <Table.Heading>
                       Region
                     </Table.Heading>
-                    <Table.Heading onClick={() => { onSort('confirmed') }} style={{ cursor: 'pointer' }}>
-                      Total Cases
-                      {sort === 'confirmed'
-                                    && <ColumnSortIcon direction="desc" />}
-                    </Table.Heading>
-                    <Table.Heading onClick={() => { onSort('deaths') }} style={{ cursor: 'pointer' }}>
-                      Deaths
-                      {sort === 'deaths'
-                                    && <ColumnSortIcon direction="desc" />}
-                    </Table.Heading>
+                    <SortedTableHeading 
+                        onSort={() => {onSort('confirmed')}} 
+                        heading="Total Cases" 
+                        selectedSort={sort === 'confirmed'} 
+                        direction='desc' 
+                    />
+                    <SortedTableHeading 
+                        onSort={() => {onSort('deaths')}} 
+                        heading="Deaths" 
+                        selectedSort={sort === 'deaths'} 
+                        direction='desc' 
+                    />
                   </Table.Row>
                 </Table.Head>
                 <Table.Body>
                   { statsForGraph ? statsForGraph.map((stat, idx) => (
                     <Table.Row key={idx}>
                       <Table.Cell>
-                        <Generic as="a" tooltipPosition="right" onClick={() => { redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : 'No external link for region yet'} textColor={isExternalLinkAvailable(stat.region) ? 'link' : 'black'}>{renderDisplay(stat.region)}</Generic>
+                          <ExternalLink 
+                              externalKey={stat.region}
+                              category="Stats:US_Counties" 
+                              tooltipText="No external link for region yet" 
+                          >
+                              {renderDisplay(stat.region)}
+                          </ExternalLink>
                       </Table.Cell>
                       <Table.Cell>
                         <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
