@@ -10,9 +10,10 @@ import numeral from 'numeral'
 import moment from 'moment'
 import LogoElement from './LogoElement'
 import { useMobileDetect } from '../hooks/ui'
+import { GRAPHSCALE_TYPES } from '../constants'
 
 export const PredictionGraph = ({
-  title, predictions, confirmed, selected, showLog = false,
+  title, predictions, confirmed, selected, graphScale = GRAPHSCALE_TYPES.LINEAR,
 }) => {
   const [plotsAsValues, setPlotsAsValues] = useState([])
 
@@ -117,7 +118,7 @@ export const PredictionGraph = ({
 
         const regionData = confirmed[region]
         for (const key of Object.keys(regionData).sort()) {
-          if ((showLog && regionData[key] > 100) || !showLog) {
+          if ((graphScale === GRAPHSCALE_TYPES.LOGARITHMIC && regionData[key] > 100) || graphScale === GRAPHSCALE_TYPES.LINEAR) {
             plots[normalizedRegion].x.push(key)
             plots[normalizedRegion].y.push(regionData[key])
           }
@@ -193,7 +194,7 @@ export const PredictionGraph = ({
     },
   }
 
-  if (showLog) {
+  if (graphScale === GRAPHSCALE_TYPES.LOGARITHMIC) {
     layout.yaxis = {
       type: 'log',
       autorange: true,
@@ -208,7 +209,7 @@ export const PredictionGraph = ({
       },
     }
 
-    if (!showLog) {
+    if (graphScale === GRAPHSCALE_TYPES.LINEAR) {
       layout = {
         ...layout,
         yaxis: {
@@ -229,20 +230,10 @@ export const PredictionGraph = ({
     <>
       <Notification>
         <Title size={4}>
-          Predictions for Today
-          {today.format('YYYY-MM-DD')}
-          &nbsp;
-          in
-          {title}
+          Predictions for Today {today.format('YYYY-MM-DD')}
+          &nbsp;in&nbsp;{title}
         </Title>
-        Between
-        &nbsp;
-        <em>{numeral(lower).format('0,0')}</em>
-        &nbsp;
-        and
-        &nbsp;
-        <em>{numeral(upper).format('0,0')}</em>
-        .
+        Between&nbsp;<em>{numeral(lower).format('0,0')}</em>&nbsp;and&nbsp;<em>{numeral(upper).format('0,0')}</em>.
         <br />
         <br />
         For a detailed explanation of how predictions work, please visit our
