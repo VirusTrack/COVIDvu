@@ -23,6 +23,8 @@ import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 import { GLOBAL_REGION_SELECT_KEY, GLOBAL_GRAPH_SCALE_KEY, GRAPHSCALE_TYPES } from '../constants'
 
+import { graphScaleOrDefault } from '../utils'
+
 export const GlobalGraphContainer = ({
   region = [], graph = 'Cases', graphScaleParam = GRAPHSCALE_TYPES.LINEAR, showPredictionsParam = false,
 }) => {
@@ -32,7 +34,8 @@ export const GlobalGraphContainer = ({
 
   const handleHistory = useHandleHistory('/covid')
 
-  const [graphScale, setGraphScale] = useState(graphScaleParam)
+
+  const [graphScale, setGraphScale] = useState(graphScaleOrDefault(graphScaleParam))
   const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
   const [selectedCountries, setSelectedCountries] = useState(region)
   const [secondaryGraph, setSecondaryGraph] = useState(graph)
@@ -62,7 +65,7 @@ export const GlobalGraphContainer = ({
     dispatch(actions.fetchTotalGlobalStats())
 
     if (store.get(GLOBAL_GRAPH_SCALE_KEY)) {
-      setGraphScale(store.get(GLOBAL_GRAPH_SCALE_KEY))
+      setGraphScale(graphScaleOrDefault(store.get(GLOBAL_GRAPH_SCALE_KEY)))
     }
   }, [dispatch, graphScale])
 

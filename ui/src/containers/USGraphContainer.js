@@ -17,6 +17,7 @@ import { actions } from '../ducks/services'
 import { renderDisplay } from '../utils'
 
 import { US_REGION_SELECT_KEY, US_GRAPH_SCALE_KEY, GRAPHSCALE_TYPES } from '../constants'
+import { graphScaleOrDefault } from '../utils'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -34,7 +35,7 @@ export const USGraphContainer = ({
   const handleHistory = useHandleHistory('/covid/us')
   const changePageTitle = useChangePageTitle()
 
-  const [graphScale, setGraphScale] = useState(graphScaleParam)
+  const [graphScale, setGraphScale] = useState(graphScaleOrDefault(graphScaleParam))
   const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
   const [selectedStates, setSelectedStates] = useState(region)
   const [secondaryGraph, setSecondaryGraph] = useState(graph)
@@ -84,7 +85,7 @@ export const USGraphContainer = ({
     dispatch(actions.fetchTotalUSStatesStats())
 
     if (store.get(US_GRAPH_SCALE_KEY)) {
-      setGraphScale(store.get(US_GRAPH_SCALE_KEY))
+      setGraphScale(graphScaleOrDefault(store.get(US_GRAPH_SCALE_KEY)))
     }
   }, [dispatch])
 
