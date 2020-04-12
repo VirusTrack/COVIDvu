@@ -23,7 +23,7 @@ JSON_DATA_BUNDLE="COVID19-cases.tar.gz"
 RAW_DATA_FILE="$SITE_DATA_DIR/raw-source.html"
 RAW_DATA_SOURCE="https://docs.google.com/spreadsheets/d/e/2PACX-1vR30F8lYP3jG7YOq8es0PBpJIE5yvRVZffOyaqC0GgMBN6yt0Q-NI8pxS7hd1F9dYXnowSC6zpZmW9D/pubhtml?gid=0&amp;single=false&amp;widget=true&amp;headers=true"
 RESOURCES_DIR="./resources"
-SNAPSHOTS_DIR="./snapshots"
+SNAPSHOTS_DIR="./database"
 TMP_OUTPUT="/tmp/refreshdata.log"
 UPDATE_ERROR="$SITE_DATA_DIR/ERROR.txt"
 # -- order is imortant:
@@ -172,20 +172,19 @@ function deployVirusDataUpdate {
 
 
 function makeDataSnapshot {
-    # EXPERIMENTAL:  transitional feature until we get the database back-end going
     local minutes=$(awk 'BEGIN { "date +\"%s\"" | getline time; print(int((time%3600)/60)); }')
 
-    echo "data snapshot time check - current minutes offset = $minutes"
+    echo "database snapshot time check - current minutes offset = $minutes"
 
     if [[ "0" == "$minutes" ]]
     then
         mkdir -p "$SNAPSHOTS_DIR"
         local now=$(date +"%Y%m%d-%H%M")
-        local fileName="$SNAPSHOTS_DIR/snapshot-$now.tar.bz2"
+        local fileName="$SNAPSHOTS_DIR/virustrack_db-snapshot-$now.tar.bz2"
 
         echo "  creating snapshot at $fileName"
 
-        tar cvjf "$fileName" "$SITE_DATA_DIR" "$RESOURCES_DIR/"*.json
+        tar cvjf "$fileName" "$MASTER_DATABASE_DIR"/* 
         [[ "0" != "$?" ]] && die "makeDataSnapshot failed - tar/bzip2 issue"  26
     fi
 } # makeDataSnapshot

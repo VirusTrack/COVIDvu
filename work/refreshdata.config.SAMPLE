@@ -13,6 +13,7 @@ export VIRUSTRACK_TEST_CLOUDFRONT_ID="E000000aa000aI"
 export CONTAINER_SIG_FILE="/proc/1/cgroup"
 export COUNTY_CASES_US_FILE="resources/counties-US-all.json" # timestamp = implementation date
 export HOSPITAL_BEDS_US_FILE="resources/hospital-beds-count-US.json"
+export MASTER_DATABASE_DIR="database"
 export RAW_DATA_FILE="$SITE_DATA_DIR/raw-source.html"
 export RAW_DATA_SOURCE="https://docs.google.com/spreadsheets/d/e/2PACX-1vR30F8lYP3jG7YOq8es0PBpJIE5yvRVZffOyaqC0GgMBN6yt0Q-NI8pxS7hd1F9dYXnowSC6zpZmW9D/pubhtml?gid=0&amp;single=false&amp;widget=true&amp;headers=true"
 export SITE_BUCKET="virustrack.live"
