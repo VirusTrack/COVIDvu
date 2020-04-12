@@ -1,5 +1,12 @@
 [
     {
+        "date": "2020-04-11",
+        "changes": [
+            "Added trend / regression lines in the form of reproduction rate available on every compare graph",
+            "Newsletter signup form for future customized email of graphs"
+        ]
+    },
+    {
         "date": "2020-04-05",
         "changes": [
             "Selections of countries in global, US states, graph scale all saved in localStorage",

@@ -16,7 +16,7 @@ import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 
 export const CountryGraphContainer = ({
-  region = 'US', graph = 'Cases', showLogParam = false, showPredictionsParam = false,
+  region = 'US', graph = 'Cases', graphScaleParam = false, showPredictionsParam = false,
 }) => {
   const dispatch = useDispatch()
   const { search } = useLocation()
@@ -24,7 +24,7 @@ export const CountryGraphContainer = ({
   const handleHistory = useHandleHistory(`/covid/country/${region}`)
   // const changePageTitle = useChangePageTitle()
 
-  const [showLog, setShowLog] = useState(showLogParam)
+  const [graphScale, setGraphScale] = useState(graphScaleParam)
   const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
   const [selectedCountries, setSelectedCountries] = useState(region)
   const [secondaryGraph, setSecondaryGraph] = useState(graph)
@@ -39,20 +39,20 @@ export const CountryGraphContainer = ({
      * Fetch all the data
      */
   useEffect(() => {
-    dispatch(actions.fetchGlobal({ showLog }))
+    dispatch(actions.fetchGlobal())
     dispatch(actions.fetchGlobalPredictions())
-  }, [dispatch, showLog])
+  }, [dispatch, graphScale])
 
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
     if (sortedConfirmed && region.length === 0) {
       const newSelectedCountries = sortedConfirmed.slice(1, 4).map((confirmed) => confirmed.region)
       setSelectedCountries(newSelectedCountries)
-      handleHistory(undefined, secondaryGraph, showLog, showPredictions)
+      handleHistory(undefined, secondaryGraph, graphScale, showPredictions)
     } else if (showPredictions && Object.keys(globalPredictions).length > 0) {
       if ((region.length === 1 && !Object.prototype.hasOwnProperty.call(globalPredictions, region))) {
         setSelectedCountries(['US'])
-        handleHistory(['US'], secondaryGraph, showLog, showPredictions)
+        handleHistory(['US'], secondaryGraph, graphScale, showPredictions)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,14 +60,14 @@ export const CountryGraphContainer = ({
 
   useEffect(() => {
     if (!search) {
-      handleHistory(undefined, secondaryGraph, showLog, showPredictions)
+      handleHistory(undefined, secondaryGraph, graphScale, showPredictions)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSelectedGraph = (selectedGraph) => {
     setSecondaryGraph(selectedGraph)
-    handleHistory(undefined, selectedGraph, showLog, showPredictions)
+    handleHistory(undefined, selectedGraph, graphScale, showPredictions)
 
     ReactGA.event({
       category: 'Region:Country',
@@ -75,13 +75,13 @@ export const CountryGraphContainer = ({
     })
   }
 
-  const handleGraphScale = (logScale) => {
-    setShowLog(logScale)
-    handleHistory(undefined, secondaryGraph, logScale, showPredictions)
+  const handleGraphScale = (graphScale) => {
+    setGraphScale(graphScale)
+    handleHistory(undefined, secondaryGraph, graphScale, showPredictions)
 
     ReactGA.event({
       category: 'Region:Country',
-      action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`,
+      action: `Changed graph scale to ${graphScale}`,
     })
   }
 
@@ -94,7 +94,7 @@ export const CountryGraphContainer = ({
     }
     setShowPredictions(!showPredictions)
 
-    handleHistory(undefined, secondaryGraph, showLog, !showPredictions)
+    handleHistory(undefined, secondaryGraph, graphScale, !showPredictions)
   }
 
   return (
@@ -119,7 +119,7 @@ export const CountryGraphContainer = ({
             handleGraphScale={handleGraphScale}
             handleShowPredictions={handleShowPredictions}
             predictions={globalPredictions}
-            showLog={showLog}
+            graphScale={graphScale}
             showPredictions={showPredictions}
             parentRegion="Global"
           />

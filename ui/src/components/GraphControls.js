@@ -9,8 +9,11 @@ import GraphImageDownloadButton from './GraphImageDownloadButton'
 import GraphScaleControl from './GraphScaleControl'
 import GraphDownloadButton from './GraphDownloadButton'
 
+import { GRAPHSCALE_TYPES } from '../constants'
+
 export const GraphControls = ({
   scale,
+  graphScale = GRAPHSCALE_TYPES.LINEAR,
   downloadImage,
   downloadCSV,
   secondaryGraph,
@@ -36,6 +39,7 @@ export const GraphControls = ({
             && (
             <GraphScaleControl
               showLog={showLog}
+              graphScale={graphScale}
               handleGraphScale={handleGraphScale}
               showPredictions={showPredictions}
               handleShowPredictions={handleShowPredictions}

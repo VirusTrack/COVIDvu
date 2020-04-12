@@ -17,15 +17,16 @@ import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
+import { GRAPHSCALE_TYPES } from '../constants'
 
 
-export const USRegionsGraphContainer = ({ region = [], graph = 'Cases', showLogParam = false }) => {
+export const USRegionsGraphContainer = ({ region = [], graph = 'Cases', graphScaleParam = false }) => {
   const dispatch = useDispatch()
   const location = useLocation()
   const { search } = location
   const handleHistory = useHandleHistory('/covid/us/regions')
 
-  const [showLog, setShowLog] = useState(showLogParam)
+  const [graphScale, setGraphScale] = useState(graphScaleParam)
   const [selectedRegions, setSelectedRegions] = useState(region)
   const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
@@ -81,13 +82,13 @@ export const USRegionsGraphContainer = ({ region = [], graph = 'Cases', showLogP
     })
   }
 
-  const handleGraphScale = (logScale) => {
-    setShowLog(logScale)
-    handleHistory(selectedRegions, secondaryGraph, logScale)
+  const handleGraphScale = (graphScale) => {
+    setGraphScale(graphScale)
+    handleHistory(selectedRegions, secondaryGraph, graphScale)
 
     ReactGA.event({
       category: 'Region:U.S. Regions',
-      action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`,
+      action: `Changed graph scale to ${graphScale}`,
     })
   }
 
@@ -113,7 +114,7 @@ export const USRegionsGraphContainer = ({ region = [], graph = 'Cases', showLogP
               selected={selectedRegions}
               handleSelected={(dataList) => handleSelectedRegion(dataList)}
               defaultSelected={region}
-              showLog={showLog}
+              graphScale={graphScale}
               parentRegion="U.S. Regions"
             />
           </>
@@ -126,12 +127,12 @@ export const USRegionsGraphContainer = ({ region = [], graph = 'Cases', showLogP
             selected={selectedRegions}
             handleSelectedGraph={handleSelectedGraph}
             handleGraphScale={handleGraphScale}
-            showLog={showLog}
+            graphScale={graphScale}
           />
 
           <Level>
             <Level.Item>
-              {!showLog
+              {graphScale === GRAPHSCALE_TYPES.LINEAR
                         && (
                         <>
                           <Tag size="large" color="danger">

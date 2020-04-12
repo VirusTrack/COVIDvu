@@ -12,6 +12,7 @@ export const GraphWithLoader = ({
   selected,
   config,
   showLog,
+  graphScale,
   ref,
 }) => (
   <>
@@ -20,6 +21,7 @@ export const GraphWithLoader = ({
         <>
           { graph ? (
             <Graph
+              graphName={graphName}
               data={graph}
               selected={selected}
               config={config}
@@ -27,6 +29,7 @@ export const GraphWithLoader = ({
               x_title={x_title}
               y_title={y_title}
               showLog={showLog}
+              graphScale={graphScale}
               start={(graphName === 'Cases') ? 100 : null}
               ref={ref}
             />

@@ -21,10 +21,10 @@ import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 
-import { GLOBAL_REGION_SELECT_KEY, GLOBAL_GRAPH_SCALE_KEY } from '../constants'
+import { GLOBAL_REGION_SELECT_KEY, GLOBAL_GRAPH_SCALE_KEY, GRAPHSCALE_TYPES } from '../constants'
 
 export const GlobalGraphContainer = ({
-  region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false,
+  region = [], graph = 'Cases', graphScaleParam = GRAPHSCALE_TYPES.LINEAR, showPredictionsParam = false,
 }) => {
   const dispatch = useDispatch()
   const { search } = useLocation()
@@ -32,7 +32,7 @@ export const GlobalGraphContainer = ({
 
   const handleHistory = useHandleHistory('/covid')
 
-  const [showLog, setShowLog] = useState(showLogParam)
+  const [graphScale, setGraphScale] = useState(graphScaleParam)
   const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
   const [selectedCountries, setSelectedCountries] = useState(region)
   const [secondaryGraph, setSecondaryGraph] = useState(graph)
@@ -57,14 +57,14 @@ export const GlobalGraphContainer = ({
      * Fetch all the data
      */
   useEffect(() => {
-    dispatch(actions.fetchGlobal({ showLog }))
+    dispatch(actions.fetchGlobal())
     dispatch(actions.fetchGlobalPredictions())
     dispatch(actions.fetchTotalGlobalStats())
 
     if (store.get(GLOBAL_GRAPH_SCALE_KEY)) {
-      setShowLog(store.get(GLOBAL_GRAPH_SCALE_KEY))
+      setGraphScale(store.get(GLOBAL_GRAPH_SCALE_KEY))
     }
-  }, [dispatch, showLog])
+  }, [dispatch, graphScale])
 
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
@@ -77,14 +77,14 @@ export const GlobalGraphContainer = ({
       }
 
       setSelectedCountries(newSelectedCountries)
-      handleHistory(newSelectedCountries, secondaryGraph, showLog, showPredictions)
+      handleHistory(newSelectedCountries, secondaryGraph, graphScale, showPredictions)
     } else if (showPredictions) {
       if ((region.length === 1 && !Object.prototype.hasOwnProperty.call(globalPredictions, region)) || region.length > 1) {
         setSelectedCountries(['US'])
-        handleHistory(['US'], secondaryGraph, showLog, showPredictions)
+        handleHistory(['US'], secondaryGraph, graphScale, showPredictions)
       }
     } else if (!sortedConfirmed) {
-      dispatch(actions.fetchGlobal({ showLog }))
+      dispatch(actions.fetchGlobal())
       dispatch(actions.fetchGlobalPredictions())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,7 +92,7 @@ export const GlobalGraphContainer = ({
 
   useEffect(() => {
     if (!search) {
-      handleHistory(selectedCountries, secondaryGraph, showLog, showPredictions)
+      handleHistory(selectedCountries, secondaryGraph, graphScale, showPredictions)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -112,7 +112,7 @@ export const GlobalGraphContainer = ({
 
   const handleSelectedRegion = (regionList) => {
     setSelectedCountries(regionList)
-    handleHistory(regionList, secondaryGraph, showLog, showPredictions)
+    handleHistory(regionList, secondaryGraph, graphScale, showPredictions)
 
     let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
 
@@ -131,7 +131,7 @@ export const GlobalGraphContainer = ({
 
   const handleSelectedGraph = (selectedGraph) => {
     setSecondaryGraph(selectedGraph)
-    handleHistory(selectedCountries, selectedGraph, showLog, showPredictions)
+    handleHistory(selectedCountries, selectedGraph, graphScale, showPredictions)
 
     ReactGA.event({
       category: 'Region:Global',
@@ -139,15 +139,16 @@ export const GlobalGraphContainer = ({
     })
   }
 
-  const handleGraphScale = (logScale) => {
-    setShowLog(logScale)
-    store.set(GLOBAL_GRAPH_SCALE_KEY, logScale)
+  const handleGraphScale = (graphScale) => {
+    console.log(`handleGraphScale: ${graphScale}`)
+    setGraphScale(graphScale)
+    store.set(GLOBAL_GRAPH_SCALE_KEY, graphScale)
 
-    handleHistory(selectedCountries, secondaryGraph, logScale, showPredictions)
+    handleHistory(selectedCountries, secondaryGraph, graphScale, showPredictions)
 
     ReactGA.event({
       category: 'Region:Global',
-      action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`,
+      action: `Changed graph scale to ${graphScale}`,
     })
   }
 
@@ -160,7 +161,7 @@ export const GlobalGraphContainer = ({
     }
     setShowPredictions(!showPredictions)
 
-    handleHistory(historicSelectedCountries, secondaryGraph, showLog, !showPredictions)
+    handleHistory(historicSelectedCountries, secondaryGraph, graphScale, !showPredictions)
   }
 
   return (
@@ -188,7 +189,6 @@ export const GlobalGraphContainer = ({
               showPredictions={showPredictions}
               predictions={globalPredictions}
               secondaryGraph={secondaryGraph}
-              showLog={showLog}
               parentRegion="Global"
             />
 
@@ -204,7 +204,7 @@ export const GlobalGraphContainer = ({
             handleGraphScale={handleGraphScale}
             handleShowPredictions={handleShowPredictions}
             predictions={globalPredictions}
-            showLog={showLog}
+            graphScale={graphScale}
             showPredictions={showPredictions}
             parentRegion="Global"
           />
@@ -212,14 +212,13 @@ export const GlobalGraphContainer = ({
           <>
             <Level>
               <Level.Item>
-                {!showLog
-
-                                && (
-                                <Tag size="large" color="danger">
-                                  Total Cases:
-                                  {numeral(confirmedTotal).format('0,0')}
-                                </Tag>
-                                )}
+                {graphScale === GRAPHSCALE_TYPES.LINEAR
+                  && (
+                  <Tag size="large" color="danger">
+                    Total Cases:
+                    {numeral(confirmedTotal).format('0,0')}
+                  </Tag>
+                )}
               </Level.Item>
             </Level>
 

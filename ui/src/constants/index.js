@@ -29,6 +29,12 @@ const DEFAULT_DOCUMENT_TITLE = 'COVID-19 Novel Coronavirus Data Visualization an
 
 const DEBUG = false
 
+const GRAPHSCALE_TYPES = {
+  LINEAR: "linear",
+  LOGARITHMIC: "logarithmic",
+  SLOPE: "slope"
+}
+
 const COUNTRIES = [
   '!Global',
   '!Outside Mainland China',
@@ -582,6 +588,7 @@ export {
   DEBUG,
   DEFAULT_DOCUMENT_TITLE,
   COUNTRIES,
+  GRAPHSCALE_TYPES,
   US_REGIONS,
   US_STATES,
   US_STATES_WITH_ABBREVIATION,
