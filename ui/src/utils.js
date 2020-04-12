@@ -1,3 +1,5 @@
+import { GRAPHSCALE_TYPES } from "./constants";
+
 /**
  * Group an array of objects into an object that is
  * grouped by key in object
@@ -10,6 +12,12 @@ export const groupByKey = (key, array) => array.reduce((obj, item) => {
   obj[objKey] = item;
   return obj;
 }, {});
+
+
+
+export const graphScaleOrDefault = (graphScale) => {
+    return Object.values(GRAPHSCALE_TYPES).indexOf(graphScale) !== -1 ? graphScale : GRAPHSCALE_TYPES.LINEAR
+}
 
 /**
  * Calculate the rough size of object and return in bytes
