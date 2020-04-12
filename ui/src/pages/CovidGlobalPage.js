@@ -8,6 +8,7 @@ import GlobalGraphContainer from '../containers/GlobalGraphContainer'
 import MainLayout from '../layouts/MainLayout'
 
 import { usePageTitle } from '../hooks/ui'
+import { GRAPHSCALE_TYPES } from '../constants'
 
 export const CovidGlobalPage = () => {
   const { search } = useLocation()
@@ -19,6 +20,7 @@ export const CovidGlobalPage = () => {
   const region = query.region ? Array.isArray(query.region) ? query.region : [query.region] : undefined
   const graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
   const showLog = query.showLog === 'true'
+  const graphScale = query.graphScale ? query.graphScale : GRAPHSCALE_TYPES.LINEAR
   const showPredictions = query.showPredictions === 'true'
 
   usePageTitle('Global Graphs')
@@ -26,7 +28,13 @@ export const CovidGlobalPage = () => {
   return (
     <MainLayout>
       <ErrorBoundary>
-        <GlobalGraphContainer region={region} graph={graph} showLogParam={showLog} showPredictionsParam={showPredictions} />
+        <GlobalGraphContainer 
+            region={region} 
+            graph={graph} 
+            showLogParam={showLog} 
+            graphScaleParam={graphScale}
+            showPredictionsParam={showPredictions} 
+          />
       </ErrorBoundary>
     </MainLayout>
   )

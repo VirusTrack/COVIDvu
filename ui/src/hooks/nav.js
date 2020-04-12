@@ -29,11 +29,11 @@ export function useChangePage() {
 export function useHandleHistory(urlFragment) {
   const history = useHistory()
 
-  return (region, graph, showLog, showPredictions) => {
+  return (region, graph, graphScale, showPredictions) => {
     const query = queryString.stringify({
       region,
       graph,
-      showLog,
+      graphScale,
       showPredictions,
     })
 

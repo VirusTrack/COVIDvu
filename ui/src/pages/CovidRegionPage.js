@@ -8,6 +8,7 @@ import RegionGraphContainer from '../containers/RegionGraphContainer'
 import MainLayout from '../layouts/MainLayout'
 
 import { usePageTitle } from '../hooks/ui'
+import { GRAPHSCALE_TYPES } from '../constants'
 
 export const CovidRegionPage = () => {
   const { region } = useParams()
@@ -19,7 +20,7 @@ export const CovidRegionPage = () => {
 
   const uniqueRegion = query.region ? Array.isArray(query.region) ? query.region : [query.region] : undefined
   const graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
-  const showLog = query.showLog === 'true'
+  const graphScale = query.graphScale ? query.graphScale : GRAPHSCALE_TYPES.LINEAR
 
   usePageTitle(`${region} Graphs`)
 
@@ -30,7 +31,7 @@ export const CovidRegionPage = () => {
           region={region}
           uniqueRegion={uniqueRegion}
           graph={graph}
-          showLogParam={showLog}
+          graphScaleParam={graphScale}
         />
       </ErrorBoundary>
     </MainLayout>

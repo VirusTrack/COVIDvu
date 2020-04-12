@@ -32,15 +32,14 @@ import globeImg from '../images/fa-icon-globe.svg'
 import usflagImg from '../images/fa-icon-usflag.svg'
 
 
-export const DashboardContainer = ({ showLogParam = false }) => {
+export const DashboardContainer = ({ graphScaleParam = false }) => {
   const dispatch = useDispatch()
   const history = useHistory()
 
   const changePageTitle = useChangePageTitle()
 
   const clientCountry = useClientCountry()
-  const [showLog, setShowLog] = useState(showLogParam)
-  // const graphControlsAlign = 'center'
+  const [graphScale, setGraphScale] = useState(graphScaleParam)
 
   // const [tzGuess, setTzGuess] = useState(moment.tz.guess())
 
@@ -59,7 +58,7 @@ export const DashboardContainer = ({ showLogParam = false }) => {
     dispatch(actions.fetchGlobal())
 
     if (store.get(DASHBOARD_GRAPH_SCALE_KEY)) {
-      setShowLog(store.get(DASHBOARD_GRAPH_SCALE_KEY))
+      setGraphScale(store.get(DASHBOARD_GRAPH_SCALE_KEY))
     }
   }, [dispatch])
 
@@ -103,13 +102,13 @@ export const DashboardContainer = ({ showLogParam = false }) => {
     )
   }
 
-  const handleGraphScale = (logScale) => {
-    setShowLog(logScale)
-    store.set(DASHBOARD_GRAPH_SCALE_KEY, logScale)
+  const handleGraphScale = (graphScale) => {
+    setGraphScale(graphScale)
+    store.set(DASHBOARD_GRAPH_SCALE_KEY, graphScale)
 
     ReactGA.event({
       category: 'Dashboard',
-      action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`,
+      action: `Changed graph scale to ${graphScale}`,
     })
   }
 
@@ -210,7 +209,7 @@ export const DashboardContainer = ({ showLogParam = false }) => {
               <Generic style={{ marginBottom: '1rem' }}>
                 <GraphControls
                   scale
-                  showLog={showLog}
+                  graphScale={graphScale}
                   handleGraphScale={handleGraphScale}
                   secondaryGraph={globalConfirmed}
                   centered
@@ -221,7 +220,7 @@ export const DashboardContainer = ({ showLogParam = false }) => {
                 graphName="Cases"
                 secondaryGraph="Cases"
                 graph={globalConfirmed}
-                showLog={showLog}
+                graphScale={graphScale}
                 selected={[clientCountry.country]}
                 style={{ width: '100%', height: '100%' }}
               />
@@ -239,7 +238,7 @@ export const DashboardContainer = ({ showLogParam = false }) => {
               <Generic style={{ paddingBottom: '1rem' }}>
                 <GraphControls
                   scale
-                  showLog={showLog}
+                  graphScale={graphScale}
                   handleGraphScale={handleGraphScale}
                   secondaryGraph={globalTop10}
                   centered
@@ -250,7 +249,7 @@ export const DashboardContainer = ({ showLogParam = false }) => {
                 graphName="Cases"
                 secondaryGraph="Cases"
                 graph={globalTop10}
-                showLog={showLog}
+                graphScale={graphScale}
                 selected={globalNamesTop10}
               />
 
@@ -332,7 +331,7 @@ export const DashboardContainer = ({ showLogParam = false }) => {
             <Generic style={{ marginBottom: '1rem' }}>
               <GraphControls
                 scale
-                showLog={showLog}
+                graphScale={graphScale}
                 handleGraphScale={handleGraphScale}
                 secondaryGraph={usStateNamesTop10}
                 centered
@@ -343,7 +342,7 @@ export const DashboardContainer = ({ showLogParam = false }) => {
               graphName="Cases"
               secondaryGraph="Cases"
               graph={usStatesTop10}
-              showLog={showLog}
+              graphScale={graphScale}
               selected={usStateNamesTop10}
             />
           </Column>
@@ -357,7 +356,7 @@ export const DashboardContainer = ({ showLogParam = false }) => {
             <Generic style={{ marginBottom: '1rem' }}>
               <GraphControls
                 scale
-                showLog={showLog}
+                graphScale={graphScale}
                 handleGraphScale={handleGraphScale}
                 secondaryGraph={confirmedUSRegions}
                 centered
@@ -368,7 +367,7 @@ export const DashboardContainer = ({ showLogParam = false }) => {
               graphName="Cases"
               secondaryGraph="Cases"
               graph={confirmedUSRegions}
-              showLog={showLog}
+              graphScale={graphScale}
               selected={['Midwest', 'Northeast', 'South', 'West']}
             />
 

@@ -10,11 +10,13 @@ import {
   LAST_UPDATE_KEY,
   CLIENT_COUNTRY_KEY,
   CLIENT_COUNTRY_CODE_KEY,
+  DEBUG
 } from '../constants'
 
 
 import { groupByKey, roughSizeOfObject } from '../utils'
 
+import { extractLatestCounts, calculateMortality } from './utils'
 
 const countriesRegions = require('../constants/countries_regions.json')
 
@@ -292,48 +294,6 @@ export default function (state = initialState, action) {
   }
 }
 
-const calculateMortality = (deaths, confirmed) => {
-  const mortality = {}
-
-  if (deaths !== null && confirmed !== null) {
-    for (const country of Object.keys(deaths)) {
-      for (const date of Object.keys(deaths[country])) {
-        const deathAtDate = deaths[country][date]
-
-        if (!Object.prototype.hasOwnProperty.call(confirmed, country)) {
-          continue
-        }
-        const confirmedAtDate = confirmed[country][date]
-
-        if (!Object.prototype.hasOwnProperty.call(mortality, country)) {
-          mortality[country] = {}
-        }
-        mortality[country][date] = (deathAtDate / confirmedAtDate)
-      }
-    }
-  }
-
-  return { mortality }
-}
-
-const extractLatestCounts = (stats, daysAgo = 0) => {
-  const regionWithLatestCounts = []
-
-  for (const region of Object.keys(stats)) {
-    const dates = Object.keys(stats[region]).sort()
-
-    const lastDate = dates[dates.length - daysAgo - 1]
-
-    const yesterDate = dates[dates.length - daysAgo - 2]
-
-    const currentNumbers = stats[region][lastDate]
-    const yesterdayNumbers = stats[region][yesterDate]
-
-    regionWithLatestCounts.push({ region, stats: currentNumbers, dayChange: (currentNumbers - yesterdayNumbers) })
-  }
-
-  return regionWithLatestCounts
-}
 
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -342,7 +302,7 @@ const extractLatestCounts = (stats, daysAgo = 0) => {
 
 
 export function* fetchClientCountry() {
-  console.time('fetchClientCountry')
+  if(DEBUG) console.time('fetchClientCountry')
   const dataService = new DataService()
 
   let countryISO = store.get(CLIENT_COUNTRY_CODE_KEY) || 'US'
@@ -354,8 +314,6 @@ export function* fetchClientCountry() {
       const countryObject = yield call(dataService.fetchUserCountry)
       countryISO = countryObject.codeISO
       country = countryObject.name
-
-      console.log(`Data grabbed, countryISO: ${countryISO} and country: ${country}`)
     } catch (error) {
       console.error('Unable to grab data from fetchUserCountry service, defaulting to US')
       countryISO = 'US'
@@ -373,7 +331,7 @@ export function* fetchClientCountry() {
     },
   })
 
-  console.timeEnd('fetchClientCountry')
+  if(DEBUG) console.timeEnd('fetchClientCountry')
 }
 
 /**
@@ -382,15 +340,20 @@ export function* fetchClientCountry() {
 export function* fetchLastUpdate() {
   const dataService = new DataService()
 
-  const lastUpdate = yield call(dataService.fetchLastUpdate)
-  const lastUpdateAsNumeric = moment(lastUpdate).valueOf()
-  const lastUpdateLocalStorage = store.session.get(LAST_UPDATE_KEY)
+  try {
+    const lastUpdate = yield call(dataService.fetchLastUpdate)
+    const lastUpdateAsNumeric = moment(lastUpdate).valueOf()
+    const lastUpdateLocalStorage = store.session.get(LAST_UPDATE_KEY)
 
-  if (!lastUpdateLocalStorage || lastUpdateLocalStorage < lastUpdateAsNumeric) {
-    store.session.set(LAST_UPDATE_KEY, lastUpdateAsNumeric)
+    if (!lastUpdateLocalStorage || lastUpdateLocalStorage < lastUpdateAsNumeric) {
+      store.session.set(LAST_UPDATE_KEY, lastUpdateAsNumeric)
+    }
+
+    yield put({ type: types.FETCH_LAST_UPDATE_SUCCESS, payload: lastUpdateAsNumeric })
+  } catch(error) {
+    console.error(error)
+    yield put({ type: types.FETCH_LAST_UPDATE_ERROR })
   }
-
-  yield put({ type: types.FETCH_LAST_UPDATE_SUCCESS, payload: lastUpdateAsNumeric })
 }
 
 
@@ -516,11 +479,11 @@ export function* fetchUSCountiesStats({ payload }) {
   } catch (error) {
     console.error(error)
   }
-  console.timeEnd('fetchUSCountiesStats')
+  if(DEBUG) console.timeEnd('fetchUSCountiesStats')
 }
 
 export function* fetchUSStatesStats({ payload }) {
-  console.time('fetchUSStatesStats')
+  if(DEBUG) console.time('fetchUSStatesStats')
 
   const dataService = new DataService()
 
@@ -571,6 +534,7 @@ export function* fetchUSStatesStats({ payload }) {
       sorted = mortalityCounts.sort((a, b) => b.stats - a.stats)
     }
 
+    const confirmedByRegionKey = groupByKey('region', confirmedCounts)
     const deathByRegionKey = groupByKey('region', deathsCounts)
     const mortalityByRegionKey = groupByKey('region', mortalityCounts)
 
@@ -582,8 +546,8 @@ export function* fetchUSStatesStats({ payload }) {
       if (Object.prototype.hasOwnProperty.call(deathByRegionKey, region)) {
         statsTotals.push({
           region,
-          confirmed: data.stats,
-          confirmedDayChange: data.dayChange,
+          confirmed: confirmedByRegionKey[region].stats,
+          confirmedDayChange: confirmedByRegionKey[region].dayChange,
           deaths: deathByRegionKey[region].stats,
           deathsDayChange: deathByRegionKey[region].dayChange,
           mortality: mortalityByRegionKey[region].stats,
@@ -600,11 +564,11 @@ export function* fetchUSStatesStats({ payload }) {
     console.error(error)
   }
 
-  console.timeEnd('fetchUSStatesStats')
+  if(DEBUG) console.timeEnd('fetchUSStatesStats')
 }
 
 export function* fetchGlobalStats({ payload }) {
-  console.time('fetchGlobalStats')
+  if(DEBUG) console.time('fetchGlobalStats')
 
   let daysAgo = 0
   const sort = (payload && payload.sort) ? payload.sort : 'confirmed'
@@ -615,13 +579,13 @@ export function* fetchGlobalStats({ payload }) {
   const dataService = new DataService()
 
   try {
-    console.time('fetchGlobalStats.axios')
+    if(DEBUG) console.time('fetchGlobalStats.axios')
 
     const global = yield call(dataService.getGlobal)
 
     const { confirmed, deaths } = global
 
-    console.timeEnd('fetchGlobalStats.axios')
+    if(DEBUG) console.timeEnd('fetchGlobalStats.axios')
 
     for (const filterCountry of filterCountries) {
       delete confirmed[filterCountry]
@@ -644,6 +608,7 @@ export function* fetchGlobalStats({ payload }) {
       sorted = mortalityCounts.sort((a, b) => b.stats - a.stats)
     }
 
+    const confirmedByCountryKey = groupByKey('region', confirmedCounts)
     const deathByCountryKey = groupByKey('region', deathsCounts)
     const mortalityByCountryKey = groupByKey('region', mortalityCounts)
 
@@ -654,8 +619,8 @@ export function* fetchGlobalStats({ payload }) {
       if (Object.prototype.hasOwnProperty.call(deathByCountryKey, region)) {
         statsTotals.push({
           region,
-          confirmed: data.stats,
-          confirmedDayChange: data.dayChange,
+          confirmed: confirmedByCountryKey[region].stats,
+          confirmedDayChange: confirmedByCountryKey[region].dayChange,
           deaths: deathByCountryKey[region].stats,
           deathsDayChange: deathByCountryKey[region].dayChange,
           mortality: mortalityByCountryKey[region].stats,
@@ -674,7 +639,7 @@ export function* fetchGlobalStats({ payload }) {
     console.error(error)
   }
 
-  console.timeEnd('fetchGlobalStats')
+  if(DEBUG) console.timeEnd('fetchGlobalStats')
 }
 
 export function* fetchTotalGlobalStats() {
@@ -754,16 +719,16 @@ const filterCountries = [
 ]
 
 export function* fetchGlobalPredictions() {
-  console.time('fetchGlobalPredictions')
+  if(DEBUG) console.time('fetchGlobalPredictions')
 
   const dataService = new DataService()
 
   try {
-    console.time('fetchGlobalPredictions.axios')
+    if(DEBUG) console.time('fetchGlobalPredictions.axios')
 
     const globalPredictions = yield call(dataService.getGlobalPredictions)
 
-    console.timeEnd('fetchGlobalPredictions.axios')
+    if(DEBUG) console.timeEnd('fetchGlobalPredictions.axios')
 
     yield put(
       {
@@ -775,20 +740,20 @@ export function* fetchGlobalPredictions() {
     console.error(error)
   }
 
-  console.timeEnd('fetchGlobalPredictions')
+  if(DEBUG) console.timeEnd('fetchGlobalPredictions')
 }
 
 export function* fetchUSPredictions() {
-  console.time('fetchUSPredictions')
+  if(DEBUG) console.time('fetchUSPredictions')
 
   const dataService = new DataService()
 
   try {
-    console.time('fetchUSPredictions.axios')
+    if(DEBUG) console.time('fetchUSPredictions.axios')
 
     const usPredictions = yield call(dataService.getUSPredictions)
 
-    console.timeEnd('fetchUSPredictions.axios')
+    if(DEBUG) console.timeEnd('fetchUSPredictions.axios')
 
     yield put(
       {
@@ -800,23 +765,23 @@ export function* fetchUSPredictions() {
     console.error(error)
   }
 
-  console.timeEnd('fetchUSPredictions')
+  if(DEBUG) console.timeEnd('fetchUSPredictions')
 }
 
 export function* fetchGlobal() {
-  console.time('fetchGlobal')
+  if(DEBUG) console.time('fetchGlobal')
 
   const dataService = new DataService()
 
   try {
-    console.time('fetchGlobal.axios')
+    if(DEBUG) console.time('fetchGlobal.axios')
 
     const global = yield call(dataService.getGlobal)
 
     const { confirmed } = global
     const { deaths } = global
 
-    console.timeEnd('fetchGlobal.axios')
+    if(DEBUG) console.timeEnd('fetchGlobal.axios')
 
     for (const filterCountry of filterCountries) {
       delete confirmed[filterCountry]
@@ -863,11 +828,11 @@ export function* fetchGlobal() {
     console.error(error)
   }
 
-  console.timeEnd('fetchGlobal')
+  if(DEBUG) console.timeEnd('fetchGlobal')
 }
 
 export function* fetchRegion({ payload }) {
-  console.time('fetchRegion')
+  if(DEBUG) console.time('fetchRegion')
 
   const dataService = new DataService()
 
@@ -879,13 +844,13 @@ export function* fetchRegion({ payload }) {
   }
 
   try {
-    console.time('fetchRegion.axios')
+    if(DEBUG) console.time('fetchRegion.axios')
 
     const global = yield call(dataService.getGlobal)
 
     const { confirmed, deaths } = global
 
-    console.timeEnd('fetchRegion.axios')
+    if(DEBUG) console.timeEnd('fetchRegion.axios')
 
     for (const country of Object.keys(confirmed)) {
       if (countriesRegions[country] !== region) {
@@ -934,22 +899,22 @@ export function* fetchRegion({ payload }) {
     console.error(error)
   }
 
-  console.timeEnd('fetchRegion')
+  if(DEBUG) console.timeEnd('fetchRegion')
 }
 
 export function* fetchContinental() {
-  console.time('fetchContinental')
+  if(DEBUG) console.time('fetchContinental')
 
   const dataService = new DataService()
 
   try {
-    console.time('fetchContinental.axios')
+    if(DEBUG) console.time('fetchContinental.axios')
 
     const continental = yield call(dataService.getContinental)
 
     const { confirmed } = continental
     const { deaths } = continental
-    console.timeEnd('fetchContinental.axios')
+    if(DEBUG) console.timeEnd('fetchContinental.axios')
 
     delete confirmed['Continental Region']
     delete deaths['Continental Region']
@@ -994,18 +959,18 @@ export function* fetchContinental() {
     console.error(error)
   }
 
-  console.timeEnd('fetchContinental')
+  if(DEBUG) console.timeEnd('fetchContinental')
 }
 
 const filterStates = []
 
 export function* fetchUSStates() {
-  console.time('fetchUSStates')
+  if(DEBUG) console.time('fetchUSStates')
 
   const dataService = new DataService()
 
   try {
-    console.time('fetchUSStates.axios')
+    if(DEBUG) console.time('fetchUSStates.axios')
 
     const us_states = yield call(dataService.getUSStates)
 
@@ -1014,7 +979,7 @@ export function* fetchUSStates() {
     const { hospitalBeds } = us_states
     const { allCounties } = us_states
 
-    console.timeEnd('fetchUSStates.axios')
+    if(DEBUG) console.timeEnd('fetchUSStates.axios')
 
     for (const filterState of filterStates) {
       delete confirmed[filterState]
@@ -1066,22 +1031,22 @@ export function* fetchUSStates() {
     console.error(error)
   }
 
-  console.timeEnd('fetchUSStates')
+  if(DEBUG) console.timeEnd('fetchUSStates')
 }
 
 export function* fetchUSRegions() {
-  console.time('fetchUSRegions')
+  if(DEBUG) console.time('fetchUSRegions')
 
   const dataService = new DataService()
 
   try {
-    console.time('fetchUSRegions.axios')
+    if(DEBUG) console.time('fetchUSRegions.axios')
 
     const us_regions = yield call(dataService.getUSRegions)
 
     const { confirmed } = us_regions
     const { deaths } = us_regions
-    console.timeEnd('fetchUSRegions.axios')
+    if(DEBUG) console.timeEnd('fetchUSRegions.axios')
 
     const latestCounts = extractLatestCounts(confirmed)
 
@@ -1102,7 +1067,7 @@ export function* fetchUSRegions() {
     console.error(error)
   }
 
-  console.timeEnd('fetchUSRegions')
+  if(DEBUG) console.timeEnd('fetchUSRegions')
 }
 
 export const sagas = [
