@@ -25,6 +25,8 @@ import NewsletterModal from '../components/NewsletterModal'
 import { TERMS } from '../constants/dictionary'
 import { DASHBOARD_GRAPH_SCALE_KEY, NEWSLETTER_SIGNUP_KEY } from '../constants'
 
+import { graphScaleOrDefault } from '../utils'
+
 import GraphControls from '../components/GraphControls'
 
 
@@ -39,7 +41,7 @@ export const DashboardContainer = ({ graphScaleParam = false }) => {
   const changePageTitle = useChangePageTitle()
 
   const clientCountry = useClientCountry()
-  const [graphScale, setGraphScale] = useState(graphScaleParam)
+  const [graphScale, setGraphScale] = useState(graphScaleOrDefault(graphScaleParam))
 
   // const [tzGuess, setTzGuess] = useState(moment.tz.guess())
 
@@ -58,7 +60,7 @@ export const DashboardContainer = ({ graphScaleParam = false }) => {
     dispatch(actions.fetchGlobal())
 
     if (store.get(DASHBOARD_GRAPH_SCALE_KEY)) {
-      setGraphScale(store.get(DASHBOARD_GRAPH_SCALE_KEY))
+      setGraphScale(graphScaleOrDefault(store.get(DASHBOARD_GRAPH_SCALE_KEY)))
     }
   }, [dispatch])
 
