@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import numeral from 'numeral'
-import { Tag, Generic, Title } from 'rbx'
+import { Tag, Title } from 'rbx'
 import ReactGA from 'react-ga'
 import store from 'store2'
 import { useChangePageTitle } from '../hooks/ui'
@@ -14,8 +14,9 @@ import { useGraphData } from '../hooks/graphData'
 
 import { actions } from '../ducks/services'
 
+import { renderDisplay } from '../utils'
 
-import { REGION_URLS, US_REGION_SELECT_KEY, US_GRAPH_SCALE_KEY } from '../constants'
+import { US_REGION_SELECT_KEY, US_GRAPH_SCALE_KEY, GRAPHSCALE_TYPES } from '../constants'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -23,17 +24,17 @@ import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
-
+import ExternalLink from '../components/ExternalLink'
 
 export const USGraphContainer = ({
-  region = [], graph = 'Cases', showLogParam = false, showPredictionsParam = false,
+  region = [], graph = 'Cases', graphScaleParam = false, showPredictionsParam = false,
 }) => {
   const dispatch = useDispatch()
   const { search } = useLocation()
   const handleHistory = useHandleHistory('/covid/us')
   const changePageTitle = useChangePageTitle()
 
-  const [showLog, setShowLog] = useState(showLogParam)
+  const [graphScale, setGraphScale] = useState(graphScaleParam)
   const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
   const [selectedStates, setSelectedStates] = useState(region)
   const [secondaryGraph, setSecondaryGraph] = useState(graph)
@@ -46,14 +47,6 @@ export const USGraphContainer = ({
   const usPredictions = useSelector((state) => state.services.usPredictions)
 
   const [confirmedTotal, setConfirmedTotal] = useState(0)
-
-  const renderDisplay = (value) => (value.startsWith('!') ? value.substring(1) : value)
-
-  const isExternalLinkAvailable = (key) => Object.prototype.hasOwnProperty.call(REGION_URLS, key)
-
-  const redirectToExternalLink = (key) => {
-    if (Object.prototype.hasOwnProperty.call(REGION_URLS, key)) window.open(REGION_URLS[key], '_blank')
-  }
 
   useEffect(() => {
     if (usStatesStats) {
@@ -75,11 +68,11 @@ export const USGraphContainer = ({
       }
 
       setSelectedStates(newSelectedStates)
-      handleHistory(newSelectedStates, secondaryGraph, showLog, showPredictions)
+      handleHistory(newSelectedStates, secondaryGraph, graphScale, showPredictions)
     } else if (showPredictions) {
       if ((region.length === 1 && !Object.prototype.hasOwnProperty.call(usPredictions, region)) || region.length > 1) {
         setSelectedStates(['New York'])
-        handleHistory(['New York'], secondaryGraph, showLog, showPredictions)
+        handleHistory(['New York'], secondaryGraph, graphScale, showPredictions)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,13 +84,13 @@ export const USGraphContainer = ({
     dispatch(actions.fetchTotalUSStatesStats())
 
     if (store.get(US_GRAPH_SCALE_KEY)) {
-      setShowLog(store.get(US_GRAPH_SCALE_KEY))
+      setGraphScale(store.get(US_GRAPH_SCALE_KEY))
     }
   }, [dispatch])
 
   useEffect(() => {
     if (!search) {
-      handleHistory(selectedStates, secondaryGraph, showLog, showPredictions)
+      handleHistory(selectedStates, secondaryGraph, graphScale, showPredictions)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -113,7 +106,7 @@ export const USGraphContainer = ({
 
   const handleSelectedRegion = (regionList) => {
     setSelectedStates(regionList)
-    handleHistory(regionList, graph, showLog, showPredictions)
+    handleHistory(regionList, graph, graphScale, showPredictions)
 
     let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
 
@@ -132,7 +125,7 @@ export const USGraphContainer = ({
 
   const handleSelectedGraph = (selectedGraph) => {
     setSecondaryGraph(selectedGraph)
-    handleHistory(selectedStates, graph, showLog, showPredictions)
+    handleHistory(selectedStates, graph, graphScale, showPredictions)
 
     ReactGA.event({
       category: 'Region:United States',
@@ -140,15 +133,15 @@ export const USGraphContainer = ({
     })
   }
 
-  const handleGraphScale = (logScale) => {
-    setShowLog(logScale)
-    store.set(US_GRAPH_SCALE_KEY, logScale)
+  const handleGraphScale = (graphScale) => {
+    setGraphScale(graphScale)
+    store.set(US_GRAPH_SCALE_KEY, graphScale)
 
-    handleHistory(selectedStates, secondaryGraph, logScale, showPredictions)
+    handleHistory(selectedStates, secondaryGraph, graphScale, showPredictions)
 
     ReactGA.event({
       category: 'Region:United States',
-      action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`,
+      action: `Changed graph scale to ${graphScale}`,
     })
   }
 
@@ -160,7 +153,7 @@ export const USGraphContainer = ({
       setSelectedStates(historicSelectedStates)
     }
     setShowPredictions(!showPredictions)
-    handleHistory(historicSelectedStates, secondaryGraph, showLog, !showPredictions)
+    handleHistory(historicSelectedStates, secondaryGraph, graphScale, !showPredictions)
   }
 
   return (
@@ -189,7 +182,7 @@ export const USGraphContainer = ({
               showPredictions={showPredictions}
               predictions={usPredictions}
               secondaryGraph={secondaryGraph}
-              showLog={showLog}
+              graphScale={graphScale}
               parentRegion="US"
             />
           </>
@@ -204,13 +197,13 @@ export const USGraphContainer = ({
             handleGraphScale={handleGraphScale}
             handleShowPredictions={handleShowPredictions}
             predictions={usPredictions}
-            showLog={showLog}
+            graphScale={graphScale}
             showPredictions={showPredictions}
             parentRegion="US"
           />
 
           <>
-            { !showLog
+            { graphScale === GRAPHSCALE_TYPES.LINEAR
                     && (
                     <>
                       <Tag size="large" color="danger">
@@ -228,7 +221,16 @@ export const USGraphContainer = ({
             <ul>
               {selectedStates.map((region, idx) => (
                 <React.Fragment key={idx}>
-                  <li><Generic as="a" tooltipPosition="left" onClick={() => { redirectToExternalLink(region) }} tooltip={isExternalLinkAvailable(region) ? null : 'No external link for region yet'}>{renderDisplay(region)}</Generic></li>
+                  <li>
+                      <ExternalLink 
+                          key={region} 
+                          externalKey={region}
+                          category="Graph:US" 
+                          tooltipText="No external link for region yet" 
+                      >
+                          {renderDisplay(region)}
+                      </ExternalLink>
+                  </li>
                 </React.Fragment>
               ))}
             </ul>

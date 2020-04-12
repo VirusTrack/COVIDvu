@@ -19,12 +19,12 @@ import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 
-export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', showLogParam = false }) => {
+export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', graphScaleParam = false }) => {
   const dispatch = useDispatch()
   const { search } = useLocation()
   const handleHistory = useHandleHistory('/covid/continental')
 
-  const [showLog, setShowLog] = useState(showLogParam)
+  const [graphScale, setGraphScale] = useState(graphScaleParam)
   const [selectedContinents, setSelectedContinents] = useState(region)
   const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
@@ -56,7 +56,7 @@ export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', showLo
 
   const handleSelectedRegion = (regionList) => {
     setSelectedContinents(regionList)
-    handleHistory(regionList, secondaryGraph, showLog)
+    handleHistory(regionList, secondaryGraph, graphScale)
 
     ReactGA.event({
       category: 'Region:Continental',
@@ -66,7 +66,7 @@ export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', showLo
 
   const handleSelectedGraph = (selectedGraph) => {
     setSecondaryGraph(selectedGraph)
-    handleHistory(selectedContinents, selectedGraph, showLog)
+    handleHistory(selectedContinents, selectedGraph, graphScale)
 
     ReactGA.event({
       category: 'Region:Continental',
@@ -74,13 +74,13 @@ export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', showLo
     })
   }
 
-  const handleGraphScale = (logScale) => {
-    setShowLog(logScale)
-    handleHistory(selectedContinents, secondaryGraph, logScale)
+  const handleGraphScale = (graphScale) => {
+    setGraphScale(graphScale)
+    handleHistory(selectedContinents, secondaryGraph, graphScale)
 
     ReactGA.event({
       category: 'Region:Continental',
-      action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`,
+      action: `Changed graph scale to ${graphScale}`,
     })
   }
 
@@ -104,7 +104,7 @@ export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', showLo
             selected={selectedContinents}
             handleSelected={(dataList) => handleSelectedRegion(dataList)}
             defaultSelected={region}
-            showLog={showLog}
+            graphScale={graphScale}
             parentRegion="Continental"
           />
 
@@ -116,7 +116,7 @@ export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', showLo
             selected={selectedContinents}
             handleSelectedGraph={handleSelectedGraph}
             handleGraphScale={handleGraphScale}
-            showLog={showLog}
+            graphScale={graphScale}
           />
 
         </TwoGraphLayout>

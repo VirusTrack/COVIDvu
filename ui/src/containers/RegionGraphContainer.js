@@ -22,13 +22,13 @@ import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 const countriesRegions = require('../constants/countries_regions.json')
 
 export const RegionGraphContainer = ({
-  region, uniqueRegion = [], graph = 'Cases', showLogParam = false,
+  region, uniqueRegion = [], graph = 'Cases', graphScaleParam = false,
 }) => {
   const dispatch = useDispatch()
   // const { search } = useLocation()
   const handleHistory = useHandleHistory(`/covid/region/${region}`)
 
-  const [showLog, setShowLog] = useState(showLogParam)
+  const [graphScale, setGraphScale] = useState(graphScaleParam)
   const [selectedRegions, setSelectedRegions] = useState(uniqueRegion)
   const [secondaryGraph, setSecondaryGraph] = useState(graph)
 
@@ -52,7 +52,7 @@ export const RegionGraphContainer = ({
       setRegionNotFound(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, region, showLog])
+  }, [dispatch, region, graphScale])
 
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
@@ -64,7 +64,7 @@ export const RegionGraphContainer = ({
 
   const handleSelectedRegion = (regionList) => {
     setSelectedRegions(regionList)
-    handleHistory(regionList, secondaryGraph, showLog)
+    handleHistory(regionList, secondaryGraph, graphScale)
 
     ReactGA.event({
       category: `Region:${region}`,
@@ -74,7 +74,7 @@ export const RegionGraphContainer = ({
 
   const handleSelectedGraph = (selectedGraph) => {
     setSecondaryGraph(selectedGraph)
-    handleHistory(selectedRegions, selectedGraph, showLog)
+    handleHistory(selectedRegions, selectedGraph, graphScale)
 
     ReactGA.event({
       category: `Region:${region}`,
@@ -82,13 +82,13 @@ export const RegionGraphContainer = ({
     })
   }
 
-  const handleGraphScale = (logScale) => {
-    setShowLog(logScale)
-    handleHistory(selectedRegions, secondaryGraph, logScale)
+  const handleGraphScale = (graphScale) => {
+    setGraphScale(graphScale)
+    handleHistory(selectedRegions, secondaryGraph, graphScale)
 
     ReactGA.event({
       category: `Region:${region}`,
-      action: `Changed graph scale to ${logScale ? 'logarithmic' : 'linear'}`,
+      action: `Changed graph scale to ${graphScale}`,
     })
   }
 
@@ -127,7 +127,7 @@ export const RegionGraphContainer = ({
               selected={selectedRegions}
               handleSelected={(dataList) => handleSelectedRegion(dataList)}
               defaultSelected={uniqueRegion}
-              showLog={showLog}
+              graphScale={graphScale}
               parentRegion={region}
             />
 
@@ -141,7 +141,7 @@ export const RegionGraphContainer = ({
             selected={selectedRegions}
             handleSelectedGraph={handleSelectedGraph}
             handleGraphScale={handleGraphScale}
-            showLog={showLog}
+            graphScale={graphScale}
           />
 
         </TwoGraphLayout>

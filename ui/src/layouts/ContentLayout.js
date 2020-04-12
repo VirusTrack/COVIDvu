@@ -15,7 +15,7 @@ export const ContentLayout = ({ children }) => {
       <Section>
         <Column.Group centered>
           <Column size="half">
-            {nodes[0]}
+                {nodes[0]}
           </Column>
         </Column.Group>
       </Section>

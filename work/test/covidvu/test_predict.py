@@ -3,47 +3,44 @@
 # vim: set fileencoding=utf-8:
 
 import json
-import numpy as np
 import os
-import pandas as pd
 import re
+
+import numpy as np
+import pandas as pd
 
 from numpy import ndarray
 from os.path import join
+
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.datetimes import DatetimeIndex
 from pandas.core.series import Series
 from pystan.model import StanModel
 
-from covidvu.predict import _castPredictionsAsTS
-from covidvu.predict import _dumpRegionPrediction
-from covidvu.predict import _dumpPredictionCollectionAsJSON
-from covidvu.predict import _dumpTimeSeriesAsJSON
-from covidvu.predict import _getPredictionsFromPosteriorSamples
-from covidvu.predict import buildLogisticModel
-from covidvu.predict import castPercentilesAsDF
-from covidvu.predict import getSavedShortCountryNames
-from covidvu.predict import load
-from covidvu.predict import loadAll
+from covidvu.cryostation import Cryostation
 from covidvu.predict import MIN_CASES_FILTER
-from covidvu.predict import predictRegions
-from covidvu.predict import predictLogisticGrowth
 from covidvu.predict import PREDICTIONS_PERCENTILES
 from covidvu.predict import PRIOR_GROWTH_RATE
 from covidvu.predict import PRIOR_LOG_CARRYING_CAPACITY
 from covidvu.predict import PRIOR_MID_POINT
 from covidvu.predict import PRIOR_SIGMA
+from covidvu.predict import _castPredictionsAsTS
+from covidvu.predict import _dumpPredictionCollectionAsJSON
+from covidvu.predict import _dumpRegionPrediction
+from covidvu.predict import _dumpTimeSeriesAsJSON
+from covidvu.predict import _getPredictionsFromPosteriorSamples
+from covidvu.predict import buildLogisticModel
+from covidvu.predict import castPercentilesAsDF
+from covidvu.predict import getSavedPredictionRegionNames
+from covidvu.predict import load
+from covidvu.predict import loadAll
+from covidvu.predict import predictLogisticGrowth
+from covidvu.predict import predictRegions
 
 
 # *** constants ***
 TEST_SITE_DATA = os.path.join(os.getcwd(), 'resources', 'test_site_data')
-TEST_JH_CSSE_PATH = os.path.join(os.getcwd(), 'resources', 'test_COVID-19','csse_covid_19_data','csse_covid_19_time_series')
-TEST_JH_CSSE_FILE_CONFIRMED    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_global.csv')
-TEST_JH_CSSE_FILE_DEATHS       = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_global.csv')
-TEST_JH_CSSE_FILE_CONFIRMED_US = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_confirmed_US.csv')
-TEST_JH_CSSE_FILE_DEATHS_US    = os.path.join(TEST_JH_CSSE_PATH, 'time_series_covid19_deaths_US')
-
-TEST_JH_CSSE_FILE_CONFIRMED_SMALL = os.path.join(TEST_JH_CSSE_PATH,  'time_series_covid19_confirmed_global_small.csv')
+TEST_DATABASE_PATH = './database/virustrack.db'
 TEST_N_SAMPLES = 1000
 TEST_N_CHAINS = 2
 
@@ -101,12 +98,7 @@ def test_buildLogisticModel():
 def test_predictLogisticGrowth():
     nDaysPredict = 10
     prediction = predictLogisticGrowth(logGrowthModel,
-                                       regionName                   = 'US',
-                                       siteData                      = TEST_SITE_DATA,
-                                       jhCSSEFileConfirmed           = TEST_JH_CSSE_FILE_CONFIRMED,
-                                       jhCSSEFileDeaths              = TEST_JH_CSSE_FILE_DEATHS,
-                                       jhCSSEFileConfirmedUS         = TEST_JH_CSSE_FILE_CONFIRMED_US,
-                                       jhCSSEFileDeathsUS            = TEST_JH_CSSE_FILE_DEATHS_US,
+                                       'US',
                                        nSamples                      = TEST_N_SAMPLES,
                                        nChains                       = TEST_N_CHAINS,
                                        nDaysPredict                  = nDaysPredict,
@@ -127,7 +119,6 @@ def test_predictLogisticGrowth():
     return prediction
 
 
-
 def test_castPercentilesAsDF():
     prediction = test_predictLogisticGrowth()
     percentiles = castPercentilesAsDF(prediction['predictionsPercentilesTS'], PREDICTIONS_PERCENTILES)
@@ -136,7 +127,6 @@ def test_castPercentilesAsDF():
     assert '25' in percentiles.columns
     assert '75' in percentiles.columns
     assert '97.5' in percentiles.columns
-
 
 
 def test__dumpCountryPrediction():
@@ -150,7 +140,6 @@ def test__dumpCountryPrediction():
         raise e
     finally:
         _purge(TEST_SITE_DATA, '.json')
-
 
 
 def test__getPredictionsFromPosteriorSamples():
@@ -172,7 +161,6 @@ def test__getPredictionsFromPosteriorSamples():
     prediction['predictionsPercentiles'] = predictionsPercentiles
     prediction['nDaysPredict'] = nDaysPredict
     return prediction
-
 
 
 def test__castPredictionsAsTS():
@@ -199,7 +187,6 @@ def test__castPredictionsAsTS():
     return predictionsMeanTS, predictionsPercentilesTS, predictions
 
 
-
 def test__dumpPredictionCollectionAsJSON():
     predictionsMeanTS, predictionsPercentilesTS, predictions = test__castPredictionsAsTS()
     try:
@@ -215,39 +202,49 @@ def test__dumpPredictionCollectionAsJSON():
         _purge(TEST_SITE_DATA, '.json')
 
 
-
 def test_predictCountries():
     try:
-        predictRegions(0,
+        predictRegions('US',
                        nDaysPredict=10,
                        siteData=TEST_SITE_DATA,
-                       jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
-                       jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
-                       jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
-                       jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
                        logGrowthModel=logGrowthModel,
                        nSamples=TEST_N_SAMPLES,
                        nChains=TEST_N_CHAINS,
+                       databasePath=TEST_DATABASE_PATH,
                        )
         _assertValidJSON(join(TEST_SITE_DATA,'prediction-world-mean-US.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
 
-        predictRegions('all',
+        predictRegions('Alabama',
+                       regionType='stateUS',
                        nDaysPredict=10,
                        siteData=TEST_SITE_DATA,
-                       jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-                       jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
-                       jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
-                       jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
                        logGrowthModel=logGrowthModel,
                        nSamples=TEST_N_SAMPLES,
                        nChains=TEST_N_CHAINS,
+                       databasePath=TEST_DATABASE_PATH,
                        )
-
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-mean-Italy.json'))
-        _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-Italy.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-mean-US.json'))
         _assertValidJSON(join(TEST_SITE_DATA, 'prediction-world-conf-int-US.json'))
+
+        nLimitRegions=2
+
+        with Cryostation(TEST_DATABASE_PATH) as cs:
+            countries = cs.allCountryNames()
+
+        predictRegions('all',
+                       regionType='country',
+                       nDaysPredict=10,
+                       siteData=TEST_SITE_DATA,
+                       logGrowthModel=logGrowthModel,
+                       nSamples=TEST_N_SAMPLES,
+                       nChains=TEST_N_CHAINS,
+                       nLimitRegions=nLimitRegions,
+                       databasePath=TEST_DATABASE_PATH,
+                       )
+
+        for i in range(nLimitRegions):
+            _assertValidJSON(join(TEST_SITE_DATA, f'prediction-world-mean-{countries[i]}.json'))
 
     except Exception as e:
         raise e
@@ -255,19 +252,19 @@ def test_predictCountries():
         _purge(TEST_SITE_DATA, '.json')
 
 
-
 def test_load():
     try:
+        nLimitRegions = 2
+
         predictRegions('all',
+                       regionType='country',
                        nDaysPredict=10,
                        siteData=TEST_SITE_DATA,
-                       jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-                       jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
-                       jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
-                       jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
                        logGrowthModel=logGrowthModel,
                        nSamples=TEST_N_SAMPLES,
                        nChains=TEST_N_CHAINS,
+                       nLimitRegions=nLimitRegions,
+                       databasePath=TEST_DATABASE_PATH,
                        )
 
 
@@ -282,45 +279,36 @@ def test_load():
         _purge(TEST_SITE_DATA, '.json')
 
 
-
 def test_getSavedShortCountryNames():
     try:
+        nLimitRegions = 2
         predictRegions('all',
+                       regionType='country',
                        nDaysPredict=10,
                        siteData=TEST_SITE_DATA,
-                       jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED_SMALL,
-                       jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
-                       jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
-                       jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
                        logGrowthModel=logGrowthModel,
                        nSamples=TEST_N_SAMPLES,
                        nChains=TEST_N_CHAINS,
+                       nLimitRegions=nLimitRegions,
+                       databasePath=TEST_DATABASE_PATH,
                        )
-        regionNameShortAll = getSavedShortCountryNames(siteData=TEST_SITE_DATA)
+
+        regionNameShortAll = getSavedPredictionRegionNames(siteData=TEST_SITE_DATA)
         assert isinstance(regionNameShortAll, list)
-        assert len(regionNameShortAll) == 3
+        assert len(regionNameShortAll) == 2
     except Exception as e:
         raise e
     finally:
         _purge(TEST_SITE_DATA, '.json')
 
 
-
 def test_loadAll():
-    try:
-        confirmedCasesAll, meanPredictionTSAll, percentilesTSAll, = loadAll(
-            siteData=join(TEST_SITE_DATA, 'test-predictions'),
-            jhCSSEFileConfirmed=TEST_JH_CSSE_FILE_CONFIRMED,
-            jhCSSEFileDeaths=TEST_JH_CSSE_FILE_DEATHS,
-            jhCSSEFileConfirmedUS=TEST_JH_CSSE_FILE_CONFIRMED_US,
-            jhCSSEFileDeathsUS=TEST_JH_CSSE_FILE_DEATHS_US,
-            )
-        assert isinstance(confirmedCasesAll, DataFrame)
-        assert isinstance(meanPredictionTSAll, DataFrame)
-        assert isinstance(percentilesTSAll, DataFrame)
-    except Exception as e:
-        raise e
-    finally:
-        _purge(join(TEST_SITE_DATA, 'test-predictions'), 'confirmed.*\w?.json')
+    meanPredictionTSAll, percentilesTSAll, = loadAll(
+        siteData=join(TEST_SITE_DATA, 'test-predictions'),
+
+        )
+    assert isinstance(meanPredictionTSAll, DataFrame)
+    assert isinstance(percentilesTSAll, DataFrame)
+
 
 

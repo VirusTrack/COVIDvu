@@ -1,8 +1,9 @@
 import React from 'react'
 
-import { Tab } from 'rbx'
+import { Tab, Notification, Title } from 'rbx'
 
 import { TERMS } from '../constants/dictionary'
+import { GRAPHSCALE_TYPES } from '../constants'
 
 import GraphControls from './GraphControls'
 import GraphWithLoader from './GraphWithLoader'
@@ -19,6 +20,8 @@ export const TabbedCompareGraphs = (
     handleGraphScale,
     handleShowPredictions,
     predictions,
+    graphScale = GRAPHSCALE_TYPES.LINEAR,
+
     showLog,
     showPredictions,
     parentRegion,
@@ -92,6 +95,7 @@ export const TabbedCompareGraphs = (
         className="TabbedCompareGraphs__controls"
         scale
         showLog={showLog}
+        graphScale={graphScale}
         handleGraphScale={handleGraphScale}
         showPredictions={showPredictions}
         handleShowPredictions={handleShowPredictions}
@@ -103,6 +107,16 @@ export const TabbedCompareGraphs = (
         downloadImage
         htmlId={htmlId}
       />
+
+{ graphScale === GRAPHSCALE_TYPES.SLOPE &&
+      <Notification>
+        <Title size={4}>
+          Reproduction Rates for selected regions
+        </Title>
+        All regions shown for confirmed cases after first 100 cases forward, and for deaths after first 10 cases. The dashed line shows the 
+        reproduction rate based on the number of days.
+      </Notification>
+      }
 
       { (showPredictions && secondaryGraph === 'Cases')
                 && (
@@ -124,7 +138,7 @@ export const TabbedCompareGraphs = (
                   secondaryGraph={secondaryGraph}
                   graph={confirmed}
                   selected={selected}
-                  showLog={showLog}
+                  graphScale={graphScale}
                   y_title="Total confirmed cases"
                 />
                 )}
@@ -135,7 +149,7 @@ export const TabbedCompareGraphs = (
         secondaryGraph={secondaryGraph}
         graph={deaths}
         selected={selected}
-        showLog={showLog}
+        graphScale={graphScale}
         y_title="Number of deaths"
       />
 

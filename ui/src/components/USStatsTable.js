@@ -1,14 +1,15 @@
 import React from 'react'
 
 import numeral from 'numeral'
-import { Title, Generic, Table } from 'rbx'
+import { Title, Table } from 'rbx'
 import { TERMS } from '../constants/dictionary'
 
-
-import { ColumnSortIcon } from './ColumnSortIcon'
+import { SortedTableHeading } from './SortedTableHeading'
+import ExternalLink from '../components/ExternalLink'
+import { renderDisplay } from '../utils'
 
 export const USStatsTable = ({
-  statsForGraph, redirectToExternalLink, isExternalLinkAvailable, renderDisplay, sort, onSort,
+  statsForGraph, sort, onSort,
 }) => (
 
   <div className="table-container">
@@ -18,37 +19,48 @@ export const USStatsTable = ({
           <Table.Heading>
             Region
           </Table.Heading>
-          <Table.Heading onClick={() => { onSort('confirmed') }} style={{ cursor: 'pointer' }}>
-            Total Cases
-            {sort === 'confirmed'
-                            && <ColumnSortIcon direction="desc" />}
-          </Table.Heading>
+          <SortedTableHeading 
+              onSort={() => {onSort('confirmed')}} 
+              heading="Total Cases" 
+              selectedSort={sort === 'confirmed'} 
+              direction='desc' 
+          />
           <Table.Heading>
             New Cases
           </Table.Heading>
           <Table.Heading tooltipPosition="bottom" tooltip="Total not-for-profit beds in each state">
             Total Hospital Beds
           </Table.Heading>
-          <Table.Heading onClick={() => { onSort('deaths') }} style={{ cursor: 'pointer' }}>
-            Deaths
-            {sort === 'deaths'
-                            && <ColumnSortIcon direction="desc" />}
-          </Table.Heading>
+          <SortedTableHeading 
+              onSort={() => {onSort('deaths')}} 
+              heading="Deaths" 
+              selectedSort={sort === 'deaths'} 
+              direction='desc' 
+          />
           <Table.Heading>
             New Deaths
           </Table.Heading>
-          <Table.Heading tooltipPosition="left" tooltip={TERMS.CFR_DEFINITION} onClick={() => { onSort('mortality') }} style={{ cursor: 'pointer' }}>
-            Case Fatality Rate
-            {sort === 'mortality'
-                            && <ColumnSortIcon direction="desc" />}
-          </Table.Heading>
+          <SortedTableHeading 
+              onSort={() => {onSort('mortality')}} 
+              heading="Case Fatality Rate" 
+              selectedSort={sort === 'mortality'} 
+              direction='desc' 
+              tooltipPosition="bottom"
+              tooltip={TERMS.CFR_DEFINITION}
+          />
         </Table.Row>
       </Table.Head>
       <Table.Body>
         { statsForGraph ? statsForGraph.map((stat, idx) => (
           <Table.Row key={idx}>
             <Table.Cell>
-              <Generic as="a" tooltipPosition="right" onClick={() => { redirectToExternalLink(stat.region) }} tooltip={isExternalLinkAvailable(stat.region) ? null : 'No external link for region yet'} textColor={isExternalLinkAvailable(stat.region) ? 'link' : 'black'}>{renderDisplay(stat.region)}</Generic>
+                <ExternalLink 
+                    externalKey={stat.region}
+                    category="Stats:US" 
+                    tooltipText="No external link for region yet" 
+                >
+                    {renderDisplay(stat.region)}
+                </ExternalLink>
             </Table.Cell>
             <Table.Cell>
               <Title size={5}>{numeral(stat.confirmed).format('0,0')}</Title>
