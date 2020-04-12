@@ -116,7 +116,7 @@ export const Graph = ({
 
     setPlotsAsValues(Object.values(plots).sort((a, b) => a.order - b.order))
 
-  }, [selected, data, y_type, graphScale, start])
+  }, [selected, data, y_type, graphScale, start, graphName])
 
   const mergeConfig = {
     ...config,
