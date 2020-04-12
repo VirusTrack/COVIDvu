@@ -140,7 +140,6 @@ export const GlobalGraphContainer = ({
   }
 
   const handleGraphScale = (graphScale) => {
-    console.log(`handleGraphScale: ${graphScale}`)
     setGraphScale(graphScale)
     store.set(GLOBAL_GRAPH_SCALE_KEY, graphScale)
 

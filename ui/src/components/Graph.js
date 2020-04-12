@@ -113,7 +113,6 @@ export const Graph = ({
         }
       }      
     }
-    console.dir(Object.values(plots).sort((a, b) => a.order - b.order))
 
     setPlotsAsValues(Object.values(plots).sort((a, b) => a.order - b.order))
 
