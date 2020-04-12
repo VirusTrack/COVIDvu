@@ -4,6 +4,7 @@
 
 
 from covidvu import utils
+from covidvu.config import SITE_DATA
 from covidvu.virustrack.countryinfo import TOTAL_US_NAME
 from covidvu.virustrack.countryinfo import US_REGIONS
 
@@ -29,7 +30,6 @@ JH_CSSE_FILE_DEATHS       = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deat
 JH_CSSE_FILE_CONFIRMED_US = os.path.join(JH_CSSE_PATH, 'time_series_covid19_confirmed_US.csv')
 JH_CSSE_FILE_DEATHS_US    = os.path.join(JH_CSSE_PATH, 'time_series_covid19_deaths_US.csv')
 
-SITE_DATA                 = './site-data'
 
 BOATS = (
          'Diamond Princess',

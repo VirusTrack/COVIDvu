@@ -2,7 +2,6 @@
 
 # See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
 # vim: set fileencoding=utf-8:
-# Version 2.0
 
 # crontab compliant :)
 
@@ -55,6 +54,12 @@ function resetErrorNotification {
 } # resetErrorNotification
 
 
+function assertCOVID19DirExists {
+    echo "assert $COVID_19_DIR directory exists"
+    [[ -d "./COVID-19" ]] || die "" 1 # nothing to do; silent fail
+} # assertCOVID19DirExists
+
+
 function assertCloudFrontConfig {
     [[ -n "$AWS_ACCESS_KEY_ID" ]] || die "AWS_ACCESS_KEY_ID is not set" 4
     [[ -n "$AWS_SECRET_ACCESS_KEY" ]] || die "AWS_SECRET_ACCESS_KEY is not set" 5
@@ -66,6 +71,18 @@ function assertCloudFrontConfig {
 function assert_rcloneConfig {
     [[ -e "$CONFIG_rclone" ]] || die "rclone config not found" 2
 } # assert_rcloneConfig
+
+
+function assertHospitalBedsJSONFiles {
+    [[ -n "$HOSPITAL_BEDS_US_FILE" ]] || die "HOSPITAL_BEDS_US_FILE not defined" 12
+    [[ -e "$HOSPITAL_BEDS_US_FILE" ]] || die "HOSPITAL_BEDS_US_FILE $HOSPITAL_BEDS_US_FILE does not exist" 13
+} # assertHospitalBedsJSONFiles
+
+
+function assertCountiesUSJSONFiles {
+    [[ -n "$COUNTY_CASES_US_FILE" ]] || die "COUNTY_CASES_US_FILE not defined" 14
+    [[ -e "$COUNTY_CASES_US_FILE" ]] || die "COUNTY_CASES_US_FILE $COUNTY_CASES_US_FILE does not exist" 15
+} # assertCountiesUSJSONFiles
 
 
 function resetSiteData {
@@ -85,79 +102,103 @@ function nukeDeploymentSite {
 } # nukeDeploymentSite
 
 
-function generateHospitalBedsData {
+function updateCOVID19DataSources {
+    echo "refreshing COVID-19 JS CSSE dataset from GitHub" 
+
+    pushd "$COVID_19_DIR"
+    git checkout master
+    git fetch
+    git pull
+    [[ "0" != "$?" ]] && die "COVID-19 repository failed to update" 16
+    popd
+
+    timeStamp=$(TZ=":Etc/UTC" date +"%Y-%m-%dT%H:%M:%SZ")
+    printf "\nCompleted on %s\n" "$timeStamp" >> "$UPDATE_NOTICE"
+} # updateCOVID19DataSources
+
+
+function generateVirusUpdateJSONFiles {
+    echo "vujson - generating virus update JSON files"
+
+    env | awk '/VIRT/' | sort
+    python3 -m covidvu.pipeline.vujson confirmed deaths
+    [[ "0" != "$?" ]] && die "generateVirusUpdateJSONFiles - failed" 17
+    ls -Alrt "$SITE_DATA_DIR" | awk '!/conf-int/ && !/mean-/'
+} # generateVirusUpdateJSONFiles
+
+
+function generateHospitalBedsJSONFiles {
     local hospitalBedsTargetFile="$SITE_DATA_DIR/hospital-beds-count-US.json"
 
     printf "fetching current US hospital beds count\n  "
     cp -vf "$HOSPITAL_BEDS_US_FILE" "$hospitalBedsTargetFile"
-    [[ "0" != "$?" ]] && die "generateHospitalBedsData - failed" 18
-} # generateHospitalBedsData
+    [[ "0" != "$?" ]] && die "generateHospitalBedsJSONFiles - failed" 18
+} # generateHospitalBedsJSONFiles
 
 
-function generateUSCountiesData {
+function generateCountiesUSJSONFile {
     local countiesUSTargetFile="$SITE_DATA_DIR/counties-US-all.json"
 
     printf "fetching current US counties report\n  "
     cp -vf "$COUNTY_CASES_US_FILE" "$countiesUSTargetFile"
-    [[ "0" != "$?" ]] && die "generateUSCountiesData - failed" 19
-} # generateUSCountiesData
+    [[ "0" != "$?" ]] && die "generateCountiesUSJSONFile - failed" 19
+} # generateCountiesUSJSONFile
 
 
-function fetchJITDataSource {
+function fetchBNODataSource {
     echo "+++++"
     curl -A "$PYAVKA_USER_AGENT" -vi -o "$RAW_DATA_FILE" --connect-timeout 20 "$RAW_DATA_SOURCE" | 
-    [[ "0" != "$?" ]] && die "fetchJITDataSource unable to fetch $RAW_DATA_SOURCE" 20
+    [[ "0" != "$?" ]] && die "fetchBNODataSource unable to fetch $RAW_DATA_SOURCE" 20
 
     cat "$RAW_DATA_FILE" | awk '/<table/ { gsub("<table", "\n<table"); gsub("/table>", "/table>\n"); print; }' | \
     awk -v "H=$HTML_FILE_NAME" '/<table/ { o = sprintf(H, n++); print > o; close(o); }'
-    [[ "0" != "$?" ]] && die "fetchJITDataSource invalid $RAW_DATA_FILE HTML scraping issue" 21
+    [[ "0" != "$?" ]] && die "fetchBNODataSource invalid $RAW_DATA_FILE HTML scraping issue" 21
     echo "+++++"
-} # fetchJITDataSource
+} # fetchBNODataSource
 
 
-function generateJITData {
+function patchJSONFiles {
+    local subCommand="$1"
     # TODO: Document the command line arguments in the README.md page:
     #
-    #       ./refreshdata publish
+    #       ./refreshdata publish patch
     #
-    #       ./refreshdata noop
+    #       ./refreshdata noop patch
     #
     #       ./refreshdata
-    echo "pyavka - grabbing the spreadsheet"
-    fetchJITDataSource
-    python3 -m covidvu.pipeline.pyavka
-    ls -Alrt "$SITE_DATA_DIR"/*html
+    if [[ "patch" = "$subCommand" ]]
+    then
+        now=$(date)
+        echo "pyavka - grabbing the spreadsheet"
+        fetchBNODataSource
+        python3 -m covidvu.pipeline.pyavka
+        ls -Alrt "$SITE_DATA_DIR"/*html
 
-    echo "vuupdate - updating system with latest calculated updates"
-    python -m covidvu.pipeline.vuupdate confirmed deaths
-    ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
-} # generateJITData
+        echo "vudpatch - patching stale JH CSSE data with latest, calculated updates"
+        python -m covidvu.pipeline.vudpatch confirmed deaths
+        ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
+    fi
+} # patchJSONFiles
 
 
-function packDataFiles {
+function packJSONFiles {
     echo "jsonpack - combine individual JSON files into a single blob"
     python3 -m covidvu.pipeline.jsonpack
     [[ "0" != "$?" ]] && die "jsonpack failed" 22
     ls -Alrt "$SITE_DATA_DIR"/*json | awk '!/conf-int/ && !/mean-/'
-} # packDataFiles
+} # packJSONFiles
 
 
-function generateContinentalRegionsData {
+function generateRegionsJSONBundle {
     echo "vuregions - generate continental region summaries"
     env | awk '/VIRT/' | sort
     python3 -m covidvu.pipeline.vuregions
     [[ "0" != "$?" ]] && die "vuregions failed" 23
     ls -Alrt "$SITE_DATA_DIR"/bundle*json
-} # generateContinentalRegionsData
+} # generateRegionsJSONBundle
 
 
-function setLatestUpdateNotice {
-    timeStamp=$(TZ=":Etc/UTC" date +"%Y-%m-%dT%H:%M:%SZ")
-    printf "\nCompleted on %s\n" "$timeStamp" | tee "$UPDATE_NOTICE"
-} # setLatestUpdateNotice
-
-
-function deployVirusDataUpdate {
+function deployVirusUpdateJSON {
     [[ -n "$1" ]] || die "deployment failed; target bucket not specified" 10
 
     local targetBucket="$1"
@@ -168,7 +209,7 @@ function deployVirusDataUpdate {
     [[ "0" != "$?" ]] && die "rclone failed" 25
 
     ./flushcf "$targetEnvironment"
-} # deployVirusDataUpdate
+} # deployVirusUpdateJSON
 
 
 function makeDataSnapshot {
@@ -198,12 +239,14 @@ echo "*** COVIDvu - website refresh tool ***"
 assertSiteDataExists
 resetErrorNotification
 resetSiteData "$1"
-generateHospitalBedsData
-generateUSCountiesData
-generateJITData
-packDataFiles
-generateContinentalRegionsData
-setLatestUpdateNotice
+assertCOVID19DirExists
+updateCOVID19DataSources
+generateVirusUpdateJSONFiles
+generateHospitalBedsJSONFiles
+generateCountiesUSJSONFile
+patchJSONFiles "$2"
+packJSONFiles
+generateRegionsJSONBundle
 assertCloudFrontConfig
 assert_rcloneConfig
 
@@ -221,17 +264,17 @@ case "$environment" in
     "production")
         ;&
     "publish")
-        deployVirusDataUpdate "$SITE_BUCKET" "$environment"
+        deployVirusUpdateJSON "$SITE_BUCKET" "$environment"
         ;;
     "staging")
         ;&
     "stage")
-        deployVirusDataUpdate "$STAGE_BUCKET" "$environment"
+        deployVirusUpdateJSON "$STAGE_BUCKET" "$environment"
         ;;
     "testing")
         ;&
     "test")
-        deployVirusDataUpdate "$TEST_BUCKET" "$environment"
+        deployVirusUpdateJSON "$TEST_BUCKET" "$environment"
         ;;
     *)
         die "invalid command - use stage|publish|nuke|noop" 11

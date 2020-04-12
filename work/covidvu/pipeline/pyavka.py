@@ -6,8 +6,8 @@
 from bs4 import BeautifulSoup
 
 from covidvu.pipeline.vujson import SITE_DATA
-from covidvu.pipeline.vudpatch import SCRAPED_US_DATA
-from covidvu.pipeline.vudpatch import SCRAPED_WORLD_DATA
+from covidvu.pipeline.vuupdate import SCRAPED_US_DATA
+from covidvu.pipeline.vuupdate import SCRAPED_WORLD_DATA
 
 import copy
 import csv
@@ -23,13 +23,6 @@ TABLES_FILES     = {
                         'ignoreRows': 6,
                         'tableHTML' : None,
                     },
-# TODO:  Eugene - Remove this later, if BNO made it permanent? - REMOVE IF YOU WORK ON THIS FILE
-#                     'WORLD': { 
-#                         'fileCSV' : SCRAPED_WORLD_DATA, 
-#                         'fileHTML': None,
-#                         'ignoreRows': 6,
-#                         'tableHTML' : None,
-#                     },
                     'UNITED STATES': { 
                         'fileCSV' : SCRAPED_US_DATA, 
                         'fileHTML': None,

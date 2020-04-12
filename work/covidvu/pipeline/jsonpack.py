@@ -3,75 +3,107 @@
 # vim: set fileencoding=utf-8:
 
 
-from covidvu.pipeline.vudpatch import fetchJSONData
-from covidvu.pipeline.vuhospitals import loadUSHospitalBedsCount
-from covidvu.pipeline.vujson import SITE_DATA
+from covidvu.config import MASTER_DATABASE
+from covidvu.config import SITE_DATA
+from covidvu.cryostation import Cryostation
 
-import collections
 import json
 import os
+
+import tqdm
 
 
 # *** constants ***
 
 # TODO: This would be better served in a config file
-COUNTIES_US_FILE_NAME='counties-US-all.json'
-GROUPINGS = { 
-                ''           : 'bundle-global',
-                # '-Boats'     : 'bundle-boats',
-                '-US'        : 'bundle-US',
-                '-US-Regions': 'bundle-US-Regions',
-            }
+BUNDLE_GLOBAL_JSON     = 'bundle-global.json'
+BUNDLE_US_JSON         = 'bundle-US.json'
+BUNDLE_US_REGIONS_JSON = 'bundle-US-Regions.json'
+COUNTIES_US_FILE_NAME  ='counties-US-all.json'
+
 PREDICT_FILE_US_PREFIX        = 'prediction-US'
 PREDICT_FILE_WORLD_PREFIX     = 'prediction-world'
-# TODO:  Make these configurable or template
 PREDICTIONS_GLOBAL_FILE_NAME  = 'bundle-global-predictions.json'
 PREDICTIONS_US_FILE_NAME      = 'bundle-US-predictions.json' 
-REPORTS                       = ( 'confirmed', 'deaths', )
 
 
 # +++ functions +++
 
 
-def loadUSCounties(siteDataDirectory = SITE_DATA, datasetFile = COUNTIES_US_FILE_NAME):
-    countiesFileName = os.path.join(siteDataDirectory, datasetFile)
-    with open(countiesFileName, 'r') as inputFile:
-        payload = json.load(inputFile)
+def packGlobal(siteData = SITE_DATA):
+    bundle = { 'confirmed': dict(), 'deaths': dict(), }
+    cryostation = Cryostation(MASTER_DATABASE)
 
-    return payload
+    for key in tqdm.tqdm(cryostation.keys()):
+        if 'confirmed' in cryostation[key]:
+            bundle['confirmed'][key] = cryostation[key]['confirmed']
+            bundle['deaths'][key] = cryostation[key]['deaths']
 
+    cryostation.close()
 
-def sortByDate(dataset):
-    result = dict()
-    for cases in dataset.keys():
-        ordered = collections.OrderedDict(sorted(dataset[cases].items()))
-        result[cases] = ordered
-
-    return result
-
-
-def packDataset(grouping, siteDataDirectory = SITE_DATA, groupings = GROUPINGS, reports = REPORTS):
-    packedDataset  = dict()
-    outputFileName = os.path.join(siteDataDirectory, groupings[grouping]+'.json')
-    for report in reports:
-        dataset = sortByDate(fetchJSONData(report, grouping, siteDataDirectory))
-        packedDataset[report] = dataset
-
-        if '-US' == grouping and 'confirmed' == report:
-            packedDataset['hospitalBeds'] = loadUSHospitalBedsCount(siteDataDirectory)
-            packedDataset['allCounties']  = loadUSCounties(siteDataDirectory)
-
-        # reportFileName = resolveReportFileName(siteDataDirectory, report, grouping)
-        with open(outputFileName, 'w') as outputStream:
-            json.dump(packedDataset, outputStream)
-
-    return packedDataset
+    fileName = os.path.join(siteData, BUNDLE_GLOBAL_JSON)
+    with open(fileName, 'w') as outputStream:
+        json.dump(bundle, outputStream)
 
 
+def _bundleHospitalBeds(countryName = 'US'):
+    bundle = dict()
+
+    with Cryostation(MASTER_DATABASE) as cryostation:
+        for state in tqdm.tqdm(cryostation[countryName]['provinces'].keys()):
+            if 'hospitalBedsCount' in cryostation[countryName]['provinces'][state]:
+                bundle[state] = cryostation[countryName]['provinces'][state]['hospitalBedsCount']
+
+    return bundle
+
+
+def packCountry(countryName = 'US', siteData = SITE_DATA):
+    print('  processing states')
+    bundle = { 'confirmed': dict(), 'deaths': dict(), 'allCounties': dict(), }
+    cryostation = Cryostation(MASTER_DATABASE)
+
+    country = cryostation[countryName]
+
+    for state in country['provinces']:
+        if 'confirmed' in country['provinces'][state]:
+            bundle['confirmed'][state] = country['provinces'][state]['confirmed']
+            bundle['deaths'][state] = country['provinces'][state]['deaths']
+        if 'counties' in country['provinces'][state]:
+            bundle['allCounties'][state] = country['provinces'][state]['counties']
+
+    cryostation.close()
+
+    print('  processing hospital beds counts by state')
+    bundle['hospitalBeds'] = _bundleHospitalBeds(countryName)
+
+    fileName = os.path.join(siteData, BUNDLE_US_JSON)
+    with open(fileName, 'w') as outputStream:
+        json.dump(bundle, outputStream)
+
+
+def packRegions(countryName = 'US', siteData = SITE_DATA):
+    bundle = { 'confirmed': dict(), 'deaths': dict(), }
+    cryostation = Cryostation(MASTER_DATABASE)
+
+    country = cryostation[countryName]
+
+    for region in country['regions']:
+        if 'confirmed' in country['regions'][region]:
+            bundle['confirmed'][region] = country['regions'][region]['confirmed']
+            bundle['deaths'][region] = country['regions'][region]['deaths']
+
+    cryostation.close()
+
+    fileName = os.path.join(siteData, BUNDLE_US_REGIONS_JSON)
+    with open(fileName, 'w') as outputStream:
+        json.dump(bundle, outputStream)
+    
+    
 def packPredictions( 
             siteDataDirectory = SITE_DATA,
             predictFilePrefix = PREDICT_FILE_WORLD_PREFIX,
             bundleTargetFileName = PREDICTIONS_GLOBAL_FILE_NAME):
+
     predictionFileNames = [ os.path.join(siteDataDirectory, fileName) for fileName in os.listdir(siteDataDirectory) if predictFilePrefix in fileName ]
     
     predictions = {  }
@@ -100,8 +132,9 @@ def packPredictions(
 
 
 def main():
-    for grouping in GROUPINGS:
-        packDataset(grouping)
+    packGlobal()
+    packCountry('US')
+    packRegions('US')
 
     packPredictions()
     packPredictions(predictFilePrefix = PREDICT_FILE_US_PREFIX, bundleTargetFileName = PREDICTIONS_US_FILE_NAME)
