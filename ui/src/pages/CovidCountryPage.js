@@ -8,6 +8,7 @@ import CountryGraphContainer from '../containers/CountryGraphContainer'
 import MainLayout from '../layouts/MainLayout'
 
 import { usePageTitle } from '../hooks/ui'
+import { GRAPHSCALE_TYPES } from '../constants'
 
 export const CovidCountryPage = () => {
   const { region } = useParams()
@@ -18,7 +19,7 @@ export const CovidCountryPage = () => {
   const query = queryString.parse(search.indexOf('?') === 0 ? search.substr(1) : search)
 
   const graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
-  const showLog = query.showLog === 'true'
+  const graphScale = query.graphScale ? query.graphScale : GRAPHSCALE_TYPES.LINEAR
   const showPredictions = query.showPredictions === 'true'
 
   usePageTitle(`${region} Graphs`)
@@ -26,7 +27,7 @@ export const CovidCountryPage = () => {
   return (
     <MainLayout>
       <ErrorBoundary>
-        <CountryGraphContainer region={region} graph={graph} showLogParam={showLog} showPredictionsParam={showPredictions} />
+        <CountryGraphContainer region={region} graph={graph} graphScaleParam={graphScale} showPredictionsParam={showPredictions} />
       </ErrorBoundary>
     </MainLayout>
   )

@@ -8,6 +8,7 @@ import ContinentalGraphContainer from '../containers/ContinentalGraphContainer'
 import MainLayout from '../layouts/MainLayout'
 
 import { usePageTitle } from '../hooks/ui'
+import { GRAPHSCALE_TYPES } from '../constants'
 
 export const CovidContinentalPage = () => {
   const { search } = useLocation()
@@ -18,14 +19,14 @@ export const CovidContinentalPage = () => {
 
   const region = query.region ? Array.isArray(query.region) ? query.region : [query.region] : undefined
   const graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
-  const showLog = query.showLog === 'true'
+  const graphScale = query.graphScale ? query.graphScale : GRAPHSCALE_TYPES.LINEAR
 
   usePageTitle('Continental Graphs')
 
   return (
     <MainLayout>
       <ErrorBoundary>
-        <ContinentalGraphContainer region={region} graph={graph} showLogParam={showLog} />
+        <ContinentalGraphContainer region={region} graph={graph} graphScaleParam={graphScale} />
       </ErrorBoundary>
     </MainLayout>
   )

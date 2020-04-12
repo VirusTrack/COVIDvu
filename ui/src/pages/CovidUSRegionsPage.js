@@ -8,6 +8,7 @@ import MainLayout from '../layouts/MainLayout'
 import USRegionsGraphContainer from '../containers/USRegionsGraphContainer'
 
 import { usePageTitle } from '../hooks/ui'
+import { GRAPHSCALE_TYPES } from '../constants'
 
 export const CovidUSRegionsPage = () => {
   const { search } = useLocation()
@@ -18,14 +19,14 @@ export const CovidUSRegionsPage = () => {
 
   const region = query.region ? Array.isArray(query.region) ? query.region : [query.region] : undefined
   const graph = validGraphs.indexOf(query.graph) !== -1 ? query.graph : undefined
-  const showLog = query.showLog === 'true'
+  const graphScale = query.graphScale ? query.graphScale : GRAPHSCALE_TYPES.LINEAR
 
   usePageTitle('United States Regional Graphs')
 
   return (
     <MainLayout>
       <ErrorBoundary>
-        <USRegionsGraphContainer region={region} graph={graph} showLogParam={showLog} />
+        <USRegionsGraphContainer region={region} graph={graph} graphScaleParam={graphScale} />
       </ErrorBoundary>
     </MainLayout>
   )

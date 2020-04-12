@@ -2,8 +2,10 @@ import React from 'react'
 
 import { Button, Column } from 'rbx'
 
+import { GRAPHSCALE_TYPES } from '../constants'
+
 export const GraphScaleControl = ({
-  showLog = false,
+  graphScale = GRAPHSCALE_TYPES.LINEAR,
   showPredictions = false,
   handleGraphScale,
   handleShowPredictions,
@@ -15,6 +17,7 @@ export const GraphScaleControl = ({
     return null
   }
 
+  console.log(`graphScale: ${graphScale}`)
   return (
     <>
       <Column.Group style={{ alignItems: 'baseline', justifyContent: align, marginRight: '1rem' }} breakpoint="mobile" multiline>
@@ -24,8 +27,9 @@ export const GraphScaleControl = ({
 
         <Column narrow>
           <Button.Group hasAddons>
-            <Button size="medium" selected={!showLog ? true : null} color={!showLog ? 'default' : 'light'} onClick={() => { if (showLog) { handleGraphScale(false) } }}>Linear</Button>
-            <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" color={showLog ? 'default' : 'light'} onClick={() => { if (!showLog) { handleGraphScale(true) } }}>Logarithmic</Button>
+            <Button size="medium" selected={graphScale === GRAPHSCALE_TYPES.LINEAR} color={graphScale === GRAPHSCALE_TYPES.LINEAR ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.LINEAR) { handleGraphScale(GRAPHSCALE_TYPES.LINEAR) } }}>Linear</Button>
+            <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" selected={graphScale === GRAPHSCALE_TYPES.LOGARITHMIC}  color={graphScale === GRAPHSCALE_TYPES.LOGARITHMIC ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.LOGARITHMIC) { handleGraphScale(GRAPHSCALE_TYPES.LOGARITHMIC) } }}>Logarithmic</Button>
+            <Button tooltip="Horizontal is stage of outbreak. Slope is reproductive rate." size="medium" selected={graphScale === GRAPHSCALE_TYPES.SLOPE} color={graphScale === GRAPHSCALE_TYPES.SLOPE ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.SLOPE) { handleGraphScale(GRAPHSCALE_TYPES.SLOPE) } }}>Rate</Button>
           </Button.Group>
         </Column>
 
