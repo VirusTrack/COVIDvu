@@ -32,7 +32,7 @@ export const USGraphContainer = ({
   const { search } = useLocation()
   const changePageTitle = useChangePageTitle()
 
-  const { 
+=  const { 
       selectedRegions, 
       graphScale,
       showPredictions,
