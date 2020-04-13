@@ -4,11 +4,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import numeral from 'numeral'
 import { Tag, Title } from 'rbx'
-import ReactGA from 'react-ga'
 import store from 'store2'
 import { useChangePageTitle } from '../hooks/ui'
+import useGraphFilter from '../hooks/graphFilter'
 
-import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
 
 
@@ -21,7 +20,6 @@ import { graphScaleOrDefault } from '../utils'
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
-
 import CheckboxRegionComponent from '../components/CheckboxRegionComponent'
 import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
@@ -32,19 +30,34 @@ export const USGraphContainer = ({
 }) => {
   const dispatch = useDispatch()
   const { search } = useLocation()
-  const handleHistory = useHandleHistory('/covid/us')
   const changePageTitle = useChangePageTitle()
 
-  const [graphScale, setGraphScale] = useState(graphScaleOrDefault(graphScaleParam))
-  const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
-  const [selectedStates, setSelectedStates] = useState(region)
-  const [secondaryGraph, setSecondaryGraph] = useState(graph)
+=  const { 
+      selectedRegions, 
+      graphScale,
+      showPredictions,
+      secondaryGraph,
+      handleSelectedRegion, 
+      handleSelectedGraph, 
+      handleShowPredictions, 
+      handleGraphScale 
+  } = useGraphFilter(
+      region, 
+      graphScaleParam, 
+      graph, 
+      showPredictionsParam, 
+      US_GRAPH_SCALE_KEY,
+      search,
+      'New York',
+      'United States',
+      '/covid/us'
+  )
 
   const {
     confirmed, sortedConfirmed, deaths, mortality,
   } = useGraphData('usStates')
-  const usStatesStats = useSelector((state) => state.services.totalUSStatesStats)
 
+  const usStatesStats = useSelector((state) => state.services.totalUSStatesStats)
   const usPredictions = useSelector((state) => state.services.usPredictions)
 
   const [confirmedTotal, setConfirmedTotal] = useState(0)
@@ -68,12 +81,10 @@ export const USGraphContainer = ({
         newSelectedStates = sortedConfirmed.slice(0, 3).map((confirmed) => confirmed.region)
       }
 
-      setSelectedStates(newSelectedStates)
-      handleHistory(newSelectedStates, secondaryGraph, graphScale, showPredictions)
+      handleSelectedRegion(newSelectedStates)
     } else if (showPredictions) {
       if ((region.length === 1 && !Object.prototype.hasOwnProperty.call(usPredictions, region)) || region.length > 1) {
-        setSelectedStates(['New York'])
-        handleHistory(['New York'], secondaryGraph, graphScale, showPredictions)
+        handleSelectedRegion(['New York'])
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,16 +96,10 @@ export const USGraphContainer = ({
     dispatch(actions.fetchTotalUSStatesStats())
 
     if (store.get(US_GRAPH_SCALE_KEY)) {
-      setGraphScale(graphScaleOrDefault(store.get(US_GRAPH_SCALE_KEY)))
+      handleGraphScale(graphScaleOrDefault(store.get(US_GRAPH_SCALE_KEY)))
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch])
-
-  useEffect(() => {
-    if (!search) {
-      handleHistory(selectedStates, secondaryGraph, graphScale, showPredictions)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useEffect(() => {
     if (confirmed) {
@@ -104,58 +109,6 @@ export const USGraphContainer = ({
       }
     }
   }, [confirmed])
-
-  const handleSelectedRegion = (regionList) => {
-    setSelectedStates(regionList)
-    handleHistory(regionList, graph, graphScale, showPredictions)
-
-    let actionDescription = `Changed selected regions to ${regionList.join(', ')}`
-
-    if (regionList.length === 0) {
-      store.remove(US_REGION_SELECT_KEY)
-      actionDescription = 'Deselected All Regions'
-    } else {
-      store.set(US_REGION_SELECT_KEY, regionList)
-    }
-
-    ReactGA.event({
-      category: 'Region:United States',
-      action: actionDescription,
-    })
-  }
-
-  const handleSelectedGraph = (selectedGraph) => {
-    setSecondaryGraph(selectedGraph)
-    handleHistory(selectedStates, graph, graphScale, showPredictions)
-
-    ReactGA.event({
-      category: 'Region:United States',
-      action: `Changed selected graph to ${selectedGraph}`,
-    })
-  }
-
-  const handleGraphScale = (graphScale) => {
-    setGraphScale(graphScale)
-    store.set(US_GRAPH_SCALE_KEY, graphScale)
-
-    handleHistory(selectedStates, secondaryGraph, graphScale, showPredictions)
-
-    ReactGA.event({
-      category: 'Region:United States',
-      action: `Changed graph scale to ${graphScale}`,
-    })
-  }
-
-  const handleShowPredictions = () => {
-    let historicSelectedStates = selectedStates
-
-    if (selectedStates.length > 1) {
-      historicSelectedStates = ['New York']
-      setSelectedStates(historicSelectedStates)
-    }
-    setShowPredictions(!showPredictions)
-    handleHistory(historicSelectedStates, secondaryGraph, graphScale, !showPredictions)
-  }
 
   return (
     <>
@@ -177,7 +130,7 @@ export const USGraphContainer = ({
           <>
             <CheckboxRegionComponent
               data={sortedConfirmed}
-              selected={selectedStates}
+              selected={selectedRegions}
               handleSelected={(dataList) => handleSelectedRegion(dataList)}
               defaultSelected={region}
               showPredictions={showPredictions}
@@ -193,7 +146,7 @@ export const USGraphContainer = ({
             confirmed={confirmed}
             deaths={deaths}
             mortality={mortality}
-            selected={selectedStates}
+            selected={selectedRegions}
             handleSelectedGraph={handleSelectedGraph}
             handleGraphScale={handleGraphScale}
             handleShowPredictions={handleShowPredictions}
@@ -220,7 +173,7 @@ export const USGraphContainer = ({
 
             <Title size={3}>Government Services: </Title>
             <ul>
-              {selectedStates.map((region, idx) => (
+              {selectedRegions.map((region, idx) => (
                 <React.Fragment key={idx}>
                   <li>
                       <ExternalLink 
