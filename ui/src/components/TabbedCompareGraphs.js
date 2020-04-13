@@ -125,7 +125,7 @@ export const TabbedCompareGraphs = (
                     graphName="Cases"
                     title={selected}
                     selected={selected}
-                    showLog={showLog}
+                    graphScale={graphScale}
                     predictions={predictions}
                     confirmed={confirmed}
                   />

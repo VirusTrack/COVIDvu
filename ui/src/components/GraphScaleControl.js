@@ -17,7 +17,11 @@ export const GraphScaleControl = ({
     return null
   }
 
-  console.log(`graphScale: ${graphScale}`)
+  
+  const generateSlopeTooltip = () => {
+      return !showPredictions ? "Horizontal is stage of outbreak. Slope is reproductive rate." : "Hide predictions to re-enable the Rate graph"
+  }
+
   return (
     <>
       <Column.Group style={{ alignItems: 'baseline', justifyContent: align, marginRight: '1rem' }} breakpoint="mobile" multiline>
@@ -29,11 +33,11 @@ export const GraphScaleControl = ({
           <Button.Group hasAddons>
             <Button size="medium" selected={graphScale === GRAPHSCALE_TYPES.LINEAR} color={graphScale === GRAPHSCALE_TYPES.LINEAR ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.LINEAR) { handleGraphScale(GRAPHSCALE_TYPES.LINEAR) } }}>Linear</Button>
             <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" selected={graphScale === GRAPHSCALE_TYPES.LOGARITHMIC}  color={graphScale === GRAPHSCALE_TYPES.LOGARITHMIC ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.LOGARITHMIC) { handleGraphScale(GRAPHSCALE_TYPES.LOGARITHMIC) } }}>Logarithmic</Button>
-            <Button tooltip="Horizontal is stage of outbreak. Slope is reproductive rate." size="medium" selected={graphScale === GRAPHSCALE_TYPES.SLOPE} color={graphScale === GRAPHSCALE_TYPES.SLOPE ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.SLOPE) { handleGraphScale(GRAPHSCALE_TYPES.SLOPE) } }}>Rate</Button>
+            <Button disabled={showPredictions} tooltip={generateSlopeTooltip()} size="medium" selected={graphScale === GRAPHSCALE_TYPES.SLOPE} color={graphScale === GRAPHSCALE_TYPES.SLOPE ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.SLOPE) { handleGraphScale(GRAPHSCALE_TYPES.SLOPE) } }}>Rate</Button>
           </Button.Group>
         </Column>
 
-        { ((parentRegion === 'Global' || parentRegion === 'US') && secondaryGraph === 'Cases')
+        { ((parentRegion === 'Global' || parentRegion === 'US') && secondaryGraph === 'Cases' && graphScale !== GRAPHSCALE_TYPES.SLOPE)
                     && (
                     <Column>
                       <span style={{ fontSize: '1.4rem' }}>

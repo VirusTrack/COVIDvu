@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { useHistory, useLocation } from 'react-router-dom'
 import { Navbar, Button } from 'rbx'
 import ReactGA from 'react-ga'
+
 import { useChangePage } from '../hooks/nav'
 
 
@@ -12,10 +13,6 @@ import SocialIcons from '../components/SocialIcons'
 import NewsletterModalButton from '../components/NewsletterModalButton'
 
 import { useClientCountry } from '../hooks/ui'
-
-import {
-  GOOGLE_ANALYTICS_KEY,
-} from '../constants'
 
 
 import compassImg from '../images/fa-icon-compass.svg'
@@ -32,8 +29,9 @@ export const HeaderContainer = () => {
 
   const selectedNav = location.pathname
 
-  ReactGA.initialize(GOOGLE_ANALYTICS_KEY)
-  ReactGA.pageview(window.location.pathname + window.location.search)
+  useEffect(() => {
+    ReactGA.pageview(window.location.pathname + window.location.search)  
+  }, [])
 
   const LocalizedNavMenu = () => (
     <Navbar.Item onClick={() => { clientCountry.countryISO === 'US' ? changePage('/covid/us') : changePage(`/covid/country/${clientCountry.country}`) }}>
