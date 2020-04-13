@@ -179,27 +179,29 @@ export const Graph = ({
   layout.legend = {
     xanchor: 'center',
     yanchor: 'top',
-    y: -0.1,
+    y: -0.2,
     x: 0.5,
+    orientation: "h",
+    itemclick: 'toggleothers'
   }
 
-  // if(graphScale === GRAPHSCALE_TYPES.SLOPE) {
-  //   layout['xaxis'] = {
-  //     title: 'Days since 100 cases',
-  //   }
+  if(graphScale === GRAPHSCALE_TYPES.SLOPE) {
+    layout['xaxis'] = {
+      title: 'Days since 100 cases',
+    }
 
-  //   layout.legend = {
-  //     ...layout.legend,
-  //     yanchor: 'bottom',
-  //     y: 1
-  //   }
+    layout.legend = {
+      ...layout.legend,
+      // yanchor: 'bottom',
+      // y: 1
+    }
   
-  // }  
+  }  
 
 
   return (
     <>
-      <Generic id="graphPlot" ref={ref} className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
+      <Generic id="graphPlot" ref={ref} className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items removes others from plot ">
         <div className="vt-graph-logo"><LogoElement url /></div>
         <Plot
           data={plotsAsValues}
