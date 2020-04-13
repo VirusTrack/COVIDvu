@@ -201,7 +201,7 @@ export const Graph = ({
 
   return (
     <>
-      <Generic id="graphPlot" ref={ref} className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items will remove them from graph">
+      <Generic id="graphPlot" ref={ref} className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items removes others from plot ">
         <div className="vt-graph-logo"><LogoElement url /></div>
         <Plot
           data={plotsAsValues}
