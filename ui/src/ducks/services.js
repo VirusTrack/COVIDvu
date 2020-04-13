@@ -452,7 +452,7 @@ export function* fetchUSCountiesStats({ payload }) {
     for (const usState of Object.keys(allCounties)) {
       const trimmedUSState = usState.trim()
       const countiesInState = allCounties[usState]
-
+  
       const abbreviation = US_STATES_WITH_ABBREVIATION[trimmedUSState]
 
       if (filterRegion && filterRegion !== abbreviation) {
@@ -460,7 +460,14 @@ export function* fetchUSCountiesStats({ payload }) {
       }
 
       for (const county of Object.keys(countiesInState)) {
-        countiesWithAbbreviation.push({ region: `${county}, ${abbreviation}`, confirmed: countiesInState[county].confirmed, deaths: countiesInState[county].deaths })
+        
+        const totalConfirmedDays = Object.keys(countiesInState[county].confirmed).length
+        const confirmed = Object.values(countiesInState[county].confirmed)[totalConfirmedDays - 1]
+
+        const totalDeathsDays = Object.keys(countiesInState[county].deaths).length
+        const deaths = Object.values(countiesInState[county].deaths)[totalDeathsDays - 1]
+  
+        countiesWithAbbreviation.push({ region: `${county}, ${abbreviation}`, confirmed: confirmed, deaths: deaths })
       }
     }
 

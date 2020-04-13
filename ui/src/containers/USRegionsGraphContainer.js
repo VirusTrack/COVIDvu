@@ -4,12 +4,10 @@ import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router'
 
 import { Tag, Notification, Level } from 'rbx'
-import ReactGA from 'react-ga'
-import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
+import useGraphFilter from '../hooks/graphFilter'
 
 import { actions } from '../ducks/services'
-
 
 import TwoGraphLayout from '../layouts/TwoGraphLayout'
 import TabbedCompareGraphs from '../components/TabbedCompareGraphs'
@@ -24,12 +22,25 @@ export const USRegionsGraphContainer = ({ region = [], graph = 'Cases', graphSca
   const dispatch = useDispatch()
   const location = useLocation()
   const { search } = location
-  const handleHistory = useHandleHistory('/covid/us/regions')
 
-  const [graphScale, setGraphScale] = useState(graphScaleParam)
-  const [selectedRegions, setSelectedRegions] = useState(region)
-  const [secondaryGraph, setSecondaryGraph] = useState(graph)
-
+  const { 
+    selectedRegions, 
+    graphScale,
+    secondaryGraph,
+    handleSelectedRegion, 
+    handleSelectedGraph, 
+    handleGraphScale 
+} = useGraphFilter(
+    region, 
+    graphScaleParam, 
+    graph, 
+    null, 
+    null,
+    search,
+    'Northeast',
+    'U.S. Regions',
+    '/covid/us/regions'
+)  
   const {
     confirmed, sortedConfirmed, deaths, mortality,
   } = useGraphData('usRegions')
@@ -43,17 +54,10 @@ export const USRegionsGraphContainer = ({ region = [], graph = 'Cases', graphSca
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
     if (sortedConfirmed && region.length === 0) {
-      setSelectedRegions(sortedConfirmed.slice(0, 3).map((confirmed) => confirmed.region))
+      handleSelectedRegion(sortedConfirmed.slice(0, 3).map((confirmed) => confirmed.region))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortedConfirmed])
-
-  useEffect(() => {
-    if (!search) {
-      handleHistory(selectedRegions, secondaryGraph)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useEffect(() => {
     if (confirmed) {
@@ -61,36 +65,6 @@ export const USRegionsGraphContainer = ({ region = [], graph = 'Cases', graphSca
       setConfirmedTotal(totalRegions[totalRegions.length - 1])
     }
   }, [confirmed])
-
-  const handleSelectedRegion = (regionList) => {
-    setSelectedRegions(regionList)
-    handleHistory(regionList, graph)
-
-    ReactGA.event({
-      category: 'Region:U.S. Regions',
-      action: `Changed selected regions to ${regionList.join(', ')}`,
-    })
-  }
-
-  const handleSelectedGraph = (selectedGraph) => {
-    setSecondaryGraph(selectedGraph)
-    handleHistory(selectedRegions, selectedGraph)
-
-    ReactGA.event({
-      category: 'Region:U.S. Regions',
-      action: `Changed selected graph to ${selectedGraph}`,
-    })
-  }
-
-  const handleGraphScale = (graphScale) => {
-    setGraphScale(graphScale)
-    handleHistory(selectedRegions, secondaryGraph, graphScale)
-
-    ReactGA.event({
-      category: 'Region:U.S. Regions',
-      action: `Changed graph scale to ${graphScale}`,
-    })
-  }
 
   return (
     <>

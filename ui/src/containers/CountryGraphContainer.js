@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
-import ReactGA from 'react-ga'
-import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
-// import { useChangePageTitle } from '../hooks/ui'
+import useGraphFilter from '../hooks/graphFilter'
 
 import { actions } from '../ducks/services'
 
@@ -21,13 +19,26 @@ export const CountryGraphContainer = ({
   const dispatch = useDispatch()
   const { search } = useLocation()
 
-  const handleHistory = useHandleHistory(`/covid/country/${region}`)
-  // const changePageTitle = useChangePageTitle()
-
-  const [graphScale, setGraphScale] = useState(graphScaleParam)
-  const [showPredictions, setShowPredictions] = useState(showPredictionsParam)
-  const [selectedCountries, setSelectedCountries] = useState(region)
-  const [secondaryGraph, setSecondaryGraph] = useState(graph)
+  const { 
+    selectedRegions, 
+    graphScale,
+    showPredictions,
+    secondaryGraph,
+    handleSelectedRegion, 
+    handleSelectedGraph, 
+    handleShowPredictions, 
+    handleGraphScale 
+} = useGraphFilter(
+    region, 
+    graphScaleParam, 
+    graph, 
+    showPredictionsParam, 
+    null,
+    search,
+    'US',
+    'Country',
+    `/covid/country/${region}`
+)
 
   const {
     confirmed, sortedConfirmed, deaths, mortality,
@@ -47,55 +58,14 @@ export const CountryGraphContainer = ({
   useEffect(() => {
     if (sortedConfirmed && region.length === 0) {
       const newSelectedCountries = sortedConfirmed.slice(1, 4).map((confirmed) => confirmed.region)
-      setSelectedCountries(newSelectedCountries)
-      handleHistory(undefined, secondaryGraph, graphScale, showPredictions)
+      handleSelectedRegion(newSelectedCountries)
     } else if (showPredictions && Object.keys(globalPredictions).length > 0) {
       if ((region.length === 1 && !Object.prototype.hasOwnProperty.call(globalPredictions, region))) {
-        setSelectedCountries(['US'])
-        handleHistory(['US'], secondaryGraph, graphScale, showPredictions)
+        handleSelectedRegion(['US'])
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortedConfirmed, globalPredictions])
-
-  useEffect(() => {
-    if (!search) {
-      handleHistory(undefined, secondaryGraph, graphScale, showPredictions)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const handleSelectedGraph = (selectedGraph) => {
-    setSecondaryGraph(selectedGraph)
-    handleHistory(undefined, selectedGraph, graphScale, showPredictions)
-
-    ReactGA.event({
-      category: 'Region:Country',
-      action: `Changed selected graph to ${selectedGraph}`,
-    })
-  }
-
-  const handleGraphScale = (graphScale) => {
-    setGraphScale(graphScale)
-    handleHistory(undefined, secondaryGraph, graphScale, showPredictions)
-
-    ReactGA.event({
-      category: 'Region:Country',
-      action: `Changed graph scale to ${graphScale}`,
-    })
-  }
-
-  const handleShowPredictions = () => {
-    let historicSelectedCountries = selectedCountries
-
-    if (Array.isArray(selectedCountries) && selectedCountries.length > 1) {
-      historicSelectedCountries = ['US']
-      setSelectedCountries(historicSelectedCountries)
-    }
-    setShowPredictions(!showPredictions)
-
-    handleHistory(undefined, secondaryGraph, graphScale, !showPredictions)
-  }
 
   return (
     <>
@@ -114,7 +84,7 @@ export const CountryGraphContainer = ({
             confirmed={confirmed}
             deaths={deaths}
             mortality={mortality}
-            selected={selectedCountries}
+            selected={selectedRegions}
             handleSelectedGraph={handleSelectedGraph}
             handleGraphScale={handleGraphScale}
             handleShowPredictions={handleShowPredictions}
