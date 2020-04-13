@@ -179,22 +179,24 @@ export const Graph = ({
   layout.legend = {
     xanchor: 'center',
     yanchor: 'top',
-    y: -0.1,
+    y: -0.2,
     x: 0.5,
+    orientation: "h",
+    itemclick: 'toggleothers'
   }
 
-  // if(graphScale === GRAPHSCALE_TYPES.SLOPE) {
-  //   layout['xaxis'] = {
-  //     title: 'Days since 100 cases',
-  //   }
+  if(graphScale === GRAPHSCALE_TYPES.SLOPE) {
+    layout['xaxis'] = {
+      title: 'Days since 100 cases',
+    }
 
-  //   layout.legend = {
-  //     ...layout.legend,
-  //     yanchor: 'bottom',
-  //     y: 1
-  //   }
+    layout.legend = {
+      ...layout.legend,
+      // yanchor: 'bottom',
+      // y: 1
+    }
   
-  // }  
+  }  
 
 
   return (
