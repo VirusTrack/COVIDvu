@@ -94,7 +94,6 @@ def test_buildLogisticModel():
     assert isinstance(logGrowthModel, StanModel)
 
 
-
 def test_predictLogisticGrowth():
     nDaysPredict = 10
     prediction = predictLogisticGrowth(logGrowthModel,
@@ -104,9 +103,10 @@ def test_predictLogisticGrowth():
                                        nDaysPredict                  = nDaysPredict,
                                        )
 
-    predictionIndex = pd.date_range(start = prediction['regionTSClean'].index[0],
-                                    end   = prediction['regionTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D'),
-                                    )
+    predictionIndex =  prediction['regionTSClean'].index.append(pd.date_range(
+                                start =  prediction['regionTSClean'].index[-1] + pd.Timedelta(1, 'D'),
+                                end   =  prediction['regionTSClean'].index[-1] + pd.Timedelta(nDaysPredict, 'D')
+                             ))
 
     assert (prediction['predictionsMeanTS'].index == predictionIndex).all()
     assert (prediction['predictionsPercentilesTS'][0][0].index == predictionIndex).all()
