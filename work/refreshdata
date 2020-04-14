@@ -20,6 +20,7 @@ CONFIG_rclone="rclone.conf"
 COVID_19_DIR="COVID-19"
 HTML_FILE_NAME="$SITE_DATA_DIR/table-%02d.html"
 JSON_DATA_BUNDLE="COVID19-cases.tar.gz"
+MINUTES_CURRENT=$(awk 'BEGIN { "date +\"%s\"" | getline time; print(int((time%3600)/60)); }')
 RAW_DATA_FILE="$SITE_DATA_DIR/raw-source.html"
 RAW_DATA_SOURCE="https://docs.google.com/spreadsheets/d/e/2PACX-1vR30F8lYP3jG7YOq8es0PBpJIE5yvRVZffOyaqC0GgMBN6yt0Q-NI8pxS7hd1F9dYXnowSC6zpZmW9D/pubhtml?gid=0&amp;single=false&amp;widget=true&amp;headers=true"
 RESOURCES_DIR="./resources"
@@ -172,7 +173,7 @@ function deployVirusDataUpdate {
 
 
 function makeDataSnapshot {
-    local minutes=$(awk 'BEGIN { "date +\"%s\"" | getline time; print(int((time%3600)/60)); }')
+    local minutes="$MINUTES_CURRENT"
 
     echo "database snapshot time check - current minutes offset = $minutes"
 
@@ -186,6 +187,8 @@ function makeDataSnapshot {
 
         tar cvjf "$fileName" "$MASTER_DATABASE_DIR"/* 
         [[ "0" != "$?" ]] && die "makeDataSnapshot failed - tar/bzip2 issue"  26
+        rclone -q --config="$CONFIG_rclone" SYNC --UPDATE "$MASTER_DATABASE_DIR" "virustrack-website:$TEST_BUCET/$MASTER_DATABASE_DIR" || die "rclone $MASTER_DATABASE_DIR to S3 failed" 27
+        rclone -q --config="$CONFIG_rclone" SYNC --UPDATE "$SNAPSHOTS_DIR" "virustrack-website:$TEST_BUCET/$SNAPSHOTS_DIR" || die "rclone $SNAPSHOTS_DIR to S3 failed" 27
     fi
 } # makeDataSnapshot
 
