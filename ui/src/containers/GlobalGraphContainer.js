@@ -85,7 +85,7 @@ export const GlobalGraphContainer = ({
       handleGraphScale(graphScaleOrDefault(store.get(GLOBAL_GRAPH_SCALE_KEY)))
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, graphScale])
+  }, [dispatch])
 
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
