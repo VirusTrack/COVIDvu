@@ -135,7 +135,7 @@ class Cryostation(object):
 
         df = pd.DataFrame(df)
         df.index = pd.to_datetime(df.index)
+        df.index = df.index.map(lambda i: i.date())
         df.fillna(0, inplace=True)
-
         return df
 
