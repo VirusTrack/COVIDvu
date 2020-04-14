@@ -52,7 +52,7 @@ export const CountryGraphContainer = ({
   useEffect(() => {
     dispatch(actions.fetchGlobal())
     dispatch(actions.fetchGlobalPredictions())
-  }, [dispatch, graphScale])
+  }, [dispatch])
 
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {

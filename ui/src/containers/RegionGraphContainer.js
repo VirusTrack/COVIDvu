@@ -65,7 +65,7 @@ export const RegionGraphContainer = ({
       setRegionNotFound(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, region, graphScale])
+  }, [dispatch, region])
 
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
