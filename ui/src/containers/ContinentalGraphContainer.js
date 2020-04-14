@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 import { useDispatch } from 'react-redux'
 
 import { useLocation } from 'react-router'
 
-import ReactGA from 'react-ga'
-import { useHandleHistory } from '../hooks/nav'
 import { useGraphData } from '../hooks/graphData'
+import useGraphFilter from '../hooks/graphFilter'
 
 import { actions } from '../ducks/services'
 
@@ -19,14 +18,33 @@ import HeroElement from '../components/HeroElement'
 import BoxWithLoadingIndicator from '../components/BoxWithLoadingIndicator'
 
 
-export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', graphScaleParam = false }) => {
+export const ContinentalGraphContainer = ({ 
+    region = [], 
+    graph = 'Cases', 
+    graphScaleParam = false 
+  }) => {
+
   const dispatch = useDispatch()
   const { search } = useLocation()
-  const handleHistory = useHandleHistory('/covid/continental')
 
-  const [graphScale, setGraphScale] = useState(graphScaleParam)
-  const [selectedContinents, setSelectedContinents] = useState(region)
-  const [secondaryGraph, setSecondaryGraph] = useState(graph)
+  const { 
+    selectedRegions, 
+    graphScale,
+    secondaryGraph,
+    handleSelectedRegion, 
+    handleSelectedGraph, 
+    handleGraphScale 
+} = useGraphFilter(
+    region, 
+    graphScaleParam, 
+    graph, 
+    null, 
+    null,
+    search,
+    'North America',
+    'Continental',
+    '/covid/continental'
+)
 
   const {
     confirmed, sortedConfirmed, deaths, mortality,
@@ -42,47 +60,10 @@ export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', graphS
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
     if (sortedConfirmed && region.length === 0) {
-      setSelectedContinents(sortedConfirmed.slice(0, 3).map((confirmed) => confirmed.region))
+      handleSelectedRegion(sortedConfirmed.slice(0, 3).map((confirmed) => confirmed.region))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortedConfirmed])
-
-  useEffect(() => {
-    if (!search) {
-      handleHistory(selectedContinents, secondaryGraph)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const handleSelectedRegion = (regionList) => {
-    setSelectedContinents(regionList)
-    handleHistory(regionList, secondaryGraph, graphScale)
-
-    ReactGA.event({
-      category: 'Region:Continental',
-      action: `Changed selected regions to ${regionList.join(', ')}`,
-    })
-  }
-
-  const handleSelectedGraph = (selectedGraph) => {
-    setSecondaryGraph(selectedGraph)
-    handleHistory(selectedContinents, selectedGraph, graphScale)
-
-    ReactGA.event({
-      category: 'Region:Continental',
-      action: `Changed selected graph to ${selectedGraph}`,
-    })
-  }
-
-  const handleGraphScale = (graphScale) => {
-    setGraphScale(graphScale)
-    handleHistory(selectedContinents, secondaryGraph, graphScale)
-
-    ReactGA.event({
-      category: 'Region:Continental',
-      action: `Changed graph scale to ${graphScale}`,
-    })
-  }
 
   return (
     <>
@@ -101,7 +82,7 @@ export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', graphS
 
           <CheckboxRegionComponent
             data={sortedConfirmed}
-            selected={selectedContinents}
+            selected={selectedRegions}
             handleSelected={(dataList) => handleSelectedRegion(dataList)}
             defaultSelected={region}
             graphScale={graphScale}
@@ -113,7 +94,7 @@ export const ContinentalGraphContainer = ({ region = [], graph = 'Cases', graphS
             confirmed={confirmed}
             deaths={deaths}
             mortality={mortality}
-            selected={selectedContinents}
+            selected={selectedRegions}
             handleSelectedGraph={handleSelectedGraph}
             handleGraphScale={handleGraphScale}
             graphScale={graphScale}

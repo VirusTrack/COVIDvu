@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 
-// import { useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 
 import { Message } from 'rbx'
-import ReactGA from 'react-ga'
-import { useHandleHistory } from '../hooks/nav'
+import useGraphFilter from '../hooks/graphFilter'
 
 import { actions } from '../ducks/services'
 
@@ -25,12 +24,26 @@ export const RegionGraphContainer = ({
   region, uniqueRegion = [], graph = 'Cases', graphScaleParam = false,
 }) => {
   const dispatch = useDispatch()
-  // const { search } = useLocation()
-  const handleHistory = useHandleHistory(`/covid/region/${region}`)
+  const { search } = useLocation()
 
-  const [graphScale, setGraphScale] = useState(graphScaleParam)
-  const [selectedRegions, setSelectedRegions] = useState(uniqueRegion)
-  const [secondaryGraph, setSecondaryGraph] = useState(graph)
+  const { 
+    selectedRegions, 
+    graphScale,
+    secondaryGraph,
+    handleSelectedRegion, 
+    handleSelectedGraph, 
+    handleGraphScale 
+} = useGraphFilter(
+    region, 
+    graphScaleParam, 
+    graph, 
+    null,
+    null,
+    search,
+    'US',
+    `Region:${region}`,
+    `/covid/region/${region}`
+)
 
   // TODO look into using the hook for this as well, somehow
   const confirmed = useSelector((state) => (Object.prototype.hasOwnProperty.call(state.services.region, region) ? state.services.region[region].confirmed : undefined))
@@ -52,45 +65,15 @@ export const RegionGraphContainer = ({
       setRegionNotFound(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, region, graphScale])
+  }, [dispatch, region])
 
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
     if (sortedConfirmed && uniqueRegion.length === 0) {
-      setSelectedRegions(sortedConfirmed.slice(0, 3).map((confirmed) => confirmed.region))
+      handleSelectedRegion(sortedConfirmed.slice(0, 3).map((confirmed) => confirmed.region))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortedConfirmed])
-
-  const handleSelectedRegion = (regionList) => {
-    setSelectedRegions(regionList)
-    handleHistory(regionList, secondaryGraph, graphScale)
-
-    ReactGA.event({
-      category: `Region:${region}`,
-      action: `Changed selected regions to ${regionList.join(', ')}`,
-    })
-  }
-
-  const handleSelectedGraph = (selectedGraph) => {
-    setSecondaryGraph(selectedGraph)
-    handleHistory(selectedRegions, selectedGraph, graphScale)
-
-    ReactGA.event({
-      category: `Region:${region}`,
-      action: `Changed selected graph to ${selectedGraph}`,
-    })
-  }
-
-  const handleGraphScale = (graphScale) => {
-    setGraphScale(graphScale)
-    handleHistory(selectedRegions, secondaryGraph, graphScale)
-
-    ReactGA.event({
-      category: `Region:${region}`,
-      action: `Changed graph scale to ${graphScale}`,
-    })
-  }
 
   if (regionNotFound) {
     return (

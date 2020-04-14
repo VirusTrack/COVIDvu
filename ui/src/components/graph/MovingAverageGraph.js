@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react'
 
-import { useMobileDetect } from '../hooks/ui'
+import { useMobileDetect } from '../../hooks/ui'
 
-import PlotlyGraph from './graph/PlotlyGraph'
-
-import { GRAPHSCALE_TYPES } from '../constants'
+import PlotlyGraph from './PlotlyGraph'
 
 import moment from 'moment'
 
-export const Graph = ({
-  graphName, data, y_type = 'numeric', y_title, x_title, selected, config, graphScale = GRAPHSCALE_TYPES.LINEAR, start = null, ref = null,
+export const MovingAverageGraph = ({
+  graphName, data, x_title, y_title, selected, config, ref = null,
 }) => {
-  const [plotsAsValues, setPlotsAsValues] = useState([])
+
+    const [plotsAsValues, setPlotsAsValues] = useState([])
 
   const detectMobile = useMobileDetect()
 
@@ -45,53 +44,7 @@ export const Graph = ({
       }
 
       const regionData = data[region]
-
-      if(graphScale === GRAPHSCALE_TYPES.SLOPE) {
-          let totalDays = 0
-
-          let slopeStart = 100
-
-
-          // console.log(`graphName: ${graphName}`)
-          if(graphName === 'Deaths') {
-            slopeStart = 10
-          }
-          for (const key of Object.keys(regionData).sort()) {
-            if(regionData[key] > slopeStart) {
-              if(plots[normalizedRegion].x.length === 0) {
-                plots[normalizedRegion].x.push(0)
-              } else {
-                const newX = plots[normalizedRegion].x[plots[normalizedRegion].x.length - 1] + 1
-                if(totalDays < newX) totalDays = newX
-                plots[normalizedRegion].x.push(newX)
-              }
     
-              plots[normalizedRegion].y.push(regionData[key])
-            }
-          }
-    
-    
-          const slope_x = Array.apply(null, {length: totalDays}).map(Number.call, Number)
-          const slope_y = slope_x.map(x => (slopeStart * Math.pow(10, Math.log10(1.3333) * (x))))
-        
-          plots['reproduction_rate'] = {
-            order: 0,
-            x: slope_x,
-            y: slope_y,
-            type: 'scatter',
-            mode: 'lines',
-            name: 'Daily Increase 33%',
-            line: {
-              color: 'black',
-              dash: 'dash',
-            },
-            marker: {
-              size: 5,
-            },
-            // showlegend: false,
-            hoverinfo: 'skip',
-          }
-      } else if(graphScale === GRAPHSCALE_TYPES.AVERAGE) {
         const diff = Object.values(regionData).reduce((acc, value, index, array) => {
           acc.push(acc.length === 0 ? value : value - array[index - 1])
           return acc
@@ -107,19 +60,7 @@ export const Graph = ({
 
         plots[normalizedRegion].type = 'bar'
 
-      } else {
-        for (const key of Object.keys(regionData).sort()) {
-          if ((graphScale === GRAPHSCALE_TYPES.LOGARITHMIC && regionData[key] > 100) || graphScale === GRAPHSCALE_TYPES.LINEAR) {
-            if (start && regionData[key] < start) continue
-
-            plots[normalizedRegion].x.push(key)
-            plots[normalizedRegion].y.push(regionData[key])
-          }
-        }
       }
-    }
-
-    if(graphScale === GRAPHSCALE_TYPES.AVERAGE) {
 
       let earliestDay = undefined
       let latestDay = undefined
@@ -140,7 +81,6 @@ export const Graph = ({
               latestDay = plotEndDate
             }
           }
-      }
 
       if(earliestDay && latestDay) {
           // console.dir(earliestDay.format('YYYY-MM-DD'))
@@ -205,14 +145,14 @@ export const Graph = ({
     for(const plot of Object.values(plots)) {
       for(let i=0; i<sortedPlotsOrder.length; i++) {
         if(plot.name === sortedPlotsOrder[i].region) {
-          plot.order = graphScale === GRAPHSCALE_TYPES.SLOPE ? i + 1 : i
+          plot.order = i
         }
       }      
     }
 
     setPlotsAsValues(Object.values(plots).sort((a, b) => a.order - b.order))
 
-  }, [selected, data, y_type, graphScale, start, graphName])
+  }, [selected, data, graphName])
 
   const mergeConfig = {
     ...config,
@@ -231,14 +171,6 @@ export const Graph = ({
     },
   }
 
-
-  if (graphScale === GRAPHSCALE_TYPES.LOGARITHMIC || graphScale === GRAPHSCALE_TYPES.SLOPE) {
-    layout.yaxis = {
-      type: 'log',
-      autorange: true,
-    }
-  }
-
   if (detectMobile.isMobile()) {
     layout = {
       ...layout,
@@ -247,14 +179,6 @@ export const Graph = ({
       },
     }
 
-    if (graphScale === GRAPHSCALE_TYPES.LINEAR) {
-      layout = {
-        ...layout,
-        yaxis: {
-          fixedrange: true,
-        },
-      }
-    }
   }
 
   if (y_title) {
@@ -262,10 +186,6 @@ export const Graph = ({
       ...layout,
       yaxis: { ...layout.yaxis, title: y_title },
     }
-  }
-
-  if (graphName === 'Mortality') {
-    layout.yaxis = { ...layout.yaxis, tickformat: '.1%' }
   }
 
   if (x_title) {
@@ -281,20 +201,9 @@ export const Graph = ({
     itemclick: 'toggleothers'
   }
 
-  if(graphScale === GRAPHSCALE_TYPES.SLOPE) {
-    layout['xaxis'] = {
-      title: 'Days since 100 cases',
-    }
-
-    layout.legend = {
-      ...layout.legend,
-    }
-  
-  }  
-
   return (
     <PlotlyGraph data={plotsAsValues} layout={layout} config={mergeConfig} ref={ref} />
   )
 }
 
-export default Graph
+export default MovingAverageGraph
