@@ -33,12 +33,12 @@ export const GraphScaleControl = ({
           <Button.Group hasAddons>
             <Button size="medium" selected={graphScale === GRAPHSCALE_TYPES.LINEAR} color={graphScale === GRAPHSCALE_TYPES.LINEAR ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.LINEAR) { handleGraphScale(GRAPHSCALE_TYPES.LINEAR) } }}>Linear</Button>
             <Button tooltip="Steeper slope on log scale means faster disease spread" size="medium" selected={graphScale === GRAPHSCALE_TYPES.LOGARITHMIC}  color={graphScale === GRAPHSCALE_TYPES.LOGARITHMIC ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.LOGARITHMIC) { handleGraphScale(GRAPHSCALE_TYPES.LOGARITHMIC) } }}>Logarithmic</Button>
-            <Button disabled={showPredictions} tooltip={generateSlopeTooltip()} size="medium" selected={graphScale === GRAPHSCALE_TYPES.SLOPE} color={graphScale === GRAPHSCALE_TYPES.SLOPE ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.SLOPE) { handleGraphScale(GRAPHSCALE_TYPES.SLOPE) } }}>Rate</Button>
             <Button disabled={showPredictions} size="medium" selected={graphScale === GRAPHSCALE_TYPES.AVERAGE} color={graphScale === GRAPHSCALE_TYPES.AVERAGE ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.AVERAGE) { handleGraphScale(GRAPHSCALE_TYPES.AVERAGE) } }}>Average</Button>
+            <Button disabled={showPredictions} tooltip={generateSlopeTooltip()} size="medium" selected={graphScale === GRAPHSCALE_TYPES.SLOPE} color={graphScale === GRAPHSCALE_TYPES.SLOPE ? 'default' : 'light'} onClick={() => { if (graphScale !== GRAPHSCALE_TYPES.SLOPE) { handleGraphScale(GRAPHSCALE_TYPES.SLOPE) } }}>Rate</Button>
           </Button.Group>
         </Column>
 
-        { ((parentRegion === 'Global' || parentRegion === 'US') && secondaryGraph === 'Cases' && graphScale !== GRAPHSCALE_TYPES.SLOPE)
+        { ((parentRegion === 'Global' || parentRegion === 'US') && secondaryGraph === 'Cases' && graphScale !== GRAPHSCALE_TYPES.SLOPE && graphScale !== GRAPHSCALE_TYPES.AVERAGE)
                     && (
                     <Column>
                       <span style={{ fontSize: '1.4rem' }}>
