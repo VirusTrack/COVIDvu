@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 
-import Plot from 'react-plotly.js'
-
-import { Generic } from 'rbx'
 import { useMobileDetect } from '../hooks/ui'
 
-import LogoElement from './LogoElement'
+import PlotlyGraph from './graph/PlotlyGraph'
+
 import { GRAPHSCALE_TYPES } from '../constants'
+
+import moment from 'moment'
 
 export const Graph = ({
   graphName, data, y_type = 'numeric', y_title, x_title, selected, config, graphScale = GRAPHSCALE_TYPES.LINEAR, start = null, ref = null,
@@ -91,6 +91,22 @@ export const Graph = ({
             // showlegend: false,
             hoverinfo: 'skip',
           }
+      } else if(graphScale === GRAPHSCALE_TYPES.AVERAGE) {
+        const diff = Object.values(regionData).reduce((acc, value, index, array) => {
+          acc.push(acc.length === 0 ? value : value - array[index - 1])
+          return acc
+        }, [])
+
+        let index = 0
+        for (const key of Object.keys(regionData).sort()) {
+          plots[normalizedRegion].x.push(key)
+          plots[normalizedRegion].y.push(diff[index])
+
+          ++index
+        }
+
+        plots[normalizedRegion].type = 'bar'
+
       } else {
         for (const key of Object.keys(regionData).sort()) {
           if ((graphScale === GRAPHSCALE_TYPES.LOGARITHMIC && regionData[key] > 100) || graphScale === GRAPHSCALE_TYPES.LINEAR) {
@@ -103,6 +119,86 @@ export const Graph = ({
       }
     }
 
+    if(graphScale === GRAPHSCALE_TYPES.AVERAGE) {
+
+      let earliestDay = undefined
+      let latestDay = undefined
+
+      for(const plot of Object.values(plots)) {
+
+        const plotBeginDate = moment(plot.x[0])
+        const plotEndDate = moment(plot.x[plot.x.length - 1])
+
+          if(!earliestDay) {
+            earliestDay = plotBeginDate
+            latestDay = plotEndDate
+          } else {
+            if(earliestDay.isBefore(plotBeginDate)) {
+              earliestDay = plotBeginDate
+            }
+            if(latestDay.isAfter(plotEndDate)) {
+              latestDay = plotEndDate
+            }
+          }
+      }
+
+      if(earliestDay && latestDay) {
+          // console.dir(earliestDay.format('YYYY-MM-DD'))
+          // console.dir(latestDay.format('YYYY-MM-DD'))
+
+          const diffInDays = latestDay.diff(earliestDay, 'days') + 1
+
+          const x_axis_days = []
+          const y_totals = []
+
+          const total_plots = Object.values(plots).length
+          let currentDayKey = moment(earliestDay).format('YYYY-MM-DD')
+
+          for(let i=0; i<diffInDays; i++) {
+            currentDayKey = moment(earliestDay).add(i, 'days').format('YYYY-MM-DD')
+
+            x_axis_days.push(currentDayKey)
+
+            let y_total = 0
+
+            for(let plot of Object.values(plots)) {
+              let y_vals = Object.values(plot.y)
+              y_total += y_vals[i]
+            }
+
+            y_total = y_total / total_plots
+            y_totals.push(y_total)
+          }
+
+          // console.dir(x_axis_days)
+          // console.dir(y_totals)
+
+          const movingAverage = y_totals.reduce((acc, value, index, array) => {
+            const howMany = index < 7 ? index : 7
+
+            let sum = 0
+            for(let i = index - howMany ; i<index; i++) {
+              sum += array[i]
+            }
+
+            acc.push(sum / howMany)
+            return acc
+          }, [])
+
+          plots['rolling_average'] = {
+            order: 0,
+            x: x_axis_days,
+            y: movingAverage,
+            type: 'scatter',
+            mode: 'lines',
+            name: '7-Day Average',
+            line: {
+              color: 'black',
+              width: 3,
+            },
+          }
+      }
+    }    
 
     const sortedPlotsOrder = plotsOrder.sort((a, b) => b.total - a.total)
 
@@ -168,7 +264,7 @@ export const Graph = ({
     }
   }
 
-  if (y_title === 'Case Fatality Rate Percentage') {
+  if (graphName === 'Mortality') {
     layout.yaxis = { ...layout.yaxis, tickformat: '.1%' }
   }
 
@@ -192,26 +288,12 @@ export const Graph = ({
 
     layout.legend = {
       ...layout.legend,
-      // yanchor: 'bottom',
-      // y: 1
     }
   
   }  
 
-
   return (
-    <>
-      <Generic id="graphPlot" ref={ref} className="vt-graph" tooltipPosition="top" tooltip="Clicking on legend items removes others from plot ">
-        <div className="vt-graph-logo"><LogoElement url /></div>
-        <Plot
-          data={plotsAsValues}
-          layout={layout}
-          config={mergeConfig}
-          useResizeHandler
-          style={{ width: '100%', height: '100%', minHeight: '45rem' }}
-        />
-      </Generic>
-    </>
+    <PlotlyGraph data={plotsAsValues} layout={layout} config={mergeConfig} ref={ref} />
   )
 }
 

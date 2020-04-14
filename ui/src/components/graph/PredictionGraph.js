@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from 'react'
 
-import Plot from 'react-plotly.js'
+import PlotlyGraph from './PlotlyGraph'
 
-
-import { Generic, Notification, Title } from 'rbx'
-
+import { Notification, Title } from 'rbx'
 
 import numeral from 'numeral'
 import moment from 'moment'
-import LogoElement from './LogoElement'
-import { useMobileDetect } from '../hooks/ui'
-import { GRAPHSCALE_TYPES } from '../constants'
+import { useMobileDetect } from '../../hooks/ui'
+import { GRAPHSCALE_TYPES } from '../../constants'
 
 export const PredictionGraph = ({
-  title, predictions, confirmed, selected, graphScale = GRAPHSCALE_TYPES.LINEAR,
+  title, predictions, confirmed, selected, graphScale = GRAPHSCALE_TYPES.LINEAR, ref = null,
 }) => {
   const [plotsAsValues, setPlotsAsValues] = useState([])
 
@@ -242,7 +239,13 @@ export const PredictionGraph = ({
         .
       </Notification>
 
-      <Generic tooltipPosition="top" className="vt-graph" tooltip="Clicking on legend items will remove them from graph">
+      <PlotlyGraph 
+          data={plotsAsValues}
+          layout={layout}
+          config={mergeConfig}
+          ref={ref} 
+        />
+      {/* <Generic tooltipPosition="top" className="vt-graph" tooltip="Clicking on legend items will remove them from graph">
         <div className="vt-graph-logo"><LogoElement url /></div>
         <Plot
           data={plotsAsValues}
@@ -251,7 +254,7 @@ export const PredictionGraph = ({
           useResizeHandler
           style={{ width: '100%', height: '100%', minHeight: '45rem' }}
         />
-      </Generic>
+      </Generic> */}
     </>
   )
 }

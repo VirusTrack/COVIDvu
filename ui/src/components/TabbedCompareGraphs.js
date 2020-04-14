@@ -7,7 +7,8 @@ import { GRAPHSCALE_TYPES } from '../constants'
 
 import GraphControls from './GraphControls'
 import GraphWithLoader from './GraphWithLoader'
-import PredictionGraph from './PredictionGraph'
+import PredictionGraph from './graph/PredictionGraph'
+import PercentGraph from './graph/PercentGraph'
 
 export const TabbedCompareGraphs = (
   {
@@ -122,45 +123,54 @@ export const TabbedCompareGraphs = (
                 && (
                 <>
                   <PredictionGraph
-                    graphName="Cases"
-                    title={selected}
-                    selected={selected}
-                    graphScale={graphScale}
-                    predictions={predictions}
-                    confirmed={confirmed}
+                      graphName="Cases"
+                      title={selected}
+                      selected={selected}
+                      graphScale={graphScale}
+                      predictions={predictions}
+                      confirmed={confirmed}
                   />
                 </>
                 )}
       { !showPredictions
                 && (
                 <GraphWithLoader
-                  graphName="Cases"
-                  secondaryGraph={secondaryGraph}
-                  graph={confirmed}
-                  selected={selected}
-                  graphScale={graphScale}
-                  y_title="Total confirmed cases"
+                    graphName="Cases"
+                    secondaryGraph={secondaryGraph}
+                    graph={confirmed}
+                    selected={selected}
+                    graphScale={graphScale}
+                    y_title="Total confirmed cases"
                 />
-                )}
+      )}
 
 
       <GraphWithLoader
-        graphName="Deaths"
-        secondaryGraph={secondaryGraph}
-        graph={deaths}
-        selected={selected}
-        graphScale={graphScale}
-        y_title="Number of deaths"
+          graphName="Deaths"
+          secondaryGraph={secondaryGraph}
+          graph={deaths}
+          selected={selected}
+          graphScale={graphScale}
+          y_title="Number of deaths"
       />
 
-      <GraphWithLoader
-        graphName="Mortality"
-        secondaryGraph={secondaryGraph}
-        graph={mortality}
-        selected={selected}
-        y_type="percent"
-        y_title="Case Fatality Rate Percentage"
-      />
+      { secondaryGraph === 'Mortality' 
+          && (
+            <>
+            {mortality ? (
+                <PercentGraph
+                    graphName="Mortality"
+                    data={mortality}
+                    selected={selected}
+                    y_title="Case Fatality Rate Percentage"
+                />
+            ) : (
+              <div>
+                Loading...
+              </div>
+            )}
+          </>
+      )}
 
     </>
   )
