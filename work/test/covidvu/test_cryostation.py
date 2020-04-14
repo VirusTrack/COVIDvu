@@ -4,7 +4,7 @@
 
 
 from pandas.core.frame import DataFrame
-from pandas.core.indexes.base import Index
+from pandas.core.indexes.datetimes import DatetimeIndex
 
 import os
 
@@ -57,7 +57,7 @@ def test_Cryostation_allProvincesOf():
 def _assertTimeSeriesDataFrameIsValid(df, expectedColumns):
     assert isinstance(df, DataFrame)
     assert (df.columns.isin(expectedColumns)).all()
-    assert isinstance(df.index, Index)
+    assert isinstance(df.index, DatetimeIndex)
     assert df.isnull().values.ravel().sum() == 0
 
 
