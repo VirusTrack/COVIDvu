@@ -32,7 +32,8 @@ const DEBUG = false
 const GRAPHSCALE_TYPES = {
   LINEAR: "linear",
   LOGARITHMIC: "logarithmic",
-  SLOPE: "slope"
+  SLOPE: "slope",
+  AVERAGE: "average",
 }
 
 const COUNTRIES = [

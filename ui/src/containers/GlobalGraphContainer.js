@@ -75,6 +75,8 @@ export const GlobalGraphContainer = ({
      * Fetch all the data
      */
   useEffect(() => {
+    console.log("GlobalGraphContainer.useEffect.dispatch")
+
     dispatch(actions.fetchGlobal())
     dispatch(actions.fetchGlobalPredictions())
     dispatch(actions.fetchTotalGlobalStats())
@@ -83,10 +85,12 @@ export const GlobalGraphContainer = ({
       handleGraphScale(graphScaleOrDefault(store.get(GLOBAL_GRAPH_SCALE_KEY)))
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, graphScale])
+  }, [dispatch])
 
   // Select the Top 3 confirmed from list if nothing is selected
   useEffect(() => {
+    console.log("GlobalGraphContainer.useEffect.sortedConfirmed")
+
     if (sortedConfirmed && region.length === 0) {
       let newSelectedCountries = []
       if (store.get(GLOBAL_REGION_SELECT_KEY)) {
