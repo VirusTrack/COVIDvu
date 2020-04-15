@@ -137,15 +137,18 @@ export const SlopeGraph = ({
         }
     }
         
-      if (detectMobile.isMobile()) {
-        layout = {
-          ...layout,
-          xaxis: {
-            fixedrange: true,
-          },
-        }    
+    if (detectMobile.isMobile() || detectMobile.isIos()) {
+      layout = {
+        ...layout,
+        xaxis: {
+          fixedrange: true
+        },
+        yaxis: {
+          fixedrange: true
+        }
       }
-      
+    }
+        
 
     return (
         <PlotlyGraph data={plotsAsValues} layout={layout} config={mergeConfig} ref={ref} />

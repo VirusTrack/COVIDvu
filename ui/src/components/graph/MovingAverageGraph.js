@@ -178,37 +178,43 @@ export const MovingAverageGraph = ({
       l: 70,
       t: 5,
       r: 10
-    }
+    },
+    legend: {
+      xanchor: "center",
+      yanchor: "top",
+      y: -0.2,
+      x: 0.5,
+      orientation: "h",
+      itemclick: "toggleothers"
+    },
   };
 
-  if (detectMobile.isMobile()) {
+  if (detectMobile.isMobile() || detectMobile.isIos()) {
     layout = {
       ...layout,
       xaxis: {
-        fixedrange: true
-      }
-    };
+        fixedrange: true,
+      },
+      yaxis: {
+        fixedrange: true,
+      },
+    }
   }
 
   if (y_title) {
     layout = {
       ...layout,
       yaxis: { ...layout.yaxis, title: y_title }
-    };
+    }
   }
 
   if (x_title) {
-    layout.xaxis.title = x_title;
+    layout = {
+      ...layout,
+      xaxis: { ...layout.xaxis, title: y_title }
+    }
   }
 
-  layout.legend = {
-    xanchor: "center",
-    yanchor: "top",
-    y: -0.2,
-    x: 0.5,
-    orientation: "h",
-    itemclick: "toggleothers"
-  };
 
   return (
     <PlotlyGraph

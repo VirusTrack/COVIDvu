@@ -87,23 +87,27 @@ export const PercentGraph = ({
       l: 70,
       t: 5,
       r: 10
-    }
-  };
+    },
+    legend: {
+      xanchor: "center",
+      yanchor: "top",
+      y: -0.2,
+      x: 0.5,
+      orientation: "h",
+      itemclick: "toggleothers"
+    },    
+  }
 
-  if (detectMobile.isMobile()) {
+  if (detectMobile.isMobile() || detectMobile.isIos()) {
     layout = {
       ...layout,
       xaxis: {
         fixedrange: true
-      }
-    };
-
-    layout = {
-      ...layout,
+      },
       yaxis: {
         fixedrange: true
       }
-    };
+    }
   }
 
   if (y_title) {
@@ -118,15 +122,6 @@ export const PercentGraph = ({
   if (x_title) {
     layout.xaxis.title = x_title;
   }
-
-  layout.legend = {
-    xanchor: "center",
-    yanchor: "top",
-    y: -0.2,
-    x: 0.5,
-    orientation: "h",
-    itemclick: "toggleothers"
-  };
 
   return (
     <PlotlyGraph
