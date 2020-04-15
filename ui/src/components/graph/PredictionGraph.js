@@ -175,7 +175,7 @@ export const PredictionGraph = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected, predictions])
 
-  const mergeConfig = {
+  let mergeConfig = {
     displayModeBar: false,
     responsive: true,
   }
@@ -189,6 +189,12 @@ export const PredictionGraph = ({
       t: 5,
       r: 10,
     },
+    legend: {
+      xanchor: 'center',
+      yanchor: 'top',
+      y: -0.1,
+      x: 0.5,
+    }
   }
 
   if (graphScale === GRAPHSCALE_TYPES.LOGARITHMIC) {
@@ -198,7 +204,7 @@ export const PredictionGraph = ({
     }
   }
 
-  if (detectMobile.isMobile()) {
+  if (detectMobile.isMobile() || detectMobile.isIos()) {
     layout = {
       ...layout,
       xaxis: {
@@ -213,15 +219,14 @@ export const PredictionGraph = ({
           fixedrange: true,
         },
       }
+    } else {
+      mergeConfig = {
+        ...mergeConfig,
+        staticPlot: true
+      }
     }
   }
 
-  layout.legend = {
-    xanchor: 'center',
-    yanchor: 'top',
-    y: -0.1,
-    x: 0.5,
-  }
 
   return (
     <>
