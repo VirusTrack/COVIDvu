@@ -97,14 +97,16 @@ export const Graph = ({
     },
   }
 
-  if (detectMobile.isMobile()) {
+  if (detectMobile.isMobile() || detectMobile.isIos()) {
     layout = {
       ...layout,
       xaxis: {
         fixedrange: true,
       },
+      yaxis: {
+        fixedrange: true,
+      },
     }
-
   }
 
   if (y_title) {

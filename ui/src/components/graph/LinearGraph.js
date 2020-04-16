@@ -90,7 +90,7 @@ export const LinearGraph = ({
     }    
   }
 
-  if (detectMobile.isMobile()) {
+  if (detectMobile.isMobile() || detectMobile.isIos()) {
     layout = {
       ...layout,
       xaxis: {
