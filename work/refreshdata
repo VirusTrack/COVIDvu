@@ -240,5 +240,5 @@ case "$environment" in
         ;;
 esac
 
-makeDataSnapshot
+# makeDataSnapshot
 
