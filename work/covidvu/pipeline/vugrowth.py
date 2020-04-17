@@ -20,9 +20,9 @@ def _computeGrowthFor(confirmedCases, windowSize):
 
 
 def _getGrowthGaugeData(growth, todayDate):
-    yesterdayDate   = (todayDate - pd.Timedelta(1, 'D')).date()
-    lastWeekDate    = (todayDate - pd.Timedelta(7, 'D')).date()
-    lastTwoWeekDate = (todayDate - pd.Timedelta(14, 'D')).date()
+    yesterdayDate   = todayDate - pd.Timedelta(1, 'D')
+    lastWeekDate    = todayDate - pd.Timedelta(7, 'D')
+    lastTwoWeekDate = todayDate - pd.Timedelta(14, 'D')
 
     yesterdayGrowth   = growth.loc[yesterdayDate]
     lastWeekGrowth    = growth.loc[lastWeekDate]
@@ -54,32 +54,37 @@ def _appendGrowthToProvinces(growthGaugeDataProvinces, databasePath, countryName
             cryostation[countryName] = country
 
 
-def _main(todayDate = TODAY_DATE, casesType = 'confirmed', windowSize = WINDOW_SIZE, databasePath = MASTER_DATABASE):
+def computeGrowth(regionType = 'country',
+                  countryName = None,
+                  casesType = 'confirmed',
+                  windowSize = WINDOW_SIZE,
+                  disableProgressBar = True,
+                  todayDate = TODAY_DATE,
+                  databasePath = MASTER_DATABASE,
+                  ):
 
     with Cryostation(databasePath) as cryostation:
-        countries = cryostation.timeSeriesFor(regionType         = 'country',
+        print('Loading time series for countries...')
+        regions = cryostation.timeSeriesFor(regionType         = regionType,
+                                              countryName        = countryName,
                                               casesType          = casesType,
-                                              disableProgressBar = True,
+                                              disableProgressBar = disableProgressBar,
                                               )
 
-    with Cryostation(databasePath) as cryostation:
-        statesUS = cryostation.timeSeriesFor(regionType='province',
-                                             countryName='US',
-                                             casesType=casesType,
-                                             disableProgressBar=True,
-                                             )
+    growth = _computeGrowthFor(regions, windowSize = windowSize)
 
-    growthCountries = _computeGrowthFor(countries,
-                                        windowSize = windowSize)
-    growthStatesUS  = _computeGrowthFor(statesUS,
-                                        windowSize = windowSize)
+    growthGaugeData = _getGrowthGaugeData(growth, todayDate)
 
-    growthGaugeDataCountries = _getGrowthGaugeData(growthCountries, todayDate)
-    growthGaugeDataStatesUS = _getGrowthGaugeData(growthStatesUS, todayDate)
-
-    _appendGrowthToCountries(growthGaugeDataCountries, databasePath, disableProgressBar=True)
-    _appendGrowthToProvinces(growthGaugeDataStatesUS, databasePath, countryName='US', disableProgressBar=True)
+    print('Computing/writing growth factors...')
+    if regionType == 'country':
+        _appendGrowthToCountries(growthGaugeData, databasePath, disableProgressBar = disableProgressBar)
+    elif regionType == 'province':
+        _appendGrowthToProvinces(growthGaugeData, databasePath, countryName=countryName, disableProgressBar=True)
+    else:
+        raise ValueError(f'regionType = {regionType} not understood')
+    print('Done.')
 
 
 if __name__ == '__main__':
-    _main()
+    computeGrowth(regionType = 'country', casesType = 'confirmed')
+    computeGrowth(regionType = 'province', countryName = 'US', casesType='confirmed')
