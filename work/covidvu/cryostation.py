@@ -139,8 +139,9 @@ class Cryostation(object):
             elif regionType == 'province':
                 if casesType in self[countryName]['provinces'][region]:
                     df[region] = pd.Series(self[countryName]['provinces'][region][casesType])
-            if i > nRegionsLimit:
-                break
+            if nRegionsLimit:
+                if i > nRegionsLimit:
+                    break
 
         df = pd.DataFrame(df)
         df.index = pd.to_datetime(df.index)
