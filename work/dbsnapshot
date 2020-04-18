@@ -38,6 +38,7 @@ function makeDataSnapshot {
 
     echo "creating snapshot at $snapshotFileName"
     cp -v "$MASTER_DATABASE" "$snapshotFileName"
+    [[ "$?" == "0" ]] || die "Unable to copy the master database to $snapshotFileName" 5
     bzip2 -9 "$snapshotFileName"
     [[ "$?" == "0" ]] || die "snapshot creation failed" 3
 } # makeDataSnapshot
