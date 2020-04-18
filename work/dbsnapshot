@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+# Version 2.0
+
+# crontab compliant :)
+
+
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+[[ -e "$REFRESHDATA_CONFIG" ]] || exit 250
+
+source ./vucommon.bash
+
+
+# +++ constants +++
+
+MINUTES_CURRENT=$(awk 'BEGIN { "date +\"%s\"" | getline time; print(int((time%3600)/60)); }')
+SNAPSHOTS_DIR="snapshots"
+
+
+# +++ functions +++
+
+function assertInstalled_bzip2 {
+    [[ -n $(which bzip2) ]] || die "bzip2 not installed" 2
+} # assertInstalled_bzip2
+
+
+function enableSnapshotsDir {
+    mkdir -p "$SNAPSHOTS_DIR" || die "snapshots dir [$SNAPSHOTS_DIR] not accessible" 1
+} # enableSnapshotsDir
+
+
+function makeDataSnapshot {
+    local now=$(date +"%Y%m%d-%H%MZ")
+    local snapshotFileName="$SNAPSHOTS_DIR/virustrack-snapshot-$now.db"
+
+    echo "creating snapshot at $snapshotFileName"
+    cp -v "$MASTER_DATABASE" "$snapshotFileName"
+    bzip2 -9 "$snapshotFileName"
+    [[ "$?" == "0" ]] || die "snapshot creation failed" 3
+} # makeDataSnapshot
+
+
+function cloneSnapshots {
+    echo "cloning $SNAPSHOTS_DIR to S3"
+    rclone -q --config="$CONFIG_rclone" sync --update "$SNAPSHOTS_DIR" "virustrack-website:$SITE_BUCKET/$SNAPSHOTS_DIR" || die "rclone $SNAPSHOTS_DIR to S3 failed" 4
+    [[ "$?" == "0" ]] || die "unable to clone $SNAPSHOTS_DIR to S3"
+} # cloneSnapshots
+
+
+# +++ main +++
+
+assertInstalled_bzip2
+echo "dbsnapshot start"
+enableSnapshotsDir
+makeDataSnapshot
+cloneSnapshots
+echo "dbsnapshot end"
+

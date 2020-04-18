@@ -17,7 +17,6 @@ source ./pyrunner
 
 # +++ constants +++
 
-CONFIG_rclone="rclone.conf"
 COVID_19_DIR="COVID-19"
 HTML_FILE_NAME="$SITE_DATA_DIR/table-%02d.html"
 JSON_DATA_BUNDLE="COVID19-cases.tar.gz"
@@ -210,6 +209,4 @@ case "$environment" in
         die "invalid command - use stage|publish|nuke|noop" 11
         ;;
 esac
-
-# makeDataSnapshot
 
