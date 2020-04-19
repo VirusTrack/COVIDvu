@@ -75,6 +75,7 @@ test: ALWAYS
 	pytest -v ./test/covidvu/pipeline/test_vuhospitals.py
 	pytest -v ./test/covidvu/pipeline/test_vujson.py
 	pytest -v ./test/covidvu/pipeline/test_vuregions.py
+	pytest -v ./test/covidvu/pipeline/test_vugrowth.py
 	pytest -v ./test/covidvu/test_cryostation.py
 	pytest -v ./test/covidvu/test_predict.py
 	pytest -v ./test/covidvu/test_utils.py

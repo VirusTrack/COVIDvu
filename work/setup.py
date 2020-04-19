@@ -24,6 +24,11 @@ if '__main__' == __name__:
         author               = 'The COVIDvu contributors',
         author_email         = 'covidvu.support@virustrack.live',
         description          = 'COVIDvu common tools',
+        entry_points         = {
+                                    'console_scripts': {
+                                        'vtdbchk=covidvu.cryostation:dbcheckmain',
+                                    }
+                               },
         include_package_data = True,
         install_requires     = requirements,
         license              = open('../LICENSE.txt').read(),
