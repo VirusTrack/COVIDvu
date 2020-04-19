@@ -6,6 +6,12 @@
 from tinydb import TinyDB, Query
 from tqdm.auto import tqdm
 
+from covidvu.config import MASTER_DATABASE
+
+import json
+import os
+import sys
+
 import pandas as pd
 
 
@@ -15,6 +21,10 @@ DEFAULT_TABLE = 'virustrack'
 
 
 # *** classes and objects ***
+
+class CryostationException(Exception):
+    pass
+
 
 class Cryostation(object):
     # *** private ***
@@ -148,4 +158,32 @@ class Cryostation(object):
         df.fillna(0, inplace=True)
 
         return df
+
+
+# --- stand-alone scripts ---
+
+def dbcheck(databaseCanonicalPath = MASTER_DATABASE):
+    # Integrity check first:
+    if not os.path.exists(databaseCanonicalPath):
+        raise FileNotFoundError
+
+    try:
+        json.load(open(databaseCanonicalPath, 'r'))
+    except:
+        raise CryostationException('JSON validation failed - file corrupted?')
+
+
+def dbcheckmain(databaseCanonicalPath = MASTER_DATABASE):
+    try:
+        database = sys.argv[1]
+    except:
+        database = databaseCanonicalPath
+
+    try:
+        dbcheck(database)
+    except Exception as e:
+        print('%s database check failed: %s' % (database, str(e)))
+        sys.exit(99)
+
+    sys.exit(0)
 

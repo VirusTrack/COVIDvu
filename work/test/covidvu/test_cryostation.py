@@ -19,6 +19,9 @@ TEST_DATABASE_FILE      = 'test.db'
 TEST_DATABASE_PATH      = './resources/test_databases'
 TEST_DATABASE_FILE_NAME = os.path.join(TEST_DATABASE_PATH, TEST_DATABASE_FILE)
 
+TEST_DATABASE_FILE_CORRUPTED  = 'test-corrupted.db'
+TEST_DATABASE_FILE_CORRUPTED_NAME = os.path.join(TEST_DATABASE_PATH, TEST_DATABASE_FILE_CORRUPTED)
+
 # TODO:  https://github.com/VirusTrack/COVIDvu/issues/537
 REAL_DATABASE_FILE      = 'virustrack.db'
 REAL_DATABASE_PATH      = './database'
@@ -175,11 +178,23 @@ def test_Cryostation__with():
     assert result
 
 
+def test_dbcheck():
+    with pytest.raises(FileNotFoundError):
+        storage.dbcheck('b0gusdb-not-here.db')
+
+    with pytest.raises(storage.CryostationException):
+        storage.dbcheck(TEST_DATABASE_FILE_CORRUPTED_NAME)
+
+
+def test_dbcheckmain():
+    pass
+    
+
 # test_Cryostation_creation()
 # test_Cryostation___setitem__n__contains__()
 # test_Cryostation_items()
 # test_Cryostation_keys()
 
 # test_Cryostation_allCountryNames()
-test_Cryostation_timeSeriesFor()
+# test_Cryostation_timeSeriesFor()
 

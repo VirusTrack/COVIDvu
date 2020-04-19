@@ -47,6 +47,13 @@ function resetErrorNotification {
 } # resetErrorNotification
 
 
+function assertDatabaseOK {
+    [[ -n $(which vtdbchk) ]] || die "vtdbchk missing; run make install in virtual environment" 26
+    
+    vtdbchk $MASTER_DATABASE || die "$MASTER_DATABASE integrity test failed" 27
+} # assertDatabaseOK
+
+
 function assertCloudFrontConfig {
     [[ -n "$AWS_ACCESS_KEY_ID" ]] || die "AWS_ACCESS_KEY_ID is not set" 4
     [[ -n "$AWS_SECRET_ACCESS_KEY" ]] || die "AWS_SECRET_ACCESS_KEY is not set" 5
@@ -170,6 +177,7 @@ echo "*** COVIDvu - website refresh tool ***"
 assertSiteDataExists
 resetErrorNotification
 resetSiteData "$1"
+assertDatabaseOK
 generateHospitalBedsData
 generateUSCountiesData
 generateJITData
