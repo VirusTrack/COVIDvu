@@ -6,6 +6,12 @@
 from tinydb import TinyDB, Query
 from tqdm.auto import tqdm
 
+from covidvu.config import MASTER_DATABASE
+
+import json
+import os
+import sys
+
 import pandas as pd
 
 
@@ -15,6 +21,10 @@ DEFAULT_TABLE = 'virustrack'
 
 
 # *** classes and objects ***
+
+class CryostationException(Exception):
+    pass
+
 
 class Cryostation(object):
     # *** private ***
@@ -99,7 +109,13 @@ class Cryostation(object):
         return [provinceName for provinceName in self[countryName]['provinces'].keys() if '!' not in provinceName]
 
 
-    def timeSeriesFor(self, regionType = 'country', casesType = 'confirmed', countryName = None, disableProgressBar = True):
+    def timeSeriesFor(self,
+                      regionType = 'country',
+                      casesType = 'confirmed',
+                      countryName = None,
+                      disableProgressBar = True,
+                      nRegionsLimit = None,
+                      ):
         """Get all time series of a given region type and return as dataframe
 
         Parameters
@@ -111,6 +127,7 @@ class Cryostation(object):
         disableProgressBar: no need for a progress bar on a service object - 
                             enable as needed if internal progress report is
                             needed, but should be off by default.
+        nRegionsLimit: Limit of number of countries to load for testing
 
         Returns
         -------
@@ -125,17 +142,48 @@ class Cryostation(object):
             raise ValueError(f'regionType = {regionType} not understood')
 
         df = {}
-        for region in tqdm(regions, disable = disableProgressBar):
+        for i, region in enumerate(tqdm(regions, disable = disableProgressBar)):
             if regionType == 'country':
                 if casesType in self[region]:
                     df[region] = pd.Series(self[region][casesType])
             elif regionType == 'province':
                 if casesType in self[countryName]['provinces'][region]:
                     df[region] = pd.Series(self[countryName]['provinces'][region][casesType])
+            if nRegionsLimit:
+                if i > nRegionsLimit:
+                    break
 
         df = pd.DataFrame(df)
         df.index = pd.to_datetime(df.index)
         df.fillna(0, inplace=True)
 
         return df
+
+
+# --- stand-alone scripts ---
+
+def dbcheck(databaseCanonicalPath = MASTER_DATABASE):
+    # Integrity check first:
+    if not os.path.exists(databaseCanonicalPath):
+        raise FileNotFoundError
+
+    try:
+        json.load(open(databaseCanonicalPath, 'r'))
+    except:
+        raise CryostationException('JSON validation failed - file corrupted?')
+
+
+def dbcheckmain(databaseCanonicalPath = MASTER_DATABASE):
+    try:
+        database = sys.argv[1]
+    except:
+        database = databaseCanonicalPath
+
+    try:
+        dbcheck(database)
+    except Exception as e:
+        print('%s database check failed: %s' % (database, str(e)))
+        sys.exit(99)
+
+    sys.exit(0)
 

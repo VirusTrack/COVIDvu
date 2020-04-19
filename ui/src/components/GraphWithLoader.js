@@ -7,7 +7,7 @@ import MovingAverageGraph from './graph/MovingAverageGraph'
 import PercentGraph from './graph/PercentGraph'
 import PredictionGraph from './graph/PredictionGraph'
 
-import { Notification, Title } from 'rbx'
+import { Notification } from 'rbx'
 
 import { GRAPHSCALE_TYPES } from '../constants'
 
@@ -58,11 +58,16 @@ export const GraphWithLoader = ({
       return (
           <>
             <Notification>
-              <Title size={4}>
-                Reproduction Rates for selected regions
-              </Title>
-              All regions shown for confirmed cases after first 100 cases forward, and for deaths 
-              after first 10 cases. The dashed line shows the reproduction rate based on the number of days.
+              { graphName === 'Cases' &&
+                <>
+                  Number of confirmed cases after the 100th case. The dashed line indicates a 33% daily increase.
+                </>
+              }
+              { graphName === 'Deaths' &&
+                <>
+                  Number of recorded deaths after the 10th death. The dashed line indicates a 33% daily increase.
+                </>
+              }
           </Notification>
 
           <GraphOrLoading graph={graph}>

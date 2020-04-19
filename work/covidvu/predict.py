@@ -90,7 +90,7 @@ def _getPredictionsFromPosteriorSamples(t,
                                         predictionsPercentiles,
                                         ):
 
-    tPredict = np.arange(len(t) + nDaysPredict)
+    tPredict = np.hstack((t, np.arange(t[-1]+1, t[-1]+nDaysPredict+1)))
 
     predictions = np.zeros((len(t)+nDaysPredict, trace.shape[0]))
 
@@ -115,11 +115,12 @@ def _castPredictionsAsTS(regionTSClean,
                          predictionsMean,
                          predictionsPercentiles,
                          ):
-    predictionsMeanTS = pd.Series(
-        index = pd.date_range(
-                                start = regionTSClean.index[0],
+    predictionIndex = regionTSClean.index.append(pd.date_range(
+                                start = regionTSClean.index[-1] + pd.Timedelta(1, 'D'),
                                 end   = regionTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
-                             ),
+                             ))
+    predictionsMeanTS = pd.Series(
+        index = predictionIndex,
         data  = predictionsMean,
     )
 
@@ -127,18 +128,12 @@ def _castPredictionsAsTS(regionTSClean,
     for qLow, qHigh in predictionsPercentiles:
 
         predictionsLow  = pd.Series(
-            index = pd.date_range(
-                                    start = regionTSClean.index[0],
-                                    end   = regionTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
-                                 ),
+            index = predictionIndex,
             data  = qLow,
         )
 
         predictionsHigh = pd.Series(
-            index = pd.date_range(
-                                    start = regionTSClean.index[0],
-                                    end   = regionTSClean.index[-1] + pd.Timedelta(nDaysPredict, 'D')
-                                 ),
+            index = predictionIndex,
             data  = qHigh,
         )
         predictionsPercentilesTS.append([predictionsLow, predictionsHigh])
@@ -205,6 +200,7 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
             raise e
 
     regionTS.index = pd.to_datetime(regionTS.index)
+    regionTS.sort_index(inplace=True)
 
     minIndex = (regionTS > minCasesFilter).argmax()
     regionTSClean = regionTS.iloc[minIndex:]
@@ -213,7 +209,7 @@ def predictLogisticGrowth(logGrowthModel: StanModel,
 
     regionTSClean.index = pd.to_datetime(regionTSClean.index)
 
-    t = np.arange(regionTSClean.shape[0])
+    t = regionTSClean.index.to_series().diff().map(lambda d: d.days).fillna(0).cumsum().values
     regionTSCleanLog = np.log(regionTSClean.values + 1)
 
     logisticGrowthData = {'nDays': regionTSClean.shape[0],
