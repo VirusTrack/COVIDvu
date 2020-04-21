@@ -6,6 +6,7 @@
 REFRESHDATA_CONFIG="./refreshdata.config"
 [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
 
+source "./vucommon.bash"
 source ./pyrunner
 
 export COUNTY_CASES_US_ENDPOINT="https://coronavirus-tracker-api.herokuapp.com/v2/locations?source=csbs"
@@ -13,7 +14,10 @@ export COUNTY_CASES_US_ENDPOINT="https://coronavirus-tracker-api.herokuapp.com/v
 
 # *** main ***
 
+
 echo "fetchcing counties data from $COUNTY_CASES_US_ENDPOINT"
+
+assertDatabaseOK
 
 curl -A "$PYAVKA_USER_AGENT" -s "$COUNTY_CASES_US_ENDPOINT" | jq -M '.locations' > "$COUNTY_CASES_CSBS_FILE" 
 
