@@ -21,4 +21,9 @@ function die {
 } # die
 
 
+function assertDatabaseOK {
+    [[ -n $(which vtdbchk) ]] || die "vtdbchk missing; run make install in virtual environment" 26
+    
+    vtdbchk $MASTER_DATABASE || die "$MASTER_DATABASE integrity test failed" 97
+} # assertDatabaseOK
 
