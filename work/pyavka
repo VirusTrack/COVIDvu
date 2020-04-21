@@ -3,6 +3,7 @@
 # vim: set fileencoding=utf-8:
 
 
+source "./vucommon.bash"
 source ./pyrunner
 
 
@@ -27,6 +28,9 @@ function fetchBNODataSource {
 
 
 # *** main ***
+
+echo "pyavka shell - scraping the data"
+assertDatabaseOK
 
 fetchBNODataSource
 python3 -m covidvu.pipeline.pyavka

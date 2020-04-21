@@ -6,12 +6,15 @@
 REFRESHDATA_CONFIG="./refreshdata.config"
 [[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
 
+source "./vucommon.bash"
 source ./pyrunner
 
 export COUNTY_CASES_US_ENDPOINT="https://coronavirus-tracker-api.herokuapp.com/v2/locations?source=csbs"
 
 
 # *** main ***
+
+assertDatabaseOK
 
 ./refreshdata local
 echo "running the predictions models for all locations"

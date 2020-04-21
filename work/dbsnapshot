@@ -53,6 +53,7 @@ function cloneSnapshots {
 
 # +++ main +++
 
+assertDatabaseOK
 assertInstalled_bzip2
 echo "dbsnapshot start"
 enableSnapshotsDir
