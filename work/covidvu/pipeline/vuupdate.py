@@ -13,7 +13,6 @@ import csv
 import datetime
 import os
 import pytz
-import sys
 
 import tqdm
 
@@ -135,7 +134,7 @@ def _updateWorldData():
             country = cryostation[countryName]
             try:
                 country['confirmed'][SCRAPED_TODAY] = updateWorldCases[countryName][SCRAPED_TODAY]
-                country['deaths'][SCRAPED_TODAY] = updateWorldCases[countryName][SCRAPED_TODAY]
+                country['deaths'][SCRAPED_TODAY] = updateWorldDeaths[countryName][SCRAPED_TODAY]
             except KeyError:
                 # TODO: Eugene - Define a mechanism to add new countries reporting to the database
                 pass
