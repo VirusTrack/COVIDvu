@@ -115,13 +115,17 @@ function generateJITData {
     #       ./refreshdata noop
     #
     #       ./refreshdata
-    echo "pyavka - grabbing the spreadsheet"
-    fetchJITDataSource
-    python3 -m covidvu.pipeline.pyavka
+#     echo "pyavka - grabbing the spreadsheet"
+#     fetchJITDataSource
+#     python3 -m covidvu.pipeline.pyavka
+
+    # TODO: Eugene - fix this for realz!
+    ./rustler
     ls -Alrt "$SITE_DATA_DIR"/*html
 
     echo "vuupdate - updating system with latest calculated updates"
     python -m covidvu.pipeline.vuupdate confirmed deaths
+    [[ "0" != "$?" ]] && die "vuupdate failed" 28
     ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
 } # generateJITData
 
