@@ -218,6 +218,5 @@ def _main():
 # +++ main +++
 
 if '__main__' == __name__:
-    for argument in sys.argv[1:]:
-        _main()
+    _main()
 
