@@ -39,6 +39,11 @@ RUSTLER_HEADERS = {
     'TotalCases': 'Cases',
     'TotalDeaths': 'Deaths',
     'USAState': 'UNITED STATES',
+    'Total Recovered': 'Recovered',
+    'ActiveCases': 'Active cases',
+    'Serious,Critical': 'Critical',
+    'Deaths/1M Pop': 'Deaths/1m',
+    'TotalTests': 'Total tests',
 } 
 
 RUSTLER_IGNORE_COUNTRY = (
@@ -94,13 +99,19 @@ def _generateWorldCSV(targetFileName, dataSource = None, maxColumns = 5):
     table  = source.find('table')
 
     header = list()
+    columns = 0
     for tableHeader in table.find_all('th'):
-        headerText = RUSTLER_HEADERS.get(tableHeader.text, '')
+        headerText = tableHeader.text
+        headerText = RUSTLER_HEADERS.get(headerText, headerText)
         if len(headerText):
             header.append(headerText)
+            columns += 1
+            if columns == maxColumns:
+                break
 
     rows = list()
     rows.append(header)
+
     for tableRow in table.find_all('tr'):
         try:
             row = list()
@@ -182,7 +193,7 @@ def _generateUSCSV(targetFileName, dataSource = None, maxColumns = 5):
 
 
 def processHTML2CSV(dataLake = SITE_DATA):
-    _generateWorldCSV(SCRAPED_WORLD_DATA, './site-data/table-00.html')
+    _generateWorldCSV(SCRAPED_WORLD_DATA, './site-data/table-00.html', maxColumns = 11)
     _generateUSCSV(SCRAPED_US_DATA, './site-data/table-01.html')
 
 

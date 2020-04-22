@@ -124,7 +124,7 @@ function generateJITData {
     ls -Alrt "$SITE_DATA_DIR"/*html
 
     echo "vuupdate - updating system with latest calculated updates"
-    python -m covidvu.pipeline.vuupdate confirmed deaths
+    python -m covidvu.pipeline.vuupdate
     [[ "0" != "$?" ]] && die "vuupdate failed" 28
     ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
 } # generateJITData
