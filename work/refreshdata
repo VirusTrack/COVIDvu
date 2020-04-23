@@ -181,7 +181,7 @@ resetErrorNotification
 assertDatabaseOK
 assertJITDataToolsAvailable
 resetSiteData "$1"
-generateHospitalBedsData
+# generateHospitalBedsData
 generateUSCountiesData
 generateJITData
 packDataFiles
