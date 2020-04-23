@@ -88,7 +88,7 @@ function generateHospitalBedsData {
 
     printf "fetching current US hospital beds count\n  "
     cp -vf "$HOSPITAL_BEDS_US_FILE" "$hospitalBedsTargetFile"
-    [[ "0" != "$?" ]] && die "generateHospitalBedsData - failed" 18
+    [[ "0" != "$?" ]] && die "generateHospitalBedsData - failed; $HOSPITAL_BEDS_US_FILE -> $hospitalBedsTargetFile" 18
 } # generateHospitalBedsData
 
 
