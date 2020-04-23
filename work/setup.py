@@ -23,6 +23,9 @@ if '__main__' == __name__:
     setup(
         author               = 'The COVIDvu contributors',
         author_email         = 'covidvu.support@virustrack.live',
+        dependency_links     = [
+                                    'https://github.com/pr3d4t0r/repo/tarball/master#egg=vtrustler',
+                               ],
         description          = 'COVIDvu common tools',
         entry_points         = {
                                     'console_scripts': {

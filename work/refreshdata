@@ -41,6 +41,12 @@ function assertSiteDataExists {
 } # assertSiteDataExists
 
 
+function assertJITDataToolsAvailable {
+    [[ -n $(which rustler) ]] || die "rustler tool not installed" 29
+    [[ -n $(which vtrustler) ]] || die "vtrustler Python module not installed" 30
+} # assertJITDataToolsAvailable
+
+
 function resetErrorNotification {
     echo "reset error notification file"
     [[ -e "$UPDATE_ERROR" ]] && rm -f "$UPDATE_ERROR"
@@ -119,8 +125,7 @@ function generateJITData {
 #     fetchJITDataSource
 #     python3 -m covidvu.pipeline.pyavka
 
-    # TODO: Eugene - fix this for realz!
-    ./rustler
+    rustler
     ls -Alrt "$SITE_DATA_DIR"/*html
 
     echo "vuupdate - updating system with latest calculated updates"
@@ -174,6 +179,7 @@ echo "*** COVIDvu - website refresh tool ***"
 assertSiteDataExists
 resetErrorNotification
 assertDatabaseOK
+assertJITDataToolsAvailable
 resetSiteData "$1"
 generateHospitalBedsData
 generateUSCountiesData
