@@ -8,6 +8,7 @@
 - [Conference of State Bank Supervisor](https://www.csbs.org/information-covid-19-coronavirus) - US
 - [Coronavirus US-County API](https://github.com/JKSenthil/coronavirus-county-api) - GitHub, JKSenthil 
 - [DataHub](https://datahub.io/) - countries, continents, languages tables
+- [DataShip](http://3datashp7cf11069.onion) - data integrity tools, new cases feed
 - [ExpDev07](https://github.com/ExpDev07/coronavirus-tracker-api) - GitHub
 - [FLUView Interactive](https://www.cdc.gov/flu/weekly/fluviewinteractive.htm) - US CDC
 - [Johns Hopkins University COVID-19 data sets](https://github.com/CSSEGISandData/COVID-19) - GitHub

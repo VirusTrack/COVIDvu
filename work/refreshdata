@@ -41,6 +41,12 @@ function assertSiteDataExists {
 } # assertSiteDataExists
 
 
+function assertJITDataToolsAvailable {
+    [[ -n $(which rustler) ]] || die "rustler tool not installed" 29
+    [[ -n $(which vtrustler) ]] || die "vtrustler Python module not installed" 30
+} # assertJITDataToolsAvailable
+
+
 function resetErrorNotification {
     echo "reset error notification file"
     [[ -e "$UPDATE_ERROR" ]] && rm -f "$UPDATE_ERROR"
@@ -82,7 +88,7 @@ function generateHospitalBedsData {
 
     printf "fetching current US hospital beds count\n  "
     cp -vf "$HOSPITAL_BEDS_US_FILE" "$hospitalBedsTargetFile"
-    [[ "0" != "$?" ]] && die "generateHospitalBedsData - failed" 18
+    [[ "0" != "$?" ]] && die "generateHospitalBedsData - failed; $HOSPITAL_BEDS_US_FILE -> $hospitalBedsTargetFile" 18
 } # generateHospitalBedsData
 
 
@@ -115,13 +121,16 @@ function generateJITData {
     #       ./refreshdata noop
     #
     #       ./refreshdata
-    echo "pyavka - grabbing the spreadsheet"
-    fetchJITDataSource
-    python3 -m covidvu.pipeline.pyavka
+#     echo "pyavka - grabbing the spreadsheet"
+#     fetchJITDataSource
+#     python3 -m covidvu.pipeline.pyavka
+
+    rustler
     ls -Alrt "$SITE_DATA_DIR"/*html
 
     echo "vuupdate - updating system with latest calculated updates"
-    python -m covidvu.pipeline.vuupdate confirmed deaths
+    python -m covidvu.pipeline.vuupdate
+    [[ "0" != "$?" ]] && die "vuupdate failed" 28
     ls -Alrt "$SITE_DATA_DIR"/*json  | awk '!/conf-int/ && !/mean-/'
 } # generateJITData
 
@@ -170,8 +179,9 @@ echo "*** COVIDvu - website refresh tool ***"
 assertSiteDataExists
 resetErrorNotification
 assertDatabaseOK
+assertJITDataToolsAvailable
 resetSiteData "$1"
-generateHospitalBedsData
+# generateHospitalBedsData
 generateUSCountiesData
 generateJITData
 packDataFiles
