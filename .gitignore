@@ -157,6 +157,7 @@ dmypy.json
 work/*.json
 **/snapshots/*
 **/database/*
+**/work/src/*
 
 # Python virtual environment
 

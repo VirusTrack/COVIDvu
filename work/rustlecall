@@ -1,0 +1,33 @@
+#!/bin/bash
+# See: https://github.com/VirusTrack/COVIDvu/blob/master/LICENSE 
+# vim: set fileencoding=utf-8:
+
+
+REFRESHDATA_CONFIG="./refreshdata.config"
+[[ -e "$REFRESHDATA_CONFIG" ]] && source "$REFRESHDATA_CONFIG"
+
+source "./vucommon.bash"
+source ./pyrunner
+
+
+# *** functions ***
+
+function assertRustlerEnvironment {
+    [[ -n "$RUSTLER_ACCOUNT" ]] || die "RUSTLER_ACCOUNT not defined" 1
+    [[ -n "$RUSTLER_PROJECT" ]] || die "RUSTLER_PROJECT not defined" 2
+} # assertRustlerEnvironment
+
+
+function installRustler {
+    pip install -U -e "git+ssh://github.com/$RUSTLER_ACCOUNT/$RUSTLER_PROJECT#egg=vtrustler"
+    [[ "$?" == 0 ]] || die "Rustler module failed to install" 3
+
+    pip list | awk 'NR < 3 { print; next; } /vtrustler/'
+} # installRustler
+
+
+# *** main ***
+
+assertRustlerEnvironment
+installRustler
+

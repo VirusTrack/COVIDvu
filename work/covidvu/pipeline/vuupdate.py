@@ -13,7 +13,6 @@ import csv
 import datetime
 import os
 import pytz
-import sys
 
 import tqdm
 
@@ -24,7 +23,7 @@ COUNTRY_NAMES = {
                     'Bosnia'             : 'Bosnia and Herzegovina',
                     'Czech Republic'     : 'Czechia',
                     'South Korea'        : 'Korea, South',
-                    'TOTAL'              : '!Global',
+                    'World'              : '!Global',
                     'Taiwan'             : 'Taiwan*',
                     'U.S. TOTAL'         : TOTAL_US_NAME,
                     'UAE'                : 'United Arab Emirates',
@@ -35,6 +34,7 @@ NIXED_ROWS_INDEX = (
     'Diamond Princess',
     'Grand Princess (repatriated)',
     'Grand Princess',
+    'Marianas',
     'Northern Marianas',
     'Queue',
     'Recovered',
@@ -117,19 +117,24 @@ def _homologizeUpdateData(dataset, table):
     return dataset
 
 
-def _updateWorldData(target, columnRef):
+def _updateWorldData():
+    # 'Cases' -- TSV ref
+    # 'confirmed' -- VirusTrack DB key
     print('  updating world...')
 
-    updateWorld = _fetchCurrentUpdates(columnRef)
-    updateWorld = _homologizeUpdateData(updateWorld, COUNTRY_NAMES)
+    updateWorldCases = _fetchCurrentUpdates('Cases')
+    updateWorldCases = _homologizeUpdateData(updateWorldCases, COUNTRY_NAMES)
+    updateWorldDeaths = _fetchCurrentUpdates('Deaths')
+    updateWorldDeaths = _homologizeUpdateData(updateWorldDeaths, COUNTRY_NAMES)
 
     cryostation = Cryostation(MASTER_DATABASE)
 
-    for countryName in tqdm.tqdm(sorted(updateWorld.keys())):
+    for countryName in tqdm.tqdm(sorted(updateWorldCases.keys())):
         if countryName in cryostation:
             country = cryostation[countryName]
             try:
-                country[target][SCRAPED_TODAY] = updateWorld[countryName][SCRAPED_TODAY]
+                country['confirmed'][SCRAPED_TODAY] = updateWorldCases[countryName][SCRAPED_TODAY]
+                country['deaths'][SCRAPED_TODAY] = updateWorldDeaths[countryName][SCRAPED_TODAY]
             except KeyError:
                 # TODO: Eugene - Define a mechanism to add new countries reporting to the database
                 pass
@@ -140,22 +145,27 @@ def _updateWorldData(target, columnRef):
     cryostation.close()
 
 
-def _updateUSData(target, columnRef):
+def _updateUSData():
+    # 'Cases' -- TSV ref
+    # 'confirmed' -- VirusTrack DB key
     print('  updating US...')
-    updateUS  = _fetchCurrentUpdatesUS(columnRef = columnRef)
-    updateUS  = _homologizeUpdateData(updateUS, US_STATE_NAMES)
+    updateUSCases  = _fetchCurrentUpdatesUS(columnRef = 'Cases')
+    updateUSCases  = _homologizeUpdateData(updateUSCases, US_STATE_NAMES)
+    updateUSDeaths = _fetchCurrentUpdatesUS(columnRef = 'Deaths')
+    updateUSDeaths = _homologizeUpdateData(updateUSDeaths, US_STATE_NAMES)
 
     cryostation = Cryostation(MASTER_DATABASE)
     country     = cryostation['US']
 
-    for location in tqdm.tqdm(sorted(updateUS.keys())):
+    for location in tqdm.tqdm(sorted(updateUSCases.keys())):
         try:
             if location in NIXED_ROWS_INDEX:
                 # TODO:  Eugene - what do we do about these uncharted locations?
                 # retardedKeys.append(location)
                 continue
 
-            country['provinces'][location][target][SCRAPED_TODAY] = updateUS[location][SCRAPED_TODAY]
+            country['provinces'][location]['confirmed'][SCRAPED_TODAY] = updateUSCases[location][SCRAPED_TODAY]
+            country['provinces'][location]['deaths'][SCRAPED_TODAY] = updateUSDeaths[location][SCRAPED_TODAY]
         except:
             print('  || Invalid location: %s' % location)
             continue
@@ -165,6 +175,7 @@ def _updateUSData(target, columnRef):
 
 
 def _updateUSRegionsData(target):
+    # 'confirmed' -- VirusTrack DB key
     print('  updating US regions...')
     updateUSRegions = dict()
 
@@ -196,30 +207,15 @@ def _updateUSRegionsData(target):
     cryostation.close()
 
 
-def _main(target):
-    print('updating the JSON files with latest "%s" cases data' % target)
-    if target == 'confirmed':
-        columnRef = 'Cases'
-    elif target == 'deaths':
-        columnRef = 'Deaths'
-
-    _updateWorldData(target, columnRef)
-    _updateUSData(target, columnRef)
-    _updateUSRegionsData(target)
+def _main():
+    _updateWorldData()
+    _updateUSData()
+    _updateUSRegionsData('confirmed')
+    _updateUSRegionsData('deaths')
 
 
 # +++ main +++
 
 if '__main__' == __name__:
-    # TODO: Parse command line for real?  Decide.
-    #
-    # Usage:  vujson.py casetype
-    #         where castype is one or more of:
-    #
-    #         - confirmed
-    #         - deaths
-    #         - recovered
-
-    for argument in sys.argv[1:]:
-        _main(argument)
+    _main()
 

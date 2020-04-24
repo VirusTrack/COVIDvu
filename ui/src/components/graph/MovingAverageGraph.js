@@ -53,20 +53,20 @@ export const MovingAverageGraph = ({
 
       const regionData = data[region];
 
+      // abs(y - x) because the daily difference should never be negative
       const diff = Object.values(regionData).reduce(
         (acc, value, index, array) => {
-          acc.push(acc.length === 0 ? value : value - array[index - 1]);
-          return acc;
-        },
-        []
-      );
+          acc.push(acc.length === 0 ? value : Math.abs(value - array[index - 1]))
+          return acc
+        }, []
+      )
 
       let index = 0;
       for (const key of Object.keys(regionData).sort()) {
-        plots[normalizedRegion].x.push(key);
-        plots[normalizedRegion].y.push(diff[index]);
+        plots[normalizedRegion].x.push(key)
+        plots[normalizedRegion].y.push(diff[index])
 
-        ++index;
+        ++index
       }
 
       plots[normalizedRegion].type = "bar";
@@ -76,15 +76,15 @@ export const MovingAverageGraph = ({
     let latestDay = undefined;
 
     for (const plot of Object.values(plots)) {
-      const plotBeginDate = moment(plot.x[0]);
-      const plotEndDate = moment(plot.x[plot.x.length - 1]);
+      const plotBeginDate = moment(plot.x[0])
+      const plotEndDate = moment(plot.x[plot.x.length - 1])
 
       if (!earliestDay) {
-        earliestDay = plotBeginDate;
-        latestDay = plotEndDate;
+        earliestDay = plotBeginDate
+        latestDay = plotEndDate
       } else {
         if (earliestDay.isBefore(plotBeginDate)) {
-          earliestDay = plotBeginDate;
+          earliestDay = plotBeginDate
         }
         if (latestDay.isAfter(plotEndDate)) {
           latestDay = plotEndDate;
