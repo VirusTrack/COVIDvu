@@ -148,6 +148,7 @@ dmypy.json
 **/resources/hospital-beds-*US.json
 **/work/*.tar.gz
 **/work/COVID-19
+**/work/NYT*
 **/work/last-update.txt
 **rclone.conf
 **run.env

@@ -3,7 +3,10 @@
 # vim: set fileencoding=utf-8:
 
 
+from covidvu.config import MASTER_DATABASE
+from covidvu.cryostation import Cryostation
 from covidvu.pipeline.vujson import dumpJSON
+from covidvu.pipeline.vuupdate import SCRAPED_TODAY
 
 import json
 import os
@@ -47,11 +50,32 @@ def processCounties( siteResources  = SITE_RESOURCES,
         
         dataset[state][county] = latest
 
-    dumpJSON(dataset, os.path.join(siteData, outputFileName))
+    with open(os.path.join(siteData, outputFileName), 'w') as outputStream:
+        json.dump(dataset, outputStream)
 
     return dataset
 
 
+def updateDatabaseWith(dataset):
+    with Cryostation(MASTER_DATABASE) as cryostation:
+        country = cryostation['US']
+
+    for state in country['provinces'].keys():
+        if 'counties' not in country['provinces'][state]:
+            continue
+
+        for county in country['provinces'][state]['counties'].keys():
+            try:
+                country['provinces'][state]['counties'][county]['confirmed'][SCRAPED_TODAY] = float(dataset[state][county]['confirmed'])
+                country['provinces'][state]['counties'][county]['deaths'][SCRAPED_TODAY] = float(dataset[state][county]['deaths'])
+            except:
+                continue
+
+    with Cryostation(MASTER_DATABASE) as cryostation:
+        cryostation['US'] = country
+
+
 if '__main__' == __name__:
-    processCounties()
+    dataset = processCounties()
+    updateDatabaseWith(dataset)
 
