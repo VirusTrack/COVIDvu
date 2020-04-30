@@ -4,6 +4,7 @@
 
 
 from covidvu.pipeline.vucounty import processCounties
+from covidvu.pipeline.vucounty import updateDatabaseWith
 
 import json
 import os
@@ -41,4 +42,8 @@ def test_processCounties_JSON():
     assert 'California' in dataset
     assert 'San Francisco' in dataset['California']
     assert dataset['California']['San Francisco']['confirmed'] > 0
+
+
+def test_upddateDatabaseWith():
+    pass
 
