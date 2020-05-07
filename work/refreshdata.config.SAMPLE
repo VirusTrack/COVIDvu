@@ -13,6 +13,7 @@ export VIRUSTRACK_TEST_CLOUDFRONT_ID="E000000aa000aI"
 export CONTAINER_SIG_FILE="/proc/1/cgroup"
 export COUNTY_CASES_CSBS_FILE="resources/counties-US-all-20200324.json"
 export COUNTY_CASES_US_FILE="resources/counties-US-all.json" # timestamp = implementation date
+export FLOCK="/tmp/covidvu"
 export HOSPITAL_BEDS_US_FILE="resources/hospital-beds-count-US.json"
 export MASTER_DATABASE_DIR="database"
 export MASTER_DATABASE="$MASTER_DATABASE_DIR/virustrack.db"
