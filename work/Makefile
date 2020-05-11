@@ -31,6 +31,7 @@ clean:
 	rm -Rf $(DIST)/*
 	rm -Rfv $$(find covidvu | awk '/__pycache__$$/')
 	rm -Rfv $$(find test | awk '/__pycache__$$/')
+	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
 	pushd ./resources ; pip uninstall -y $(MODULE)==$(VERSION) || true ; popd
     
 

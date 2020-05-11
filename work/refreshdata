@@ -167,8 +167,6 @@ function deployVirusDataUpdate {
     echo "cloning $SITE_DATA_DIR to the $targetBucket website"
     rclone -q --config="$CONFIG_rclone" --exclude-from=exclude.rclone sync --update "$SITE_DATA_DIR" "virustrack-website:$targetBucket/$SITE_DATA_DIR" || die "rclone site-data to S3 failed" 9
     [[ "0" != "$?" ]] && die "rclone failed" 25
-
-    ./flushcf "$targetEnvironment"
 } # deployVirusDataUpdate
 
 
