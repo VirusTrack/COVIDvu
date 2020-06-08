@@ -63,6 +63,8 @@ SCRAPED_TODAY      = pytz.utc.localize(datetime.datetime.today()).astimezone(pyt
 # *** functions ***
 
 def _fetchCurrentUpdates(columnRef, index = 'LOCATION'):
+    grandTotal = 0.0
+
     updatesDataset = dict()
     with open(SCRAPED_WORLD_DATA, 'r') as inputFile:
         rawData = csv.DictReader(inputFile, delimiter = '\t')
@@ -75,10 +77,16 @@ def _fetchCurrentUpdates(columnRef, index = 'LOCATION'):
                     bodyCount = float(row[columnRef]) if row[columnRef] != '' else 0.0
                 except:
                     bodyCount = 0.0
+
                 updatesDataset[ref] = { SCRAPED_TODAY: float(bodyCount) }
+                
+                grandTotal += bodyCount
 
     if 'Queue' in updatesDataset:
         del(updatesDataset['Queue'])
+
+    updatesDataset['!Global'] = dict()
+    updatesDataset['!Global'][SCRAPED_TODAY] = grandTotal
 
     return updatesDataset
 
