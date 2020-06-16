@@ -28,5 +28,7 @@ status="$?"
 cat "$CASES_OUTPUT" | jq -M '.locations' > "$COUNTY_CASES_CSBS_FILE" 
 
 python -m covidvu.pipeline.vucounty
-python -m covidvu.pipeline.vuhospitals
+# https://github.com/VirusTrack/COVIDvu/issues/631
+# Low-cal fix because there aren't enough eyeballs on this; no need to go all the way.
+# python -m covidvu.pipeline.vuhospitals
 
