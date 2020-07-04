@@ -159,6 +159,7 @@ work/*.json
 **/snapshots/*
 **/database/*
 **/work/src/*
+**/.wget-hsts
 
 # Python virtual environment
 
