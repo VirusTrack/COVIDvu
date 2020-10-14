@@ -12,14 +12,14 @@ import ContributorLarge from '../components/ContributorLarge.js'
 import ContributorSmall from '../components/ContributorSmall.js'
 
 
-export const DepreciatedPage = () => {
+export const DeprecatedPage = () => {
 
-  usePageTitle('VirusTrack.live has been depreciated')
+  usePageTitle('VirusTrack.live has been Deprecated')
 
   return (
     <ContentLayout>
         <Content>
-          <Title style={{color: 'white'}}size={2}>This Project has been Depreciated</Title>
+          <Title style={{color: 'white'}}size={2}>This Project has been Deprecated</Title>
           <p style={{color: 'white', marginBottom: '2rem'}}>A special thanks to the VirusTrack contributors</p>
 
           <ContributorLarge 
@@ -59,4 +59,4 @@ export const DepreciatedPage = () => {
   )
 }
 
-export default DepreciatedPage
+export default DeprecatedPage

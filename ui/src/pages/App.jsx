@@ -4,12 +4,12 @@ import {
     Switch,
     Route,
 } from 'react-router-dom'
-import DepreciatedPage from './DepreciatedPage'
+import DeprecatedPage from './DeprecatedPage'
 
 const App = () => (
     <Switch>
         <Route>
-            <DepreciatedPage />
+            <DeprecatedPage />
         </Route>
     </Switch>
 )
