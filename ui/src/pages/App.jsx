@@ -19,10 +19,11 @@ import {
     Redirect,
 } from 'react-router-dom'
 import { NotFoundPage } from './NotFoundPage'
+import DepreciatedPage from './DepreciatedPage'
 
 const App = () => (
     <Switch>
-        <Redirect exact from="/" to="/dashboard" />
+        <Redirect exact from="/" to="/depreciated" />
 
         <Route path="/dashboard">
             <DashboardPage />
@@ -59,6 +60,9 @@ const App = () => (
         </Route>
         <Route path="/whatsnew">
             <WhatsNewPage />
+        </Route>
+        <Route path="/depreciated">
+            <DepreciatedPage />
         </Route>
         <Route>
             <NotFoundPage />
