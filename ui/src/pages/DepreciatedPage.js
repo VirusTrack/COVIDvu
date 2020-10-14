@@ -53,20 +53,6 @@ export const DepreciatedPage = () => {
                 {label: 'Linkedin', url: 'https://www.linkedin.com/in/lucasmarohn/'}
               ]}
               />
-              <ContributorSmall
-              name="Captain Kirk" 
-              links={[
-                {label: 'Website', url: 'https://emergence.design'},
-                {label: 'Linkedin', url: 'https://www.linkedin.com/in/lucasmarohn/'}
-              ]}
-              />
-              <ContributorSmall
-              name="Mr. Spock" 
-              links={[
-                {label: 'Website', url: 'https://emergence.design'},
-                {label: 'Linkedin', url: 'https://www.linkedin.com/in/lucasmarohn/'}
-              ]}
-              />
           </Box>
         </Content>
     </ContentLayout>
