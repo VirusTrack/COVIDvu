@@ -9,15 +9,10 @@ import moment from 'moment'
 import { useInterval } from '../hooks/ui'
 
 import { actions } from '../ducks/services'
-
-
 import { CACHE_TIMER } from '../constants'
 
 import ccBy from '../images/cc-by.svg'
 import ccSa from '../images/cc-sa.svg'
-
-
-import SocialIcons from '../components/SocialIcons'
 
 export const FooterContainer = () => {
   const dispatch = useDispatch()
@@ -88,12 +83,6 @@ export const FooterContainer = () => {
               </p>
 
               <p>
-                We welcome information about data sources, suggestions, and general feedback via
-                &nbsp;
-                <a href="mailto:feedback@virustrack.live">feedback@virustrack.live</a>
-              </p>
-
-              <p>
                 <strong><a href="https://github.com/VirusTrack/covidvu" target="_new" rel="noopener noreferrer">COVIDvu GitHub</a></strong>
                 &nbsp;
                 Support by:
@@ -129,10 +118,7 @@ export const FooterContainer = () => {
                 </em>
               </p>
 
-              <p>
-                Stay up to date:
-              </p>
-              <SocialIcons size="large" donate style={{ marginTop: '.5rem' }} />
+             
             </Column>
 
 
