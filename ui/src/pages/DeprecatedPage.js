@@ -24,9 +24,11 @@ export const DeprecatedPage = () => {
 
           <ContributorLarge 
             title="CIME" 
-            description="Advanced technology advisors worldwide" 
+            src="https://user-images.githubusercontent.com/148262/99761673-825f7400-2aab-11eb-9728-b139635ad589.GIF"
+            description="CIME Software Ltd is a consultancy that offers strategic technology planning in the areas of machine learning, exploratory analysis of unstructured data, and high performance system design to private and government entities in Europe, Asia, and Northamerica. 6 successful exits in the last 10 years are the result of 15+ years of applied experience in these technological areas. VirusTrack was a successful application of CIME's expertise in assembling a world-class team and delivering a production-ready, robust working system that would've taken other firms months to develop and deploy. Reach out to our principals via LinkedIn." 
             links={[
               {label: 'Website', url: 'https://cime.net'},
+              {label: 'LinkedIn', url: 'https://www.linkedin.com/in/ciurana/'},
             ]}
             />
             <ContributorLarge 
