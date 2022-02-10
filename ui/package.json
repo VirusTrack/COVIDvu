@@ -13,7 +13,7 @@
     "html2canvas": "^1.0.0-rc.5",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.28",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "numeral": "^2.0.6",
     "plotly.js": "^1.52.3",
     "rbx": "^2.2.0",
